@@ -1,10 +1,12 @@
 from .dqn.dqn_agent import DQNAgent
-from .ethics_module import EthicsModule
+from .moving_module import MovingModule
 from .norms_module import NormsModule
+from .ethics_module import EthicsModule
+import numpy as np
 
 class HarvestAgent(DQNAgent):
     def __init__(self,unique_id,model,agent_type,min_width,max_width,min_height,max_height,n_features,training,epsilon,shared_replay_buffer=None):
-        self.actions = ["north", "east", "south", "west", "throw", "eat"]
+        self.actions = ["move", "eat", "random_throw", "egalitarian_throw", "maximin_throw", "utilitarian_throw"]
         #dqn agent class handles learning and action selection
         super().__init__(unique_id,model,agent_type,self.actions,n_features,training,epsilon,shared_replay_buffer=shared_replay_buffer)
         self.health = 0.8
@@ -23,6 +25,7 @@ class HarvestAgent(DQNAgent):
         self.berry_health_payoff = 0.6
         self.low_health_threshold = 0.6
         self.agent_type = agent_type
+        self._moving_module = MovingModule(model)
         self.norm_module = NormsModule(self.unique_id)
         self._norm_clipping_frequency = 10
         if agent_type != "baseline":
@@ -32,10 +35,12 @@ class HarvestAgent(DQNAgent):
             self._rewards = self._baseline_rewards()
         self.off_grid = False
         self.current_action = None
+    
+
         
-    def execute_action(self, action):
+    def execute_transition(self, action):
         """
-        execute_action updates the ethics module with its ability to act ethically (has berries)
+        execute_transition updates the ethics module with its ability to act ethically (has berries)
         calls ethics module to store measure of social welfare appropriate for the principle
         performs action, gets sanction from ethics module
         updates attributes and writes norms
@@ -52,9 +57,7 @@ class HarvestAgent(DQNAgent):
                 have_berries = False
             society_well_being = [x.days_left_to_live for x in self.model.living_agents]
             self._ethics_module.update_state(self.agent_type, society_well_being, have_berries)
-        reward, x, y = self._move(action)
-        self.model.grid.move_agent(self, (x,y))
-        reward += self._forage((x,y))
+        reward = self._perform_action(action)
         next_state = self.model.observe(self)
         if self.agent_type != "baseline" and self.agent_type != "berry":
             society_well_being = [x.days_left_to_live for x in self.model.living_agents]
@@ -66,50 +69,39 @@ class HarvestAgent(DQNAgent):
                 self.norm_module.clip_norm_base()
         return reward, next_state, done
     
-    def _move(self, action):
-        x, y = self.pos
+    def _perform_action(self, action):
         reward = 0
         #action 0
-        if self.actions[action] == "north":
-            if (y + 1) < self.max_height:
-                y += 1
-            else:
-                reward = self._rewards["crash"]
+        if self.actions[action] == "move":
+            reward = self._move()
         #action 1
-        elif self.actions[action] == "east":
-            if (x + 1) < self.max_width:
-                x += 1
-            else:
-                reward = self._rewards["crash"]
-        #action 2
-        elif self.actions[action] == "south":
-            if (y - 1) >= self.min_height:
-                y -= 1
-            else:
-                reward = self._rewards["crash"]
-        #action 3
-        elif self.actions[action] == "west":
-            if (x - 1) >= self.min_width:
-                x -= 1
-            else:
-                reward = self._rewards["crash"]
-        #action 4
-        elif self.actions[action] == "throw":
-            reward = self._throw()
-        #action 5
         elif self.actions[action] == "eat":
             reward = self._eat()
-        return reward, x, y
-
-    def _forage(self, cell):
-        #check if there is a berry at current location
-        location = self.model.grid.iter_cell_list_contents(cell)
-        for a in location:
-            if a.agent_type == "berry":
-                if self.training or (not self.training and a.allocated_agent_id == self.unique_id):
-                    self.berries += 1
-                    self.model.spawn_berry(a)
-                    return self._rewards["forage"]
+        #action 2
+        elif self.actions[action] == "random_throw":
+            benefactor = np.random.choice(self.model.living_agents)
+            reward = self._throw(benefactor)
+        #action 3
+        elif self.actions[action] == "egalitarian_throw":
+            benefactor = None
+            reward = self._throw(benefactor)
+        #action 4
+        elif self.actions[action] == "maximin_throw":
+            benefactor = None
+            reward = self._throw(benefactor)
+        #action 5
+        elif self.actions[action] == "utilitarian_throw":
+            benefactor = None
+            reward = self._throw(benefactor)
+        return reward
+    
+    def _move(self):
+        if not self._moving_module.check_nearest_berry():
+            #if no berries have been found to walk towards, have to wait
+            return self._rewards["empty_forage"]
+        if self._moving_module.move_towards_berry():
+            self.berries += 1
+            return self._rewards["forage"]
         return self._rewards["empty_forage"]
     
     def _throw(self):

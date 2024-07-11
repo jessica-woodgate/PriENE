@@ -40,7 +40,7 @@ class DQNAgent(Agent):
             self.losses = list()
     
     @abstractmethod
-    def execute_action(self):
+    def execute_transition(self):
         raise NotImplementedError
     
     def step(self):
@@ -48,7 +48,7 @@ class DQNAgent(Agent):
             observation = self.model.observe(self)
             assert(observation.size == self.n_features), f"expected {self.n_features}, got {observation.size}"
             action = self.q_network.choose_action(observation,self.epsilon)
-            self.current_reward, next_state, self.done = self.execute_action(action)
+            self.current_reward, next_state, self.done = self.execute_transition(action)
             if self.training:
                 self._learn(observation, action, self.current_reward, next_state, self.done)
                 self.epsilon = max(self.min_exploration_prob, np.exp(-self.expl_decay*self.model.episode))

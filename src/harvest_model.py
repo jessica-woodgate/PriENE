@@ -78,6 +78,10 @@ class HarvestModel(Model):
         self.day += 1
         #check for dead agents
         for a in self.schedule.agents:
+            if a.type == "berry" and a.foraged == True:
+                self.grid.move_to_empty(a)
+                a.foraged = False
+                a.marked = False
             if a.agent_type != "berry":
                 if self.num_living_agents == self.num_agents and a.off_grid == False:
                     self._collect_agent_data(a)
