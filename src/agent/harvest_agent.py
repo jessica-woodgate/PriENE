@@ -35,8 +35,6 @@ class HarvestAgent(DQNAgent):
             self._rewards = self._baseline_rewards()
         self.off_grid = False
         self.current_action = None
-    
-
         
     def execute_transition(self, action):
         """
