@@ -29,9 +29,9 @@ class DQN:
         if self.training:
             self.dqn = NNetwork(self.n_features,self.hidden_units, self.n_actions)
         else:
-            #self.dqn = keras.saving.load_model(self.checkpoint_path)
+            self.dqn = keras.saving.load_model(self.checkpoint_path,compile=True)
             #self.dqn.compile(optimiser="Adam", loss="Huber")
-            self.dqn = keras.layers.TFSMLayer(self.checkpoint_path, call_endpoint="serving_default")
+            #self.dqn = keras.layers.TFSMLayer(self.checkpoint_path, call_endpoint="serving_default")
     
     def train(self, TargetNet):
         if len(self.experience['s']) < self.min_experiences:

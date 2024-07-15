@@ -65,11 +65,11 @@ class NormsModule():
         else:
             b = "high berries"
         view = ["IF", h, b]
-        agent_days = [a.days_left_to_live for a in well_being if a.unique_id != self.agent_id and a.agent_type != "berry"]
-        for d in agent_days:
-            if d < self.low_days_left_threshold:
+        #agent_days = [a.days_left_to_live for a in well_being if a.unique_id != self.agent_id and a.agent_type != "berry"]
+        for w in well_being:
+            if w < self.low_days_left_threshold:
                 view.append("low days")
-            elif d >= self.low_days_left_threshold and d < self.high_days_left_threshold:
+            elif w >= self.low_days_left_threshold and w < self.high_days_left_threshold:
                 view.append("medium days")
             else:
                 view.append("high days")

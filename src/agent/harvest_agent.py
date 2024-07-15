@@ -45,6 +45,7 @@ class HarvestAgent(DQNAgent):
         """
         done = False
         self.current_action = action
+        society_well_being = [x.days_left_to_live for x in self.model.living_agents]
         if self.model.write_norms:
             self.norm_module.update_norm_age()
             antecedent = self.norm_module.get_antecedent(self.health, self.berries, society_well_being)
@@ -53,7 +54,6 @@ class HarvestAgent(DQNAgent):
                 have_berries = True
             else:
                 have_berries = False
-            society_well_being = [x.days_left_to_live for x in self.model.living_agents]
             self._ethics_module.update_state(self.agent_type, society_well_being, have_berries)
         reward = self._perform_action(action)
         next_state = self.model.observe(self)

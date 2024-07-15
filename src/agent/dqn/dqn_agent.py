@@ -44,6 +44,9 @@ class DQNAgent(Agent):
         raise NotImplementedError
     
     def step(self):
+        """
+        if agents are being tested, they do not learn
+        """
         if self.done == False:
             observation = self.model.observe(self)
             assert(observation.size == self.n_features), f"expected {self.n_features}, got {observation.size}"
