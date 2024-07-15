@@ -102,8 +102,7 @@ class HarvestModel(Model):
                     if self.write_norms and self.episode % 100 == 0:
                         self.append_norm_dict_to_file(a.norm_module.norm_base, "data/results/"+self.file_string+"_agent_"+str(a.unique_id)+"_norm_base")
                     if self.training: 
-                        a.q_network.dqn.save(a.q_checkpoint_path)
-                        a.target_network.dqn.save(a.target_checkpoint_path)
+                        a.save_models()
             if self.training:
                 self._collect_model_episode_data()
             self._reset()

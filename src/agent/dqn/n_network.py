@@ -4,9 +4,11 @@ from keras import layers
 from keras import initializers as initialiser
 
 class NNetwork(keras.Model):
-    def __init__(self, n_features, hidden_units, n_actions):
-        super(NNetwork, self).__init__()
+    def __init__(self, n_features, hidden_units, n_actions, trainable=True, dtype="float32", **kwargs):
+        super().__init__()
         self.n_features = n_features
+        self.hidden_units = hidden_units
+        self.n_actions = n_actions
         self.input_layer = layers.InputLayer(shape=n_features,)
         self.hidden_layer_1 = layers.Dense(hidden_units, activation="relu", kernel_initializer=initialiser.HeNormal())
         self.hidden_layer_2 = layers.Dense(hidden_units, activation="relu", kernel_initializer=initialiser.HeNormal())
@@ -22,3 +24,19 @@ class NNetwork(keras.Model):
     def call(self, inputs):
         z = self.model(inputs)
         return z
+    
+    def get_config(self):
+        """
+        when saving a model that includes custom objects, you must call a get_config() method on the object class
+        https://keras.io/guides/serialization_and_saving/
+        """
+        config = super().get_config()
+        #Update the config with the custom model's parameters
+        config.update(
+            {
+                "n_features": self.n_features,
+                "hidden_units": self.hidden_units,
+                "n_actions": self.n_actions,
+            }
+        )
+        return config

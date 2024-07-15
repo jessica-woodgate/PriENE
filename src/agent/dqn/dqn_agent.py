@@ -57,6 +57,10 @@ class DQNAgent(Agent):
                 self.epsilon = max(self.min_exploration_prob, np.exp(-self.expl_decay*self.model.episode))
             self.total_episode_reward += self.current_reward
 
+    def save_models(self):
+        self.q_network.dqn.save(self.q_checkpoint_path)
+        self.target_network.dqn.save(self.target_checkpoint_path)
+    
     def _learn(self, observation, action, reward, next_state, done):
         experience = {"s":observation, "a":action, "r":reward, "s_":next_state, "done":done}
         self.q_network.add_experience(experience)
