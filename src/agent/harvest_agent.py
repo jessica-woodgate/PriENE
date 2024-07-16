@@ -2,11 +2,10 @@ from .dqn.dqn_agent import DQNAgent
 from .moving_module import MovingModule
 from .norms_module import NormsModule
 from .ethics_module import EthicsModule
-import numpy as np
 
 class HarvestAgent(DQNAgent):
     def __init__(self,unique_id,model,agent_type,min_width,max_width,min_height,max_height,n_features,training,epsilon,shared_replay_buffer=None):
-        self.actions = ["move", "eat", "random_throw", "egalitarian_throw", "maximin_throw", "utilitarian_throw"]
+        self.actions = self._generate_actions(unique_id, model.num_agents)
         #dqn agent class handles learning and action selection
         super().__init__(unique_id,model,agent_type,self.actions,n_features,training,epsilon,shared_replay_buffer=shared_replay_buffer)
         self.health = 0.8
@@ -25,7 +24,7 @@ class HarvestAgent(DQNAgent):
         self.berry_health_payoff = 0.6
         self.low_health_threshold = 0.6
         self.agent_type = agent_type
-        self._moving_module = MovingModule(model)
+        self._moving_module = MovingModule(self, model)
         self.norm_module = NormsModule(self.unique_id)
         self._norm_clipping_frequency = 10
         if agent_type != "baseline":
@@ -67,30 +66,37 @@ class HarvestAgent(DQNAgent):
                 self.norm_module.clip_norm_base()
         return reward, next_state, done
     
-    def _perform_action(self, action):
+    def _generate_actions(self, unique_id, num_agents):
+        """
+        Generates a list of all possible actions for the agents.
+        If there are lots of agents, should reconsider this function
+        Args:
+            num_agents: Number of agents in the environment.
+
+        Returns:
+            A list of actions, where each action is a string representing 
+            "move", "eat", or "throw_AGENT_ID" (e.g., "throw_1").
+        """
+        actions = ["move", "eat"]
+        for agent_id in range(num_agents):
+            if agent_id != unique_id:
+                actions.append(f"throw_{agent_id}")
+        return actions
+    
+    def _perform_action(self, action_index):
         reward = 0
+        action = self.actions[action_index]
         #action 0
-        if self.actions[action] == "move":
+        if action == "move":
             reward = self._move()
         #action 1
-        elif self.actions[action] == "eat":
+        elif action == "eat":
             reward = self._eat()
-        #action 2
-        elif self.actions[action] == "random_throw":
-            benefactor = np.random.choice(self.model.living_agents)
-            reward = self._throw(benefactor)
-        #action 3
-        elif self.actions[action] == "egalitarian_throw":
-            benefactor = None
-            reward = self._throw(benefactor)
-        #action 4
-        elif self.actions[action] == "maximin_throw":
-            benefactor = None
-            reward = self._throw(benefactor)
-        #action 5
-        elif self.actions[action] == "utilitarian_throw":
-            benefactor = None
-            reward = self._throw(benefactor)
+        #action 2+ (throw)
+        else:
+            for a in self.actions[2:]:
+                agent_id = int(action.split("_")[1])
+                reward = self._throw(agent_id)
         return reward
     
     def _move(self):
@@ -102,29 +108,27 @@ class HarvestAgent(DQNAgent):
             return self._rewards["forage"]
         return self._rewards["empty_forage"]
     
-    def _throw(self):
+    def _throw(self, benefactor_id):
+        """
+        checks if it is feasible to throw a berry (have berries and have health)
+        gets the agent with the matching id to the throw action
+        benefactor immediately eats the berry
+        """
         if self.berries <= 0:
             return self._rewards["no_berries"]
         #have to have a minimum amount of health to throw
         if self.health < self.low_health_threshold:
             return self._rewards["insufficient_health"]
-        benefactor = self.choose_benefactor()
-        if not benefactor:
-            return self._rewards["no_benefactor"]
-        assert(benefactor.agent_type != "berry")
-        benefactor.health += self.berry_health_payoff 
-        benefactor.berries_consumed += 1
-        benefactor.days_left_to_live = benefactor.get_days_left_to_live()
-        self.berries -= 1
-        self.berries_thrown += 1
-        return self._rewards["throw"]
-    
-    def choose_benefactor(self):
-        benefactor = [a for a in self.model.living_agents if a.unique_id != self.unique_id]
-        if len(benefactor) > 0:
-            return benefactor[0]
-        else:
-            return False
+        for a in self.model.living_agents:
+            if a.unique_id == benefactor_id:
+                assert(a.agent_type != "berry")
+                a.health += self.berry_health_payoff 
+                a.berries_consumed += 1
+                a.days_left_to_live = a.get_days_left_to_live()
+                self.berries -= 1
+                self.berries_thrown += 1
+                return self._rewards["throw"]
+        return self._rewards["no_benefactor"]
     
     def _eat(self):
         if self.berries > 0:

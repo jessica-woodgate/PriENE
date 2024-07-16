@@ -56,3 +56,20 @@ class UnrecognisedPrinciple(HarvestException):
     
     def __str__(self):
         return("Do not recognise principle {p}".format(p=self.principle))
+    
+class NoPathFound(HarvestException):
+    def __init__(self, agent_id, agent_coordinates, berry_coordinates):
+        self.agent_id = agent_id
+        self.agent_coordinates = agent_coordinates
+        self.berry_coordinates = berry_coordinates
+
+    def __str__(self):
+        return ("Agent {a} couldn't find a path from {m} to {n}".format(a=self.agent_id,m=self.agent_coordinates,n=self.berry_coordinates))
+
+class IllegalBerry(HarvestException):
+    def __init__(self, agent_id, allocated_agent_id):
+        self.agent_id = agent_id
+        self.allocated_agent_id = allocated_agent_id
+
+    def __str__(self):
+        return (f"Agent {self.agent_id} is trying to access berry which is allocated to agent {self.allocated_agent_id}")

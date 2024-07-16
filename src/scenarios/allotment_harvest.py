@@ -18,10 +18,11 @@ class AllotmentHarvest(HarvestModel):
                                 "allotment": [4,self.max_width,0,self.max_height]}
                         }
         self.init_agents(self.n_features, agent_type)
-        self.init_berries()
+        self.berries = self.init_berries()
 
     def init_berries(self):
         self.num_berries = 0
+        berries = []
         for agent_data in self.allocations.values():
             agent_id = agent_data["id"]
             allotment = agent_data["allotment"]
@@ -30,7 +31,9 @@ class AllotmentHarvest(HarvestModel):
                 b = self.new_berry(allotment[0],allotment[1],allotment[2],allotment[3],agent_id)
                 self.place_agent_in_allotment(b)
                 self.num_berries += 1
+                berries.append(b)
         assert(self.num_berries==self.num_start_berries)
+        return berries
       
     def init_agents(self,n_features, agent_type):
         self.living_agents = []

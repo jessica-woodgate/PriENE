@@ -1,6 +1,7 @@
 from src.harvest_exception import NoBerriesException
 from src.harvest_exception import OutOfBounds
 from src.harvest_exception import NoPathFound
+from src.harvest_exception import IllegalBerry
 import math
 from queue import PriorityQueue
 
@@ -17,6 +18,7 @@ class MovingModule():
         #find nearest berry and find path towards; if a berry has been eaten it will move elsewhere which is why it won't have the same pos
         if self._path == None or self._nearest_berry_coordinates != self._nearest_berry.pos:
             self._nearest_berry_coordinates = self._get_nearest_berry_coordinates(self.agent.pos)
+            print("nearest berry coords", self._nearest_berry_coordinates)
             #if there are no berries, have to wait
             if self._nearest_berry_coordinates == None:
                 return False
@@ -35,6 +37,7 @@ class MovingModule():
             #check if at end of path
             if self._path_step == len(self._path):
                 if self._forage(self.agent.pos):
+                    print("AGENT FORAGED")
                     berry_found = True
                     self._path = None
                 else:
@@ -73,7 +76,9 @@ class MovingModule():
         #check if there is a berry at current location
         location = self.model.grid.iter_cell_list_contents(cell)
         for b in location:
-            if b.type == "berry" and b.allocated_agent_id == self.agent.unique_id:
+            if b.agent_type == "berry":
+                if not self.agent.training and b.allocated_agent_id != self.agent.unique_id:
+                    raise IllegalBerry(self.agent.unique_id, b.allocated_agent_id)
                 b.foraged = True
                 return True
         return False

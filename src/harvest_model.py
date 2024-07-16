@@ -78,7 +78,7 @@ class HarvestModel(Model):
         self.day += 1
         #check for dead agents
         for a in self.schedule.agents:
-            if a.type == "berry" and a.foraged == True:
+            if a.agent_type == "berry" and a.foraged == True:
                 self.grid.move_to_empty(a)
                 a.foraged = False
                 a.marked = False
@@ -408,3 +408,16 @@ class HarvestModel(Model):
             return 0
         m /= self.num_agents
         return m
+
+    def get_uneaten_berry_coordinates(self, agent):
+        berry_coordinates = []
+        for b in self.berries:
+            print("berry", b.unique_id, "foraged", b.foraged, "marked", b.marked, "allocated agent id", b.allocated_agent_id, "agent id", agent.unique_id)
+            if b.foraged == False and b.marked == False: 
+                if not self.training:
+                    if b.allocated_agent_id == agent.unique_id:
+                        berry_coordinates.append(b.pos)
+                else:
+                    berry_coordinates.append(b.pos)
+        return berry_coordinates
+        #return [b.pos for b in self.berries if b.foraged == False and b.marked == False and (not self.training or b.allocated_agent_id == agent.unique_id)]
