@@ -67,9 +67,9 @@ class NoPathFound(HarvestException):
         return ("Agent {a} couldn't find a path from {m} to {n}".format(a=self.agent_id,m=self.agent_coordinates,n=self.berry_coordinates))
 
 class IllegalBerry(HarvestException):
-    def __init__(self, agent_id, allocated_agent_id):
+    def __init__(self, agent_id, illegal_move):
         self.agent_id = agent_id
-        self.allocated_agent_id = allocated_agent_id
+        self.illegal_move = illegal_move
 
     def __str__(self):
-        return (f"Agent {self.agent_id} is trying to access berry which is allocated to agent {self.allocated_agent_id}")
+        return (f"Agent {self.agent_id} is trying to access illegal berry: {self.illegal_move}")

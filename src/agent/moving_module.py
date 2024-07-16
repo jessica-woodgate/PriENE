@@ -18,13 +18,10 @@ class MovingModule():
         #find nearest berry and find path towards; if a berry has been eaten it will move elsewhere which is why it won't have the same pos
         if self._path == None or self._nearest_berry_coordinates != self._nearest_berry.pos:
             self._nearest_berry_coordinates = self._get_nearest_berry_coordinates(self.agent.pos)
-            print("nearest berry coords", self._nearest_berry_coordinates)
-            #if there are no berries, have to wait
+            #if there are no berries, have to wait - return False
             if self._nearest_berry_coordinates == None:
                 return False
             self._nearest_berry = self._get_uneaten_berry_by_coords(self._nearest_berry_coordinates)
-            assert self._nearest_berry.foraged == False, "attempting to assign nearest berry which has already been eaten"
-            assert self._nearest_berry.marked == False, "attempting to assign nearest berry which has already been marked"
             self._nearest_berry.marked = True
             self._path = self._get_path_to_berry(self.agent.pos,self._nearest_berry.pos)
             self._path_step = 0
@@ -37,11 +34,11 @@ class MovingModule():
             #check if at end of path
             if self._path_step == len(self._path):
                 if self._forage(self.agent.pos):
-                    print("AGENT FORAGED")
                     berry_found = True
                     self._path = None
                 else:
-                    raise NoBerriesException(self.unique_id, self.agent.pos)
+                    print("agent", self.agent.unique_id, "foraging at", self.agent.pos, "nearest berry coords", self._nearest_berry_coordinates,"path is", self._path)
+                    raise NoBerriesException(self.agent.unique_id, self.agent.pos)
             #if not at the end of the path, move
             else:
                 self._move(self._path[self._path_step])
@@ -76,11 +73,13 @@ class MovingModule():
         #check if there is a berry at current location
         location = self.model.grid.iter_cell_list_contents(cell)
         for b in location:
-            if b.agent_type == "berry":
+            #there can be multiple berries at one location: check we are foraging the one we were going for
+            if b.agent_type == "berry" and b.unique_id == self._nearest_berry.unique_id:
                 if not self.agent.training and b.allocated_agent_id != self.agent.unique_id:
-                    raise IllegalBerry(self.agent.unique_id, b.allocated_agent_id)
-                b.foraged = True
-                return True
+                    raise IllegalBerry(self.agent.unique_id, f"allocated to agent {b.allocated_agent_id}")
+                else:
+                    b.foraged = True
+                    return True
         return False
 
     def _calculate_distance(self, point1, point2):
@@ -88,18 +87,18 @@ class MovingModule():
         return math.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
 
     def _get_nearest_berry_coordinates(self, agent_coordinates):
-        berry_coordinates = self.model.get_uneaten_berry_coordinates(self.agent)
-        if not berry_coordinates:
+        uneaten_berry_coordinates = self.model.get_uneaten_berry_coordinates(self.agent)
+        if not uneaten_berry_coordinates:
             return None
         # Use the key parameter of min to find the index of the minimum distance
-        nearest_berry_index = min(range(len(berry_coordinates)), key=lambda i: self._calculate_distance(agent_coordinates, berry_coordinates[i]))
-        berry = berry_coordinates[nearest_berry_index]
+        nearest_berry_index = min(range(len(uneaten_berry_coordinates)), key=lambda i: self._calculate_distance(agent_coordinates, uneaten_berry_coordinates[i]))
+        nearest_berry_coordinates = uneaten_berry_coordinates[nearest_berry_index]
         # Return the position of the nearest berry
-        return berry
+        return nearest_berry_coordinates
     
     def _get_uneaten_berry_by_coords(self, coords):
         for b in self.model.berries:
-            if b.pos == coords and b.foraged == False:
+            if b.pos == coords and b.foraged == False and b.marked == False:
                 return b
         raise NoBerriesException(coordinates=coords) 
 

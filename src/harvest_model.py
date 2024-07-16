@@ -147,28 +147,36 @@ class HarvestModel(Model):
         self._clear_grid()
         for a in self.schedule.agents:
             if a.agent_type != "berry":
-                a.done = False
-                a.total_episode_reward = 0
-                a.berries = 0
-                a.berries_consumed = 0
-                a.berries_thrown = 0
-                a.max_berries = 0
-                a.health = self.start_health
-                a.current_reward = 0
-                a.days_left_to_live = a.get_days_left_to_live()
-                a.days_survived = 0
-                a.norm_module.norm_base  = {}
-                self.place_agent_in_allotment(a)
-                a.off_grid = False
-                self.living_agents.append(a)
+                self._reset_agent(a)
                 num_agents += 1
             elif a.agent_type == "berry":
-                self.place_agent_in_allotment(a)
+                self._reset_berry(a)
                 num_berries += 1
         assert num_agents == self.num_agents, "reset "+str(num_agents)+" agents instead of "+str(self.num_agents)
         assert num_berries == self.num_berries, "reset "+str(num_berries)+" berries instead of "+str(self.num_berries)
         self.num_living_agents = self.num_agents
-
+    
+    def _reset_agent(self, agent):
+        agent.done = False
+        agent.total_episode_reward = 0
+        agent.berries = 0
+        agent.berries_consumed = 0
+        agent.berries_thrown = 0
+        agent.max_berries = 0
+        agent.health = self.start_health
+        agent.current_reward = 0
+        agent.days_left_to_live = agent.get_days_left_to_live()
+        agent.days_survived = 0
+        agent.norm_module.norm_base  = {}
+        self.place_agent_in_allotment(agent)
+        agent.off_grid = False
+        self.living_agents.append(agent)
+    
+    def _reset_berry(self, berry):
+        berry.foraged = False
+        berry.marked = False
+        self.place_agent_in_allotment(berry)
+        
     def _init_reporters(self):
         self.agent_reporter = pd.DataFrame({"agent_id": [],
                                "episode": [],
@@ -412,12 +420,10 @@ class HarvestModel(Model):
     def get_uneaten_berry_coordinates(self, agent):
         berry_coordinates = []
         for b in self.berries:
-            print("berry", b.unique_id, "foraged", b.foraged, "marked", b.marked, "allocated agent id", b.allocated_agent_id, "agent id", agent.unique_id)
             if b.foraged == False and b.marked == False: 
-                if not self.training:
+                if self.training:
+                    berry_coordinates.append(b.pos)
+                else:
                     if b.allocated_agent_id == agent.unique_id:
                         berry_coordinates.append(b.pos)
-                else:
-                    berry_coordinates.append(b.pos)
         return berry_coordinates
-        #return [b.pos for b in self.berries if b.foraged == False and b.marked == False and (not self.training or b.allocated_agent_id == agent.unique_id)]

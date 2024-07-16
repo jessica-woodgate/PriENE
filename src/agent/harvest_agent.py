@@ -102,11 +102,12 @@ class HarvestAgent(DQNAgent):
     def _move(self):
         if not self._moving_module.check_nearest_berry():
             #if no berries have been found to walk towards, have to wait
-            return self._rewards["empty_forage"]
+            return self._rewards["neutral_reward"]
+        #otherwise, we have a path, move towards the berry; returns True if we are at the end of the path and find a berry
         if self._moving_module.move_towards_berry():
             self.berries += 1
             return self._rewards["forage"]
-        return self._rewards["empty_forage"]
+        return self._rewards["neutral_reward"]
     
     def _throw(self, benefactor_id):
         """
@@ -144,7 +145,7 @@ class HarvestAgent(DQNAgent):
                    "no_berries": -0.2,
                    "no_benefactor": -0.2,
                    "insufficient_health": -0.2,
-                   "empty_forage": 0,
+                   "neutral_reward": 0,
                    "throw": 0.5,
                    "forage": 1,
                    "eat": 1
@@ -156,7 +157,7 @@ class HarvestAgent(DQNAgent):
                    "no_berries": -0.1,
                    "no_benefactor": -0.1,
                    "insufficient_health": -0.1,
-                   "empty_forage": 0,
+                   "neutral_reward": 0,
                    "shaped_reward": 0.4,
                    "throw": 0.5,
                    "forage": 0.8,
