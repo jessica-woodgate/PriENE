@@ -56,7 +56,7 @@ def run_simulation(model_inst, log_wandb):
     return num_episodes
 
 def create_and_run_model(scenario, agent_type, max_episodes, training, write_data, write_norms, log_wandb):   
-    num_agents = 2
+    num_agents = 4
     file_string = scenario+"_"+agent_type
     if scenario == "basic":
         model_inst = BasicHarvest(num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string)

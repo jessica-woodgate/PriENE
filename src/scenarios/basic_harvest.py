@@ -3,9 +3,9 @@ from src.harvest_model import HarvestModel
 
 class BasicHarvest(HarvestModel):
     def __init__(self,num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string="",log_wandb=False):
-        self.max_width = 4
+        self.max_width = num_agents * 2
         super().__init__(num_agents,self.max_width,max_episodes,training,write_data,write_norms,file_string)
-        self.num_start_berries = 6
+        self.num_start_berries = num_agents * 3
         self.init_agents(self.n_features, agent_type)
         self.berries = self.init_berries()
 
