@@ -10,6 +10,7 @@ from .harvest_exception import FileExistsException
 from .harvest_exception import OutOfBounds
 from .harvest_exception import NoEmptyCells
 from .harvest_exception import NumAgentsException
+from .harvest_exception import AgentTypeException
 from os.path import exists
 from abc import abstractmethod
 
@@ -34,7 +35,6 @@ class HarvestModel(Model):
         self.agent_id = 0
         self.berry_id = 0
         self.episode = 1
-        self.start_health = 0.8
         self.training = training
         self.file_string = file_string
         self.write_data = write_data
@@ -76,12 +76,10 @@ class HarvestModel(Model):
     def step(self):
         self.schedule.step()
         self.day += 1
-        #check for dead agents
+        #check for dead agents & foraged berries
         for a in self.schedule.agents:
             if a.agent_type == "berry" and a.foraged == True:
-                self.grid.move_to_empty(a)
-                a.foraged = False
-                a.marked = False
+                self._reset_berry(a, False)
             if a.agent_type != "berry":
                 if self.num_living_agents == self.num_agents and a.off_grid == False:
                     self._collect_agent_data(a)
@@ -150,31 +148,26 @@ class HarvestModel(Model):
                 self._reset_agent(a)
                 num_agents += 1
             elif a.agent_type == "berry":
-                self._reset_berry(a)
+                self._reset_berry(a, True)
                 num_berries += 1
         assert num_agents == self.num_agents, "reset "+str(num_agents)+" agents instead of "+str(self.num_agents)
         assert num_berries == self.num_berries, "reset "+str(num_berries)+" berries instead of "+str(self.num_berries)
         self.num_living_agents = self.num_agents
     
     def _reset_agent(self, agent):
-        agent.done = False
-        agent.total_episode_reward = 0
-        agent.berries = 0
-        agent.berries_consumed = 0
-        agent.berries_thrown = 0
-        agent.max_berries = 0
-        agent.health = self.start_health
-        agent.current_reward = 0
-        agent.days_left_to_live = agent.get_days_left_to_live()
-        agent.days_survived = 0
-        agent.norm_module.norm_base  = {}
+        if agent.agent_type == "berry":
+            raise AgentTypeException(agent.agent_type, "berry")
+        agent.reset()
         self.place_agent_in_allotment(agent)
         agent.off_grid = False
         self.living_agents.append(agent)
     
-    def _reset_berry(self, berry):
-        berry.foraged = False
-        berry.marked = False
+    def _reset_berry(self, berry, end_of_episode):
+        if berry.agent_type != "berry":
+            raise AgentTypeException("berry", berry.agent_type)
+        if not end_of_episode:
+            self.grid.remove_agent(berry)
+        berry.reset()
         self.place_agent_in_allotment(berry)
         
     def _init_reporters(self):
@@ -420,7 +413,7 @@ class HarvestModel(Model):
     def get_uneaten_berry_coordinates(self, agent):
         berry_coordinates = []
         for b in self.berries:
-            if b.foraged == False and b.marked == False: 
+            if b.foraged == False:# and b.marked == False: 
                 if self.training:
                     berry_coordinates.append(b.pos)
                 else:

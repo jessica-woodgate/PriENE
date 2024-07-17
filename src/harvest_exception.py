@@ -33,6 +33,15 @@ class NumAgentsException(HarvestException):
     def __str__(self):
         return ("Expected {n} agents and got {m}".format(n=self.num_agents, m=self.num_expected_agents))
 
+class AgentTypeException(HarvestException):
+    def __init__(self, agent_type, expected_type):
+        super().__init__
+        self.agent_type = agent_type
+        self.expected_type = expected_type
+    
+    def __str__(self):
+        return (f"Expected type {self.expected_type} and got {self.agent_type}")
+
 class OutOfBounds(HarvestException):
     def __init__(self, agent_id, coordinates):
         super().__init__

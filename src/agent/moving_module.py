@@ -22,7 +22,7 @@ class MovingModule():
             if self._nearest_berry_coordinates == None:
                 return False
             self._nearest_berry = self._get_uneaten_berry_by_coords(self._nearest_berry_coordinates)
-            self._nearest_berry.marked = True
+            #self._nearest_berry.marked = True
             self._path = self._get_path_to_berry(self.agent.pos,self._nearest_berry.pos)
             self._path_step = 0
         return True
@@ -37,13 +37,18 @@ class MovingModule():
                     berry_found = True
                     self._path = None
                 else:
-                    print("agent", self.agent.unique_id, "foraging at", self.agent.pos, "nearest berry coords", self._nearest_berry_coordinates,"path is", self._path)
                     raise NoBerriesException(self.agent.unique_id, self.agent.pos)
             #if not at the end of the path, move
             else:
                 self._move(self._path[self._path_step])
                 self._path_step += 1
         return berry_found
+    
+    def reset(self):
+        self._path = None
+        self._path_step = 0
+        self._nearest_berry = None
+        self._nearest_berry_coordinates = None
     
     def _move(self, action):
         x, y = self.agent.pos
@@ -98,7 +103,7 @@ class MovingModule():
     
     def _get_uneaten_berry_by_coords(self, coords):
         for b in self.model.berries:
-            if b.pos == coords and b.foraged == False and b.marked == False:
+            if b.pos == coords and b.foraged == False:# and b.marked == False:
                 return b
         raise NoBerriesException(coordinates=coords) 
 
@@ -109,7 +114,6 @@ class MovingModule():
             possible_moves = [(0, 1), (0, -1), (1, 0), (-1, 0)] 
             # := assigns a value to a variable as part of an expression
             return [(new_x, new_y) for dx, dy in possible_moves if 0 <= (new_x := x + dx) < self.agent.max_width and 0 <= (new_y := y + dy) < self.agent.max_height]
-        
         #stores nodes to be explored; priority is sum of the cost to reach the node ("g_values") and estimated cost to goal
         open_set = PriorityQueue()
         #add start node to priority queue with initial priority of 0
@@ -120,7 +124,6 @@ class MovingModule():
         #g is the cost to reach the current node from the starting node
         #stores cost of reaching each node from the start node
         g_values = {agent_coordinates: 0}
-
         #continue until all reachable nodes have been explored/path to goal has been found
         while not open_set.empty():
             #retrieve and remove element with highest priority

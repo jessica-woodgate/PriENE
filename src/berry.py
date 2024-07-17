@@ -5,7 +5,7 @@ class Berry(Agent):
         super().__init__(unique_id, model)
         self.agent_type = "berry"
         self.foraged = False
-        self.marked = False
+        #self.marked = False
         self.allocated_agent_id = allocated_agent_id
         self.min_width = min_width
         self.max_width = max_width
@@ -14,3 +14,7 @@ class Berry(Agent):
     
     def step(self):
         pass
+
+    def reset(self):
+        self.foraged = False
+        #self.marked = False

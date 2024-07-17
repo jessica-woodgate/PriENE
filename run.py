@@ -5,6 +5,7 @@ from src.data_analysis import DataAnalysis
 import pandas as pd
 import argparse
 import wandb
+import numpy as np
 
 agent_types = ["baseline", "egalitarian", "maximin", "rawlsian", "utilitarian"]
 
