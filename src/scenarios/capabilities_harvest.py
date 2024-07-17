@@ -27,6 +27,7 @@ class CapabilitiesHarvest(HarvestModel):
                 self.num_berries += 1
                 berries.append(b)
         assert(self.num_berries == self.num_start_berries)
+        return berries
     
     #agents can see their coords and attributes,coords of berries they can reach,coords of other agents+how many days they have to live
     def observe(self, observer):

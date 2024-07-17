@@ -96,7 +96,7 @@ class MovingModule():
         return math.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
 
     def _get_nearest_berry_coordinates(self, agent_coordinates):
-        uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.agent)
+        uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.agent_id)
         if not uneaten_berries_coordinates:
             return None
         # Use the key parameter of min to find the index of the minimum distance

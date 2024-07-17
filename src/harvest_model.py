@@ -411,14 +411,14 @@ class HarvestModel(Model):
         m /= self.num_agents
         return m
 
-    def get_uneaten_berries_coordinates(self, agent):
+    def get_uneaten_berries_coordinates(self, agent_id):
         berries_coordinates = []
         for b in self.berries:
             if b.foraged == False:# and b.marked == False: 
                 if self.training:
                     berries_coordinates.append(b.pos)
                 else:
-                    if b.allocated_agent_id == agent.unique_id:
+                    if b.allocated_agent_id == agent_id:
                         berries_coordinates.append(b.pos)
         return berries_coordinates
     

@@ -59,11 +59,11 @@ def create_and_run_model(scenario, agent_type, max_episodes, training, write_dat
     num_agents = 2
     file_string = scenario+"_"+agent_type
     if scenario == "basic":
-        model_inst = BasicHarvest(num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string,log_wandb)
+        model_inst = BasicHarvest(num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string)
     elif scenario == "capabilities":
-        model_inst = CapabilitiesHarvest(num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string,log_wandb)
+        model_inst = CapabilitiesHarvest(num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string,log_wandb)
+        model_inst = AllotmentHarvest(num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string)
     else:
         ValueError("Unknown argument: "+scenario)
     run_simulation(model_inst,log_wandb)
