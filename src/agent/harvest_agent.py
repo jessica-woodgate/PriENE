@@ -25,7 +25,7 @@ class HarvestAgent(DQNAgent):
         self.berry_health_payoff = 0.6
         self.low_health_threshold = 0.6
         self.agent_type = agent_type
-        self._moving_module = MovingModule(self, model)
+        self._moving_module = MovingModule(self.unique_id, model, training, max_width, max_height)
         self.norm_module = NormsModule(self.unique_id)
         self._norm_clipping_frequency = 10
         if agent_type != "baseline":
@@ -115,13 +115,16 @@ class HarvestAgent(DQNAgent):
         return reward
     
     def _move(self):
-        if not self._moving_module.check_nearest_berry():
+        if not self._moving_module.check_nearest_berry(self.pos):
             #if no berries have been found to walk towards, have to wait
             return self._rewards["neutral_reward"]
         #otherwise, we have a path, move towards the berry; returns True if we are at the end of the path and find a berry
-        if self._moving_module.move_towards_berry():
+        berry_found, new_pos = self._moving_module.move_towards_berry(self.pos)
+        if berry_found:
             self.berries += 1
             return self._rewards["forage"]
+        if new_pos != self.pos:
+            self.model.grid.move_agent(self, new_pos)
         return self._rewards["neutral_reward"]
     
     def _throw(self, benefactor_id):

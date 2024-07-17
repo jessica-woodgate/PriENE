@@ -11,6 +11,7 @@ from .harvest_exception import OutOfBounds
 from .harvest_exception import NoEmptyCells
 from .harvest_exception import NumAgentsException
 from .harvest_exception import AgentTypeException
+from .harvest_exception import NoBerriesException
 from os.path import exists
 from abc import abstractmethod
 
@@ -410,13 +411,19 @@ class HarvestModel(Model):
         m /= self.num_agents
         return m
 
-    def get_uneaten_berry_coordinates(self, agent):
-        berry_coordinates = []
+    def get_uneaten_berries_coordinates(self, agent):
+        berries_coordinates = []
         for b in self.berries:
             if b.foraged == False:# and b.marked == False: 
                 if self.training:
-                    berry_coordinates.append(b.pos)
+                    berries_coordinates.append(b.pos)
                 else:
                     if b.allocated_agent_id == agent.unique_id:
-                        berry_coordinates.append(b.pos)
-        return berry_coordinates
+                        berries_coordinates.append(b.pos)
+        return berries_coordinates
+    
+    def get_uneaten_berry_by_coords(self, coords):
+        for b in self.berries:
+            if b.pos == coords and b.foraged == False:# and b.marked == False:
+                return b
+        raise NoBerriesException(coordinates=coords) 
