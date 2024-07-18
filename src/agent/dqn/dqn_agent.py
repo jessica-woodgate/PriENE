@@ -5,7 +5,7 @@ from abc import abstractmethod
 import os
 
 class DQNAgent(Agent):
-    def __init__(self,unique_id,model,agent_type,actions,n_features,training,epsilon,shared_replay_buffer=None):
+    def __init__(self,unique_id,model,agent_type,actions,training,epsilon,shared_replay_buffer=None):
         super().__init__(unique_id, model)
         self.epsilon = epsilon
         self.min_exploration_prob = 0.01
@@ -13,7 +13,7 @@ class DQNAgent(Agent):
         self.total_episode_reward = 0
         self.actions = actions
         self.n_actions = len(self.actions)
-        self.n_features = n_features
+        self.n_features = self.get_n_features()
         self.done = False
         self.shared_replay_buffer = shared_replay_buffer
         self.learn_step = 0
@@ -43,12 +43,20 @@ class DQNAgent(Agent):
     def execute_transition(self):
         raise NotImplementedError
     
+    @abstractmethod
+    def observe(self):
+        raise NotImplementedError
+    
+    @abstractmethod
+    def get_n_features(self):
+        raise NotImplementedError
+    
     def step(self):
         """
         if agents are being tested, they do not learn
         """
         if self.done == False:
-            observation = self.model.observe(self)
+            observation = self.observe()
             assert(observation.size == self.n_features), f"expected {self.n_features}, got {observation.size}"
             action = self.q_network.choose_action(observation,self.epsilon)
             self.current_reward, next_state, self.done = self.execute_transition(action)

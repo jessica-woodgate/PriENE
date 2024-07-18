@@ -20,13 +20,13 @@ class MovingModule():
     def check_nearest_berry(self, current_pos):
         #find nearest berry and find path towards; if a berry has been eaten it will move elsewhere which is why it won't have the same pos
         if self._path == None or self._nearest_berry_coordinates != self._nearest_berry.pos:
-            self._nearest_berry_coordinates = self._get_nearest_berry_coordinates(current_pos)
+            self._nearest_berry_coordinates = self._find_nearest_berry_coordinates(current_pos)
             #if there are no berries, have to wait - return False
             if self._nearest_berry_coordinates == None:
                 return False
             self._nearest_berry = self.model.get_uneaten_berry_by_coords(self._nearest_berry_coordinates)
             #self._nearest_berry.marked = True
-            self._path = self._get_path_to_berry(current_pos,self._nearest_berry.pos)
+            self._path = self._find_path_to_berry(current_pos,self._nearest_berry.pos)
             self._path_step = 0
         return True
     
@@ -54,6 +54,11 @@ class MovingModule():
         self._nearest_berry = None
         self._nearest_berry_coordinates = None
     
+    def get_distance_to_berry(self):
+        if self._path == None:
+            return 0
+        return len(self._path) - self._path_step
+    
     def _move(self, current_pos, action):
         x, y = current_pos
         if action == "north":
@@ -80,7 +85,7 @@ class MovingModule():
     
     def _forage(self, cell):
         #check if there is a berry at current location
-        location = self.model.grid.iter_cell_list_contents(cell)
+        location = self.model.get_cell_contents(cell)
         for b in location:
             #there can be multiple berries at one location: check we are foraging the one we were going for
             if b.agent_type == "berry" and b.unique_id == self._nearest_berry.unique_id:
@@ -95,7 +100,7 @@ class MovingModule():
         #Euclidean distance between two points
         return math.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
 
-    def _get_nearest_berry_coordinates(self, agent_coordinates):
+    def _find_nearest_berry_coordinates(self, agent_coordinates):
         uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.agent_id)
         if not uneaten_berries_coordinates:
             return None
@@ -105,7 +110,7 @@ class MovingModule():
         # Return the position of the nearest berry
         return nearest_berry_coordinates
 
-    def _get_path_to_berry(self, agent_coordinates, berry_coordinates):
+    def _find_path_to_berry(self, agent_coordinates, berry_coordinates):
         def get_neighbours(node):
             x, y = node
             # Possible moves: up, down, right, left
@@ -150,11 +155,11 @@ class MovingModule():
         #continue as long as there are nodes to backtrack in came_from dictionary
         while current_node in came_from:
             next_node = came_from[current_node]
-            path.append(self._get_direction(current_node, next_node))
+            path.append(self._direction_to_string(current_node, next_node))
             current_node = next_node
         return path[::-1]  # Reverse the path to start from the agent
 
-    def _get_direction(self, start, end):
+    def _direction_to_string(self, start, end):
         dx, dy = end[0] - start[0], end[1] - start[1]
         if dx == 0:
             return "south" if dy > 0 else "north"

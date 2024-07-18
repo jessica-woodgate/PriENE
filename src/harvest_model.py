@@ -31,7 +31,7 @@ class HarvestModel(Model):
         self.max_days = 50
         self.max_episodes = max_episodes
         self.min_epsilon = 0.01
-        self.day = 1
+        self._day = 1
         self.shared_replay_buffer = {"s": [], "a": [], "r": [], "s_": [], "done": []}
         self.agent_id = 0
         self.berry_id = 0
@@ -39,11 +39,10 @@ class HarvestModel(Model):
         self.training = training
         self.file_string = file_string
         self.write_data = write_data
-        self.write_norms = write_norms
+        self._write_norms = write_norms
         self.societal_norm_emergence_threshold = 0.9
         self.emerged_norms_current = {}
         self.emerged_norms_history = {}
-        self.n_features = self._calculate_n_features()
         if self.training:
             self.epsilon = 0.9
         else:
@@ -53,15 +52,11 @@ class HarvestModel(Model):
     @abstractmethod
     def init_berries(self):
         raise NotImplementedError
-
-    @abstractmethod
-    def observe(self):
-        raise NotImplementedError
     
-    def init_agents(self,n_features, agent_type):
+    def init_agents(self, agent_type):
         self.living_agents = []
         for i in range(self.num_agents):
-            a = HarvestAgent(i,self,agent_type,0,self.max_width,0,self.max_height,n_features,self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
+            a = HarvestAgent(i,self,agent_type,self.max_days,0,self.max_width,0,self.max_height,self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
             self.add_agent(a)
         self.num_living_agents = len(self.living_agents)
         self.berry_id = self.num_living_agents + 1
@@ -76,7 +71,7 @@ class HarvestModel(Model):
             
     def step(self):
         self.schedule.step()
-        self.day += 1
+        self._day += 1
         #check for dead agents & foraged berries
         for a in self.schedule.agents:
             if a.agent_type == "berry" and a.foraged == True:
@@ -87,42 +82,24 @@ class HarvestModel(Model):
                 if a.done == True and a.off_grid == False:
                     self._remove_agent(a)
         self.epsilon = self.get_mean_epsilon()
-        if self.write_norms:
+        if self._write_norms:
             self.emerged_norms = self.get_emerged_norms()
         #if exceeded max days or all agents died, reset for new episode
-        if self.day >= self.max_days or self.num_living_agents <= 0:
-            self.end_day = self.day
-            if self.write_norms:
+        if self._day >= self.max_days or self.num_living_agents <= 0:
+            self.end_day = self._day
+            if self._write_norms:
                 self.append_norm_dict_to_file(self.emerged_norms, "data/results/"+self.file_string+"_emerged_norms")
             for a in self.schedule.agents:
                 if a.agent_type != "berry":
                     if a.off_grid == False:
-                        a.days_survived = self.day
-                    if self.write_norms and self.episode % 100 == 0:
+                        a.days_survived = self._day
+                    if self._write_norms and self.episode % 100 == 0:
                         self.append_norm_dict_to_file(a.norm_module.norm_base, "data/results/"+self.file_string+"_agent_"+str(a.unique_id)+"_norm_base")
                     if self.training: 
                         a.save_models()
             if self.training:
                 self._collect_model_episode_data()
             self._reset()
-    
-    def get_emerged_norms(self):
-        emergence_count = self.num_agents * self.societal_norm_emergence_threshold
-        emerged_norms = {}
-        for agent in self.schedule.agents:
-            if agent.agent_type != "berry":
-                for norm_name, norm_value in agent.norm_module.norm_base.items():
-                    if norm_name not in emerged_norms:
-                        emerged_norms[norm_name] = {"score": 0,
-                                                    "numerosity": 0,
-                                                    "fitness": 0,
-                                                    "num_instances": 0}
-                    emerged_norms[norm_name]["score"] += norm_value["score"]
-                    emerged_norms[norm_name]["numerosity"] += norm_value["numerosity"]
-                    emerged_norms[norm_name]["fitness"] += norm_value["fitness"]
-                    emerged_norms[norm_name]["num_instances"] += 1
-        emerged_norms = {norm: norm_value for norm, norm_value in emerged_norms.items() if norm_value["num_instances"] >= emergence_count}
-        return emerged_norms
 
     def append_norm_dict_to_file(self, norm_dictionary, filename):
         with open(filename, "a+") as file:
@@ -138,7 +115,7 @@ class HarvestModel(Model):
         self.living_agents = []
         self.emerged_norms_current = {}
         self.emerged_norms_history = {}
-        self.day = 0
+        self._day = 0
         num_agents = 0
         num_berries = 0
         self.episode += 1
@@ -213,7 +190,7 @@ class HarvestModel(Model):
     def _collect_agent_data(self, agent):
         new_entry = pd.DataFrame({"agent_id": [agent.unique_id],
                                "episode": [self.episode],
-                               "day": [self.day],
+                               "day": [self._day],
                                "berries": [agent.berries],
                                "berries_consumed": [agent.berries_consumed],
                                "berries_thrown": [agent.berries_thrown],
@@ -221,7 +198,7 @@ class HarvestModel(Model):
                                "days_left_to_live": [agent.days_left_to_live],
                                "action": [agent.current_action],
                                "reward": [agent.current_reward],
-                               "num_norms": [len(agent.norm_module.norm_base) if self.write_norms else None]})
+                               "num_norms": [len(agent.norm_module.norm_base) if self._write_norms else None]})
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry], ignore_index=True)
         #if self.write_data:
          #   new_entry.to_csv("data/results/agent_reports_"+self.file_string+".csv", header=None, mode='a')
@@ -229,7 +206,7 @@ class HarvestModel(Model):
     def _collect_model_episode_data(self):
         row_index_list = self.agent_reporter.index[self.agent_reporter["episode"] == self.episode].tolist()
         new_entry = pd.DataFrame({"episode": [self.episode], 
-                               "end_day": [self.day],
+                               "end_day": [self._day],
                                "epsilon": [self.epsilon],
                                "mean_reward": [self.get_mean_reward()],
                                "mean_loss": [self.get_mean_loss()],
@@ -244,7 +221,7 @@ class HarvestModel(Model):
                                "median_health": [self.agent_reporter["health"].iloc[row_index_list].median()],
                                "variance_health": [self.agent_reporter["health"].iloc[row_index_list].var(axis=0)],
                                "deceased": [self.num_agents - self.num_living_agents],
-                               "num_emerged_norms": [len(self.emerged_norms_history) if self.write_norms else None]})
+                               "num_emerged_norms": [len(self.emerged_norms_history) if self._write_norms else None]})
         self.model_episode_reporter = pd.concat([self.model_episode_reporter, new_entry], ignore_index=True)
         if self.write_data:
             new_entry.to_csv("data/results/model_episode_reports_"+self.file_string+".csv", header=None, mode='a')
@@ -296,17 +273,6 @@ class HarvestModel(Model):
     #                 agents.append(a)
     #     return agents
     
-    def _calculate_n_features(self):
-        #agent coords
-        n_features = self.num_agents * 2
-        #agent's own health and num berries
-        n_features += 2
-        #feature for each cell that could have berries in
-        n_features += (self.max_width * self.max_height)
-        #feature for how many days each agent has left to live
-        n_features += self.num_agents
-        return n_features
-    
     # def empty_cell(self, cell):
     #     for a in self.schedule.agents:
     #         if a.pos == cell:
@@ -320,6 +286,9 @@ class HarvestModel(Model):
         cell = self.get_allotment_cell(agent)
         self.grid.place_agent(agent, cell)
 
+    def move_agent(self, agent, new_pos):
+        self.grid.move_agent(agent, new_pos)
+
     #for agents who are on the grid
     def move_agent_in_allotment(self, agent, cell=None):
         if not self.grid.exists_empty_cells:
@@ -327,11 +296,6 @@ class HarvestModel(Model):
         if cell == None:
             cell = self.get_allotment_cell(agent)
         self.grid.move_agent(agent, cell)
-    
-    def get_allotment_cell(self, agent):
-        width = np.random.randint(agent.min_width, agent.max_width)
-        height = np.random.randint(agent.min_height, agent.max_height)
-        return (width, height)
     
     def _clear_grid(self):
         for a in self.schedule.agents:
@@ -368,6 +332,32 @@ class HarvestModel(Model):
             self.num_berries += 1
         else:
             raise OutOfBounds("berry", cell)
+    
+    def get_cell_contents(self, cell):
+        return self.grid.iter_cell_list_contents(cell)
+    
+    def get_emerged_norms(self):
+        emergence_count = self.num_agents * self.societal_norm_emergence_threshold
+        emerged_norms = {}
+        for agent in self.schedule.agents:
+            if agent.agent_type != "berry":
+                for norm_name, norm_value in agent.norm_module.norm_base.items():
+                    if norm_name not in emerged_norms:
+                        emerged_norms[norm_name] = {"score": 0,
+                                                    "numerosity": 0,
+                                                    "fitness": 0,
+                                                    "num_instances": 0}
+                    emerged_norms[norm_name]["score"] += norm_value["score"]
+                    emerged_norms[norm_name]["numerosity"] += norm_value["numerosity"]
+                    emerged_norms[norm_name]["fitness"] += norm_value["fitness"]
+                    emerged_norms[norm_name]["num_instances"] += 1
+        emerged_norms = {norm: norm_value for norm, norm_value in emerged_norms.items() if norm_value["num_instances"] >= emergence_count}
+        return emerged_norms
+    
+    def get_allotment_cell(self, agent):
+        width = np.random.randint(agent.min_width, agent.max_width)
+        height = np.random.randint(agent.min_height, agent.max_height)
+        return (width, height)
     
     def get_gini_berries_consumed(self):
         berries_consumed = [a.berries_consumed for a in self.schedule.agents if a.agent_type != "berry"]
@@ -426,4 +416,29 @@ class HarvestModel(Model):
         for b in self.berries:
             if b.pos == coords and b.foraged == False:# and b.marked == False:
                 return b
-        raise NoBerriesException(coordinates=coords) 
+        raise NoBerriesException(coordinates=coords)
+    
+    def get_society_well_being(self, observer, include_observer):
+        society_well_being = np.array([])
+        for a in self.schedule.agents:
+            if (a.unique_id == observer.unique_id and not include_observer) or a.agent_type == "berry":
+                continue
+            elif a.done == False:
+                #observe agent's coords and how many days they have left
+                society_well_being = np.append(society_well_being, a.days_left_to_live)
+            elif a.done == True:
+                #if dead, observe 0s
+                society_well_being = np.append(society_well_being, 0)
+        return society_well_being
+    
+    def get_num_agents(self):
+        return self.num_agents
+    
+    def get_living_agents(self):
+        return self.living_agents
+    
+    def get_day(self):
+        return self._day
+    
+    def get_write_norms(self):
+        return self._write_norms

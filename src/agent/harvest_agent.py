@@ -2,18 +2,20 @@ from .dqn.dqn_agent import DQNAgent
 from .moving_module import MovingModule
 from .norms_module import NormsModule
 from .ethics_module import EthicsModule
+import numpy as np
 
 class HarvestAgent(DQNAgent):
-    def __init__(self,unique_id,model,agent_type,min_width,max_width,min_height,max_height,n_features,training,epsilon,shared_replay_buffer=None):
-        self.actions = self._generate_actions(unique_id, model.num_agents)
+    def __init__(self,unique_id,model,agent_type,max_days,min_width,max_width,min_height,max_height,training,epsilon,shared_replay_buffer=None):
+        self.actions = self._generate_actions(unique_id, model.get_num_agents())
         #dqn agent class handles learning and action selection
-        super().__init__(unique_id,model,agent_type,self.actions,n_features,training,epsilon,shared_replay_buffer=shared_replay_buffer)
+        super().__init__(unique_id,model,agent_type,self.actions,training,epsilon,shared_replay_buffer=shared_replay_buffer)
         self.start_health = 0.8
         self.health = 0.8
         self.berries = 0
         self.berries_consumed = 0
         self.berries_thrown = 0
         self.days_survived = 0
+        self.max_days = max_days
         self.max_width = max_width
         self.min_width = min_width
         self.width = max_width - min_width + 1
@@ -45,8 +47,8 @@ class HarvestAgent(DQNAgent):
         """
         done = False
         self.current_action = action
-        society_well_being = [x.days_left_to_live for x in self.model.living_agents]
-        if self.model.write_norms:
+        society_well_being = self.model.get_society_well_being(self, True)
+        if self.model.get_write_norms():
             self.norm_module.update_norm_age()
             antecedent = self.norm_module.get_antecedent(self.health, self.berries, society_well_being)
         if self.agent_type != "baseline" and self.agent_type != "berry":
@@ -56,17 +58,33 @@ class HarvestAgent(DQNAgent):
                 have_berries = False
             self._ethics_module.update_state(self.agent_type, society_well_being, have_berries)
         reward = self._perform_action(action)
-        next_state = self.model.observe(self)
+        next_state = self.observe()
         if self.agent_type != "baseline" and self.agent_type != "berry":
-            society_well_being = [x.days_left_to_live for x in self.model.living_agents]
+            society_well_being = self.model.get_society_well_being(self, True)
             reward += self._ethics_module.get_sanction(society_well_being)
         done, reward = self._update_attributes(reward)
-        if self.model.write_norms:
+        if self.model.get_write_norms():
             self.norm_module.update_norm(antecedent, self.actions[action], reward)
-            if self.model.day % self._norm_clipping_frequency == 0:
+            if self.model.get_day() % self._norm_clipping_frequency == 0:
                 self.norm_module.clip_norm_base()
         return reward, next_state, done
-
+        
+    #agents can see their attributes,distance to nearest berry,well being of other agents
+    def observe(self):
+        distance_to_berry = self._moving_module.get_distance_to_berry()
+        observer_features = np.array([self.health, self.berries, self.days_left_to_live, distance_to_berry])
+        agent_well_being = self.model.get_society_well_being(self, False)
+        observation = np.append(observer_features, agent_well_being)
+        assert len(observation) == self.n_features
+        return observation
+    
+    def get_n_features(self):
+        #agent health, berries, days left to live, distance to berry
+        n_features = 4
+        #feature for each observer well being
+        n_features += self.model.get_num_agents() -1
+        return n_features
+      
     def reset(self):
         self.done = False
         self.total_episode_reward = 0
@@ -80,6 +98,14 @@ class HarvestAgent(DQNAgent):
         self.days_survived = 0
         self.norm_module.norm_base  = {}
         self._moving_module.reset()
+
+    def get_days_left_to_live(self):
+        health = self.health
+        health += self.berry_health_payoff * self.berries
+        days_left_to_live = health / self.health_decay
+        if days_left_to_live < 0:
+            return 0
+        return days_left_to_live
     
     def _generate_actions(self, unique_id, num_agents):
         """
@@ -124,7 +150,7 @@ class HarvestAgent(DQNAgent):
             self.berries += 1
             return self._rewards["forage"]
         if new_pos != self.pos:
-            self.model.grid.move_agent(self, new_pos)
+            self.model.move_agent(self, new_pos)
         return self._rewards["neutral_reward"]
     
     def _throw(self, benefactor_id):
@@ -138,7 +164,7 @@ class HarvestAgent(DQNAgent):
         #have to have a minimum amount of health to throw
         if self.health < self.low_health_threshold:
             return self._rewards["insufficient_health"]
-        for a in self.model.living_agents:
+        for a in self.model.get_living_agents():
             if a.unique_id == benefactor_id:
                 assert(a.agent_type != "berry")
                 a.health += self.berry_health_payoff 
@@ -182,29 +208,22 @@ class HarvestAgent(DQNAgent):
                    "eat": 0.8
                    }
         return rewards
-
-    def get_days_left_to_live(self):
-        health = self.health
-        health += self.berry_health_payoff * self.berries
-        days_left_to_live = health / self.health_decay
-        if days_left_to_live < 0:
-            return 0
-        return days_left_to_live
     
     def _update_attributes(self, reward):
         done = False
         self.health -= self.health_decay
         self.days_left_to_live = self.get_days_left_to_live()
-        if len(self.model.living_agents) < self.model.num_agents:
+        day = self.model.get_day()
+        if len(self.model.get_living_agents()) < self.model.get_num_agents():
             reward -= 1
-            self.days_survived = self.model.day
+            self.days_survived = day
             done = True
         if self.health <= 0:
             #environment class checks for dead agents to remove at the end of each step
             done = True
-            self.days_survived = self.model.day
+            self.days_survived = day
             self.health = 0
             reward -= 1
-        if self.model.day == self.model.max_days - 1:
+        if day == self.max_days - 1:
             reward += 1
         return done, reward
