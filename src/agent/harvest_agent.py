@@ -54,18 +54,20 @@ class HarvestAgent(DQNAgent):
         if self.agent_type != "baseline" and self.agent_type != "berry":
             if self.berries > 0 and self.health >= self.low_health_threshold:
                 can_help = True
-                print("agent", self.unique_id, "about to execute action", self.actions[action], "health", self.health, "berries", self.berries, "days", self.days_left_to_live)
+                self.ethics_module.update_state(self.agent_type, society_well_being, self.model.get_day(),can_help)
+                #print("day",self.model.get_day(),"agent", self.unique_id, "about to execute action", self.actions[action], "health", self.health, "berries", self.berries, "days", self.days_left_to_live, "can help", can_help)
             else:
                 can_help = False
-            self.ethics_module.update_state(self.agent_type, society_well_being, can_help)
+            #self.ethics_module.update_state(self.agent_type, society_well_being, self.model.get_day(),can_help)
         reward = self._perform_action(action)
         next_state = self.observe()
         done, reward = self._update_attributes(reward)
         if self.agent_type != "baseline" and self.agent_type != "berry":
             society_well_being = self.model.get_society_well_being(self, True)
             if can_help:
-                print("agent", self.unique_id, "executed action", self.actions[action], "health", self.health, "berries", self.berries, "days", self.days_left_to_live, "can help", can_help)
-            reward += self.ethics_module.get_sanction(society_well_being)
+                #print("agent", self.unique_id, "executed action", self.actions[action], "health", self.health, "berries", self.berries, "days", self.days_left_to_live, "can help", can_help)
+                reward += self.ethics_module.get_sanction(society_well_being)
+            #reward += self.ethics_module.get_sanction(society_well_being)
         if self.model.get_write_norms():
             self.norms_module.update_norm(antecedent, self.actions[action], reward)
             if self.model.get_day() % self._norm_clipping_frequency == 0:
@@ -166,10 +168,10 @@ class HarvestAgent(DQNAgent):
         #have to have a minimum amount of health to throw
         if self.health < self.low_health_threshold:
             return self._rewards["insufficient_health"]
-        print("trying to throw to", benefactor_id, "berries", self.berries)
+        #print("trying to throw to", benefactor_id, "berries", self.berries)
         for a in self.model.get_living_agents():
             if a.unique_id == benefactor_id:
-                print("throwing to", a.unique_id)
+                #print("throwing to", a.unique_id)
                 assert(a.agent_type != "berry")
                 a.health += self.berry_health_payoff 
                 a.berries_consumed += 1

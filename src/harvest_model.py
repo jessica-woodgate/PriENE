@@ -426,8 +426,11 @@ class HarvestModel(Model):
             elif a.done == False:
                 #observe agent's coords and how many days they have left
                 society_well_being = np.append(society_well_being, a.days_left_to_live)
-            elif a.done == True:
-                #if dead, observe 0s
+            elif a.done == True and include_observer:
+                #if looking for utility measure, don't include dead agents
+                continue
+            else:
+                #if observing, include dead agents as 0s
                 society_well_being = np.append(society_well_being, 0)
         return society_well_being
     
