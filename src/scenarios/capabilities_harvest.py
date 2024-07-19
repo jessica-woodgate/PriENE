@@ -1,4 +1,3 @@
-import numpy as np
 from src.harvest_model import HarvestModel
 
 class CapabilitiesHarvest(HarvestModel):

@@ -1,4 +1,3 @@
-import numpy as np
 from src.harvest_model import HarvestModel
 from src.agent.harvest_agent import HarvestAgent
 
