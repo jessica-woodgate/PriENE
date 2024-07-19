@@ -2,10 +2,9 @@ import numpy as np
 from src.harvest_model import HarvestModel
 
 class BasicHarvest(HarvestModel):
-    def __init__(self,num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string="",log_wandb=False):
-        self.max_width = num_agents * 2
-        super().__init__(num_agents,self.max_width,max_episodes,training,write_data,write_norms,file_string)
-        self.num_start_berries = num_agents * 3
+    def __init__(self,num_agents,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string=""):
+        super().__init__(num_agents,max_episodes,training,write_data,write_norms,file_string)
+        self.num_start_berries = num_agents
         self.init_agents(agent_type)
         self.berries = self.init_berries()
 

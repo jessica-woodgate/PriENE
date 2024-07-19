@@ -5,9 +5,51 @@ from src.data_analysis import DataAnalysis
 import pandas as pd
 import argparse
 import wandb
+import pygame
 import numpy as np
 
-agent_types = ["baseline", "egalitarian", "maximin", "rawlsian", "utilitarian"]
+AGENT_TYPES = ["baseline", "egalitarian", "maximin", "rawlsian", "utilitarian"]
+NUM_AGENTS = 4
+#render globals
+MAX_WIDTH = NUM_AGENTS * 2
+MAX_HEIGHT = MAX_WIDTH
+BLOCK_SIZE = 640/MAX_WIDTH
+COLOUR_MAP = {
+    "red": (255, 0, 0),
+    "blue": (0, 0, 255),
+    "green": (0, 255, 0),
+    "black": (0, 0, 0),
+    "white": (255, 255, 255),
+    "yellow": (255, 255, 0),
+    "purple": (255, 0, 255),
+}
+
+OBJ_COLOURS = {
+    "None": "red",
+    "0": "purple",
+    "1": "blue"
+}
+
+AGENT_COLOURS = {
+    "baseline": "red",
+    "egalitarian": "yellow",
+    "maximin": "blue",
+    "utilitarian": "green",
+    "berry": "purple"
+}
+
+
+def draw_agent(screen, colour, x, y):
+    pygame.draw.rect(screen, colour, (x+BLOCK_SIZE/4, y, BLOCK_SIZE/2, BLOCK_SIZE/4))
+    pygame.draw.circle(screen, "blue", (x+BLOCK_SIZE/2-BLOCK_SIZE/8,y+BLOCK_SIZE/8), (BLOCK_SIZE/8))
+    pygame.draw.circle(screen, "blue", (x+BLOCK_SIZE/2+BLOCK_SIZE/8,y+BLOCK_SIZE/8), (BLOCK_SIZE/8))
+    pygame.draw.rect(screen, colour, (x, y+BLOCK_SIZE/4, BLOCK_SIZE, BLOCK_SIZE/4))
+    pygame.draw.rect(screen, colour, (x, y+BLOCK_SIZE/2, BLOCK_SIZE/4, BLOCK_SIZE/2))
+    pygame.draw.rect(screen, colour, (x+BLOCK_SIZE*3/4, y+BLOCK_SIZE/2, BLOCK_SIZE/4, BLOCK_SIZE/2))
+
+def draw_berry(screen, colour, x, y):
+    pygame.draw.circle(screen, colour, (x+BLOCK_SIZE/2,y+BLOCK_SIZE/2), (BLOCK_SIZE/3))
+    pygame.draw.arc(screen, "green", (x,y, BLOCK_SIZE/2, BLOCK_SIZE/2), 0/57, 90/57)
 
 def generate_graphs(scenario):
     """
@@ -18,7 +60,7 @@ def generate_graphs(scenario):
     data_analysis = DataAnalysis()
     path = "data/"+scenario+"/"
     files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"rawlsian.csv",path+"utilitarian.csv"]
-    labels = agent_types
+    labels = AGENT_TYPES
     dfs = []
     for file in files:
         df = pd.read_csv(file)
@@ -42,9 +84,11 @@ def log_wandb_agents(model_inst, last_episode, reward_tracker):
             string = base_string+"_epsilon"
             wandb.log({string: agent.epsilon})
 
-def run_simulation(model_inst, log_wandb):
+def run_simulation(model_inst, render, log_wandb):
     if log_wandb:
-        wandb.init(project="PriNE")
+        wandb.init(project="PriENE")
+    if render:
+        screen = init_pygame()
     while (model_inst.training and model_inst.epsilon > model_inst.min_epsilon) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
         model_inst.step()
         if log_wandb:
@@ -52,25 +96,57 @@ def run_simulation(model_inst, log_wandb):
             log_wandb_agents(model_inst, model_inst.episode, reward_tracker)
             mean_reward = model_inst.model_reporter["mean_reward"].mean()
             wandb.log({'mean_reward_test': mean_reward})
+        if render:
+            screen = render_pygame(screen, model_inst)
     num_episodes = model_inst.episode
     return num_episodes
 
-def create_and_run_model(scenario, agent_type, max_episodes, training, write_data, write_norms, log_wandb):   
-    num_agents = 4
+def init_pygame():
+    # create window
+    pygame.init()
+    # setup screen
+    width, height = MAX_WIDTH * BLOCK_SIZE, MAX_HEIGHT * BLOCK_SIZE
+    screen = pygame.display.set_mode((width, height))
+    pygame.display.set_caption('Harvest Model')
+    # setup timer
+    pygame.time.Clock()
+    return screen
+
+def render_pygame(screen, model_inst):
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            break
+    screen.fill(COLOUR_MAP["black"])
+    for a in model_inst.schedule.agents:
+        # if a has attribute deceased
+        if hasattr(a, "off_grid") and a.off_grid:
+            continue
+        x = a.pos[0] * BLOCK_SIZE
+        y = a.pos[1] * BLOCK_SIZE
+        if a.agent_type == "berry":
+            colour = COLOUR_MAP[AGENT_COLOURS[str(a.agent_type)]]
+            draw_berry(screen, colour, x, y)
+        else:
+            colour = COLOUR_MAP[AGENT_COLOURS[str(a.agent_type)]]
+            draw_agent(screen, colour, x, y)
+    pygame.display.flip()
+    return screen
+
+def create_and_run_model(scenario,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb):   
     file_string = scenario+"_"+agent_type
     if scenario == "basic":
-        model_inst = BasicHarvest(num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string)
+        model_inst = BasicHarvest(NUM_AGENTS,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
     elif scenario == "capabilities":
-        model_inst = CapabilitiesHarvest(num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string)
+        model_inst = CapabilitiesHarvest(NUM_AGENTS,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string)
+        model_inst = AllotmentHarvest(NUM_AGENTS,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
     else:
         ValueError("Unknown argument: "+scenario)
-    run_simulation(model_inst,log_wandb)
+    run_simulation(model_inst,render,log_wandb)
 
-def run_all(scenario, max_episodes, training, write_data, write_norms, log_wandb):
-    for agent_type in agent_types:
-        create_and_run_model(scenario, agent_type, max_episodes, training, write_data, write_norms, log_wandb)
+def run_all(scenario,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb):
+    for agent_type in AGENT_TYPES:
+        create_and_run_model(scenario,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb)
 
 def get_integer_input(prompt):
     while True:
@@ -89,6 +165,17 @@ parser.add_argument("-l", "--log", type=str, default=None,
                     help="Log wandb (optional)")
 args = parser.parse_args()
 
+def get_write_data_input(data_type):
+    write_data = input(f"Do you want to write {data_type} to file? (y, n): ")
+    while write_data not in ["y", "n"]:
+        write_data = input("Invalid choice. Please choose 'y' or 'n': ")
+    if write_data == "y":
+        write_data = True
+        print(f"{data_type} will be written into data/results.")
+    elif write_data == "n":
+        write_data = False
+    return write_data
+
 if args.option not in ["test", "train", "generate_graphs"]:
     print("Please choose 'test', 'train', or 'generate_graphs'.")
 elif args.option == "test" or args.option == "train":
@@ -98,25 +185,23 @@ elif args.option == "test" or args.option == "train":
             scenario = input("Invalid scenario. Please choose 'capabilities', or 'allotment': ")
     else:
         scenario = "basic"
+    #########################################################################################
     agent_type = input("What type of agent do you want to implement (baseline, maximin, egalitarian, utilitarian, all): ")
-    while agent_type not in agent_types:
+    while agent_type not in AGENT_TYPES:
         agent_type = input("Invalid agent type. Please choose 'baseline', 'maximin', 'egalitarian', or 'utilitarian', or 'all': ")
-    write_data = input("Do you want to write data to file? (y, n): ")
-    while write_data not in ["y", "n"]:
-        write_data = input("Invalid choice. Please choose 'y' or 'n': ")
-    if write_data == "y":
-        write_data = True
-        print("Data will be written into data/results.")
-    elif write_data == "n":
-        write_data = False
-    write_norms = input("Do you want to write norms to file? (y, n): ")
-    while write_norms not in ["y", "n"]:
-        write_norms = input("Invalid choice. Please choose 'y' or 'n': ")
-    if write_norms == "y":
-        write_norms = True
-        print("Norms will be written into data/results.")
-    elif write_norms == "n":
-        write_norms = False
+    #########################################################################################
+    write_data = get_write_data_input("data")
+    #########################################################################################
+    write_norms = get_write_data_input("norms")
+    #########################################################################################
+    render = input("Do you want to render the simulation? (y, n): ")
+    while render not in ["y", "n"]:
+        render = input("Invalid choice. Please choose 'y' or 'n': ")
+    if render == "y":
+        render = True
+    elif render == "n":
+        render = False
+    #########################################################################################
     if args.option == "train":
         training = True
         print("Model variables will be written into model_variables/current_run")
@@ -124,14 +209,16 @@ elif args.option == "test" or args.option == "train":
     else:
         max_episodes = get_integer_input("How many episodes do you want to run: ")
         training = False
+    #########################################################################################
     if args.log is not None:
         log_wandb = True
     else:
         log_wandb = False
     if agent_type == "all":
-        run_all(scenario, max_episodes, training, write_data, write_norms, log_wandb)
+        run_all(scenario,MAX_WIDTH,MAX_HEIGHT,max_episodes,training,write_data,write_norms,render,log_wandb)
     else:
-        create_and_run_model(scenario, agent_type, max_episodes, training, write_data, write_norms, log_wandb)
+        create_and_run_model(scenario,MAX_WIDTH,MAX_HEIGHT,agent_type,max_episodes,training,write_data,write_norms,render,log_wandb)
+#########################################################################################
 elif args.option == "generate_graphs":
     scenario = input("What type of scenario do you want to generate graphs for (capabilities, allotment): ")
     while scenario not in ["capabilities", "allotment"]:

@@ -16,7 +16,7 @@ from os.path import exists
 from abc import abstractmethod
 
 class HarvestModel(Model):
-    def __init__(self,num_agents,max_width,max_episodes,training,write_data,write_norms,file_string=""):
+    def __init__(self,num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string=""):
         super().__init__()
         self.num_agents = num_agents
         if self.num_agents <= 0:
@@ -26,7 +26,7 @@ class HarvestModel(Model):
         self.schedule = RandomActivation(self)
         #max_width changes depending on the scenario; max_height stays the same
         self.max_width = max_width
-        self.max_height = 4
+        self.max_height = max_height
         self.grid = MultiGrid(self.max_width, self.max_height, False)
         self.max_days = 50
         self.max_episodes = max_episodes

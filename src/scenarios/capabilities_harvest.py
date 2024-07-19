@@ -2,9 +2,8 @@ import numpy as np
 from src.harvest_model import HarvestModel
 
 class CapabilitiesHarvest(HarvestModel):
-    def __init__(self,num_agents,agent_type,max_episodes,training,write_data,write_norms,file_string=""):
-        self.max_width = 4
-        super().__init__(num_agents,self.max_width,max_episodes,training,write_data,write_norms,file_string)
+    def __init__(self,num_agents,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string=""):
+        super().__init__(num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
         self.num_start_berries = 8
         self.allocations = {"agent_0": {
                                 "id": 0,
