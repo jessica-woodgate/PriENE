@@ -6,16 +6,17 @@ class EthicsModule():
     agent calls update_state which tracks the measure of well-being before the agent acts
     after acting, agent calls get_sanction which calls the chosen principle to generate a sanction indicating alignment
     """
-    def __init__(self,shaped_reward):
+    def __init__(self,shaped_reward,agent_id):
         self._shaped_reward = shaped_reward
-        self._have_berries = False
+        self._can_help = False
         self._current_principle = None
         self._society_well_being = None
         self._measure_of_well_being = None
+        self.agent_id = agent_id
     
-    def update_state(self, principle, society_well_being, have_berries=None):
-        if have_berries != None:
-            self.have_berries = have_berries
+    def update_state(self, principle, society_well_being, can_help=None):
+        if can_help != None:
+            self._can_help = can_help
         self._calculate_social_welfare(principle, society_well_being)
     
     def _calculate_social_welfare(self, principle, society_well_being):
@@ -44,9 +45,13 @@ class EthicsModule():
         return min(society_well_being)
 
     def _egalitarian_welfare(self, society_well_being):
-        #get gini index of utility
-        gini = self._calculate_gini(society_well_being)
-        return gini
+        n = len(society_well_being)
+        total = sum(society_well_being)
+        ideal = total/n
+        loss = sum(abs(x - ideal) for x in society_well_being)
+        if self._can_help:
+            print("agent", self.agent_id, "egalitarian welfare", society_well_being, "n is", n, "total is", total, "ideal is", ideal, "loss is", loss)
+        return loss
     
     def _utilitarian_welfare(self, society_well_being):
         return sum(society_well_being)
@@ -78,29 +83,34 @@ class EthicsModule():
     #         if a.days_left_to_live > min_well_being:
     #             return self.shaped_reward
     #     #else, negative
-    #     if self_in_min == False and self.have_berries:
+    #     if self_in_min == False and self._can_help:
     #             return -self.shaped_reward
     #     return 0
     def _maximin_sanction(self, previous_min, society_well_being):
         current_min = self._maximin_welfare(society_well_being)
         if previous_min > current_min:
             return self._shaped_reward
-        if previous_min < current_min and self.have_berries:
+        if previous_min < current_min and self._can_help:
             return -self._shaped_reward
         return 0
     
-    def _egalitarian_sanction(self, previous_gini, society_well_being):
-        current_gini = self._egalitarian_welfare(society_well_being)
-        if previous_gini > current_gini:
-            return -self._shaped_reward
-        elif previous_gini < current_gini and self.have_berries:
+    def _egalitarian_sanction(self, previous_loss, society_well_being):
+        current_loss = self._egalitarian_welfare(society_well_being)
+        if previous_loss > current_loss and self._can_help:
+            print("agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning pos reward")
             return self._shaped_reward
+        elif previous_loss < current_loss:
+            if self._can_help:
+                print("agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning neg reward")
+            return -self._shaped_reward
+        if self._can_help:
+            print("agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning neutral reward")
         return 0
     
     def _utilitarian_sanction(self, previous_welfare, society_well_being):
         current_welfare = self._utilitarian_welfare(society_well_being)
         if current_welfare > previous_welfare:
             return self._shaped_reward
-        elif current_welfare < previous_welfare and self.have_berries:
+        elif current_welfare < previous_welfare and self._can_help:
             return -self._shaped_reward
         return 0

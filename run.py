@@ -118,9 +118,9 @@ elif args.option == "test" or args.option == "train":
     else:
         scenario = "basic"
     #########################################################################################
-    agent_type = input("What type of agent do you want to implement (baseline, maximin, egalitarian, utilitarian, all): ")
+    agent_type = input("What type of agent do you want to implement (baseline, egalitarian, maximin, utilitarian, all): ")
     while agent_type not in AGENT_TYPES:
-        agent_type = input("Invalid agent type. Please choose 'baseline', 'maximin', 'egalitarian', or 'utilitarian', or 'all': ")
+        agent_type = input("Invalid agent type. Please choose 'baseline', 'egalitarian', 'maximin', or 'utilitarian', or 'all': ")
     #########################################################################################
     write_data = write_data_input("data")
     #########################################################################################
