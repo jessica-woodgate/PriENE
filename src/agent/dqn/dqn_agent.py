@@ -31,12 +31,12 @@ class DQNAgent(Agent):
             self.target_checkpoint_path = "model_variables/current_run/"+self.agent_type+"/agent_"+str(unique_id)+"/target_model_variables.keras"
 
         self.hidden_units = round(((self.n_features/3) * 2) + (2 * self.n_actions))
-        self.qNetwork = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
-        self.targetNetwork = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
+        self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
+        self.target_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
         if self.training:
             inputs = np.zeros(self.n_features)
-            self.qNetwork.dqn(np.atleast_2d(inputs.astype('float32')))
-            self.targetNetwork.dqn(np.atleast_2d(inputs.astype('float32')))
+            self.q_network.dqn(np.atleast_2d(inputs.astype('float32')))
+            self.target_network.dqn(np.atleast_2d(inputs.astype('float32')))
             self.losses = list()
     
     @abstractmethod
@@ -58,7 +58,7 @@ class DQNAgent(Agent):
         if self.done == False:
             observation = self.observe()
             assert(observation.size == self.n_features), f"expected {self.n_features}, got {observation.size}"
-            action = self.qNetwork.choose_action(observation,self.epsilon)
+            action = self.q_network.choose_action(observation,self.epsilon)
             self.current_reward, next_state, self.done = self.execute_transition(action)
             if self.training:
                 self._learn(observation, action, self.current_reward, next_state, self.done)
@@ -66,17 +66,17 @@ class DQNAgent(Agent):
             self.total_episode_reward += self.current_reward
 
     def save_models(self):
-        self.qNetwork.dqn.save(self.q_checkpoint_path)
-        self.targetNetwork.dqn.save(self.target_checkpoint_path)
+        self.q_network.dqn.save(self.q_checkpoint_path)
+        self.target_network.dqn.save(self.target_checkpoint_path)
     
     def _learn(self, observation, action, reward, next_state, done):
         experience = {"s":observation, "a":action, "r":reward, "s_":next_state, "done":done}
-        self.qNetwork.add_experience(experience)
-        loss = self.qNetwork.train(self.targetNetwork)
+        self.q_network.add_experience(experience)
+        loss = self.q_network.train(self.target_network)
         self._append_losses(loss)
         self.learn_step += 1
         if self.learn_step % self.replace_target_iter == 0:
-            self.targetNetwork.copy_weights(self.qNetwork)
+            self.target_network.copy_weights(self.q_network)
     
     def _append_losses(self, loss):
         if isinstance(loss, int):

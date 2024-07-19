@@ -20,7 +20,7 @@ def generate_graphs(scenario):
     processed dfs contain data for each agent at the end of each episode
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
-    dataAnalysis = DataAnalysis()
+    data_analysis = DataAnalysis()
     path = "data/"+scenario+"/"
     files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"rawlsian.csv",path+"utilitarian.csv"]
     labels = AGENT_TYPES
@@ -28,53 +28,53 @@ def generate_graphs(scenario):
     for file in files:
         df = pd.read_csv(file)
         dfs.append(df)
-    normalised_sum_df_list, agent_end_episode_list = dataAnalysis.process_agent_dfs(dfs, labels)
-    dataAnalysis.display_graphs(normalised_sum_df_list, agent_end_episode_list, labels)
+    normalised_sum_df_list, agent_end_episode_list = data_analysis.process_agent_dfs(dfs, labels)
+    data_analysis.display_graphs(normalised_sum_df_list, agent_end_episode_list, labels)
 
-def log_wandb_agents(modelInst, last_episode, reward_tracker):
-    for i, agent in enumerate(modelInst.schedule.agents):
+def log_wandb_agents(model_inst, last_episode, reward_tracker):
+    for i, agent in enumerate(model_inst.schedule.agents):
         if agent.type != "berry":
             base_string = agent.type+"_agent_"+str(agent.unique_id)
-            if last_episode != modelInst.episode:
+            if last_episode != model_inst.episode:
                 string = base_string+"_total_episode_reward"
                 reward = reward_tracker[i]
                 wandb.log({string: reward})
             string = base_string+"_reward"
             wandb.log({string: agent.current_reward})
-            mean_loss = (np.mean(agent.losses) if modelInst.training else 0)
+            mean_loss = (np.mean(agent.losses) if model_inst.training else 0)
             string = base_string+"_mean_loss"
             wandb.log({string: mean_loss})
             string = base_string+"_epsilon"
             wandb.log({string: agent.epsilon})
 
-def run_simulation(modelInst, render, log_wandb):
+def run_simulation(model_inst, render, log_wandb):
     if log_wandb:
         wandb.init(project="PriENE")
     if render:
-        renderInst = RenderPygame(modelInst.max_width, modelInst.max_height)
-    while (modelInst.training and modelInst.epsilon > modelInst.min_epsilon) or (not modelInst.training and modelInst.episode <= modelInst.max_episodes):
-        modelInst.step()
+        render_inst = RenderPygame(model_inst.max_width, model_inst.max_height)
+    while (model_inst.training and model_inst.epsilon > model_inst.min_epsilon) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
+        model_inst.step()
         if log_wandb:
-            reward_tracker = [a.total_episode_reward for a in modelInst.schedule.agents if a.type != "berry"]
-            log_wandb_agents(modelInst, modelInst.episode, reward_tracker)
-            mean_reward = modelInst.model_reporter["mean_reward"].mean()
+            reward_tracker = [a.total_episode_reward for a in model_inst.schedule.agents if a.type != "berry"]
+            log_wandb_agents(model_inst, model_inst.episode, reward_tracker)
+            mean_reward = model_inst.model_reporter["mean_reward"].mean()
             wandb.log({'mean_reward_test': mean_reward})
         if render:
-            renderInst.render_pygame(modelInst)
-    num_episodes = modelInst.episode
+            render_inst.render_pygame(model_inst)
+    num_episodes = model_inst.episode
     return num_episodes
 
 def create_and_run_model(scenario,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb):   
     file_string = scenario+"_"+agent_type
     if scenario == "basic":
-        modelInst = BasicHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
+        model_inst = BasicHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
     elif scenario == "capabilities":
-        modelInst = CapabilitiesHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
+        model_inst = CapabilitiesHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
     elif scenario == "allotment":
-        modelInst = AllotmentHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
+        model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
     else:
         ValueError("Unknown argument: "+scenario)
-    run_simulation(modelInst,render,log_wandb)
+    run_simulation(model_inst,render,log_wandb)
 
 def run_all(scenario,num_start_berries,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb):
     for agent_type in AGENT_TYPES:
