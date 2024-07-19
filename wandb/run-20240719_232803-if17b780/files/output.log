@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/yp19484/repos/PriENE/run.py", line 150, in <module>
+    run_all(scenario,NUM_AGENTS,NUM_START_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,training,write_data,write_norms,render,log_wandb)
+  File "/home/yp19484/repos/PriENE/run.py", line 81, in run_all
+    create_and_run_model(scenario,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb)
+  File "/home/yp19484/repos/PriENE/run.py", line 77, in create_and_run_model
+    run_simulation(model_inst,render,log_wandb)
+  File "/home/yp19484/repos/PriENE/run.py", line 60, in run_simulation
+    mean_reward = model_inst.model_reporter["mean_reward"].mean()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'BasicHarvest' object has no attribute 'model_reporter'
