@@ -10,7 +10,7 @@ import numpy as np
 
 AGENT_TYPES = ["baseline", "egalitarian", "maximin", "rawlsian", "utilitarian"]
 NUM_AGENTS = 4
-NUM_START_BERRIES = 4
+NUM_START_BERRIES = NUM_AGENTS * 3
 MAX_WIDTH = NUM_AGENTS * 2
 MAX_HEIGHT = MAX_WIDTH
 
