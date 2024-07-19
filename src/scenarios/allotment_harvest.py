@@ -3,9 +3,9 @@ from src.harvest_model import HarvestModel
 from src.agent.harvest_agent import HarvestAgent
 
 class AllotmentHarvest(HarvestModel):
-    def __init__(self,num_agents, agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string=""):
+    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string=""):
         super().__init__(num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
-        self.num_start_berries = 8
+        self.num_start_berries = num_start_berries
         #allocations is a nested dictionary with allotments for each agent (list of coordinates for max/min width/height) and berry allocation;
         self.allocations = {"agent_0": {
                                 "id": 0,

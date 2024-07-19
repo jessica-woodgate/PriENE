@@ -27,12 +27,12 @@ class HarvestAgent(DQNAgent):
         self.berry_health_payoff = 0.6
         self.low_health_threshold = 0.6
         self.agent_type = agent_type
-        self._moving_module = MovingModule(self.unique_id, model, training, max_width, max_height)
-        self.norm_module = NormsModule(self.unique_id)
+        self.movingModule = MovingModule(self.unique_id, model, training, max_width, max_height)
+        self.normModule = NormsModule(self.unique_id)
         self._norm_clipping_frequency = 10
         if agent_type != "baseline":
             self._rewards = self._ethics_rewards()
-            self._ethics_module = EthicsModule(self._rewards["shaped_reward"])
+            self.ethicsModule = EthicsModule(self._rewards["shaped_reward"])
         else:
             self._rewards = self._baseline_rewards()
         self.off_grid = False
@@ -49,29 +49,29 @@ class HarvestAgent(DQNAgent):
         self.current_action = action
         society_well_being = self.model.get_society_well_being(self, True)
         if self.model.get_write_norms():
-            self.norm_module.update_norm_age()
-            antecedent = self.norm_module.get_antecedent(self.health, self.berries, society_well_being)
+            self.normModule.update_norm_age()
+            antecedent = self.normModule.get_antecedent(self.health, self.berries, society_well_being)
         if self.agent_type != "baseline" and self.agent_type != "berry":
             if self.berries > 0:
                 have_berries = True
             else:
                 have_berries = False
-            self._ethics_module.update_state(self.agent_type, society_well_being, have_berries)
+            self.ethicsModule.update_state(self.agent_type, society_well_being, have_berries)
         reward = self._perform_action(action)
         next_state = self.observe()
         if self.agent_type != "baseline" and self.agent_type != "berry":
             society_well_being = self.model.get_society_well_being(self, True)
-            reward += self._ethics_module.get_sanction(society_well_being)
+            reward += self.ethicsModule.get_sanction(society_well_being)
         done, reward = self._update_attributes(reward)
         if self.model.get_write_norms():
-            self.norm_module.update_norm(antecedent, self.actions[action], reward)
+            self.normModule.update_norm(antecedent, self.actions[action], reward)
             if self.model.get_day() % self._norm_clipping_frequency == 0:
-                self.norm_module.clip_norm_base()
+                self.normModule.clip_norm_base()
         return reward, next_state, done
         
     #agents can see their attributes,distance to nearest berry,well being of other agents
     def observe(self):
-        distance_to_berry = self._moving_module.get_distance_to_berry()
+        distance_to_berry = self.movingModule.get_distance_to_berry()
         observer_features = np.array([self.health, self.berries, self.days_left_to_live, distance_to_berry])
         agent_well_being = self.model.get_society_well_being(self, False)
         observation = np.append(observer_features, agent_well_being)
@@ -96,8 +96,8 @@ class HarvestAgent(DQNAgent):
         self.current_reward = 0
         self.days_left_to_live = self.get_days_left_to_live()
         self.days_survived = 0
-        self.norm_module.norm_base  = {}
-        self._moving_module.reset()
+        self.normModule.norm_base  = {}
+        self.movingModule.reset()
 
     def get_days_left_to_live(self):
         health = self.health
@@ -141,11 +141,11 @@ class HarvestAgent(DQNAgent):
         return reward
     
     def _move(self):
-        if not self._moving_module.check_nearest_berry(self.pos):
+        if not self.movingModule.check_nearest_berry(self.pos):
             #if no berries have been found to walk towards, have to wait
             return self._rewards["neutral_reward"]
         #otherwise, we have a path, move towards the berry; returns True if we are at the end of the path and find a berry
-        berry_found, new_pos = self._moving_module.move_towards_berry(self.pos)
+        berry_found, new_pos = self.movingModule.move_towards_berry(self.pos)
         if berry_found:
             self.berries += 1
             return self._rewards["forage"]

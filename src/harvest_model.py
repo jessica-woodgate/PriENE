@@ -94,7 +94,7 @@ class HarvestModel(Model):
                     if a.off_grid == False:
                         a.days_survived = self._day
                     if self._write_norms and self.episode % 100 == 0:
-                        self.append_norm_dict_to_file(a.norm_module.norm_base, "data/results/"+self.file_string+"_agent_"+str(a.unique_id)+"_norm_base")
+                        self.append_norm_dict_to_file(a.normModule.norm_base, "data/results/"+self.file_string+"_agent_"+str(a.unique_id)+"_norm_base")
                     if self.training: 
                         a.save_models()
             if self.training:
@@ -198,7 +198,7 @@ class HarvestModel(Model):
                                "days_left_to_live": [agent.days_left_to_live],
                                "action": [agent.current_action],
                                "reward": [agent.current_reward],
-                               "num_norms": [len(agent.norm_module.norm_base) if self._write_norms else None]})
+                               "num_norms": [len(agent.normModule.norm_base) if self._write_norms else None]})
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry], ignore_index=True)
         #if self.write_data:
          #   new_entry.to_csv("data/results/agent_reports_"+self.file_string+".csv", header=None, mode='a')
@@ -341,7 +341,7 @@ class HarvestModel(Model):
         emerged_norms = {}
         for agent in self.schedule.agents:
             if agent.agent_type != "berry":
-                for norm_name, norm_value in agent.norm_module.norm_base.items():
+                for norm_name, norm_value in agent.normModule.norm_base.items():
                     if norm_name not in emerged_norms:
                         emerged_norms[norm_name] = {"score": 0,
                                                     "numerosity": 0,
