@@ -8,7 +8,7 @@ import argparse
 import wandb
 import numpy as np
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "rawlsian", "utilitarian"]
+AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian"]
 NUM_AGENTS = 4
 NUM_START_BERRIES = NUM_AGENTS * 3
 MAX_WIDTH = NUM_AGENTS * 2
@@ -22,7 +22,7 @@ def generate_graphs(scenario):
     """
     data_analysis = DataAnalysis()
     path = "data/"+scenario+"/"
-    files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"rawlsian.csv",path+"utilitarian.csv"]
+    files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv"]
     labels = AGENT_TYPES
     dfs = []
     for file in files:
