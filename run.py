@@ -76,9 +76,9 @@ def create_and_run_model(scenario,num_agents,num_start_berries,agent_type,max_wi
         ValueError("Unknown argument: "+scenario)
     run_simulation(model_inst,render,log_wandb)
 
-def run_all(scenario,num_start_berries,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb):
+def run_all(scenario,num_agents,num_start_berries,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb):
     for agent_type in AGENT_TYPES:
-        create_and_run_model(scenario,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb)
+        create_and_run_model(scenario,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb)
 
 def get_integer_input(prompt):
     while True:
@@ -119,7 +119,7 @@ elif args.option == "test" or args.option == "train":
         scenario = "basic"
     #########################################################################################
     agent_type = input("What type of agent do you want to implement (baseline, egalitarian, maximin, utilitarian, all): ")
-    while agent_type not in AGENT_TYPES:
+    while agent_type != "all" and agent_type not in AGENT_TYPES:
         agent_type = input("Invalid agent type. Please choose 'baseline', 'egalitarian', 'maximin', or 'utilitarian', or 'all': ")
     #########################################################################################
     write_data = write_data_input("data")
