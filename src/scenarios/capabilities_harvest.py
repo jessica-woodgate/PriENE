@@ -6,12 +6,18 @@ class CapabilitiesHarvest(HarvestModel):
         self.num_start_berries = num_start_berries
         self.allocations = {"agent_0": {
                                 "id": 0,
-                                "berry_allocation": 6},
+                                "berry_allocation": 5},
                             "agent_1": {
                                 "id": 1,
-                                "berry_allocation": 2}
+                                "berry_allocation": 2},
+                            "agent_2": {
+                                "id": 2,
+                                "berry_allocation": 3},
+                            "agent_3": {
+                                "id": 3,
+                                "berry_allocation": 2},
                             }
-        self.init_agents(self.n_features, agent_type)
+        self.init_agents(agent_type)
         self.berries = self.init_berries()
 
     def init_berries(self):

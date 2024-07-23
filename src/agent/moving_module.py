@@ -24,7 +24,10 @@ class MovingModule():
             #if there are no berries, have to wait - return False
             if self._nearest_berry_coordinates == None:
                 return False
-            self._nearest_berry = self.model.get_uneaten_berry_by_coords(self._nearest_berry_coordinates)
+            if self.training:
+                self._nearest_berry = self.model.get_uneaten_berry_by_coords(self._nearest_berry_coordinates)
+            else:
+                self._nearest_berry = self.model.get_uneaten_berry_by_coords(self._nearest_berry_coordinates, self.agent_id)
             #self._nearest_berry.marked = True
             self._path = self._find_path_to_berry(current_pos,self._nearest_berry.pos)
             self._path_step = 0
@@ -101,7 +104,10 @@ class MovingModule():
         return math.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
 
     def _find_nearest_berry_coordinates(self, agent_coordinates):
-        uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.agent_id)
+        if self.training:
+            uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates()
+        else:
+            uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.agent_id)
         if not uneaten_berries_coordinates:
             return None
         # Use the key parameter of min to find the index of the minimum distance

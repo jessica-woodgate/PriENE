@@ -8,9 +8,9 @@ import argparse
 import wandb
 import numpy as np
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "rawlsian", "utilitarian"]
+AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian"]
 NUM_AGENTS = 4
-NUM_START_BERRIES = 4
+NUM_START_BERRIES = NUM_AGENTS * 3
 MAX_WIDTH = NUM_AGENTS * 2
 MAX_HEIGHT = MAX_WIDTH
 
@@ -22,7 +22,7 @@ def generate_graphs(scenario):
     """
     data_analysis = DataAnalysis()
     path = "data/"+scenario+"/"
-    files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"rawlsian.csv",path+"utilitarian.csv"]
+    files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv"]
     labels = AGENT_TYPES
     dfs = []
     for file in files:
@@ -33,8 +33,8 @@ def generate_graphs(scenario):
 
 def log_wandb_agents(model_inst, last_episode, reward_tracker):
     for i, agent in enumerate(model_inst.schedule.agents):
-        if agent.type != "berry":
-            base_string = agent.type+"_agent_"+str(agent.unique_id)
+        if agent.agent_type != "berry":
+            base_string = agent.agent_type+"_agent_"+str(agent.unique_id)
             if last_episode != model_inst.episode:
                 string = base_string+"_total_episode_reward"
                 reward = reward_tracker[i]
@@ -55,10 +55,10 @@ def run_simulation(model_inst, render, log_wandb):
     while (model_inst.training and model_inst.epsilon > model_inst.min_epsilon) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
         model_inst.step()
         if log_wandb:
-            reward_tracker = [a.total_episode_reward for a in model_inst.schedule.agents if a.type != "berry"]
+            reward_tracker = [a.total_episode_reward for a in model_inst.schedule.agents if a.agent_type != "berry"]
             log_wandb_agents(model_inst, model_inst.episode, reward_tracker)
-            mean_reward = model_inst.model_reporter["mean_reward"].mean()
-            wandb.log({'mean_reward_test': mean_reward})
+            mean_reward = model_inst.model_episode_reporter["mean_reward"].mean()
+            wandb.log({'mean_episode_reward': mean_reward})
         if render:
             render_inst.render_pygame(model_inst)
     num_episodes = model_inst.episode
