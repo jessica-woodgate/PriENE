@@ -220,10 +220,10 @@ class HarvestAgent(DQNAgent):
         self.health -= self.health_decay
         self.days_left_to_live = self.get_days_left_to_live()
         day = self.model.get_day()
-        if len(self.model.get_living_agents()) < self.model.get_num_agents():
-            reward -= 1
-            self.days_survived = day
-            done = True
+        # if len(self.model.get_living_agents()) < self.model.get_num_agents():
+        #     reward -= 1
+        #     self.days_survived = day
+        #     done = True
         if self.health <= 0:
             #environment class checks for dead agents to remove at the end of each step
             done = True
