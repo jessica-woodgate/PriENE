@@ -154,7 +154,7 @@ class HarvestAgent(DQNAgent):
             self.berries += 1
             return self._rewards["forage"]
         if new_pos != self.pos:
-            self.model.move_agent(self, new_pos)
+            self.model.move_agent_to_cell(self, new_pos)
         return self._rewards["neutral_reward"]
     
     def _throw(self, benefactor_id):

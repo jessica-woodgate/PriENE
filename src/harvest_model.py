@@ -28,7 +28,7 @@ class HarvestModel(Model):
         self.max_width = max_width
         self.max_height = max_height
         self.grid = MultiGrid(self.max_width, self.max_height, False)
-        self.max_days = 50
+        self._max_days = 50
         self.max_episodes = max_episodes
         self.min_epsilon = 0.01
         self._day = 1
@@ -56,7 +56,7 @@ class HarvestModel(Model):
     def init_agents(self, agent_type):
         self.living_agents = []
         for i in range(self.num_agents):
-            a = HarvestAgent(i,self,agent_type,self.max_days,0,self.max_width,0,self.max_height,self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
+            a = HarvestAgent(i,self,agent_type,self._max_days,0,self.max_width,0,self.max_height,self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
             self.add_agent(a)
         self.num_living_agents = len(self.living_agents)
         self.berry_id = self.num_living_agents + 1
@@ -85,7 +85,7 @@ class HarvestModel(Model):
         if self._write_norms:
             self.emerged_norms = self.get_emerged_norms()
         #if exceeded max days or all agents died, reset for new episode
-        if self._day >= self.max_days or self.num_living_agents <= 0:
+        if self._day >= self._max_days or self.num_living_agents <= 0:
             self.end_day = self._day
             if self._write_norms:
                 self.append_norm_dict_to_file(self.emerged_norms, "data/results/"+self.file_string+"_emerged_norms")
@@ -286,7 +286,7 @@ class HarvestModel(Model):
         cell = self.get_allotment_cell(agent)
         self.grid.place_agent(agent, cell)
 
-    def move_agent(self, agent, new_pos):
+    def move_agent_to_cell(self, agent, new_pos):
         self.grid.move_agent(agent, new_pos)
 
     #for agents who are on the grid
@@ -445,6 +445,9 @@ class HarvestModel(Model):
     
     def get_day(self):
         return self._day
+    
+    def get_max_days(self):
+        return self._max_days
     
     def get_write_norms(self):
         return self._write_norms
