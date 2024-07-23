@@ -21,7 +21,8 @@ def generate_graphs(scenario):
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
     data_analysis = DataAnalysis()
-    path = "data/"+scenario+"/"
+    #path = "data/"+scenario+"/"
+    path = "data/results/agent_reports_"+scenario+"_"
     files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv"]
     labels = AGENT_TYPES
     dfs = []
