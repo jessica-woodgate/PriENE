@@ -9,8 +9,8 @@ class HarvestAgent(DQNAgent):
         self.actions = self._generate_actions(unique_id, model.get_num_agents())
         #dqn agent class handles learning and action selection
         super().__init__(unique_id,model,agent_type,self.actions,training,epsilon,shared_replay_buffer=shared_replay_buffer)
-        self.start_health = 0.8
-        self.health = 0.8
+        self._start_health = 0.8
+        self.health = self._start_health
         self.berries = 0
         self.berries_consumed = 0
         self.berries_thrown = 0
@@ -97,7 +97,7 @@ class HarvestAgent(DQNAgent):
         self.berries_consumed = 0
         self.berries_thrown = 0
         self.max_berries = 0
-        self.health = self.start_health
+        self.health = self._start_health
         self.current_reward = 0
         self.days_left_to_live = self.get_days_left_to_live()
         self.days_survived = 0

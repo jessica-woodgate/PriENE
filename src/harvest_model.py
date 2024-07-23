@@ -54,11 +54,11 @@ class HarvestModel(Model):
         raise NotImplementedError
     
     def init_agents(self, agent_type):
-        self.living_agents = []
+        self._living_agents = []
         for i in range(self.num_agents):
             a = HarvestAgent(i,self,agent_type,self._max_days,0,self.max_width,0,self.max_height,self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
             self.add_agent(a)
-        self.num_living_agents = len(self.living_agents)
+        self.num_living_agents = len(self._living_agents)
         self.berry_id = self.num_living_agents + 1
         assert self.num_living_agents == self.num_agents, "init {self.num_living_agents} instead of {self.num_agents}"
 
@@ -67,7 +67,7 @@ class HarvestModel(Model):
         self.place_agent_in_allotment(a)
         if a.agent_type != "berry":
             self.agent_id += 1
-            self.living_agents.append(a)
+            self._living_agents.append(a)
             
     def step(self):
         self.schedule.step()
@@ -112,7 +112,7 @@ class HarvestModel(Model):
             file.write(",")
 
     def _reset(self):
-        self.living_agents = []
+        self._living_agents = []
         self.emerged_norms_current = {}
         self.emerged_norms_history = {}
         self._day = 0
@@ -138,7 +138,7 @@ class HarvestModel(Model):
         agent.reset()
         self.place_agent_in_allotment(agent)
         agent.off_grid = False
-        self.living_agents.append(agent)
+        self._living_agents.append(agent)
     
     def _reset_berry(self, berry, end_of_episode):
         if berry.agent_type != "berry":
@@ -313,8 +313,8 @@ class HarvestModel(Model):
         self.grid.remove_agent(agent)
         agent.off_grid = True
         agent.days_left_to_live = 0
-        self.living_agents = [a for a in self.schedule.agents if a.agent_type != "berry" and a.off_grid == False]
-        list_living = len(self.living_agents)
+        self._living_agents = [a for a in self.schedule.agents if a.agent_type != "berry" and a.off_grid == False]
+        list_living = len(self._living_agents)
         assert list_living == self.num_living_agents, "length of living agents list is {list_living} and the number of living agents is {self.num_living_agents}"
     
     def new_berry(self,min_width,max_width,min_height,max_height,allocation_id=None):
@@ -441,7 +441,7 @@ class HarvestModel(Model):
         return self.num_agents
     
     def get_living_agents(self):
-        return self.living_agents
+        return self._living_agents
     
     def get_day(self):
         return self._day
