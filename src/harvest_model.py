@@ -401,21 +401,24 @@ class HarvestModel(Model):
         m /= self.num_agents
         return m
 
-    def get_uneaten_berries_coordinates(self, agent_id):
+    def get_uneaten_berries_coordinates(self, agent_id=None):
         berries_coordinates = []
         for b in self.berries:
             if b.foraged == False:# and b.marked == False: 
-                if self.training:
+                if agent_id==None:
                     berries_coordinates.append(b.pos)
                 else:
                     if b.allocated_agent_id == agent_id:
                         berries_coordinates.append(b.pos)
         return berries_coordinates
     
-    def get_uneaten_berry_by_coords(self, coords):
+    def get_uneaten_berry_by_coords(self, coords, agent_id=None):
         for b in self.berries:
             if b.pos == coords and b.foraged == False:# and b.marked == False:
-                return b
+                if agent_id == None:
+                    return b
+                elif b.allocated_agent_id == agent_id:
+                    return b
         raise NoBerriesException(coordinates=coords)
     
     def get_society_well_being(self, observer, include_observer):
