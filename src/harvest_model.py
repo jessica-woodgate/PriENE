@@ -18,8 +18,8 @@ from abc import abstractmethod
 class HarvestModel(Model):
     def __init__(self,num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string=""):
         super().__init__()
-        self.num_agents = num_agents
-        if self.num_agents <= 0:
+        self._num_agents = num_agents
+        if self._num_agents <= 0:
             raise NumAgentsException(">0", 0)
         self.num_berries = 0
         self.end_day = 0
@@ -55,12 +55,12 @@ class HarvestModel(Model):
     
     def init_agents(self, agent_type):
         self._living_agents = []
-        for i in range(self.num_agents):
+        for i in range(self._num_agents):
             a = HarvestAgent(i,self,agent_type,self._max_days,0,self.max_width,0,self.max_height,self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
             self.add_agent(a)
-        self.num_living_agents = len(self._living_agents)
-        self.berry_id = self.num_living_agents + 1
-        assert self.num_living_agents == self.num_agents, "init {self.num_living_agents} instead of {self.num_agents}"
+        self._num_living_agents = len(self._living_agents)
+        self.berry_id = self._num_living_agents + 1
+        assert self._num_living_agents == self._num_agents, "init {self._num_living_agents} instead of {self._num_agents}"
 
     def add_agent(self, a):
         self.schedule.add(a)
@@ -77,7 +77,7 @@ class HarvestModel(Model):
             if a.agent_type == "berry" and a.foraged == True:
                 self._reset_berry(a, False)
             if a.agent_type != "berry":
-                if self.num_living_agents == self.num_agents and a.off_grid == False:
+                if self._num_living_agents == self._num_agents and a.off_grid == False:
                     self._collect_agent_data(a)
                 if a.done == True and a.off_grid == False:
                     self._remove_agent(a)
@@ -85,7 +85,7 @@ class HarvestModel(Model):
         if self._write_norms:
             self.emerged_norms = self.get_emerged_norms()
         #if exceeded max days or all agents died, reset for new episode
-        if self._day >= self._max_days or self.num_living_agents <= 0:
+        if self._day >= self._max_days or self._num_living_agents <= 0:
             self.end_day = self._day
             if self._write_norms:
                 self.append_norm_dict_to_file(self.emerged_norms, "data/results/"+self.file_string+"_emerged_norms")
@@ -128,9 +128,9 @@ class HarvestModel(Model):
             elif a.agent_type == "berry":
                 self._reset_berry(a, True)
                 num_berries += 1
-        assert num_agents == self.num_agents, "reset "+str(num_agents)+" agents instead of "+str(self.num_agents)
+        assert num_agents == self._num_agents, "reset "+str(num_agents)+" agents instead of "+str(self._num_agents)
         assert num_berries == self.num_berries, "reset "+str(num_berries)+" berries instead of "+str(self.num_berries)
-        self.num_living_agents = self.num_agents
+        self._num_living_agents = self._num_agents
     
     def _reset_agent(self, agent):
         if agent.agent_type == "berry":
@@ -220,7 +220,7 @@ class HarvestModel(Model):
                                "mean_health": [self.agent_reporter["health"].iloc[row_index_list].mean(axis=0)],
                                "median_health": [self.agent_reporter["health"].iloc[row_index_list].median()],
                                "variance_health": [self.agent_reporter["health"].iloc[row_index_list].var(axis=0)],
-                               "deceased": [self.num_agents - self.num_living_agents],
+                               "deceased": [self._num_agents - self._num_living_agents],
                                "num_emerged_norms": [len(self.emerged_norms_history) if self._write_norms else None]})
         self.model_episode_reporter = pd.concat([self.model_episode_reporter, new_entry], ignore_index=True)
         if self.write_data:
@@ -309,13 +309,13 @@ class HarvestModel(Model):
     #     self.num_berries -= 1
     
     def _remove_agent(self, agent):
-        self.num_living_agents -= 1
+        self._num_living_agents -= 1
         self.grid.remove_agent(agent)
         agent.off_grid = True
         agent.days_left_to_live = 0
         self._living_agents = [a for a in self.schedule.agents if a.agent_type != "berry" and a.off_grid == False]
         list_living = len(self._living_agents)
-        assert list_living == self.num_living_agents, "length of living agents list is {list_living} and the number of living agents is {self.num_living_agents}"
+        assert list_living == self._num_living_agents, "length of living agents list is {list_living} and the number of living agents is {self._num_living_agents}"
     
     def new_berry(self,min_width,max_width,min_height,max_height,allocation_id=None):
         berry = Berry(self.berry_id,self,min_width,max_width,min_height,max_height,allocation_id)
@@ -337,7 +337,7 @@ class HarvestModel(Model):
         return self.grid.iter_cell_list_contents(cell)
     
     def get_emerged_norms(self):
-        emergence_count = self.num_agents * self.societal_norm_emergence_threshold
+        emergence_count = self._num_agents * self.societal_norm_emergence_threshold
         emerged_norms = {}
         for agent in self.schedule.agents:
             if agent.agent_type != "berry":
@@ -365,7 +365,7 @@ class HarvestModel(Model):
         s = sum(x)
         if s == 0:
             return 0
-        N = self.num_agents
+        N = self._num_agents
         B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * s)
         return 1 + (1 / N) - 2 * B
     
@@ -378,7 +378,7 @@ class HarvestModel(Model):
                         m += np.mean(agent.losses)
             if m == 0:
                 return 0
-            m /= self.num_agents
+            m /= self._num_agents
         return m
     
     def get_mean_reward(self):
@@ -388,7 +388,7 @@ class HarvestModel(Model):
                 m += agent.total_episode_reward
         if m == 0:
             return 0
-        m /= self.num_agents
+        m /= self._num_agents
         return m
     
     def get_mean_epsilon(self):
@@ -398,7 +398,7 @@ class HarvestModel(Model):
                 m += agent.epsilon
         if m == 0:
             return 0
-        m /= self.num_agents
+        m /= self._num_agents
         return m
 
     def get_uneaten_berries_coordinates(self, agent_id=None):
@@ -438,7 +438,11 @@ class HarvestModel(Model):
         return society_well_being
     
     def get_num_agents(self):
-        return self.num_agents
+        return self._num_agents
+    
+    def get_num_living_agents(self):
+        assert self._num_living_agents == len(self._living_agents)
+        return self._num_living_agents
     
     def get_living_agents(self):
         return self._living_agents
