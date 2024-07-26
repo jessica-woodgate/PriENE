@@ -34,12 +34,12 @@ class AllotmentHarvest(HarvestModel):
         return berries
       
     def init_agents(self, agent_type):
-        self.living_agents = []
-        for id in range(self.num_agents):
+        self._living_agents = []
+        for id in range(self._num_agents):
             agent_id = "agent_"+str(id)
             allotment = self.allocations[agent_id]["allotment"]
             a = HarvestAgent(id,self,agent_type,allotment[0],allotment[1],allotment[2],allotment[3],self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
             self.add_agent(a)
-        self.num_living_agents = len(self.living_agents)
-        self.berry_id = self.num_living_agents + 1
-        assert self.num_living_agents == self.num_agents, f"init {self.num_living_agents} instead of {self.num_agents}"
+        self._num_living_agents = len(self._living_agents)
+        self.berry_id = self._num_living_agents + 1
+        assert self._num_living_agents == self._num_agents, f"init {self.num_living_agents} instead of {self._num_agents}"
