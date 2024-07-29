@@ -8,7 +8,7 @@ import argparse
 import wandb
 import numpy as np
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian"]
+AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "deon_egalitarian"]
 NUM_AGENTS = 4
 NUM_START_BERRIES = NUM_AGENTS * 3
 MAX_WIDTH = NUM_AGENTS * 2
@@ -118,9 +118,9 @@ elif args.option == "test" or args.option == "train":
     else:
         scenario = "basic"
     #########################################################################################
-    agent_type = input("What type of agent do you want to implement (baseline, egalitarian, maximin, utilitarian, all): ")
+    agent_type = input("What type of agent do you want to implement (baseline, egalitarian, maximin, utilitarian, deon_egalitarian, all): ")
     while agent_type != "all" and agent_type not in AGENT_TYPES:
-        agent_type = input("Invalid agent type. Please choose 'baseline', 'egalitarian', 'maximin', or 'utilitarian', or 'all': ")
+        agent_type = input("Invalid agent type. Please choose 'baseline', 'egalitarian', 'maximin', or 'utilitarian', 'deon_egalitarian', or 'all': ")
     #########################################################################################
     write_data = write_data_input("data")
     #########################################################################################
