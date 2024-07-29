@@ -103,14 +103,14 @@ def write_data_input(data_type):
 #########################################################################################
 
 parser = argparse.ArgumentParser(description="Program options")
-parser.add_argument("option", choices=["test", "train", "generate_graphs"],
+parser.add_argument("option", choices=["test", "train", "graphs"],
                     help="Choose the program operation")
 parser.add_argument("-l", "--log", type=str, default=None,
                     help="Log wandb (optional)")
 args = parser.parse_args()
 
-if args.option not in ["test", "train", "generate_graphs"]:
-    print("Please choose 'test', 'train', or 'generate_graphs'.")
+if args.option not in ["test", "train", "graphs"]:
+    print("Please choose 'test', 'train', or 'graphs'.")
 elif args.option == "test" or args.option == "train":
     if args.option == "test":
         scenario = input("What type of scenario do you want to run (capabilities, allotment): ")
@@ -152,7 +152,7 @@ elif args.option == "test" or args.option == "train":
     else:
         create_and_run_model(scenario,NUM_AGENTS,NUM_START_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,training,write_data,write_norms,render,log_wandb)
 #########################################################################################
-elif args.option == "generate_graphs":
+elif args.option == "graphs":
     scenario = input("What type of scenario do you want to generate graphs for (capabilities, allotment): ")
     while scenario not in ["capabilities", "allotment"]:
         scenario = input("Invalid scenario. Please choose 'capabilities', or 'allotment': ")
