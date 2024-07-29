@@ -3,23 +3,22 @@ import numpy as np
 
 class EthicsModule():
     """
-    on each step, agent updates it's ability to act cooperatively (has berries)
+    on each step, agent updates it's ability to act cooperatively (has berries; is healthy)
     agent calls update_state which tracks the measure of well-being before the agent acts
     after acting, agent calls get_sanction which calls the chosen principle to generate a sanction indicating alignment
     """
-    def __init__(self,shaped_reward,agent_id):
+    def __init__(self,agent_id,shaped_reward):
+        self.agent_id = agent_id
         self._shaped_reward = shaped_reward
         self._can_help = False
         self._current_principle = None
         self._society_well_being = None
         self._measure_of_well_being = None
         self._number_of_minimums = None
-        self.agent_id = agent_id
     
-    def update_state(self, principle, society_well_being, day, can_help=None):
-        self.day = day
-        if can_help != None:
-            self._can_help = can_help
+    def update_state(self, principle, society_well_being, day, can_help):
+        #self.day = day
+        self._can_help = can_help
         self._calculate_social_welfare(principle, society_well_being)
     
     def _calculate_social_welfare(self, principle, society_well_being):
@@ -45,7 +44,6 @@ class EthicsModule():
     #     return ordered_agents[-1].days_left_to_live, agent_in_min, self_in_min
 
     def _maximin_welfare(self, society_well_being):
-        #return min(society_well_being)
         min_value = min(society_well_being)
         count = np.count_nonzero(society_well_being==min_value)
         #print("day",self.day,"agent", self.agent_id, "maximin welfare", society_well_being, "min is", min(society_well_being), "count is", count)
@@ -63,17 +61,17 @@ class EthicsModule():
         #print("day",self.day,"agent", self.agent_id, "utilitarian welfare", society_well_being, "total is", sum(society_well_being))
         return sum(society_well_being)
     
-    def _calculate_gini(self, series):
-        #sort series in ascending order
-        x = sorted(series)
-        s = sum(x)
-        if s == 0:
-            return 0
-        N = len(series)
-        #for each element xi, compute xi * (N - i); divide by num agents * sum
-        B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * s)
-        #
-        return 1 + (1 / N) - 2 * B
+    # def _calculate_gini(self, series):
+    #     #sort series in ascending order
+    #     x = sorted(series)
+    #     s = sum(x)
+    #     if s == 0:
+    #         return 0
+    #     N = len(series)
+    #     #for each element xi, compute xi * (N - i); divide by num agents * sum
+    #     B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * s)
+    #     #
+    #     return 1 + (1 / N) - 2 * B
     
     def get_sanction(self, society_well_being):
         if self.current_principle == "maximin":

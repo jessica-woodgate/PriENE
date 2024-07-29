@@ -32,7 +32,7 @@ class HarvestAgent(DQNAgent):
         self._norm_clipping_frequency = 10
         if agent_type != "baseline":
             self._rewards = self._ethics_rewards()
-            self.ethics_module = EthicsModule(self._rewards["shaped_reward"], self.unique_id)
+            self.ethics_module = EthicsModule(self.unique_id,self._rewards["shaped_reward"])
         else:
             self._rewards = self._baseline_rewards()
         self.off_grid = False
@@ -51,7 +51,7 @@ class HarvestAgent(DQNAgent):
         if self.model.get_write_norms():
             self.norms_module.update_norm_age()
             antecedent = self.norms_module.get_antecedent(self.health, self.berries, society_well_being)
-        if self.agent_type != "baseline" and self.agent_type != "berry":
+        if self.agent_type != "baseline":
             if self.berries > 0 and self.health >= self.low_health_threshold:
                 can_help = True
                 self.ethics_module.update_state(self.agent_type, society_well_being, self.model.get_day(),can_help)
@@ -62,7 +62,7 @@ class HarvestAgent(DQNAgent):
         reward = self._perform_action(action)
         next_state = self.observe()
         done, reward = self._update_attributes(reward)
-        if self.agent_type != "baseline" and self.agent_type != "berry":
+        if self.agent_type != "baseline":
             society_well_being = self.model.get_society_well_being(self, True)
             if can_help:
                 #print("agent", self.unique_id, "executed action", self.actions[action], "health", self.health, "berries", self.berries, "days", self.days_left_to_live, "can help", can_help)
