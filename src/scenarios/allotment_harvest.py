@@ -6,15 +6,24 @@ class AllotmentHarvest(HarvestModel):
         super().__init__(num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
         self.num_start_berries = num_start_berries
         #allocations is a nested dictionary with allotments for each agent (list of coordinates for max/min width/height) and berry allocation;
+        allocation_interval = int(max_width / num_agents)
         self.allocations = {"agent_0": {
                                 "id": 0,
-                                "berry_allocation": 6,
-                                "allotment": [0,4,0,self.max_height]},
+                                "berry_allocation": 5,
+                                "allotment": [0,allocation_interval,0,self.max_height]},
                             "agent_1": {
                                 "id": 1,
                                 "berry_allocation": 2,
-                                "allotment": [4,self.max_width,0,self.max_height]}
-                        }
+                                "allotment": [allocation_interval,allocation_interval*2,0,self.max_height]},
+                            "agent_2": {
+                                "id": 2,
+                                "berry_allocation": 3,
+                                "allotment": [allocation_interval*2,allocation_interval*3,0,self.max_height]},
+                            "agent_3": {
+                                "id": 3,
+                                "berry_allocation": 2,
+                                "allotment": [allocation_interval*3,self.max_width,0,self.max_height]},
+                            }
         self.init_agents(agent_type)
         self.berries = self.init_berries()
 
@@ -38,7 +47,7 @@ class AllotmentHarvest(HarvestModel):
         for id in range(self._num_agents):
             agent_id = "agent_"+str(id)
             allotment = self.allocations[agent_id]["allotment"]
-            a = HarvestAgent(id,self,agent_type,allotment[0],allotment[1],allotment[2],allotment[3],self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
+            a = HarvestAgent(id,self,agent_type,self._max_days,allotment[0],allotment[1],allotment[2],allotment[3],self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
             self.add_agent(a)
         self._num_living_agents = len(self._living_agents)
         self.berry_id = self._num_living_agents + 1
