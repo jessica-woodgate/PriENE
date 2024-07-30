@@ -22,7 +22,7 @@ def generate_graphs(scenario):
     """
     data_analysis = DataAnalysis()
     path = "data/current_run/agent_reports_"+scenario+"_"
-    files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv"]
+    files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv",path+"deon_egalitarian.csv"]
     labels = AGENT_TYPES
     dfs = []
     for file in files:
