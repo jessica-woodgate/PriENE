@@ -47,7 +47,10 @@ class HarvestAgent(DQNAgent):
         """
         done = False
         self.current_action = action
-        society_well_being = self.model.get_society_well_being(self, True)
+        if self.agent_type == "deon_egalitarianism":
+            society_well_being = self.model.get_society_resources(self)
+        else:
+            society_well_being = self.model.get_society_well_being(self, True)
         if self.model.get_write_norms():
             self.norms_module.update_norm_age()
             antecedent = self.norms_module.get_antecedent(self.health, self.berries, society_well_being)

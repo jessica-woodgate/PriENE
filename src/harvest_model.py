@@ -434,6 +434,19 @@ class HarvestModel(Model):
                 #if observing, include dead agents as 0s
                 society_well_being = np.append(society_well_being, 0)
         return society_well_being
+
+    def get_society_resources(self):
+        society_resources = np.array([])
+        for a in self.schedule.agents:
+            if a.agent_type == "berry":
+                continue
+            elif a.done == False:
+                #observe agent's coords and how many days they have left
+                society_well_being = np.append(society_resources, a.berries_consumed)
+            elif a.done == True:
+                #if looking for utility measure, don't include dead agents
+                continue
+        return society_well_being
     
     def get_num_agents(self):
         return self._num_agents

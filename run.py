@@ -14,13 +14,13 @@ NUM_START_BERRIES = NUM_AGENTS * 3
 MAX_WIDTH = NUM_AGENTS * 2
 MAX_HEIGHT = MAX_WIDTH
 
-def generate_graphs(scenario):
+def generate_graphs(scenario, num_agents):
     """
     takes raw files and generates graphs displayed in the paper
     processed dfs contain data for each agent at the end of each episode
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
-    data_analysis = DataAnalysis()
+    data_analysis = DataAnalysis(num_agents)
     path = "data/current_run/agent_reports_"+scenario+"_"
     files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv",path+"deon_egalitarian.csv"]
     labels = AGENT_TYPES
@@ -156,4 +156,4 @@ elif args.option == "graphs":
     while scenario not in ["capabilities", "allotment"]:
         scenario = input("Invalid scenario. Please choose 'capabilities', or 'allotment': ")
     print("Graphs will be saved in data/current_run")
-    generate_graphs(scenario)
+    generate_graphs(scenario, NUM_AGENTS)

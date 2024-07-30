@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 class DataAnalysis():
-    def __init__(self):
-        self.num_agents = 2
+    def __init__(self, num_agents):
+        self.num_agents = num_agents
 
     def process_agent_dfs(self, agent_df_list, df_labels):
         normalised_sum_df_list = self._apply_function_to_list(agent_df_list, self._normalised_sum_step_across_episodes)
