@@ -21,6 +21,20 @@ class EthicsModule():
         self._can_help = can_help
         self._calculate_social_welfare(principle, society_well_being)
     
+    def get_sanction(self, society_well_being):
+        if self.current_principle == "maximin":
+            return self._maximin_sanction(self._measure_of_well_being, self._number_of_minimums, society_well_being)
+        elif self.current_principle == "egalitarian":
+            return self._egalitarian_sanction(self._measure_of_well_being, society_well_being)
+        elif self.current_principle == "utilitarian":
+            return self._utilitarian_sanction(self._measure_of_well_being, society_well_being)
+        elif self.current_principle == "deon_egalitarian":
+            return self._deon_egalitarian_sanction(society_well_being)
+
+    def get_egalitarian_loss(self, society_resources):
+        loss = self._egalitarian_welfare(society_resources)
+        return loss/10
+    
     def _calculate_social_welfare(self, principle, society_well_being):
         self.current_principle = principle
         if principle == "maximin":
@@ -42,22 +56,14 @@ class EthicsModule():
     def _egalitarian_welfare(self, society_well_being):
         n = len(society_well_being)
         total = sum(society_well_being)
+        if total == 0:
+            return 0
         ideal = total/n
         loss = sum(abs(x - ideal) for x in society_well_being)
         return loss
     
     def _utilitarian_welfare(self, society_well_being):
         return sum(society_well_being)
-    
-    def get_sanction(self, society_well_being):
-        if self.current_principle == "maximin":
-            return self._maximin_sanction(self._measure_of_well_being, self._number_of_minimums, society_well_being)
-        elif self.current_principle == "egalitarian":
-            return self._egalitarian_sanction(self._measure_of_well_being, society_well_being)
-        elif self.current_principle == "utilitarian":
-            return self._utilitarian_sanction(self._measure_of_well_being, society_well_being)
-        elif self.current_principle == "deon_egalitarian":
-            return self._deon_egalitarian_sanction(society_well_being)
     
     def _maximin_sanction(self, previous_min, number_of_previous_mins, society_well_being):
         current_min, current_number_of_current_mins = self._maximin_welfare(society_well_being)

@@ -8,7 +8,7 @@ import argparse
 import wandb
 import numpy as np
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "deon_egalitarian"]
+AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "deon_egalitarian", "deon_egalitarian_loss"]
 NUM_AGENTS = 4
 NUM_START_BERRIES = NUM_AGENTS * 3
 MAX_WIDTH = NUM_AGENTS * 2
@@ -22,7 +22,7 @@ def generate_graphs(scenario, num_agents):
     """
     data_analysis = DataAnalysis(num_agents)
     path = "data/current_run/agent_reports_"+scenario+"_"
-    files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv",path+"deon_egalitarian.csv"]
+    files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv",path+"deon_egalitarian.csv",path+"deon_egalitarian_loss.csv"]
     labels = AGENT_TYPES
     dfs = []
     for file in files:
@@ -118,9 +118,9 @@ elif args.option == "test" or args.option == "train":
     else:
         scenario = "basic"
     #########################################################################################
-    agent_type = input("What type of agent do you want to implement (baseline, egalitarian, maximin, utilitarian, deon_egalitarian, all): ")
+    agent_type = input(f"What type of agent do you want to implement {AGENT_TYPES}, all): ")
     while agent_type != "all" and agent_type not in AGENT_TYPES:
-        agent_type = input("Invalid agent type. Please choose 'baseline', 'egalitarian', 'maximin', or 'utilitarian', 'deon_egalitarian', or 'all': ")
+        agent_type = input(f"Invalid agent type. Please choose {AGENT_TYPES}, or 'all': ")
     #########################################################################################
     write_data = write_data_input("data")
     #########################################################################################

@@ -54,7 +54,7 @@ class HarvestAgent(DQNAgent):
         if self.model.get_write_norms():
             self.norms_module.update_norm_age()
             antecedent = self.norms_module.get_antecedent(self.health, self.berries, society_well_being)
-        if self.agent_type != "baseline":
+        if self.agent_type != "baseline" and self.agent_type != "deon_egalitarian_loss":
             if self.berries > 0 and self.health >= self.low_health_threshold:
                 can_help = True
                 self.ethics_module.update_state(self.agent_type, society_well_being, self.model.get_day(), can_help)
@@ -63,7 +63,7 @@ class HarvestAgent(DQNAgent):
         reward = self._perform_action(action)
         next_state = self.observe()
         done, reward = self._update_attributes(reward)
-        if self.agent_type != "baseline":
+        if self.agent_type != "baseline" and self.agent_type != "deon_egalitarian_loss":
             society_well_being = self.model.get_society_well_being(self, True)
             if can_help:
                 reward += self.ethics_module.get_sanction(society_well_being)
@@ -111,6 +111,21 @@ class HarvestAgent(DQNAgent):
         if days_left_to_live < 0:
             return 0
         return int(days_left_to_live)
+    
+    def _learn(self, observation, action, reward, next_state, done):
+        experience = {"s":observation, "a":action, "r":reward, "s_":next_state, "done":done}
+        self.q_network.add_experience(experience)
+        loss = self.q_network.train(self.target_network)
+        if self.agent_type == "deon_egalitarian_loss":
+            fairness_loss = self.ethics_module.get_egalitarian_loss(self.model.get_society_resources())
+            if fairness_loss != 0:
+                if loss == 0:
+                    fairness_loss = int(fairness_loss)
+                loss += fairness_loss
+        self._append_losses(loss)
+        self.learn_step += 1
+        if self.learn_step % self.replace_target_iter == 0:
+            self.target_network.copy_weights(self.q_network)
     
     def _generate_actions(self, unique_id, num_agents):
         """

@@ -442,11 +442,11 @@ class HarvestModel(Model):
                 continue
             elif a.done == False:
                 #observe agent's coords and how many days they have left
-                society_well_being = np.append(society_resources, a.berries_consumed)
+                society_resources = np.append(society_resources, a.berries_consumed)
             elif a.done == True:
                 #if looking for utility measure, don't include dead agents
                 continue
-        return society_well_being
+        return society_resources
     
     def get_num_agents(self):
         return self._num_agents
