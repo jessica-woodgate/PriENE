@@ -8,11 +8,12 @@ import argparse
 import wandb
 import numpy as np
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "deon_egalitarian", "deon_egalitarian_loss"]
+AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "deon_egalitarian", "deon_egalitarian_2", "deon_egalitarian_loss"]
 NUM_AGENTS = 4
 NUM_START_BERRIES = NUM_AGENTS * 3
 MAX_WIDTH = NUM_AGENTS * 2
 MAX_HEIGHT = MAX_WIDTH
+MAX_TEST_EPISODES = 2000
 
 def generate_graphs(scenario, num_agents):
     """
@@ -21,8 +22,10 @@ def generate_graphs(scenario, num_agents):
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
     data_analysis = DataAnalysis(num_agents)
-    path = "data/current_run/agent_reports_"+scenario+"_"
-    files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv",path+"deon_egalitarian.csv",path+"deon_egalitarian_loss.csv"]
+    path_1 = "data/current_run/agent_reports_"+scenario+"_"
+    path_2 = "data/results/run_2/run_2_capabilities/agent_reports_"+scenario+"_"
+    path_3 = "data/results/run_2/run_2_capabilities/with_deon_egal/agent_reports_"+scenario+"_"
+    files = [path_2+"baseline.csv",path_2+"egalitarian.csv",path_2+"maximin.csv",path_2+"utilitarian.csv",path_3+"deon_egalitarian.csv",path_1+"deon_egalitarian_2.csv",path_1+"deon_egalitarian_loss.csv"]
     labels = AGENT_TYPES
     dfs = []
     for file in files:
@@ -139,7 +142,8 @@ elif args.option == "test" or args.option == "train":
         print("Model variables will be written into model_variables/current_run")
         max_episodes = 0
     else:
-        max_episodes = get_integer_input("How many episodes do you want to run: ")
+        #max_episodes = get_integer_input("How many episodes do you want to run: ")
+        max_episodes = MAX_TEST_EPISODES
         training = False
     #########################################################################################
     if args.log is not None:

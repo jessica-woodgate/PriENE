@@ -117,7 +117,7 @@ class HarvestAgent(DQNAgent):
         self.q_network.add_experience(experience)
         loss = self.q_network.train(self.target_network)
         if self.agent_type == "deon_egalitarian_loss":
-            fairness_loss = self.ethics_module.get_egalitarian_loss(self.model.get_society_resources())
+            fairness_loss = self.ethics_module.get_egalitarian_loss(self.model.get_society_well_being(self, True))
             if fairness_loss != 0:
                 if loss == 0:
                     fairness_loss = int(fairness_loss)

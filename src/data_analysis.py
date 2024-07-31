@@ -92,6 +92,7 @@ class DataAnalysis():
                 palette=colors,
                 ax=ax,
                 legend=False,
+                cut=0
             )
 
             plt.xlabel("Society")
