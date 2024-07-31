@@ -8,8 +8,9 @@ import argparse
 import wandb
 import numpy as np
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "deon_egalitarian", "deon_egalitarian_2", "deon_egalitarian_loss"]
-NUM_AGENTS = 4
+#AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "deon_egalitarian", "deon_egalitarian_2", "deon_egalitarian_loss"]
+AGENT_TYPES = ["baseline", "maximin"]
+NUM_AGENTS = 6
 NUM_START_BERRIES = NUM_AGENTS * 3
 MAX_WIDTH = NUM_AGENTS * 2
 MAX_HEIGHT = MAX_WIDTH
@@ -25,7 +26,8 @@ def generate_graphs(scenario, num_agents):
     path_1 = "data/current_run/agent_reports_"+scenario+"_"
     path_2 = "data/results/run_2/run_2_capabilities/agent_reports_"+scenario+"_"
     path_3 = "data/results/run_2/run_2_capabilities/with_deon_egal/agent_reports_"+scenario+"_"
-    files = [path_2+"baseline.csv",path_2+"egalitarian.csv",path_2+"maximin.csv",path_2+"utilitarian.csv",path_3+"deon_egalitarian.csv",path_1+"deon_egalitarian_2.csv",path_1+"deon_egalitarian_loss.csv"]
+    #files = [path_2+"baseline.csv",path_2+"egalitarian.csv",path_2+"maximin.csv",path_2+"utilitarian.csv",path_3+"deon_egalitarian.csv",path_1+"deon_egalitarian_2.csv",path_1+"deon_egalitarian_loss.csv"]
+    files = [path_2+"baseline.csv",path_2+"maximin.csv"]
     labels = AGENT_TYPES
     dfs = []
     for file in files:
