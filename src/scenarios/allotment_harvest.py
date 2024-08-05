@@ -56,7 +56,7 @@ class AllotmentHarvest(HarvestModel):
         for id in range(self._num_agents):
             agent_id = "agent_"+str(id)
             allotment = self.allocations[agent_id]["allotment"]
-            a = HarvestAgent(id,self,agent_type,self._max_days,allotment[0],allotment[1],allotment[2],allotment[3],self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
+            a = HarvestAgent(id,self,agent_type,self._max_days,allotment[0],allotment[1],allotment[2],allotment[3],self.training,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self.add_agent(a)
         self._num_living_agents = len(self._living_agents)
         self.berry_id = self._num_living_agents + 1

@@ -52,7 +52,7 @@ class HarvestAgent(DQNAgent):
             society_well_being = self.model.get_society_resources(self)
         else:
             society_well_being = self.model.get_society_well_being(self, True)
-        if self.write_norms():
+        if self.write_norms:
             self.norms_module.update_norm_age()
             antecedent = self.norms_module.get_antecedent(self.health, self.berries, society_well_being)
         if self.agent_type != "baseline" and self.agent_type != "deon_egalitarian_loss":
@@ -61,8 +61,8 @@ class HarvestAgent(DQNAgent):
         next_state = self.observe()
         done, reward = self._update_attributes(reward)
         if self.agent_type != "baseline" and self.agent_type != "deon_egalitarian_loss":
-            self._ethics_sanction(can_help)
-        if self.write_norms():
+            reward += self._ethics_sanction(can_help)
+        if self.write_norms:
             self.norms_module.update_norm(antecedent, self.actions[action], reward)
             if self.model.get_day() % self._norm_clipping_frequency == 0:
                 self.norms_module.clip_norm_base()
