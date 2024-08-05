@@ -21,7 +21,7 @@ def generate_graphs(scenario):
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
     data_analysis = DataAnalysis()
-    path = "data/"+scenario+"/"
+    path = "data/current_run/agent_reports_"+scenario+"_"
     files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv"]
     labels = AGENT_TYPES
     dfs = []
@@ -94,7 +94,7 @@ def write_data_input(data_type):
         write_data = input("Invalid choice. Please choose 'y' or 'n': ")
     if write_data == "y":
         write_data = True
-        print(f"{data_type} will be written into data/results.")
+        print(f"{data_type} will be written into data/current_run.")
     elif write_data == "n":
         write_data = False
     return write_data
@@ -102,14 +102,14 @@ def write_data_input(data_type):
 #########################################################################################
 
 parser = argparse.ArgumentParser(description="Program options")
-parser.add_argument("option", choices=["test", "train", "generate_graphs"],
+parser.add_argument("option", choices=["test", "train", "graphs"],
                     help="Choose the program operation")
 parser.add_argument("-l", "--log", type=str, default=None,
                     help="Log wandb (optional)")
 args = parser.parse_args()
 
-if args.option not in ["test", "train", "generate_graphs"]:
-    print("Please choose 'test', 'train', or 'generate_graphs'.")
+if args.option not in ["test", "train", "graphs"]:
+    print("Please choose 'test', 'train', or 'graphs'.")
 elif args.option == "test" or args.option == "train":
     if args.option == "test":
         scenario = input("What type of scenario do you want to run (capabilities, allotment): ")
@@ -118,9 +118,10 @@ elif args.option == "test" or args.option == "train":
     else:
         scenario = "basic"
     #########################################################################################
-    agent_type = input("What type of agent do you want to implement (baseline, egalitarian, maximin, utilitarian, all): ")
+    types = AGENT_TYPES + ["all"]
+    agent_type = input(f"What type of agent do you want to implement {types}: ")
     while agent_type != "all" and agent_type not in AGENT_TYPES:
-        agent_type = input("Invalid agent type. Please choose 'baseline', 'egalitarian', 'maximin', or 'utilitarian', or 'all': ")
+        agent_type = input(f"Invalid agent type. Please choose {types}: ")
     #########################################################################################
     write_data = write_data_input("data")
     #########################################################################################
@@ -151,9 +152,9 @@ elif args.option == "test" or args.option == "train":
     else:
         create_and_run_model(scenario,NUM_AGENTS,NUM_START_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,training,write_data,write_norms,render,log_wandb)
 #########################################################################################
-elif args.option == "generate_graphs":
+elif args.option == "graphs":
     scenario = input("What type of scenario do you want to generate graphs for (capabilities, allotment): ")
     while scenario not in ["capabilities", "allotment"]:
         scenario = input("Invalid scenario. Please choose 'capabilities', or 'allotment': ")
-    print("Graphs will be saved in data/results")
+    print("Graphs will be saved in data/current_run")
     generate_graphs(scenario)

@@ -1,0 +1,2902 @@
+
+"100"{
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 48,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,medium days,medium days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 46,
+        "fitness": 0.0324
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 4,
+        "age": 44,
+        "fitness": 0.0029159999999999993
+    },
+    "IF,medium health,no berries,low days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 43,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,low days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 41,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,low days,low days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 37,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,medium days,high days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 36,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 35,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 34,
+        "fitness": 0.6
+    },
+    "IF,high health,medium berries,low days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 32,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,high days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 31,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,high days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 5,
+        "age": 30,
+        "fitness": 1.0460353202999993e-10
+    },
+    "IF,high health,no berries,medium days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 29,
+        "fitness": 0.27
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 5,
+        "age": 26,
+        "fitness": 7.174453499999997e-08
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,eat": {
+        "score": 7,
+        "numerosity": 6,
+        "age": 25,
+        "fitness": 3.5586121596605967e-12
+    },
+    "IF,high health,no berries,medium days,high days,medium days,THEN,throw_0": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 16,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,high days,medium days,THEN,eat": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 15,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,high days,high days,THEN,move": {
+        "score": 3,
+        "numerosity": 7,
+        "age": 13,
+        "fitness": 0.00012400289999999994
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 5,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,medium days,high days,high days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 2,
+        "fitness": 0.0
+    }
+},"200"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,throw_0": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 48,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,medium days,medium days,medium days,medium days,THEN,throw_0": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 46,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,medium days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 44,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,low days,medium days,low days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 43,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 42,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,low days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 41,
+        "fitness": 0
+    },
+    "IF,low health,no berries,medium days,low days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 40,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,high days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 39,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 38,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 37,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,medium days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 36,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 35,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 34,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 33,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 32,
+        "fitness": 0.6
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 30,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 5,
+        "age": 29,
+        "fitness": 5.2301766014999965e-11
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,THEN,eat": {
+        "score": 5,
+        "numerosity": 5,
+        "age": 28,
+        "fitness": 2.3535794706749977e-11
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 6,
+        "age": 27,
+        "fitness": 9.150716981984391e-14
+    },
+    "IF,medium health,no berries,high days,medium days,low days,THEN,throw_1": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 26,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 5,
+        "age": 25,
+        "fitness": 0.0010934999999999999
+    },
+    "IF,medium health,medium berries,high days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 14,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 3,
+        "age": 13,
+        "fitness": 0.004373999999999999
+    },
+    "IF,high health,no berries,high days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 4,
+        "fitness": 0.27
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,THEN,throw_3": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 1,
+        "fitness": 0
+    }
+},"300"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 2,
+        "numerosity": 3,
+        "age": 49,
+        "fitness": 0.014579999999999996
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,low days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 48,
+        "fitness": 0.009719999999999998
+    },
+    "IF,medium health,no berries,low days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,medium days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 46,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 42,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 41,
+        "fitness": 0.05399999999999999
+    },
+    "IF,medium health,no berries,low days,medium days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 40,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,medium days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 39,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 37,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,low days,medium days,medium days,THEN,throw_3": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 36,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 35,
+        "fitness": 0.05399999999999999
+    },
+    "IF,high health,medium berries,medium days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 34,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 33,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 31,
+        "fitness": 0.6
+    },
+    "IF,high health,medium berries,low days,low days,high days,medium days,THEN,throw_3": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 29,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 28,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,high days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 27,
+        "fitness": 2.361959999999999e-05
+    },
+    "IF,high health,medium berries,low days,low days,high days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 26,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,medium days,low days,high days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 25,
+        "fitness": 0.36
+    },
+    "IF,high health,no berries,medium days,low days,high days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 24,
+        "fitness": 0.18
+    },
+    "IF,high health,no berries,low days,low days,high days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 21,
+        "fitness": 0.08099999999999999
+    },
+    "IF,high health,medium berries,low days,low days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 19,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,low days,high days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 16,
+        "fitness": 5.314409999999998e-06
+    },
+    "IF,high health,medium berries,low days,high days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 6,
+        "age": 15,
+        "fitness": 9.565937999999994e-07
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 13,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,high days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 3,
+        "age": 12,
+        "fitness": 0.0
+    },
+    "IF,high health,no berries,low days,high days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 9,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,low days,high days,medium days,THEN,eat": {
+        "score": 4,
+        "numerosity": 3,
+        "age": 6,
+        "fitness": 0.008747999999999999
+    }
+},"400"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 3,
+        "numerosity": 6,
+        "age": 48,
+        "fitness": 0.00010628819999999994
+    },
+    "IF,low health,medium berries,medium days,medium days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 46,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,low days,medium days,low days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 43,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,medium days,low days,medium days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 40,
+        "fitness": 0.0029159999999999993
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 39,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,low days,medium days,THEN,throw_3": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 37,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,low days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 4,
+        "age": 36,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 3,
+        "age": 35,
+        "fitness": 0.0486
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 33,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,medium days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 30,
+        "fitness": 0
+    },
+    "IF,low health,no berries,high days,medium days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 28,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,high days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 27,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 4,
+        "age": 25,
+        "fitness": 0.0002624399999999999
+    },
+    "IF,low health,no berries,high days,low days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 22,
+        "fitness": 0.27
+    },
+    "IF,low health,medium berries,high days,low days,low days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 19,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,high days,medium days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 16,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,low days,THEN,move": {
+        "score": 3,
+        "numerosity": 6,
+        "age": 15,
+        "fitness": 0.0003542939999999999
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 14,
+        "fitness": 7.873199999999998e-05
+    },
+    "IF,high health,no berries,high days,medium days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 13,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 10,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 8,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 3,
+        "numerosity": 3,
+        "age": 4,
+        "fitness": 0.07289999999999999
+    },
+    "IF,high health,medium berries,high days,medium days,high days,low days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 2,
+        "fitness": 0
+    }
+},"500"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 48,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,throw_0": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 46,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,low days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 44,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 43,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,medium days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 42,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,medium days,medium days,high days,medium days,THEN,eat": {
+        "score": 5,
+        "numerosity": 5,
+        "age": 41,
+        "fitness": 3.2285040749999977e-08
+    },
+    "IF,high health,no berries,medium days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 40,
+        "fitness": 0.0
+    },
+    "IF,high health,no berries,low days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 38,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,medium days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 37,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,low days,high days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 35,
+        "fitness": 0.05399999999999999
+    },
+    "IF,high health,no berries,medium days,medium days,high days,medium days,THEN,move": {
+        "score": 3,
+        "numerosity": 6,
+        "age": 34,
+        "fitness": 0.0003542939999999999
+    },
+    "IF,high health,medium berries,medium days,low days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 33,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,high days,medium days,THEN,move": {
+        "score": 4,
+        "numerosity": 12,
+        "age": 23,
+        "fitness": 6.887475359999996e-07
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,eat": {
+        "score": 4,
+        "numerosity": 4,
+        "age": 17,
+        "fitness": 0.003499199999999999
+    },
+    "IF,high health,no berries,medium days,high days,high days,THEN,move": {
+        "score": 3,
+        "numerosity": 4,
+        "age": 7,
+        "fitness": 0.008747999999999999
+    },
+    "IF,high health,medium berries,medium days,high days,high days,THEN,throw_3": {
+        "score": 2.5,
+        "numerosity": 3,
+        "age": 6,
+        "fitness": 0.005467499999999999
+    },
+    "IF,high health,medium berries,medium days,high days,high days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 3,
+        "fitness": 0
+    }
+},"600"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 49,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,low health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 46,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,medium days,medium days,medium days,medium days,THEN,throw_0": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,medium days,low days,low days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 44,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 43,
+        "fitness": 0.6
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,low days,THEN,eat": {
+        "score": 3,
+        "numerosity": 3,
+        "age": 41,
+        "fitness": 0.0005904899999999998
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 40,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 5,
+        "age": 39,
+        "fitness": 0.00032804999999999987
+    },
+    "IF,medium health,no berries,high days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 38,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 34,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,medium days,THEN,eat": {
+        "score": 3,
+        "numerosity": 3,
+        "age": 30,
+        "fitness": 0.021869999999999994
+    },
+    "IF,medium health,no berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 29,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 3,
+        "age": 27,
+        "fitness": 0.0
+    },
+    "IF,high health,no berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 3,
+        "numerosity": 4,
+        "age": 26,
+        "fitness": 6.377291999999997e-06
+    },
+    "IF,high health,no berries,high days,medium days,medium days,medium days,THEN,throw_1": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 22,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,medium days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 21,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,high days,low days,medium days,low days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 20,
+        "fitness": 0.0324
+    },
+    "IF,high health,no berries,high days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 19,
+        "fitness": 0.0
+    },
+    "IF,high health,medium berries,high days,low days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 13,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,medium days,high days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 6,
+        "age": 12,
+        "fitness": 0.0026243999999999994
+    },
+    "IF,high health,medium berries,high days,medium days,high days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 9,
+        "fitness": 0.10799999999999998
+    },
+    "IF,high health,no berries,high days,medium days,high days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 4,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,low days,high days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 3,
+        "fitness": 0.6
+    },
+    "IF,high health,medium berries,high days,low days,high days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 1,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,low days,high days,low days,THEN,throw_0": {
+        "score": 0.8,
+        "numerosity": 1,
+        "age": 0,
+        "fitness": 0
+    }
+},"700"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 48,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,low days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 46,
+        "fitness": 0.6
+    },
+    "IF,medium health,medium berries,medium days,low days,medium days,low days,THEN,throw_1": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 44,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,medium days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 43,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,low days,THEN,throw_0": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 42,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 41,
+        "fitness": 0.0
+    },
+    "IF,high health,no berries,medium days,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 39,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,medium days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 38,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,medium days,low days,THEN,eat": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 37,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 36,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 35,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,medium days,low days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 34,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,low days,high days,low days,THEN,move": {
+        "score": 2,
+        "numerosity": 3,
+        "age": 33,
+        "fitness": 9.565937999999994e-07
+    },
+    "IF,high health,medium berries,medium days,low days,high days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 31,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,high days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 30,
+        "fitness": 0.0006560999999999998
+    },
+    "IF,high health,no berries,medium days,medium days,high days,low days,THEN,throw_1": {
+        "score": -0.4,
+        "numerosity": 2,
+        "age": 29,
+        "fitness": -0.00017495999999999996
+    },
+    "IF,high health,medium berries,medium days,medium days,high days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 3,
+        "age": 27,
+        "fitness": 0.0
+    },
+    "IF,high health,medium berries,medium days,medium days,high days,low days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 24,
+        "fitness": 0.009719999999999998
+    },
+    "IF,high health,no berries,medium days,medium days,high days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 21,
+        "fitness": 0.0
+    },
+    "IF,high health,no berries,medium days,high days,medium days,THEN,move": {
+        "score": 3,
+        "numerosity": 5,
+        "age": 17,
+        "fitness": 2.6572049999999986e-05
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 16,
+        "fitness": 0.0
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,eat": {
+        "score": 5,
+        "numerosity": 4,
+        "age": 14,
+        "fitness": 9.565937999999994e-07
+    },
+    "IF,high health,no berries,low days,high days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 4,
+        "age": 9,
+        "fitness": 0.0002624399999999999
+    },
+    "IF,high health,no berries,low days,high days,medium days,THEN,throw_3": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 7,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,high days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 4,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,low days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 3,
+        "fitness": 0
+    }
+},"800"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 48,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,medium days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 46,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,throw_0": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 4,
+        "age": 44,
+        "fitness": 0.005831999999999999
+    },
+    "IF,medium health,medium berries,medium days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 42,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,throw_3": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 41,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 40,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,medium days,THEN,throw_0": {
+        "score": 1.5,
+        "numerosity": 3,
+        "age": 37,
+        "fitness": 4.236443047214996e-12
+    },
+    "IF,medium health,no berries,high days,low days,low days,medium days,THEN,move": {
+        "score": 3,
+        "numerosity": 11,
+        "age": 36,
+        "fitness": 9.320174703872991e-12
+    },
+    "IF,low health,no berries,high days,low days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 34,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,high days,low days,medium days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 33,
+        "fitness": 0.009719999999999998
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 27,
+        "fitness": 5.648590729619995e-13
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 25,
+        "fitness": 0.0029159999999999993
+    },
+    "IF,medium health,no berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 3,
+        "numerosity": 8,
+        "age": 24,
+        "fitness": 2.7894275207999983e-09
+    },
+    "IF,medium health,no berries,high days,low days,medium days,medium days,THEN,throw_1": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 23,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 15,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 10,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 9,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 8,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,medium days,THEN,throw_3": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 4,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 3,
+        "age": 2,
+        "fitness": 0.54
+    }
+},"900"{
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 48,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 46,
+        "fitness": 0.0243
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,low days,medium days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 5,
+        "age": 44,
+        "fitness": 0.0006560999999999997
+    },
+    "IF,high health,no berries,low days,low days,medium days,medium days,THEN,throw_1": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 41,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,low days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 39,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,low days,medium days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 35,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 34,
+        "fitness": 0.0
+    },
+    "IF,high health,no berries,low days,medium days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 32,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,low days,medium days,high days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 31,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,high days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 30,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 29,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,medium days,low days,high days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 28,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,low days,high days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 27,
+        "fitness": 0.6
+    },
+    "IF,high health,medium berries,medium days,medium days,high days,low days,THEN,throw_3": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 25,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,low days,high days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 5,
+        "age": 24,
+        "fitness": 0.012149999999999998
+    },
+    "IF,high health,medium berries,medium days,low days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 20,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,high days,medium days,THEN,move": {
+        "score": 3,
+        "numerosity": 5,
+        "age": 18,
+        "fitness": 1.9371024449999987e-08
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 17,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,high days,medium days,THEN,throw_3": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 16,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,high days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 8,
+        "age": 15,
+        "fitness": 8.503055999999996e-06
+    },
+    "IF,high health,medium berries,low days,high days,medium days,THEN,eat": {
+        "score": 3,
+        "numerosity": 3,
+        "age": 12,
+        "fitness": 0.0005904899999999998
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,throw_3": {
+        "score": 1.5,
+        "numerosity": 1,
+        "age": 0,
+        "fitness": 0
+    }
+},"1000"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 2,
+        "numerosity": 3,
+        "age": 48,
+        "fitness": 0.0486
+    },
+    "IF,low health,medium berries,medium days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 46,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,medium days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 43,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 42,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,low days,THEN,move": {
+        "score": 3,
+        "numerosity": 6,
+        "age": 41,
+        "fitness": 0.00010628819999999994
+    },
+    "IF,medium health,medium berries,medium days,medium days,low days,THEN,eat": {
+        "score": 3,
+        "numerosity": 3,
+        "age": 39,
+        "fitness": 0.00017714699999999995
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 4,
+        "age": 35,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,THEN,eat": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 33,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,THEN,move": {
+        "score": 4,
+        "numerosity": 7,
+        "age": 27,
+        "fitness": 2.928898896839998e-10
+    },
+    "IF,medium health,no berries,high days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 3,
+        "age": 26,
+        "fitness": 0.0
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,THEN,eat": {
+        "score": 5,
+        "numerosity": 5,
+        "age": 23,
+        "fitness": 9.685512224999994e-09
+    },
+    "IF,medium health,no berries,high days,medium days,low days,THEN,throw_3": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 20,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,medium days,medium days,THEN,move": {
+        "score": 4,
+        "numerosity": 8,
+        "age": 15,
+        "fitness": 5.101833599999997e-06
+    },
+    "IF,high health,medium berries,high days,medium days,medium days,THEN,throw_3": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 11,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,high days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 3,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,high days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 1,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,high days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 0,
+        "fitness": 0
+    }
+},"1100"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,medium days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 48,
+        "fitness": 0.6
+    },
+    "IF,low health,medium berries,medium days,medium days,medium days,low days,THEN,throw_0": {
+        "score": -0.4,
+        "numerosity": 2,
+        "age": 46,
+        "fitness": -0.24
+    },
+    "IF,low health,medium berries,low days,low days,low days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 44,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 43,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,medium days,medium days,low days,THEN,move": {
+        "score": 2,
+        "numerosity": 4,
+        "age": 41,
+        "fitness": 1.4171759999999994e-05
+    },
+    "IF,low health,medium berries,medium days,medium days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 40,
+        "fitness": 0.0008747999999999998
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 39,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 4,
+        "age": 38,
+        "fitness": 0.0
+    },
+    "IF,low health,no berries,medium days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 34,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,medium days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 29,
+        "fitness": 0.36
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 28,
+        "fitness": 0.004859999999999999
+    },
+    "IF,medium health,no berries,high days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 4,
+        "age": 25,
+        "fitness": 7.085879999999997e-06
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 24,
+        "fitness": 0.18
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 4,
+        "age": 21,
+        "fitness": 1.913187599999999e-07
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 3,
+        "age": 20,
+        "fitness": 0.0003936599999999999
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,THEN,eat": {
+        "score": 4,
+        "numerosity": 4,
+        "age": 19,
+        "fitness": 2.834351999999999e-05
+    },
+    "IF,medium health,no berries,high days,low days,medium days,THEN,eat": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 16,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,high days,low days,high days,THEN,move": {
+        "score": 1,
+        "numerosity": 4,
+        "age": 6,
+        "fitness": 0.0029159999999999993
+    },
+    "IF,high health,medium berries,high days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 5,
+        "fitness": 0.6
+    },
+    "IF,high health,medium berries,high days,low days,high days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 3,
+        "fitness": 0
+    }
+},"1200"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 48,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,medium days,THEN,throw_1": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 46,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,low days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 44,
+        "fitness": 0.0029159999999999993
+    },
+    "IF,medium health,no berries,low days,low days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 43,
+        "fitness": 0.0162
+    },
+    "IF,medium health,no berries,low days,medium days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 42,
+        "fitness": 0.007289999999999998
+    },
+    "IF,medium health,medium berries,low days,medium days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 41,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 36,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 35,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,medium days,low days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 34,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,low days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 33,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,low days,low days,high days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 32,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,low days,high days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 31,
+        "fitness": 0.6
+    },
+    "IF,medium health,high berries,medium days,low days,high days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 29,
+        "fitness": 0
+    },
+    "IF,medium health,high berries,medium days,low days,high days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 28,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,medium days,low days,high days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 27,
+        "fitness": 0.10799999999999998
+    },
+    "IF,high health,medium berries,medium days,low days,high days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 26,
+        "fitness": 0.08099999999999999
+    },
+    "IF,high health,medium berries,medium days,high days,THEN,move": {
+        "score": 4,
+        "numerosity": 13,
+        "age": 22,
+        "fitness": 1.6318150996679987e-10
+    },
+    "IF,high health,medium berries,medium days,high days,THEN,eat": {
+        "score": 4,
+        "numerosity": 4,
+        "age": 21,
+        "fitness": 2.0662426079999986e-08
+    },
+    "IF,high health,no berries,medium days,high days,THEN,move": {
+        "score": 3,
+        "numerosity": 6,
+        "age": 20,
+        "fitness": 2.869781399999998e-06
+    }
+},"1300"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 48,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 4,
+        "age": 46,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,medium days,THEN,move": {
+        "score": 3,
+        "numerosity": 7,
+        "age": 45,
+        "fitness": 3.0132704699999984e-07
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 44,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,eat": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 43,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,low days,medium days,medium days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 37,
+        "fitness": 0
+    },
+    "IF,low health,no berries,medium days,low days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 35,
+        "fitness": 0.6
+    },
+    "IF,low health,medium berries,medium days,low days,low days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 33,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,medium days,medium days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 29,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 28,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,low days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 27,
+        "fitness": 0.36
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,medium days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 26,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 24,
+        "fitness": 3.7657271530799964e-12
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 4,
+        "age": 23,
+        "fitness": 4.184141281199997e-11
+    },
+    "IF,medium health,no berries,high days,low days,low days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 4,
+        "age": 21,
+        "fitness": 0.0
+    },
+    "IF,low health,no berries,high days,low days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 17,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,high days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 16,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,low days,high days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 15,
+        "fitness": 0.27
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,high days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 12,
+        "fitness": 0.0029159999999999993
+    },
+    "IF,medium health,no berries,high days,low days,medium days,high days,THEN,move": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 11,
+        "fitness": 0.0324
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 10,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 4,
+        "age": 9,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,medium days,THEN,throw_0": {
+        "score": 0.8,
+        "numerosity": 1,
+        "age": 0,
+        "fitness": 0
+    }
+},"1400"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 2,
+        "numerosity": 3,
+        "age": 48,
+        "fitness": 0.0486
+    },
+    "IF,medium health,medium berries,low days,medium days,medium days,medium days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 46,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 43,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 42,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,medium days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 41,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,medium days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 40,
+        "fitness": 0.6
+    },
+    "IF,high health,medium berries,medium days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 38,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,low days,high days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 37,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,low days,high days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 36,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 35,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,medium days,THEN,eat": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 34,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 33,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 32,
+        "fitness": 0.10799999999999998
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 31,
+        "fitness": 0.0
+    },
+    "IF,high health,medium berries,low days,high days,high days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 30,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 27,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,high days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 26,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,high days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 25,
+        "fitness": 0.18
+    },
+    "IF,high health,no berries,low days,high days,high days,THEN,move": {
+        "score": 1,
+        "numerosity": 5,
+        "age": 24,
+        "fitness": 5.2301766014999965e-11
+    },
+    "IF,high health,medium berries,low days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 22,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,high days,high days,THEN,throw_3": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 21,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,high days,high days,THEN,move": {
+        "score": 4,
+        "numerosity": 11,
+        "age": 18,
+        "fitness": 1.7046501515999988e-08
+    },
+    "IF,high health,medium berries,medium days,high days,high days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 13,
+        "fitness": 0.6
+    },
+    "IF,high health,medium berries,medium days,high days,high days,THEN,eat": {
+        "score": 4,
+        "numerosity": 4,
+        "age": 11,
+        "fitness": 0.0003149279999999999
+    }
+},"1500"{
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 49,
+        "fitness": 0.6
+    },
+    "IF,medium health,medium berries,medium days,low days,medium days,low days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,low health,no berries,medium days,low days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 46,
+        "fitness": 0.18
+    },
+    "IF,low health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,medium days,low days,low days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 43,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 42,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 41,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 3,
+        "age": 40,
+        "fitness": 0.014579999999999996
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,medium days,THEN,eat": {
+        "score": 3,
+        "numerosity": 3,
+        "age": 38,
+        "fitness": 3.8742048899999975e-08
+    },
+    "IF,medium health,no berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 8,
+        "age": 37,
+        "fitness": 4.518872583695996e-12
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,medium days,THEN,eat": {
+        "score": 3,
+        "numerosity": 3,
+        "age": 34,
+        "fitness": 1.0460353202999995e-09
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 3,
+        "age": 33,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,medium days,THEN,throw_0": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 28,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 27,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 26,
+        "fitness": 0.0004373999999999999
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,medium days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 24,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 18,
+        "fitness": 0.6
+    },
+    "IF,high health,no berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 14,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 3,
+        "age": 12,
+        "fitness": 0.0
+    },
+    "IF,high health,no berries,high days,low days,medium days,low days,THEN,move": {
+        "score": 2,
+        "numerosity": 3,
+        "age": 9,
+        "fitness": 0.00011809799999999997
+    },
+    "IF,high health,medium berries,high days,medium days,high days,low days,THEN,throw_0": {
+        "score": 1.5,
+        "numerosity": 3,
+        "age": 8,
+        "fitness": 0.0032804999999999996
+    },
+    "IF,high health,no berries,high days,medium days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 7,
+        "fitness": 0.05399999999999999
+    },
+    "IF,high health,no berries,high days,medium days,high days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 6,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,high days,medium days,high days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 3,
+        "fitness": 0
+    }
+},"1600"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 49,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,low days,low days,low days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 46,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 44,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,medium days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 43,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,medium days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 42,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,low days,high days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 41,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,medium days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 40,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,low days,low days,high days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 39,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,low days,high days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 38,
+        "fitness": 0.6
+    },
+    "IF,high health,medium berries,low days,medium days,high days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 36,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,high days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 35,
+        "fitness": 0.08099999999999999
+    },
+    "IF,high health,no berries,medium days,low days,high days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 33,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,medium days,medium days,high days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 31,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,medium days,high days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 30,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,high days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 5,
+        "age": 29,
+        "fitness": 8.472886094429993e-13
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,eat": {
+        "score": 3,
+        "numerosity": 3,
+        "age": 28,
+        "fitness": 1.0460353202999995e-09
+    },
+    "IF,high health,no berries,low days,high days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 3,
+        "age": 27,
+        "fitness": 0.0
+    },
+    "IF,high health,no berries,medium days,high days,low days,THEN,move": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 25,
+        "fitness": 0.0029159999999999993
+    },
+    "IF,high health,medium berries,medium days,high days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 24,
+        "fitness": 0.0
+    },
+    "IF,high health,medium berries,low days,high days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 22,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,low days,high days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 21,
+        "fitness": 0.0008747999999999998
+    },
+    "IF,high health,no berries,low days,high days,medium days,THEN,throw_3": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 16,
+        "fitness": 0
+    },
+    "IF,high health,no berries,low days,high days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 6,
+        "age": 15,
+        "fitness": 0.00023619599999999993
+    },
+    "IF,high health,no berries,low days,high days,medium days,THEN,eat": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 5,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,medium days,high days,medium days,THEN,throw_3": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 3,
+        "fitness": 0
+    },
+    "IF,high health,no berries,medium days,high days,high days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 2,
+        "fitness": 0.27
+    }
+},"1700"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 49,
+        "fitness": 0.6
+    },
+    "IF,medium health,medium berries,medium days,medium days,medium days,low days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 47,
+        "fitness": 0
+    },
+    "IF,low health,no berries,medium days,low days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 46,
+        "fitness": 0.6
+    },
+    "IF,low health,medium berries,medium days,low days,low days,low days,THEN,throw_1": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 44,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,high days,low days,low days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 43,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,low days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 3,
+        "age": 42,
+        "fitness": 0.0486
+    },
+    "IF,low health,medium berries,medium days,low days,medium days,medium days,THEN,throw_1": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 40,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,high days,low days,medium days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 39,
+        "fitness": 1.721868839999999e-08
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 37,
+        "fitness": 0.0029159999999999993
+    },
+    "IF,medium health,no berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 6,
+        "age": 36,
+        "fitness": 0.0013121999999999997
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 32,
+        "fitness": 0.00019682999999999994
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 28,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 27,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 26,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 22,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 3,
+        "numerosity": 7,
+        "age": 21,
+        "fitness": 3.720086999999998e-05
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 3,
+        "age": 18,
+        "fitness": 0.0
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,medium days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 15,
+        "fitness": 0.36
+    },
+    "IF,high health,medium berries,high days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 9,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 8,
+        "fitness": 0.0
+    },
+    "IF,high health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 6,
+        "fitness": 0.18
+    },
+    "IF,high health,medium berries,high days,medium days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 5,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,medium days,high days,low days,THEN,move": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 3,
+        "fitness": 0.36
+    },
+    "IF,high health,medium berries,high days,medium days,high days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 2,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,high days,medium days,high days,low days,THEN,throw_3": {
+        "score": 1.5,
+        "numerosity": 1,
+        "age": 0,
+        "fitness": 0
+    }
+},"1800"{
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 3,
+        "age": 49,
+        "fitness": 0.0
+    },
+    "IF,low health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 46,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,medium days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,medium days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 3,
+        "age": 44,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 41,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 39,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,low days,low days,medium days,low days,THEN,throw_1": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 38,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,medium days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 37,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,medium days,medium days,medium days,THEN,throw_3": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 36,
+        "fitness": 0
+    },
+    "IF,low health,no berries,medium days,medium days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 35,
+        "fitness": 0.6
+    },
+    "IF,low health,medium berries,medium days,low days,low days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 33,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,low days,medium days,low days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 32,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,low days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 31,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,high days,THEN,move": {
+        "score": 3,
+        "numerosity": 3,
+        "age": 30,
+        "fitness": 0.00017714699999999995
+    },
+    "IF,low health,medium berries,medium days,low days,medium days,high days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 29,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 28,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,low days,medium days,high days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 26,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,high days,THEN,move": {
+        "score": 0,
+        "numerosity": 4,
+        "age": 25,
+        "fitness": 0.0
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,high days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 20,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,medium days,high days,THEN,move": {
+        "score": 0,
+        "numerosity": 3,
+        "age": 19,
+        "fitness": 0.0
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,high days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 17,
+        "fitness": 0.0014579999999999997
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,high days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 16,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,medium days,high days,THEN,throw_3": {
+        "score": -0.4,
+        "numerosity": 2,
+        "age": 15,
+        "fitness": -0.24
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,high days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 12,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,high days,THEN,eat": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 10,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,low days,high days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 9,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,low days,high days,THEN,throw_3": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 8,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,low days,high days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 7,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,low days,high days,THEN,eat": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 6,
+        "fitness": 0
+    },
+    "IF,low health,no berries,high days,low days,low days,high days,THEN,eat": {
+        "score": -0.6000000000000001,
+        "numerosity": 3,
+        "age": 5,
+        "fitness": -0.16200000000000003
+    },
+    "IF,low health,no berries,high days,low days,low days,high days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 2,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,high days,low days,low days,high days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 1,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,low days,high days,THEN,eat": {
+        "score": 0.8,
+        "numerosity": 1,
+        "age": 0,
+        "fitness": 0
+    }
+},"1900"{
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 8,
+        "fitness": 0.6
+    },
+    "IF,medium health,medium berries,medium days,medium days,medium days,low days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 6,
+        "fitness": 0
+    },
+    "IF,low health,no berries,medium days,medium days,low days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 5,
+        "fitness": 0
+    },
+    "IF,low health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 3,
+        "age": 4,
+        "fitness": 0.0
+    },
+    "IF,low health,no berries,medium days,medium days,low days,low days,THEN,throw_1": {
+        "score": -0.2,
+        "numerosity": 1,
+        "age": 1,
+        "fitness": 0
+    },
+    "IF,low health,no berries,medium days,medium days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 0,
+        "fitness": 0
+    }
+},"2000"{
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 49,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 5,
+        "age": 48,
+        "fitness": 0.003644999999999999
+    },
+    "IF,low health,medium berries,medium days,low days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 46,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,medium days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 45,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,low days,low days,medium days,THEN,move": {
+        "score": 3,
+        "numerosity": 3,
+        "age": 41,
+        "fitness": 0.021869999999999994
+    },
+    "IF,low health,medium berries,medium days,medium days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 40,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,medium days,medium days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 2,
+        "age": 39,
+        "fitness": 0.0
+    },
+    "IF,medium health,medium berries,medium days,low days,medium days,medium days,THEN,throw_0": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 37,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,medium days,low days,medium days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 35,
+        "fitness": 0
+    },
+    "IF,low health,medium berries,medium days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 34,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,low days,low days,medium days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 32,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,low days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 31,
+        "fitness": 0
+    },
+    "IF,medium health,medium berries,high days,medium days,medium days,medium days,THEN,eat": {
+        "score": 3,
+        "numerosity": 3,
+        "age": 30,
+        "fitness": 0.00017714699999999995
+    },
+    "IF,medium health,no berries,high days,low days,medium days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 5,
+        "age": 29,
+        "fitness": 5.9048999999999976e-05
+    },
+    "IF,medium health,medium berries,high days,low days,medium days,medium days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 28,
+        "fitness": 0
+    },
+    "IF,medium health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 1,
+        "numerosity": 3,
+        "age": 23,
+        "fitness": 0.007289999999999998
+    },
+    "IF,high health,no berries,high days,medium days,medium days,medium days,THEN,move": {
+        "score": 2,
+        "numerosity": 3,
+        "age": 20,
+        "fitness": 8.609344199999995e-08
+    },
+    "IF,high health,medium berries,high days,medium days,medium days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 16,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,low days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 2,
+        "age": 15,
+        "fitness": 0.6
+    },
+    "IF,high health,medium berries,high days,low days,high days,low days,THEN,eat": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 13,
+        "fitness": 0
+    },
+    "IF,high health,no berries,high days,medium days,high days,low days,THEN,move": {
+        "score": 3,
+        "numerosity": 7,
+        "age": 12,
+        "fitness": 1.1160260999999995e-05
+    },
+    "IF,high health,no berries,high days,medium days,medium days,low days,THEN,move": {
+        "score": 1,
+        "numerosity": 1,
+        "age": 11,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,high days,medium days,high days,low days,THEN,move": {
+        "score": 0,
+        "numerosity": 1,
+        "age": 10,
+        "fitness": 0
+    },
+    "IF,high health,medium berries,high days,medium days,high days,low days,THEN,eat": {
+        "score": 2,
+        "numerosity": 2,
+        "age": 9,
+        "fitness": 0.009719999999999998
+    },
+    "IF,high health,medium berries,high days,medium days,high days,low days,THEN,throw_3": {
+        "score": 0.5,
+        "numerosity": 1,
+        "age": 6,
+        "fitness": 0
+    }
+},

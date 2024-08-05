@@ -8,13 +8,13 @@ class DataAnalysis():
 
     def process_agent_dfs(self, agent_df_list, df_labels):
         normalised_sum_df_list = self._apply_function_to_list(agent_df_list, self._normalised_sum_step_across_episodes)
-        self._write_df_list_to_file(normalised_sum_df_list, df_labels, "dqn_results/normalised_sum_df_")
+        self._write_df_list_to_file(normalised_sum_df_list, df_labels, "data/results/normalised_sum_df_")
         agent_end_episode_list = self._process_end_episode_dataframes(agent_df_list)
-        self._write_df_list_to_file(agent_end_episode_list, df_labels, "dqn_results/processed_episode_df_")
+        self._write_df_list_to_file(agent_end_episode_list, df_labels, "data/results/processed_episode_df_")
         return normalised_sum_df_list, agent_end_episode_list
     
     def display_graphs(self, normalised_sum_df_list, agent_end_episode_list, df_labels):
-        self._days_left_to_live_results(normalised_sum_df_list, df_labels, "dqn_results/days_left_to_live")
+        self._days_left_to_live_results(normalised_sum_df_list, df_labels, "data/results/days_left_to_live")
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", "data/results/violin_end_day", "Violin Plot of Episode Length", "End Day")
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", "data/results/violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
 
@@ -65,11 +65,11 @@ class DataAnalysis():
         self._display_dataframe(total_days_left_to_live, "Total Days Left To Live", "Days Left To Live", filename+"_total")
         gini_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_gini)
         self._display_dataframe(gini_days_left_to_live, "Gini Index of Days Left To Live", "Days Left To Live", filename+"_gini")
-        max_days_left_to_live.to_csv("dqn_results/max_days_left_to_live.csv")
-        min_days_left_to_live.to_csv("dqn_results/min_days_left_to_live.csv")
-        var_days_left_to_live.to_csv("dqn_results/var_days_left_to_live.csv")
-        gini_days_left_to_live.to_csv("dqn_results/gini_days_left_to_live.csv")
-        total_days_left_to_live.to_csv("dqn_results/total_days_left_to_live.csv")
+        max_days_left_to_live.to_csv("data/results/max_days_left_to_live.csv")
+        min_days_left_to_live.to_csv("data/results/min_days_left_to_live.csv")
+        var_days_left_to_live.to_csv("data/results/var_days_left_to_live.csv")
+        gini_days_left_to_live.to_csv("data/results/gini_days_left_to_live.csv")
+        total_days_left_to_live.to_csv("data/results/total_days_left_to_live.csv")
 
     def _calculate_column_across_episode(self, df_list, df_labels, column, calculation):
             data = []
