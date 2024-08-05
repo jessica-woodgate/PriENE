@@ -211,9 +211,9 @@ class HarvestModel(Model):
                                "reward": [],
                                "num_norms": []})
         if self.write_data and not self.training:
-           if exists("data/current_run/agent_reports_"+self.file_string+".csv"):
-               raise FileExistsException("data/current_run/agent_reports_"+self.file_string+".csv")
-           self.agent_reporter.to_csv("data/current_run/agent_reports_"+self.file_string+".csv", mode='a')
+           if exists("data/results/current_run/agent_reports_"+self.file_string+".csv"):
+               raise FileExistsException("data/results/current_run/agent_reports_"+self.file_string+".csv")
+           self.agent_reporter.to_csv("data/results/current_run/agent_reports_"+self.file_string+".csv", mode='a')
         self.model_episode_reporter = pd.DataFrame({"episode": [], 
                                "end_day": [],
                                "epsilon": [],
@@ -232,9 +232,9 @@ class HarvestModel(Model):
                                "deceased": [],
                                "num_emerged_norms": []})
         if self.write_data:
-            if exists("data/current_run/model_episode_reports_"+self.file_string+".csv"):
-                raise FileExistsException("data/current_run/model_episode_reports_"+self.file_string+".csv")
-            self.model_episode_reporter.to_csv("data/current_run/model_episode_reports_"+self.file_string+".csv", mode='a')
+            if exists("data/results/current_run/model_episode_reports_"+self.file_string+".csv"):
+                raise FileExistsException("data/results/current_run/model_episode_reports_"+self.file_string+".csv")
+            self.model_episode_reporter.to_csv("data/results/current_run/model_episode_reports_"+self.file_string+".csv", mode='a')
 
     def _collect_agent_data(self, agent):
         new_entry = pd.DataFrame({"agent_id": [agent.unique_id],
@@ -250,7 +250,7 @@ class HarvestModel(Model):
                                "num_norms": [len(agent.norms_module.norm_base) if self._write_norms else None]})
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry], ignore_index=True)
         if self.write_data and not self.training:
-           new_entry.to_csv("data/current_run/agent_reports_"+self.file_string+".csv", header=None, mode='a')
+           new_entry.to_csv("data/results/current_run/agent_reports_"+self.file_string+".csv", header=None, mode='a')
     
     def _collect_model_episode_data(self):
         row_index_list = self.agent_reporter.index[self.agent_reporter["episode"] == self.episode].tolist()
@@ -273,7 +273,7 @@ class HarvestModel(Model):
                                "num_emerged_norms": [len(self.emerged_norms_history) if self._write_norms else None]})
         self.model_episode_reporter = pd.concat([self.model_episode_reporter, new_entry], ignore_index=True)
         if self.write_data:
-            new_entry.to_csv("data/current_run/model_episode_reports_"+self.file_string+".csv", header=None, mode='a')
+            new_entry.to_csv("data/results/current_run/model_episode_reports_"+self.file_string+".csv", header=None, mode='a')
         return new_entry
 
     def _append_norm_dict_to_file(self, norm_dictionary, filename):
