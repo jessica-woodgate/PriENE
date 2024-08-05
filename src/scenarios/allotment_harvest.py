@@ -7,23 +7,32 @@ class AllotmentHarvest(HarvestModel):
         self.num_start_berries = num_start_berries
         #allocations is a nested dictionary with allotments for each agent (list of coordinates for max/min width/height) and berry allocation;
         allocation_interval = int(max_width / num_agents)
+        # self.allocations = {"agent_0": {
+        #                         "id": 0,
+        #                         "berry_allocation": 5,
+        #                         "allotment": [0,allocation_interval,0,self.max_height]},
+        #                     "agent_1": {
+        #                         "id": 1,
+        #                         "berry_allocation": 2,
+        #                         "allotment": [allocation_interval,allocation_interval*2,0,self.max_height]},
+        #                     "agent_2": {
+        #                         "id": 2,
+        #                         "berry_allocation": 3,
+        #                         "allotment": [allocation_interval*2,allocation_interval*3,0,self.max_height]},
+        #                     "agent_3": {
+        #                         "id": 3,
+        #                         "berry_allocation": 2,
+        #                         "allotment": [allocation_interval*3,self.max_width,0,self.max_height]},
+        #                     }
         self.allocations = {"agent_0": {
                                 "id": 0,
-                                "berry_allocation": 5,
-                                "allotment": [0,allocation_interval,0,self.max_height]},
+                                "berry_allocation": 6,
+                                "allotment": [0,4,0,self.max_height]},
                             "agent_1": {
                                 "id": 1,
                                 "berry_allocation": 2,
-                                "allotment": [allocation_interval,allocation_interval*2,0,self.max_height]},
-                            "agent_2": {
-                                "id": 2,
-                                "berry_allocation": 3,
-                                "allotment": [allocation_interval*2,allocation_interval*3,0,self.max_height]},
-                            "agent_3": {
-                                "id": 3,
-                                "berry_allocation": 2,
-                                "allotment": [allocation_interval*3,self.max_width,0,self.max_height]},
-                            }
+                                "allotment": [4,self.max_width,0,self.max_height]}
+                        }
         self.init_agents(agent_type)
         self.berries = self.init_berries()
 
