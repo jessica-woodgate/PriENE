@@ -24,7 +24,7 @@ def generate_graphs(scenario, num_agents):
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
     data_analysis = DataAnalysis(num_agents)
-    path_1 = "data/current_run/agent_reports_"+scenario+"_"
+    path_1 = "data/results/current_run/agent_reports_"+scenario+"_"
     path_2 = "data/results/run_3_baseline_maximin/2_agents/capabilities/agent_reports_"+scenario+"_"
     path_3 = "data/results/run_2/run_2_capabilities/with_deon_egal/agent_reports_"+scenario+"_"
     #files = [path_2+"baseline.csv",path_2+"egalitarian.csv",path_2+"maximin.csv",path_2+"utilitarian.csv",path_3+"deon_egalitarian.csv",path_1+"deon_egalitarian_2.csv",path_1+"deon_egalitarian_loss.csv"]
@@ -100,7 +100,7 @@ def write_data_input(data_type):
         write_data = input("Invalid choice. Please choose 'y' or 'n': ")
     if write_data == "y":
         write_data = True
-        print(f"{data_type} will be written into data/current_run.")
+        print(f"{data_type} will be written into data/results/current_run.")
     elif write_data == "n":
         write_data = False
     return write_data
@@ -162,5 +162,5 @@ elif args.option == "graphs":
     scenario = input("What type of scenario do you want to generate graphs for (capabilities, allotment): ")
     while scenario not in ["capabilities", "allotment"]:
         scenario = input("Invalid scenario. Please choose 'capabilities', or 'allotment': ")
-    print("Graphs will be saved in data/current_run")
+    print("Graphs will be saved in data/results/current_run")
     generate_graphs(scenario, NUM_AGENTS)
