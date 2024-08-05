@@ -26,11 +26,11 @@ class AllotmentHarvest(HarvestModel):
         #                     }
         self.allocations = {"agent_0": {
                                 "id": 0,
-                                "berry_allocation": 6,
+                                "berry_allocation": 3,
                                 "allotment": [0,4,0,self.max_height]},
                             "agent_1": {
                                 "id": 1,
-                                "berry_allocation": 2,
+                                "berry_allocation": 1,
                                 "allotment": [4,self.max_width,0,self.max_height]}
                         }
         self.init_agents(agent_type)

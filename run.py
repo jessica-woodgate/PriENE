@@ -11,9 +11,9 @@ import numpy as np
 #AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "deon_egalitarian", "deon_egalitarian_2", "deon_egalitarian_loss"]
 AGENT_TYPES = ["baseline", "maximin"]
 NUM_AGENTS = 2
-NUM_START_BERRIES = NUM_AGENTS * 4
-#MAX_WIDTH = NUM_AGENTS * 2
-MAX_WIDTH = NUM_AGENTS * 4 #allotment
+NUM_START_BERRIES = NUM_AGENTS * 2
+MAX_WIDTH = NUM_AGENTS * 2
+#MAX_WIDTH = NUM_AGENTS * 4 #allotment
 MAX_HEIGHT = MAX_WIDTH
 MAX_TEST_EPISODES = 2000
 
@@ -28,7 +28,7 @@ def generate_graphs(scenario, num_agents):
     path_2 = "data/results/run_3_baseline_maximin/2_agents/capabilities/agent_reports_"+scenario+"_"
     path_3 = "data/results/run_2/run_2_capabilities/with_deon_egal/agent_reports_"+scenario+"_"
     #files = [path_2+"baseline.csv",path_2+"egalitarian.csv",path_2+"maximin.csv",path_2+"utilitarian.csv",path_3+"deon_egalitarian.csv",path_1+"deon_egalitarian_2.csv",path_1+"deon_egalitarian_loss.csv"]
-    files = [path_2+"baseline.csv",path_2+"maximin.csv"]
+    files = [path_1+"baseline.csv",path_1+"maximin.csv"]
     labels = AGENT_TYPES
     dfs = []
     for file in files:
