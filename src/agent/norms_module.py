@@ -13,32 +13,6 @@ class NormsModule():
         self.numerosity_weight = 1.0
         self.score_weight = 1.0
 
-    def update_norm(self, antecedent, action, reward):
-        consequent = self.get_consequent(action)
-        current_norm = ",".join([antecedent,consequent])
-        norm = self.norm_base.get(current_norm)
-        if norm != None:
-            norm["score"] += reward
-            norm["numerosity"] += 1
-            self.update_norm_fitness(norm)
-        else:
-            self.norm_base[current_norm] = {"score": reward,
-                                    "numerosity": 1,
-                                    "age": 0,
-                                    "fitness": 0}
-    
-    def update_norm_fitness(self, norm):
-        if norm["age"] != 0:
-            base_fitness = self.norm_decay_rate ** norm["age"]
-            discounted_numerosity = norm["numerosity"] ** self.numerosity_weight
-            discounted_score = norm["score"] ** self.score_weight
-            norm["fitness"] = base_fitness * discounted_numerosity * discounted_score
-
-    def update_norm_age(self):
-        for value in self.norm_base.values():
-            if "age" in value:
-                value["age"] += 1
-
     def clip_norm_base(self):
         if len(self.norm_base.keys()) > self.max_norms:
             for norm in self.norm_base:
@@ -80,5 +54,33 @@ class NormsModule():
         consequent = "THEN,"
         if action == "north" or action == "east" or action == "south" or action == "west":
             return consequent + "move"
+        elif "throw" in action:
+            return consequent + "throw"
         else:
             return consequent + action
+
+    def update_norm_age(self):
+        for value in self.norm_base.values():
+            if "age" in value:
+                value["age"] += 1
+
+    def update_norm(self, antecedent, action, reward):
+        consequent = self.get_consequent(action)
+        current_norm = ",".join([antecedent,consequent])
+        norm = self.norm_base.get(current_norm)
+        if norm != None:
+            norm["score"] += reward
+            norm["numerosity"] += 1
+            self._update_norm_fitness(norm)
+        else:
+            self.norm_base[current_norm] = {"score": reward,
+                                    "numerosity": 1,
+                                    "age": 0,
+                                    "fitness": 0}
+    
+    def _update_norm_fitness(self, norm):
+        if norm["age"] != 0:
+            base_fitness = self.norm_decay_rate ** norm["age"]
+            discounted_numerosity = norm["numerosity"] ** self.numerosity_weight
+            discounted_score = norm["score"] ** self.score_weight
+            norm["fitness"] = base_fitness * discounted_numerosity * discounted_score
