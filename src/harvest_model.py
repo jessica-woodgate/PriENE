@@ -39,7 +39,7 @@ class HarvestModel(Model):
         self.training = training
         self.file_string = file_string
         self.write_data = write_data
-        self._write_norms = write_norms
+        self.write_norms = write_norms
         self.societal_norm_emergence_threshold = 0.9
         self.emerged_norms_current = {}
         self.emerged_norms_history = {}
@@ -56,7 +56,7 @@ class HarvestModel(Model):
     def init_agents(self, agent_type):
         self._living_agents = []
         for i in range(self._num_agents):
-            a = HarvestAgent(i,self,agent_type,self._max_days,0,self.max_width,0,self.max_height,self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
+            a = HarvestAgent(i,self,agent_type,self._max_days,0,self.max_width,0,self.max_height,self.training,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self.add_agent(a)
         self._num_living_agents = len(self._living_agents)
         self.berry_id = self._num_living_agents + 1
@@ -82,18 +82,18 @@ class HarvestModel(Model):
                 if a.done == True and a.off_grid == False:
                     self._remove_agent(a)
         self.epsilon = self.get_mean_epsilon()
-        if self._write_norms:
+        if self.write_norms:
             self.emerged_norms = self.get_emerged_norms()
         #if exceeded max days or all agents died, reset for new episode
         if self._day >= self._max_days or self._num_living_agents <= 0:
             self.end_day = self._day
-            if self._write_norms:
+            if self.write_norms:
                 self.append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.file_string+"_emerged_norms")
             for a in self.schedule.agents:
                 if a.agent_type != "berry":
                     if a.off_grid == False:
                         a.days_survived = self._day
-                    if self._write_norms and self.episode % 100 == 0:
+                    if self.write_norms and self.episode % 100 == 0:
                         self.append_norm_dict_to_file(a.norms_module.norm_base, "data/results/current_run/"+self.file_string+"_agent_"+str(a.unique_id)+"_norm_base")
                     if self.training: 
                         a.save_models()
@@ -196,7 +196,7 @@ class HarvestModel(Model):
                                "days_left_to_live": [agent.days_left_to_live],
                                "action": [agent.current_action],
                                "reward": [agent.current_reward],
-                               "num_norms": [len(agent.norms_module.norm_base) if self._write_norms else None]})
+                               "num_norms": [len(agent.norms_module.norm_base) if self.write_norms else None]})
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry], ignore_index=True)
         if self.write_data and not self.training:
            new_entry.to_csv("data/results/current_run/agent_reports_"+self.file_string+".csv", header=None, mode='a')
@@ -219,7 +219,7 @@ class HarvestModel(Model):
                                "median_health": [self.agent_reporter["health"].iloc[row_index_list].median()],
                                "variance_health": [self.agent_reporter["health"].iloc[row_index_list].var(axis=0)],
                                "deceased": [self._num_agents - self._num_living_agents],
-                               "num_emerged_norms": [len(self.emerged_norms_history) if self._write_norms else None]})
+                               "num_emerged_norms": [len(self.emerged_norms_history) if self.write_norms else None]})
         self.model_episode_reporter = pd.concat([self.model_episode_reporter, new_entry], ignore_index=True)
         if self.write_data:
             new_entry.to_csv("data/results/current_run/model_episode_reports_"+self.file_string+".csv", header=None, mode='a')
@@ -463,6 +463,3 @@ class HarvestModel(Model):
     
     def get_max_days(self):
         return self._max_days
-    
-    def get_write_norms(self):
-        return self._write_norms
