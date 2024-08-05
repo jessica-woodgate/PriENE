@@ -4,18 +4,25 @@ class CapabilitiesHarvest(HarvestModel):
     def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string=""):
         super().__init__(num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
         self.num_start_berries = num_start_berries
+        # self.allocations = {"agent_0": {
+        #                         "id": 0,
+        #                         "berry_allocation": 5},
+        #                     "agent_1": {
+        #                         "id": 1,
+        #                         "berry_allocation": 2},
+        #                     "agent_2": {
+        #                         "id": 2,
+        #                         "berry_allocation": 3},
+        #                     "agent_3": {
+        #                         "id": 3,
+        #                         "berry_allocation": 2},
+        #                     }
         self.allocations = {"agent_0": {
                                 "id": 0,
-                                "berry_allocation": 5},
+                                "berry_allocation": 6},
                             "agent_1": {
                                 "id": 1,
-                                "berry_allocation": 2},
-                            "agent_2": {
-                                "id": 2,
-                                "berry_allocation": 3},
-                            "agent_3": {
-                                "id": 3,
-                                "berry_allocation": 2},
+                                "berry_allocation": 2}
                             }
         self.init_agents(agent_type)
         self.berries = self.init_berries()
