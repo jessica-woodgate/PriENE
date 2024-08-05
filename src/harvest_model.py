@@ -48,26 +48,6 @@ class HarvestModel(Model):
         else:
             self.epsilon = 0.05
         self._init_reporters()
-
-    @abstractmethod
-    def init_berries(self):
-        raise NotImplementedError
-    
-    def init_agents(self, agent_type):
-        self._living_agents = []
-        for i in range(self._num_agents):
-            a = HarvestAgent(i,self,agent_type,self._max_days,0,self.max_width,0,self.max_height,self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
-            self.add_agent(a)
-        self._num_living_agents = len(self._living_agents)
-        self.berry_id = self._num_living_agents + 1
-        assert self._num_living_agents == self._num_agents, "init {self._num_living_agents} instead of {self._num_agents}"
-
-    def add_agent(self, a):
-        self.schedule.add(a)
-        self.place_agent_in_allotment(a)
-        if a.agent_type != "berry":
-            self.agent_id += 1
-            self._living_agents.append(a)
             
     def step(self):
         self.schedule.step()
@@ -81,34 +61,105 @@ class HarvestModel(Model):
                     self._collect_agent_data(a)
                 if a.done == True and a.off_grid == False:
                     self._remove_agent(a)
-        self.epsilon = self.get_mean_epsilon()
+        self.epsilon = self._mean_epsilon()
         if self._write_norms:
-            self.emerged_norms = self.get_emerged_norms()
+            self.emerged_norms = self._check_emerged_norms()
         #if exceeded max days or all agents died, reset for new episode
         if self._day >= self._max_days or self._num_living_agents <= 0:
             self.end_day = self._day
             if self._write_norms:
-                self.append_norm_dict_to_file(self.emerged_norms, "data/current_run/"+self.file_string+"_emerged_norms")
+                self._append_norm_dict_to_file(self.emerged_norms, "data/current_run/"+self.file_string+"_emerged_norms")
             for a in self.schedule.agents:
                 if a.agent_type != "berry":
                     if a.off_grid == False:
                         a.days_survived = self._day
                     if self._write_norms and self.episode % 100 == 0:
-                        self.append_norm_dict_to_file(a.norms_module.norm_base, "data/current_run/"+self.file_string+"_agent_"+str(a.unique_id)+"_norm_base")
+                        self._append_norm_dict_to_file(a.norms_module.norm_base, "data/current_run/"+self.file_string+"_agent_"+str(a.unique_id)+"_norm_base")
                     if self.training: 
                         a.save_models()
             self._collect_model_episode_data()
             self._reset()
 
-    def append_norm_dict_to_file(self, norm_dictionary, filename):
-        with open(filename, "a+") as file:
-            file.seek(0)
-            if not file.read(1):
-                file.write("\n")
-            file.seek(0, 2)
-            json.dump(str(self.episode), file, indent=4)
-            json.dump(norm_dictionary, file, indent=4)
-            file.write(",")
+    def move_agent_to_cell(self, agent, new_pos):
+        self.grid.move_agent(agent, new_pos)
+    
+    def get_cell_contents(self, cell):
+        return self.grid.iter_cell_list_contents(cell)
+
+    def get_uneaten_berries_coordinates(self, agent_id=None):
+        berries_coordinates = []
+        for b in self.berries:
+            if b.foraged == False:# and b.marked == False: 
+                if agent_id==None:
+                    berries_coordinates.append(b.pos)
+                else:
+                    if b.allocated_agent_id == agent_id:
+                        berries_coordinates.append(b.pos)
+        return berries_coordinates
+    
+    def get_uneaten_berry_by_coords(self, coords, agent_id=None):
+        for b in self.berries:
+            if b.pos == coords and b.foraged == False:# and b.marked == False:
+                if agent_id == None:
+                    return b
+                elif b.allocated_agent_id == agent_id:
+                    return b
+        raise NoBerriesException(coordinates=coords)
+    
+    def get_society_well_being(self, observer, include_observer):
+        society_well_being = np.array([])
+        for a in self.schedule.agents:
+            if (a.unique_id == observer.unique_id and not include_observer) or a.agent_type == "berry":
+                continue
+            elif a.done == False:
+                #observe agent's coords and how many days they have left
+                society_well_being = np.append(society_well_being, a.days_left_to_live)
+            elif a.done == True and include_observer:
+                #if looking for utility measure, don't include dead agents
+                continue
+            else:
+                #if observing, include dead agents as 0s
+                society_well_being = np.append(society_well_being, 0)
+        return society_well_being
+    
+    def get_num_agents(self):
+        return self._num_agents
+    
+    def get_num_living_agents(self):
+        assert self._num_living_agents == len(self._living_agents)
+        return self._num_living_agents
+    
+    def get_living_agents(self):
+        return self._living_agents
+    
+    def get_day(self):
+        return self._day
+    
+    def get_max_days(self):
+        return self._max_days
+    
+    def get_write_norms(self):
+        return self._write_norms
+    
+    @abstractmethod
+    def _init_berries(self):
+        raise NotImplementedError
+    
+    def _init_agents(self, agent_type):
+        self._living_agents = []
+        for i in range(self._num_agents):
+            a = HarvestAgent(i,self,agent_type,self._max_days,0,self.max_width,0,self.max_height,self.training,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
+            self._add_agent(a)
+        self._num_living_agents = len(self._living_agents)
+        self.berry_id = self._num_living_agents + 1
+        assert self._num_living_agents == self._num_agents, "init {self._num_living_agents} instead of {self._num_agents}"
+
+    def _add_agent(self, a):
+        self.schedule.add(a)
+        self._place_agent_in_allotment(a)
+        if a.agent_type != "berry":
+            self.agent_id += 1
+            self._living_agents.append(a)
 
     def _reset(self):
         self._living_agents = []
@@ -135,7 +186,7 @@ class HarvestModel(Model):
         if agent.agent_type == "berry":
             raise AgentTypeException(agent.agent_type, "berry")
         agent.reset()
-        self.place_agent_in_allotment(agent)
+        self._place_agent_in_allotment(agent)
         agent.off_grid = False
         self._living_agents.append(agent)
     
@@ -145,7 +196,7 @@ class HarvestModel(Model):
         if not end_of_episode:
             self.grid.remove_agent(berry)
         berry.reset()
-        self.place_agent_in_allotment(berry)
+        self._place_agent_in_allotment(berry)
         
     def _init_reporters(self):
         self.agent_reporter = pd.DataFrame({"agent_id": [],
@@ -206,13 +257,13 @@ class HarvestModel(Model):
         new_entry = pd.DataFrame({"episode": [self.episode], 
                                "end_day": [self._day],
                                "epsilon": [self.epsilon],
-                               "mean_reward": [self.get_mean_reward()],
-                               "mean_loss": [self.get_mean_loss()],
+                               "mean_reward": [self._mean_reward()],
+                               "mean_loss": [self._mean_loss()],
                                "max_berries": [self.agent_reporter["berries"].iloc[row_index_list].max()],
                                "mean_berries": [self.agent_reporter["berries"].iloc[row_index_list].mean(axis=0)],
                                "max_berries_consumed": [self.agent_reporter["berries_consumed"].iloc[row_index_list].max()],
                                "mean_berries_consumed": [self.agent_reporter["berries_consumed"].iloc[row_index_list].mean(axis=0)],
-                               "gini_berries_consumed": [self.get_gini_berries_consumed()],
+                               "gini_berries_consumed": [self._gini_berries_consumed()],
                                "mean_berries_thrown": [self.agent_reporter["berries_thrown"].iloc[row_index_list].mean(axis=0)],
                                "max_health": [self.agent_reporter["health"].iloc[row_index_list].max()],
                                "mean_health": [self.agent_reporter["health"].iloc[row_index_list].mean(axis=0)],
@@ -224,8 +275,36 @@ class HarvestModel(Model):
         if self.write_data:
             new_entry.to_csv("data/current_run/model_episode_reports_"+self.file_string+".csv", header=None, mode='a')
         return new_entry
+
+    def _append_norm_dict_to_file(self, norm_dictionary, filename):
+        with open(filename, "a+") as file:
+            file.seek(0)
+            if not file.read(1):
+                file.write("\n")
+            file.seek(0, 2)
+            json.dump(str(self.episode), file, indent=4)
+            json.dump(norm_dictionary, file, indent=4)
+            file.write(",")
     
-    def check_bounds(self, cell):
+    def _check_emerged_norms(self):
+        emergence_count = self._num_agents * self.societal_norm_emergence_threshold
+        emerged_norms = {}
+        for agent in self.schedule.agents:
+            if agent.agent_type != "berry":
+                for norm_name, norm_value in agent.norms_module.norm_base.items():
+                    if norm_name not in emerged_norms:
+                        emerged_norms[norm_name] = {"score": 0,
+                                                    "numerosity": 0,
+                                                    "fitness": 0,
+                                                    "num_instances": 0}
+                    emerged_norms[norm_name]["score"] += norm_value["score"]
+                    emerged_norms[norm_name]["numerosity"] += norm_value["numerosity"]
+                    emerged_norms[norm_name]["fitness"] += norm_value["fitness"]
+                    emerged_norms[norm_name]["num_instances"] += 1
+        emerged_norms = {norm: norm_value for norm, norm_value in emerged_norms.items() if norm_value["num_instances"] >= emergence_count}
+        return emerged_norms
+    
+    def _check_bounds(self, cell):
         if cell[0] >= 0 and cell[0] < self.max_width:
             if cell[1] >= 0 and cell[1] < self.max_height:
                 return True
@@ -278,21 +357,18 @@ class HarvestModel(Model):
     #     return True
     
     #for new agents who aren't yet on the grid
-    def place_agent_in_allotment(self, agent):
+    def _place_agent_in_allotment(self, agent):
         if not self.grid.exists_empty_cells:
             raise NoEmptyCells
-        cell = self.get_allotment_cell(agent)
+        cell = self._random_allotment_cell(agent)
         self.grid.place_agent(agent, cell)
 
-    def move_agent_to_cell(self, agent, new_pos):
-        self.grid.move_agent(agent, new_pos)
-
     #for agents who are on the grid
-    def move_agent_in_allotment(self, agent, cell=None):
+    def _move_agent_in_allotment(self, agent, cell=None):
         if not self.grid.exists_empty_cells:
             raise NoEmptyCells
         if cell == None:
-            cell = self.get_allotment_cell(agent)
+            cell = self._random_allotment_cell(agent)
         self.grid.move_agent(agent, cell)
     
     def _clear_grid(self):
@@ -300,11 +376,6 @@ class HarvestModel(Model):
             if a.agent_type != "berry" and a.off_grid:
                 continue
             self.grid.remove_agent(a)
-
-    # def _remove_berry(self, berry):
-    #     self.schedule.remove(berry)
-    #     self.grid.remove_agent(berry)
-    #     self.num_berries -= 1
     
     def _remove_agent(self, agent):
         self._num_living_agents -= 1
@@ -315,49 +386,28 @@ class HarvestModel(Model):
         list_living = len(self._living_agents)
         assert list_living == self._num_living_agents, "length of living agents list is {list_living} and the number of living agents is {self._num_living_agents}"
     
-    def new_berry(self,min_width,max_width,min_height,max_height,allocation_id=None):
+    def _new_berry(self,min_width,max_width,min_height,max_height,allocation_id=None):
         berry = Berry(self.berry_id,self,min_width,max_width,min_height,max_height,allocation_id)
         self.schedule.add(berry)
         self.berry_id += 1
         return berry
     
-    def spawn_berry(self, berry, cell=None):
-        if cell == None:
-            self.move_agent_in_allotment(berry)
-            return
-        if self.check_bounds(cell):
-            self.grid.place_agent(berry, cell)
-            self.num_berries += 1
-        else:
-            raise OutOfBounds("berry", cell)
+    # def _spawn_berry(self, berry, cell=None):
+    #     if cell == None:
+    #         self._move_agent_in_allotment(berry)
+    #         return
+    #     if self._check_bounds(cell):
+    #         self.grid.place_agent(berry, cell)
+    #         self.num_berries += 1
+    #     else:
+    #         raise OutOfBounds("berry", cell)
     
-    def get_cell_contents(self, cell):
-        return self.grid.iter_cell_list_contents(cell)
-    
-    def get_emerged_norms(self):
-        emergence_count = self._num_agents * self.societal_norm_emergence_threshold
-        emerged_norms = {}
-        for agent in self.schedule.agents:
-            if agent.agent_type != "berry":
-                for norm_name, norm_value in agent.norms_module.norm_base.items():
-                    if norm_name not in emerged_norms:
-                        emerged_norms[norm_name] = {"score": 0,
-                                                    "numerosity": 0,
-                                                    "fitness": 0,
-                                                    "num_instances": 0}
-                    emerged_norms[norm_name]["score"] += norm_value["score"]
-                    emerged_norms[norm_name]["numerosity"] += norm_value["numerosity"]
-                    emerged_norms[norm_name]["fitness"] += norm_value["fitness"]
-                    emerged_norms[norm_name]["num_instances"] += 1
-        emerged_norms = {norm: norm_value for norm, norm_value in emerged_norms.items() if norm_value["num_instances"] >= emergence_count}
-        return emerged_norms
-    
-    def get_allotment_cell(self, agent):
+    def _random_allotment_cell(self, agent):
         width = np.random.randint(agent.min_width, agent.max_width)
         height = np.random.randint(agent.min_height, agent.max_height)
         return (width, height)
     
-    def get_gini_berries_consumed(self):
+    def _gini_berries_consumed(self):
         berries_consumed = [a.berries_consumed for a in self.schedule.agents if a.agent_type != "berry"]
         x = sorted(berries_consumed)
         s = sum(x)
@@ -367,7 +417,7 @@ class HarvestModel(Model):
         B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * s)
         return 1 + (1 / N) - 2 * B
     
-    def get_mean_loss(self):
+    def _mean_loss(self):
         m = 0
         if self.training:
             for agent in self.schedule.agents:
@@ -379,7 +429,7 @@ class HarvestModel(Model):
             m /= self._num_agents
         return m
     
-    def get_mean_reward(self):
+    def _mean_reward(self):
         m = 0
         for agent in self.schedule.agents:
             if agent.agent_type != "berry":
@@ -389,7 +439,7 @@ class HarvestModel(Model):
         m /= self._num_agents
         return m
     
-    def get_mean_epsilon(self):
+    def _mean_epsilon(self):
         m = 0
         for agent in self.schedule.agents:
             if agent.agent_type != "berry":
@@ -398,58 +448,3 @@ class HarvestModel(Model):
             return 0
         m /= self._num_agents
         return m
-
-    def get_uneaten_berries_coordinates(self, agent_id=None):
-        berries_coordinates = []
-        for b in self.berries:
-            if b.foraged == False:# and b.marked == False: 
-                if agent_id==None:
-                    berries_coordinates.append(b.pos)
-                else:
-                    if b.allocated_agent_id == agent_id:
-                        berries_coordinates.append(b.pos)
-        return berries_coordinates
-    
-    def get_uneaten_berry_by_coords(self, coords, agent_id=None):
-        for b in self.berries:
-            if b.pos == coords and b.foraged == False:# and b.marked == False:
-                if agent_id == None:
-                    return b
-                elif b.allocated_agent_id == agent_id:
-                    return b
-        raise NoBerriesException(coordinates=coords)
-    
-    def get_society_well_being(self, observer, include_observer):
-        society_well_being = np.array([])
-        for a in self.schedule.agents:
-            if (a.unique_id == observer.unique_id and not include_observer) or a.agent_type == "berry":
-                continue
-            elif a.done == False:
-                #observe agent's coords and how many days they have left
-                society_well_being = np.append(society_well_being, a.days_left_to_live)
-            elif a.done == True and include_observer:
-                #if looking for utility measure, don't include dead agents
-                continue
-            else:
-                #if observing, include dead agents as 0s
-                society_well_being = np.append(society_well_being, 0)
-        return society_well_being
-    
-    def get_num_agents(self):
-        return self._num_agents
-    
-    def get_num_living_agents(self):
-        assert self._num_living_agents == len(self._living_agents)
-        return self._num_living_agents
-    
-    def get_living_agents(self):
-        return self._living_agents
-    
-    def get_day(self):
-        return self._day
-    
-    def get_max_days(self):
-        return self._max_days
-    
-    def get_write_norms(self):
-        return self._write_norms
