@@ -82,3 +82,12 @@ class IllegalBerry(HarvestException):
 
     def __str__(self):
         return (f"Agent {self.agent_id} is trying to access illegal berry: {self.illegal_move}")
+    
+class NumBerriesException(HarvestException):
+    def __init__(self, num_expected_berries, num_berries):
+        super().__init__
+        self.num_expected_berries = num_expected_berries
+        self.num_berries = num_berries
+    
+    def __str__(self):
+        return ("Expected {n} berries and got {m}".format(n=self.num_berries, m=self.num_expected_berries))

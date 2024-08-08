@@ -14,7 +14,7 @@ SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 2000
 RESULTS_FILEPATH = "data/results/current_run/"
-RUN_OPTIONS = ["current_run", "run_1"]
+RUN_OPTIONS = ["current_run", "run_1", "run_2"]
 
 def generate_graphs(scenario, num_agents):
     """
@@ -23,8 +23,9 @@ def generate_graphs(scenario, num_agents):
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
     data_analysis = DataAnalysis(num_agents, RESULTS_FILEPATH)
-    path = RESULTS_FILEPATH+"agent_reports_"+scenario+"_"
+    path = "data/current_run/agent_reports_"+scenario+"_"
     files = [path+"baseline.csv",path+"maximin.csv"]
+    #files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv"]
     dfs = []
     for file in files:
         df = pd.read_csv(file)
@@ -101,7 +102,7 @@ def write_data_input(data_type):
         write_data = input("Invalid choice. Please choose 'y' or 'n': ")
     if write_data == "y":
         write_data = True
-        print(f"{data_type} will be written into data/current_run.")
+        print(f"{data_type} will be written into data/results/current_run.")
     elif write_data == "n":
         write_data = False
     return write_data

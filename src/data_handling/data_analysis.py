@@ -1,23 +1,39 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import json
+from src.data_handling.norm_processing import NormProcessing
 
 class DataAnalysis():
-    def __init__(self):
-        self.num_agents = 2
+    def __init__(self, num_agents, filepath):
+        self.num_agents = num_agents
+        self.filepath = filepath
+    
+    def proccess_and_display_all_data(self, scenario, agent_df_list, df_labels):
+        normalised_sum_df_list, agent_end_episode_list = self._process_agent_dfs(agent_df_list, df_labels)
+        self._display_graphs(normalised_sum_df_list, agent_end_episode_list, df_labels)
+        self._display_norm_tree(scenario, df_labels)
 
-    def process_agent_dfs(self, agent_df_list, df_labels):
+    def _process_agent_dfs(self, agent_df_list, df_labels):
         normalised_sum_df_list = self._apply_function_to_list(agent_df_list, self._normalised_sum_step_across_episodes)
-        self._write_df_list_to_file(normalised_sum_df_list, df_labels, "data/results/normalised_sum_df_")
+        self._write_df_list_to_file(normalised_sum_df_list, df_labels, self.filepath+"normalised_sum_df_")
         agent_end_episode_list = self._process_end_episode_dataframes(agent_df_list)
-        self._write_df_list_to_file(agent_end_episode_list, df_labels, "data/results/processed_episode_df_")
+        self._write_df_list_to_file(agent_end_episode_list, df_labels, self.filepath+"processed_episode_df_")
         return normalised_sum_df_list, agent_end_episode_list
     
-    def display_graphs(self, normalised_sum_df_list, agent_end_episode_list, df_labels):
-        self._days_left_to_live_results(normalised_sum_df_list, df_labels, "data/results/days_left_to_live")
-        self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", "data/results/violin_end_day", "Violin Plot of Episode Length", "End Day")
-        self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", "data/results/violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
+    def _display_graphs(self, normalised_sum_df_list, agent_end_episode_list, df_labels):
+        self._days_left_to_live_results(normalised_sum_df_list, df_labels, self.filepath+"days_left_to_live")
+        self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", self.filepath+"violin_end_day", "Violin Plot of Episode Length", "End Day")
+        self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", self.filepath+"violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
 
+    def _display_norm_tree(self,scenario, df_labels):
+        scenario_file = self.filepath+scenario
+        norm_processing = NormProcessing()
+        for label in df_labels:
+            input_file = scenario_file+"_"+label+"_emerged_norms.json"
+            output_file = scenario_file+"_"+label+"_tree"
+            norm_processing.proccess_and_display_tree(input_file, output_file, True, 1, 0.1)
+            
     def _write_df_list_to_file(self, df_list, df_labels, file_string):
         i = 0
         for df in df_list:
@@ -65,11 +81,11 @@ class DataAnalysis():
         self._display_dataframe(total_days_left_to_live, "Total Days Left To Live", "Days Left To Live", filename+"_total")
         gini_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_gini)
         self._display_dataframe(gini_days_left_to_live, "Gini Index of Days Left To Live", "Days Left To Live", filename+"_gini")
-        max_days_left_to_live.to_csv("data/results/max_days_left_to_live.csv")
-        min_days_left_to_live.to_csv("data/results/min_days_left_to_live.csv")
-        var_days_left_to_live.to_csv("data/results/var_days_left_to_live.csv")
-        gini_days_left_to_live.to_csv("data/results/gini_days_left_to_live.csv")
-        total_days_left_to_live.to_csv("data/results/total_days_left_to_live.csv")
+        max_days_left_to_live.to_csv(self.filepath+"max_days_left_to_live.csv")
+        min_days_left_to_live.to_csv(self.filepath+"min_days_left_to_live.csv")
+        var_days_left_to_live.to_csv(self.filepath+"var_days_left_to_live.csv")
+        gini_days_left_to_live.to_csv(self.filepath+"gini_days_left_to_live.csv")
+        total_days_left_to_live.to_csv(self.filepath+"total_days_left_to_live.csv")
 
     def _calculate_column_across_episode(self, df_list, df_labels, column, calculation):
             data = []
@@ -140,3 +156,20 @@ class DataAnalysis():
     
     def _calculate_total(self, series):
         return series.sum()
+    
+    def _create_norms_dataframe(self, filename, write_name=None):
+        norms_data = []
+        with open(filename, 'r') as file:
+            data = json.load(file)
+        # Iterate through each episode key (e.g., "100")
+        for episode, rules in data.items():
+            for rule in rules:
+                # Extract attributes from each rule dictionary
+                attributes = rule.popitem()[1]  # Get first key-value pair (rule name and its dictionary)
+                attributes['episode'] = episode  # Add episode information
+                norms_data.append(attributes)  # Append extracted attributes to data list
+        # Create DataFrame from the data list
+        df = pd.DataFrame(norms_data)
+        if write_name != None:
+            df.to_csv(write_name+".csv")
+        return df
