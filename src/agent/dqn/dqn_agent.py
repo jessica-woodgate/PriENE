@@ -5,7 +5,7 @@ from abc import abstractmethod
 import os
 
 class DQNAgent(Agent):
-    def __init__(self,unique_id,model,agent_type,actions,training,epsilon,shared_replay_buffer=None):
+    def __init__(self,unique_id,model,agent_type,actions,training,checkpoint_path,epsilon,shared_replay_buffer=None):
         super().__init__(unique_id, model)
         self.epsilon = epsilon
         self.min_exploration_prob = 0.01
@@ -22,13 +22,13 @@ class DQNAgent(Agent):
         self.current_reward = 0
         self.training = training
         if self.training:
-            self.q_checkpoint_path = "model_variables/current_run/"+self.agent_type+"/agent_"+str(unique_id)+"/q_model_variables.keras"
-            self.target_checkpoint_path = "model_variables/current_run/"+self.agent_type+"/agent_"+str(unique_id)+"/target_model_variables.keras"
+            self.q_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(unique_id)+"/q_model_variables.keras"
+            self.target_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(unique_id)+"/target_model_variables.keras"
             os.makedirs(os.path.dirname(self.q_checkpoint_path), exist_ok=True)
             os.makedirs(os.path.dirname(self.target_checkpoint_path), exist_ok=True)
         else:
-            self.q_checkpoint_path = "model_variables/current_run/"+self.agent_type+"/agent_"+str(unique_id)+"/q_model_variables.keras"
-            self.target_checkpoint_path = "model_variables/current_run/"+self.agent_type+"/agent_"+str(unique_id)+"/target_model_variables.keras"
+            self.q_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(unique_id)+"/q_model_variables.keras"
+            self.target_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(unique_id)+"/target_model_variables.keras"
 
         self.hidden_units = round(((self.n_features/3) * 2) + (2 * self.n_actions))
         self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
