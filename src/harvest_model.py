@@ -18,8 +18,8 @@ from abc import abstractmethod
 class HarvestModel(Model):
     def __init__(self,num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string=""):
         super().__init__()
-        self._num_agents = num_agents
-        if self._num_agents <= 0:
+        self.num_agents = num_agents
+        if self.num_agents <= 0:
             raise NumAgentsException(">0", 0)
         self.num_berries = 0
         self.end_day = 0
@@ -28,10 +28,10 @@ class HarvestModel(Model):
         self.max_width = max_width
         self.max_height = max_height
         self.grid = MultiGrid(self.max_width, self.max_height, False)
-        self._max_days = 50
+        self.max_days = 50
         self.max_episodes = max_episodes
         self.min_epsilon = 0.01
-        self._day = 1
+        self.day = 1
         self.shared_replay_buffer = {"s": [], "a": [], "r": [], "s_": [], "done": []}
         self.agent_id = 0
         self.berry_id = 0
@@ -51,20 +51,20 @@ class HarvestModel(Model):
             
     def step(self):
         self.schedule.step()
-        self._day += 1
+        self.day += 1
         self._check_agents_and_berries()
         self.epsilon = self._mean_epsilon()
         if self.write_norms:
             self.emerged_norms = self._check_emerged_norms()
         #if exceeded max days or all agents died, reset for new episode
-        if self._day >= self._max_days or self._num_living_agents <= 0:
-            self.end_day = self._day
+        if self.day >= self.max_days or self.num_living_agents <= 0:
+            self.end_day = self.day
             if self.write_norms:
                 self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.file_string+"_emerged_norms.json")
             for a in self.schedule.agents:
                 if a.agent_type != "berry":
                     if a.off_grid == False:
-                        a.days_survived = self._day
+                        a.days_survived = self.day
                     if self.training: 
                         a.save_models()
             self._collect_model_episode_data()
@@ -113,46 +113,46 @@ class HarvestModel(Model):
         return society_well_being
     
     def get_num_agents(self):
-        return self._num_agents
+        return self.num_agents
     
     def get_num_living_agents(self):
-        assert self._num_living_agents == len(self._living_agents)
-        return self._num_living_agents
+        assert self.num_living_agents == len(self.living_agents)
+        return self.num_living_agents
     
     def get_living_agents(self):
-        return self._living_agents
+        return self.living_agents
     
     def get_day(self):
-        return self._day
+        return self.day
     
     def get_max_days(self):
-        return self._max_days
+        return self.max_days
     
     @abstractmethod
     def _init_berries(self):
         raise NotImplementedError
     
     def _init_agents(self, agent_type, checkpoint_path):
-        self._living_agents = []
-        for i in range(self._num_agents):
-            a = HarvestAgent(i,self,agent_type,self._max_days,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+        self.living_agents = []
+        for i in range(self.num_agents):
+            a = HarvestAgent(i,self,agent_type,self.max_days,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
-        self._num_living_agents = len(self._living_agents)
-        self.berry_id = self._num_living_agents + 1
-        assert self._num_living_agents == self._num_agents, "init {self._num_living_agents} instead of {self._num_agents}"
+        self.num_living_agents = len(self.living_agents)
+        self.berry_id = self.num_living_agents + 1
+        assert self.num_living_agents == self.num_agents, "init {self.num_living_agents} instead of {self.num_agents}"
 
     def _add_agent(self, a):
         self.schedule.add(a)
         self._place_agent_in_allotment(a)
         if a.agent_type != "berry":
             self.agent_id += 1
-            self._living_agents.append(a)
+            self.living_agents.append(a)
 
     def _reset(self):
-        self._living_agents = []
+        self.living_agents = []
         self.emerged_norms_current = {}
         self.emerged_norms_history = {}
-        self._day = 0
+        self.day = 0
         num_agents = 0
         num_berries = 0
         self.episode += 1
@@ -165,9 +165,9 @@ class HarvestModel(Model):
             elif a.agent_type == "berry":
                 self._reset_berry(a, True)
                 num_berries += 1
-        assert num_agents == self._num_agents, "reset "+str(num_agents)+" agents instead of "+str(self._num_agents)
+        assert num_agents == self.num_agents, "reset "+str(num_agents)+" agents instead of "+str(self.num_agents)
         assert num_berries == self.num_berries, "reset "+str(num_berries)+" berries instead of "+str(self.num_berries)
-        self._num_living_agents = self._num_agents
+        self.num_living_agents = self.num_agents
     
     def _reset_agent(self, agent):
         if agent.agent_type == "berry":
@@ -175,7 +175,7 @@ class HarvestModel(Model):
         agent.reset()
         self._place_agent_in_allotment(agent)
         agent.off_grid = False
-        self._living_agents.append(agent)
+        self.living_agents.append(agent)
     
     def _reset_berry(self, berry, end_of_episode):
         if berry.agent_type != "berry":
@@ -226,7 +226,7 @@ class HarvestModel(Model):
     def _collect_agent_data(self, agent):
         new_entry = pd.DataFrame({"agent_id": [agent.unique_id],
                                "episode": [self.episode],
-                               "day": [self._day],
+                               "day": [self.day],
                                "berries": [agent.berries],
                                "berries_consumed": [agent.berries_consumed],
                                "berries_thrown": [agent.berries_thrown],
@@ -242,7 +242,7 @@ class HarvestModel(Model):
     def _collect_model_episode_data(self):
         row_index_list = self.agent_reporter.index[self.agent_reporter["episode"] == self.episode].tolist()
         new_entry = pd.DataFrame({"episode": [self.episode], 
-                               "end_day": [self._day],
+                               "end_day": [self.day],
                                "epsilon": [self.epsilon],
                                "mean_reward": [self._mean_reward()],
                                "mean_loss": [self._mean_loss()],
@@ -256,7 +256,7 @@ class HarvestModel(Model):
                                "mean_health": [self.agent_reporter["health"].iloc[row_index_list].mean(axis=0)],
                                "median_health": [self.agent_reporter["health"].iloc[row_index_list].median()],
                                "variance_health": [self.agent_reporter["health"].iloc[row_index_list].var(axis=0)],
-                               "deceased": [self._num_agents - self._num_living_agents],
+                               "deceased": [self.num_agents - self.num_living_agents],
                                "num_emerged_norms": [len(self.emerged_norms_history) if self.write_norms else None]})
         self.model_episode_reporter = pd.concat([self.model_episode_reporter, new_entry], ignore_index=True)
         if self.write_data:
@@ -336,13 +336,13 @@ class HarvestModel(Model):
             self.grid.remove_agent(a)
     
     def _remove_agent(self, agent):
-        self._num_living_agents -= 1
+        self.num_living_agents -= 1
         self.grid.remove_agent(agent)
         agent.off_grid = True
         agent.days_left_to_live = 0
-        self._living_agents = [a for a in self.schedule.agents if a.agent_type != "berry" and a.off_grid == False]
-        list_living = len(self._living_agents)
-        assert list_living == self._num_living_agents, "length of living agents list is {list_living} and the number of living agents is {self._num_living_agents}"
+        self.living_agents = [a for a in self.schedule.agents if a.agent_type != "berry" and a.off_grid == False]
+        list_living = len(self.living_agents)
+        assert list_living == self.num_living_agents, "length of living agents list is {list_living} and the number of living agents is {self.num_living_agents}"
     
     def _new_berry(self,min_width,max_width,min_height,max_height,allocation_id=None):
         berry = Berry(self.berry_id,self,min_width,max_width,min_height,max_height,allocation_id)
@@ -361,7 +361,7 @@ class HarvestModel(Model):
         s = sum(x)
         if s == 0:
             return 0
-        N = self._num_agents
+        N = self.num_agents
         B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * s)
         return 1 + (1 / N) - 2 * B
     
@@ -374,7 +374,7 @@ class HarvestModel(Model):
                         m += np.mean(agent.losses)
             if m == 0:
                 return 0
-            m /= self._num_agents
+            m /= self.num_agents
         return m
     
     def _mean_reward(self):
@@ -384,7 +384,7 @@ class HarvestModel(Model):
                 m += agent.total_episode_reward
         if m == 0:
             return 0
-        m /= self._num_agents
+        m /= self.num_agents
         return m
     
     def _mean_epsilon(self):
@@ -394,5 +394,5 @@ class HarvestModel(Model):
                 m += agent.epsilon
         if m == 0:
             return 0
-        m /= self._num_agents
+        m /= self.num_agents
         return m
