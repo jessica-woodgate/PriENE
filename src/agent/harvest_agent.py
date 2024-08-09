@@ -2,6 +2,8 @@ from .dqn.dqn_agent import DQNAgent
 from .moving_module import MovingModule
 from .norms_module import NormsModule
 from .ethics_module import EthicsModule
+from src.harvest_exception import NumFeaturesException
+from src.harvest_exception import AgentTypeException
 import numpy as np
 
 class HarvestAgent(DQNAgent):
@@ -9,8 +11,8 @@ class HarvestAgent(DQNAgent):
         self.actions = self._generate_actions(unique_id, model.get_num_agents())
         #dqn agent class handles learning and action selection
         super().__init__(unique_id,model,agent_type,self.actions,training,checkpoint_path,epsilon,shared_replay_buffer=shared_replay_buffer)
-        self._start_health = 0.8
-        self.health = self._start_health
+        self.start_health = 0.8
+        self.health = self.start_health
         self.berries = 0
         self.berries_consumed = 0
         self.berries_thrown = 0
@@ -30,12 +32,11 @@ class HarvestAgent(DQNAgent):
         self.write_norms = write_norms
         self.moving_module = MovingModule(self.unique_id, model, training, max_width, max_height)
         self.norms_module = NormsModule(self.unique_id)
-        self._norm_clipping_frequency = 10
         if agent_type != "baseline":
-            self._rewards = self._ethics_rewards()
-            self.ethics_module = EthicsModule(self.unique_id,self._rewards["shaped_reward"])
+            self.rewards = self._ethics_rewards()
+            self.ethics_module = EthicsModule(self.unique_id,self.rewards["shaped_reward"])
         else:
-            self._rewards = self._baseline_rewards()
+            self.rewards = self._baseline_rewards()
         self.off_grid = False
         self.current_action = None
         
@@ -68,7 +69,8 @@ class HarvestAgent(DQNAgent):
         observer_features = np.array([self.health, self.berries, self.days_left_to_live, distance_to_berry])
         agent_well_being = self.model.get_society_well_being(self, False)
         observation = np.append(observer_features, agent_well_being)
-        assert len(observation) == self.n_features
+        if len(observation) != self.n_features:
+            raise NumFeaturesException(self.n_features, len(observation))
         return observation
     
     def get_n_features(self):
@@ -85,11 +87,11 @@ class HarvestAgent(DQNAgent):
         self.berries_consumed = 0
         self.berries_thrown = 0
         self.max_berries = 0
-        self.health = self._start_health
+        self.health = self.start_health
         self.current_reward = 0
         self.days_left_to_live = self.get_days_left_to_live()
         self.days_survived = 0
-        self.norms_module.norm_base  = {}
+        self.norms_module.behaviour_base  = {}
         self.moving_module.reset()
 
     def get_days_left_to_live(self):
@@ -135,15 +137,15 @@ class HarvestAgent(DQNAgent):
     def _move(self):
         if not self.moving_module.check_nearest_berry(self.pos):
             #if no berries have been found to walk towards, have to wait
-            return self._rewards["neutral_reward"]
+            return self.rewards["neutral_reward"]
         #otherwise, we have a path, move towards the berry; returns True if we are at the end of the path and find a berry
         berry_found, new_pos = self.moving_module.move_towards_berry(self.pos)
         if berry_found:
             self.berries += 1
-            return self._rewards["forage"]
+            return self.rewards["forage"]
         if new_pos != self.pos:
             self.model.move_agent_to_cell(self, new_pos)
-        return self._rewards["neutral_reward"]
+        return self.rewards["neutral_reward"]
     
     def _throw(self, benefactor_id):
         """
@@ -152,31 +154,30 @@ class HarvestAgent(DQNAgent):
         benefactor immediately eats the berry
         """
         if self.berries <= 0:
-            return self._rewards["no_berries"]
+            return self.rewards["no_berries"]
         #have to have a minimum amount of health to throw
         if self.health < self.low_health_threshold:
-            return self._rewards["insufficient_health"]
-        #print("trying to throw to", benefactor_id, "berries", self.berries)
+            return self.rewards["insufficient_health"]
         for a in self.model.get_living_agents():
             if a.unique_id == benefactor_id:
-                #print("throwing to", a.unique_id)
-                assert(a.agent_type != "berry")
+                if a.agent_type == "berry":
+                    raise AgentTypeException("not berry", "berry")
                 a.health += self.berry_health_payoff 
                 a.berries_consumed += 1
                 a.days_left_to_live = a.get_days_left_to_live()
                 self.berries -= 1
                 self.berries_thrown += 1
-                return self._rewards["throw"]
-        return self._rewards["no_benefactor"]
+                return self.rewards["throw"]
+        return self.rewards["no_benefactor"]
     
     def _eat(self):
         if self.berries > 0:
             self.health += self.berry_health_payoff
             self.berries -= 1
             self.berries_consumed += 1
-            return self._rewards["eat"]
+            return self.rewards["eat"]
         else:
-            return self._rewards["no_berries"]
+            return self.rewards["no_berries"]
 
     def _ethics_sanction(self, can_help):
         society_well_being = self.model.get_society_well_being(self, True)

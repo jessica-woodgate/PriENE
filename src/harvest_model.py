@@ -12,6 +12,7 @@ from .harvest_exception import NoEmptyCells
 from .harvest_exception import NumAgentsException
 from .harvest_exception import AgentTypeException
 from .harvest_exception import NoBerriesException
+from .harvest_exception import NumBerriesException
 from os.path import exists
 from abc import abstractmethod
 
@@ -116,7 +117,8 @@ class HarvestModel(Model):
         return self.num_agents
     
     def get_num_living_agents(self):
-        assert self.num_living_agents == len(self.living_agents)
+        if self.num_living_agents != len(self.living_agents):
+            raise NumAgentsException(self.num_living_agents, len(self.living_agents))
         return self.num_living_agents
     
     def get_living_agents(self):
@@ -139,7 +141,8 @@ class HarvestModel(Model):
             self._add_agent(a)
         self.num_living_agents = len(self.living_agents)
         self.berry_id = self.num_living_agents + 1
-        assert self.num_living_agents == self.num_agents, "init {self.num_living_agents} instead of {self.num_agents}"
+        if self.num_living_agents != self.num_agents:
+            raise NumAgentsException(self.num_agents, self.num_living_agents)
 
     def _add_agent(self, a):
         self.schedule.add(a)
@@ -165,8 +168,10 @@ class HarvestModel(Model):
             elif a.agent_type == "berry":
                 self._reset_berry(a, True)
                 num_berries += 1
-        assert num_agents == self.num_agents, "reset "+str(num_agents)+" agents instead of "+str(self.num_agents)
-        assert num_berries == self.num_berries, "reset "+str(num_berries)+" berries instead of "+str(self.num_berries)
+        if num_agents != self.num_agents:
+            raise NumAgentsException(self.num_agents, num_agents)
+        if num_berries != self.num_berries:
+            raise NumBerriesException(self.num_berries, num_berries)
         self.num_living_agents = self.num_agents
     
     def _reset_agent(self, agent):
@@ -342,7 +347,8 @@ class HarvestModel(Model):
         agent.days_left_to_live = 0
         self.living_agents = [a for a in self.schedule.agents if a.agent_type != "berry" and a.off_grid == False]
         list_living = len(self.living_agents)
-        assert list_living == self.num_living_agents, "length of living agents list is {list_living} and the number of living agents is {self.num_living_agents}"
+        if list_living != len(self.living_agents):
+            raise NumAgentsException(len(self.living_agents), list_living)
     
     def _new_berry(self,min_width,max_width,min_height,max_height,allocation_id=None):
         berry = Berry(self.berry_id,self,min_width,max_width,min_height,max_height,allocation_id)
@@ -355,6 +361,20 @@ class HarvestModel(Model):
         height = np.random.randint(agent.min_height, agent.max_height)
         return (width, height)
     
+    def _generate_resource_allocations(self, num_agents):
+        if num_agents == 2:
+            resources = [5, 1]
+            #resources = [6, 2]
+            #resources = [7, 1]
+        elif num_agents == 4:
+            resources = [5, 2, 3, 2]
+            #resources = [8, 2, 4, 2]
+        elif num_agents == 6:
+            resources = [5, 2, 3, 2, 5, 1]
+            #resources = [9, 3, 3, 2, 5, 2]
+        self.num_start_berries = sum(resources)
+        return resources
+
     def _gini_berries_consumed(self):
         berries_consumed = [a.berries_consumed for a in self.schedule.agents if a.agent_type != "berry"]
         x = sorted(berries_consumed)

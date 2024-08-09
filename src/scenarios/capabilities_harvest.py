@@ -1,24 +1,21 @@
 from src.harvest_model import HarvestModel
+from src.harvest_exception import NumBerriesException
 
 class CapabilitiesHarvest(HarvestModel):
     def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,checkpoint_path,write_data,write_norms,file_string=""):
         super().__init__(num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
         self.num_start_berries = num_start_berries
-        self.allocations = {"agent_0": {
-                                "id": 0,
-                                "berry_allocation": 5},
-                            "agent_1": {
-                                "id": 1,
-                                "berry_allocation": 2},
-                            "agent_2": {
-                                "id": 2,
-                                "berry_allocation": 3},
-                            "agent_3": {
-                                "id": 3,
-                                "berry_allocation": 2},
-                            }
+        self.allocations = self._assign_allocations()
         self._init_agents(agent_type, checkpoint_path)
         self.berries = self._init_berries()
+    
+    def _assign_allocations(self):
+        resources = self._generate_resource_allocations(self.num_agents)
+        allocations = {}
+        for i in range(self.num_agents):
+            key = "agent_"+str(i)
+            allocations[key] = {"id": i, "berry_allocation": resources[i]}
+        return allocations
 
     def _init_berries(self):
         berries = []
@@ -30,5 +27,6 @@ class CapabilitiesHarvest(HarvestModel):
                 self._place_agent_in_allotment(b)
                 self.num_berries += 1
                 berries.append(b)
-        assert(self.num_berries == self.num_start_berries)
+        if self.num_berries != self.num_start_berries:
+            raise NumBerriesException(self.num_start_berries, self.num_berries)
         return berries
