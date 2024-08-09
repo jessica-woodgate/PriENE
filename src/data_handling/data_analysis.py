@@ -63,9 +63,9 @@ class DataAnalysis():
             grouped_df = df.groupby("episode")
             episode_dfs = []
             for episode, group_df in grouped_df:
-                last_two_rows = group_df.tail(2).loc[:, ~group_df.columns.str.contains('^Unnamed')]
-                last_two_rows["total_berries"] = last_two_rows["berries"] + last_two_rows["berries_consumed"]
-                episode_dfs.append(last_two_rows)
+                last_rows = group_df.tail(self.num_agents).loc[:, ~group_df.columns.str.contains('^Unnamed')]
+                last_rows["total_berries"] = last_rows["berries"] + last_rows["berries_consumed"]
+                episode_dfs.append(last_rows)
             processed_df = pd.concat(episode_dfs)
             processed_dfs.append(processed_df)
         return processed_dfs
