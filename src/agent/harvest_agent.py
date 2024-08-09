@@ -5,10 +5,10 @@ from .ethics_module import EthicsModule
 import numpy as np
 
 class HarvestAgent(DQNAgent):
-    def __init__(self,unique_id,model,agent_type,max_days,min_width,max_width,min_height,max_height,training,epsilon,write_norms,shared_replay_buffer=None):
+    def __init__(self,unique_id,model,agent_type,max_days,min_width,max_width,min_height,max_height,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None):
         self.actions = self._generate_actions(unique_id, model.get_num_agents())
         #dqn agent class handles learning and action selection
-        super().__init__(unique_id,model,agent_type,self.actions,training,epsilon,shared_replay_buffer=shared_replay_buffer)
+        super().__init__(unique_id,model,agent_type,self.actions,training,checkpoint_path,epsilon,shared_replay_buffer=shared_replay_buffer)
         self._start_health = 0.8
         self.health = self._start_health
         self.berries = 0
@@ -50,7 +50,6 @@ class HarvestAgent(DQNAgent):
         self.current_action = action
         society_well_being = self.model.get_society_well_being(self, True)
         if self.write_norms:
-            self.norms_module.update_norm_age()
             antecedent = self.norms_module.get_antecedent(self.health, self.berries, society_well_being)
         if self.agent_type != "baseline":
             can_help = self._update_ethics(society_well_being)
@@ -60,9 +59,7 @@ class HarvestAgent(DQNAgent):
         if self.agent_type != "baseline":
             reward += self._ethics_sanction(can_help)
         if self.write_norms:
-            self.norms_module.update_norm(antecedent, self.actions[action], reward)
-            if self.model.get_day() % self._norm_clipping_frequency == 0:
-                self.norms_module.clip_norm_base()
+            self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day())
         return reward, next_state, done
         
     #agents can see their attributes,distance to nearest berry,well being of other agents

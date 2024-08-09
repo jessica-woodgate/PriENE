@@ -2,7 +2,7 @@ from src.harvest_model import HarvestModel
 from src.agent.harvest_agent import HarvestAgent
 
 class AllotmentHarvest(HarvestModel):
-    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string=""):
+    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,checkpoint_path,write_data,write_norms,file_string=""):
         super().__init__(num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
         self.num_start_berries = num_start_berries
         #allocations is a nested dictionary with allotments for each agent (list of coordinates for max/min width/height) and berry allocation;
@@ -24,7 +24,7 @@ class AllotmentHarvest(HarvestModel):
                                 "berry_allocation": 2,
                                 "allotment": [allocation_interval*3,self.max_width,0,self.max_height]},
                             }
-        self._init_agents(agent_type)
+        self._init_agents(agent_type, checkpoint_path)
         self.berries = self._init_berries()
 
     def _init_berries(self):
@@ -42,12 +42,12 @@ class AllotmentHarvest(HarvestModel):
         assert(self.num_berries==self.num_start_berries)
         return berries
       
-    def _init_agents(self, agent_type):
+    def _init_agents(self, agent_type, checkpoint_path):
         self._living_agents = []
         for id in range(self._num_agents):
             agent_id = "agent_"+str(id)
             allotment = self.allocations[agent_id]["allotment"]
-            a = HarvestAgent(id,self,agent_type,self._max_days,allotment[0],allotment[1],allotment[2],allotment[3],self.training,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+            a = HarvestAgent(id,self,agent_type,self._max_days,allotment[0],allotment[1],allotment[2],allotment[3],self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
         self._num_living_agents = len(self._living_agents)
         self.berry_id = self._num_living_agents + 1

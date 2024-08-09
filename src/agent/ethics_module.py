@@ -16,8 +16,7 @@ class EthicsModule():
         self._measure_of_well_being = None
         self._number_of_minimums = None
     
-    def update_state(self, principle, society_well_being, day, can_help):
-        #self.day = day
+    def update_state(self, principle, society_well_being, can_help):
         self._can_help = can_help
         self._calculate_social_welfare(principle, society_well_being)
     

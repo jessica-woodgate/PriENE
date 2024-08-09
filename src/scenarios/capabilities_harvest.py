@@ -1,7 +1,7 @@
 from src.harvest_model import HarvestModel
 
 class CapabilitiesHarvest(HarvestModel):
-    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,file_string=""):
+    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,checkpoint_path,write_data,write_norms,file_string=""):
         super().__init__(num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
         self.num_start_berries = num_start_berries
         self.allocations = {"agent_0": {
@@ -17,7 +17,7 @@ class CapabilitiesHarvest(HarvestModel):
                                 "id": 3,
                                 "berry_allocation": 2},
                             }
-        self._init_agents(agent_type)
+        self._init_agents(agent_type, checkpoint_path)
         self.berries = self._init_berries()
 
     def _init_berries(self):

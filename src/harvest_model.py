@@ -52,15 +52,7 @@ class HarvestModel(Model):
     def step(self):
         self.schedule.step()
         self._day += 1
-        #check for dead agents & foraged berries
-        for a in self.schedule.agents:
-            if a.agent_type == "berry" and a.foraged == True:
-                self._reset_berry(a, False)
-            if a.agent_type != "berry":
-                if self._num_living_agents == self._num_agents and a.off_grid == False:
-                    self._collect_agent_data(a)
-                if a.done == True and a.off_grid == False:
-                    self._remove_agent(a)
+        self._check_agents_and_berries()
         self.epsilon = self._mean_epsilon()
         if self.write_norms:
             self.emerged_norms = self._check_emerged_norms()
@@ -68,13 +60,11 @@ class HarvestModel(Model):
         if self._day >= self._max_days or self._num_living_agents <= 0:
             self.end_day = self._day
             if self.write_norms:
-                self._append_norm_dict_to_file(self.emerged_norms, "data/current_run/"+self.file_string+"_emerged_norms")
+                self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.file_string+"_emerged_norms.json")
             for a in self.schedule.agents:
                 if a.agent_type != "berry":
                     if a.off_grid == False:
                         a.days_survived = self._day
-                    if self.write_norms and self.episode % 100 == 0:
-                        self._append_norm_dict_to_file(a.norms_module.norm_base, "data/current_run/"+self.file_string+"_agent_"+str(a.unique_id)+"_norm_base")
                     if self.training: 
                         a.save_models()
             self._collect_model_episode_data()
@@ -142,10 +132,10 @@ class HarvestModel(Model):
     def _init_berries(self):
         raise NotImplementedError
     
-    def _init_agents(self, agent_type):
+    def _init_agents(self, agent_type, checkpoint_path):
         self._living_agents = []
         for i in range(self._num_agents):
-            a = HarvestAgent(i,self,agent_type,self._max_days,0,self.max_width,0,self.max_height,self.training,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+            a = HarvestAgent(i,self,agent_type,self._max_days,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
         self._num_living_agents = len(self._living_agents)
         self.berry_id = self._num_living_agents + 1
@@ -244,7 +234,7 @@ class HarvestModel(Model):
                                "days_left_to_live": [agent.days_left_to_live],
                                "action": [agent.current_action],
                                "reward": [agent.current_reward],
-                               "num_norms": [len(agent.norms_module.norm_base) if self.write_norms else None]})
+                               "num_norms": [len(agent.norms_module.behaviour_base) if self.write_norms else None]})
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry], ignore_index=True)
         if self.write_data and not self.training:
            new_entry.to_csv("data/results/current_run/agent_reports_"+self.file_string+".csv", header=None, mode='a')
@@ -277,81 +267,52 @@ class HarvestModel(Model):
         with open(filename, "a+") as file:
             file.seek(0)
             if not file.read(1):
-                file.write("\n")
+                file.write("{")
             file.seek(0, 2)
-            json.dump(str(self.episode), file, indent=4)
-            json.dump(norm_dictionary, file, indent=4)
-            file.write(",")
-    
+            norm_list = []
+            for key, value in norm_dictionary.items():
+                dict = {key: value}
+                norm_list.append(dict)
+            file.write(f"\"{self.episode}\": {json.dumps(norm_list, indent=4)}\n")
+            if self.episode != self.max_episodes:
+                file.write(",")
+            else:
+                file.write("}")
+
     def _check_emerged_norms(self):
-        emergence_count = self._num_agents * self.societal_norm_emergence_threshold
+        emergence_count = self.num_agents * self.societal_norm_emergence_threshold
         emerged_norms = {}
         for agent in self.schedule.agents:
             if agent.agent_type != "berry":
-                for norm_name, norm_value in agent.norms_module.norm_base.items():
+                for norm_name, norm_value in agent.norms_module.behaviour_base.items():
                     if norm_name not in emerged_norms:
-                        emerged_norms[norm_name] = {"score": 0,
+                        emerged_norms[norm_name] = {"reward": 0,
                                                     "numerosity": 0,
                                                     "fitness": 0,
                                                     "num_instances": 0}
-                    emerged_norms[norm_name]["score"] += norm_value["score"]
+                    emerged_norms[norm_name]["reward"] += norm_value["reward"]
                     emerged_norms[norm_name]["numerosity"] += norm_value["numerosity"]
                     emerged_norms[norm_name]["fitness"] += norm_value["fitness"]
                     emerged_norms[norm_name]["num_instances"] += 1
         emerged_norms = {norm: norm_value for norm, norm_value in emerged_norms.items() if norm_value["num_instances"] >= emergence_count}
         return emerged_norms
     
+    def _check_agents_and_berries(self):
+        #check for dead agents & foraged berries
+        for a in self.schedule.agents:
+            if a.agent_type == "berry" and a.foraged == True:
+                self._reset_berry(a, False)
+            if a.agent_type != "berry":
+                if a.off_grid == False:
+                    self._collect_agent_data(a)
+                    if a.done == True:
+                        self._remove_agent(a)
+    
     def _check_bounds(self, cell):
         if cell[0] >= 0 and cell[0] < self.max_width:
             if cell[1] >= 0 and cell[1] < self.max_height:
                 return True
         return False
-    
-    # def get_neighbourhood(self, x, y):
-    #     neighborhood = []
-    #     cols = self.max_width
-    #     rows = self.max_height
-    #     # Define the relative offsets for the neighboring cells
-    #     offsets = [(-1, 0), (0, -1), (0, 1), (1, 0)]
-    #     # get list of tuples for neighbourhood coords
-    #     for dr, dc in offsets:
-    #         r, c = x + dr, y + dc
-    #         if 0 <= r < rows and 0 <= c < cols:
-    #             neighborhood.append((r, c))
-    #     return neighborhood
-    
-    # def get_neighbours(self, neighbourhood):
-    #     neighbours = []
-    #     assert len(neighbourhood)>=0, "need more than {neighbourhood} to get neighbourhood"
-    #     for cell in neighbourhood:
-    #         a = self.get_agent_by_coords(cell)
-    #         if a != None:
-    #             neighbours += a
-    #     return neighbours
-    
-    # def get_berries_in_cell(self, cell):
-    #     #check cell is in bounds
-    #     for a in self.schedule.agents:
-    #         if a.agent_type == "berry":
-    #             if a.pos == cell:
-    #                 return a
-    #     return False
-    
-    # def get_agent_by_coords(self, coords):
-    #     agents = []
-    #     for a in self.schedule.agents:
-    #         if a.agent_type == "berry":
-    #             pass
-    #         elif a.off_grid == False:
-    #             if a.pos == coords:
-    #                 agents.append(a)
-    #     return agents
-    
-    # def empty_cell(self, cell):
-    #     for a in self.schedule.agents:
-    #         if a.pos == cell:
-    #             return False
-    #     return True
     
     #for new agents who aren't yet on the grid
     def _place_agent_in_allotment(self, agent):
@@ -388,16 +349,6 @@ class HarvestModel(Model):
         self.schedule.add(berry)
         self.berry_id += 1
         return berry
-    
-    # def _spawn_berry(self, berry, cell=None):
-    #     if cell == None:
-    #         self._move_agent_in_allotment(berry)
-    #         return
-    #     if self._check_bounds(cell):
-    #         self.grid.place_agent(berry, cell)
-    #         self.num_berries += 1
-    #     else:
-    #         raise OutOfBounds("berry", cell)
     
     def _random_allotment_cell(self, agent):
         width = np.random.randint(agent.min_width, agent.max_width)
