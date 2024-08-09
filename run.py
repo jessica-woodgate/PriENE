@@ -13,6 +13,7 @@ AGENT_TYPES = ["baseline", "maximin"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 2000
+MAX_DAYS = 50
 RESULTS_FILEPATH = "data/results/current_run/"
 RUN_OPTIONS = ["current_run", "run_1"]
 
@@ -64,22 +65,22 @@ def run_simulation(model_inst, render, log_wandb):
     num_episodes = model_inst.episode
     return num_episodes
 
-def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb):   
+def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb):   
     file_string = scenario+"_"+agent_type
     checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
     if scenario == "basic":
-        model_inst = BasicHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = BasicHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     elif scenario == "capabilities":
-        model_inst = CapabilitiesHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = CapabilitiesHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     else:
         ValueError("Unknown argument: "+scenario)
     run_simulation(model_inst,render,log_wandb)
 
-def run_all(scenario,run_name,num_agents,num_start_berries,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb):
+def run_all(scenario,run_name,num_agents,num_start_berries,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb):
     for agent_type in AGENT_TYPES:
-        create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,write_data,write_norms,render,log_wandb)
+        create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb)
 
 def get_integer_input(prompt):
     while True:
@@ -143,16 +144,16 @@ elif args.option == "test" or args.option == "train":
     #########################################################################################
     write_data = write_data_input("data")
     #########################################################################################
-    write_norms = write_data_input("norms")
-    #########################################################################################
-    render = get_input("Do you want to render the simulation? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"])
-    if render == "y":
-        render = True
-    elif render == "n":
-        render = False
-    #########################################################################################
     if args.option == "train":
         print("Model variables will be written into",run_name)
+        write_norms = False
+    else:
+        write_norms = write_data_input("norms")
+        render = get_input("Do you want to render the simulation? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"])
+        if render == "y":
+            render = True
+        elif render == "n":
+            render = False
     #########################################################################################
     if args.log is not None:
         log_wandb = True
@@ -165,9 +166,9 @@ elif args.option == "test" or args.option == "train":
     MAX_HEIGHT = num_agents * 2
     NUM_BERRIES = num_agents * 3
     if agent_type == "all":
-        run_all(scenario,run_name,num_agents,NUM_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,training,write_data,write_norms,render,log_wandb)
+        run_all(scenario,run_name,num_agents,NUM_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,log_wandb)
     else:
-        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,training,write_data,write_norms,render,log_wandb)
+        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,log_wandb)
 #########################################################################################
 elif args.option == "graphs":
     scenario = input("What type of scenario do you want to generate graphs for (capabilities, allotment): ")

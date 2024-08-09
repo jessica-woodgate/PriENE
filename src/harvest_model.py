@@ -17,7 +17,7 @@ from os.path import exists
 from abc import abstractmethod
 
 class HarvestModel(Model):
-    def __init__(self,num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string=""):
+    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,file_string=""):
         super().__init__()
         self.num_agents = num_agents
         if self.num_agents <= 0:
@@ -25,11 +25,10 @@ class HarvestModel(Model):
         self.num_berries = 0
         self.end_day = 0
         self.schedule = RandomActivation(self)
-        #max_width changes depending on the scenario; max_height stays the same
         self.max_width = max_width
         self.max_height = max_height
         self.grid = MultiGrid(self.max_width, self.max_height, False)
-        self.max_days = 50
+        self.max_days = max_days
         self.max_episodes = max_episodes
         self.min_epsilon = 0.01
         self.day = 1
@@ -98,18 +97,26 @@ class HarvestModel(Model):
         raise NoBerriesException(coordinates=coords)
     
     def get_society_well_being(self, observer, include_observer):
+        """
+        Gathers the well-being of a society.
+        Args:
+            observer (Agent): The observer agent.
+            include_observer (bool): Whether to include the observer's well-being in the calculation.
+        Returns:
+            numpy.ndarray: A NumPy array containing the well-being values of all agents in the society, except for the observer if `include_observer` is False.
+        This function iterates over all agents in the society, excluding the observer if the agent is observing.
+        For each active agent, it appends their `days_left_to_live` value to the `society_well_being` array.
+        For dead agents, it appends 0 if observing (`include_observer` is False), otherwise skips them.
+        """
         society_well_being = np.array([])
         for a in self.schedule.agents:
             if (a.unique_id == observer.unique_id and not include_observer) or a.agent_type == "berry":
                 continue
             elif a.done == False:
-                #observe agent's coords and how many days they have left
                 society_well_being = np.append(society_well_being, a.days_left_to_live)
             elif a.done == True and include_observer:
-                #if looking for utility measure, don't include dead agents
                 continue
             else:
-                #if observing, include dead agents as 0s
                 society_well_being = np.append(society_well_being, 0)
         return society_well_being
     

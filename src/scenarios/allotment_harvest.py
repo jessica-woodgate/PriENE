@@ -4,8 +4,8 @@ from src.harvest_exception import NumAgentsException
 from src.harvest_exception import NumBerriesException
 
 class AllotmentHarvest(HarvestModel):
-    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,checkpoint_path,write_data,write_norms,file_string=""):
-        super().__init__(num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
+    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string=""):
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,file_string)
         self.num_start_berries = num_start_berries
         allotment_interval = int(max_width / num_agents)
         #allocations is a nested dictionary with allotments for each agent (list of coordinates for max/min width/height) and berry allocation;

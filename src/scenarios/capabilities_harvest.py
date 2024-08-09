@@ -2,8 +2,8 @@ from src.harvest_model import HarvestModel
 from src.harvest_exception import NumBerriesException
 
 class CapabilitiesHarvest(HarvestModel):
-    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,checkpoint_path,write_data,write_norms,file_string=""):
-        super().__init__(num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
+    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string=""):
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,file_string)
         self.num_start_berries = num_start_berries
         self.allocations = self._assign_allocations()
         self._init_agents(agent_type, checkpoint_path)
