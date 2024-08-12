@@ -12,8 +12,8 @@ import numpy as np
 AGENT_TYPES = ["baseline", "maximin"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
-MAX_EPISODES = 2000
-MAX_DAYS = 50
+MAX_EPISODES = 1000
+MAX_DAYS = 150
 RESULTS_FILEPATH = "data/results/current_run/"
 RUN_OPTIONS = ["current_run", "run_1"]
 
@@ -147,6 +147,7 @@ elif args.option == "test" or args.option == "train":
     if args.option == "train":
         print("Model variables will be written into",run_name)
         write_norms = False
+        render = False
     else:
         write_norms = write_data_input("norms")
         render = get_input("Do you want to render the simulation? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"])
