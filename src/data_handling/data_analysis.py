@@ -41,21 +41,21 @@ class DataAnalysis():
             i += 1
 
     def _normalised_sum_step_across_episodes(self, df):
-            df = df.drop(["episode", "action"], axis=1)
-            df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-            #Calculate counts for each (step, agent_id) combination
-            count_df = df.groupby(["day", "agent_id"]).size().reset_index(name="count")
-            #Sum and normalize by count
-            sum_df = df.groupby(["day", "agent_id"]).sum().reset_index()
-            sum_df = sum_df.reset_index(drop=True)
-            count_df = count_df.reset_index(drop=True)
-            to_divide_columns = list(sum_df.columns)
-            to_divide_columns.remove("day")
-            to_divide_columns.remove("agent_id")
-            sum_df.loc[:, to_divide_columns] = sum_df.loc[:, to_divide_columns].divide(count_df["count"], axis=0)
-            #sum_df = sum_df.divide(count_df["count"], axis=0)
-            sum_df["count"] = count_df["count"]
-            return sum_df
+        df = df.drop(["episode", "action"], axis=1)
+        df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+        #Calculate counts for each (step, agent_id) combination
+        count_df = df.groupby(["day", "agent_id"]).size().reset_index(name="count")
+        #Sum and normalize by count
+        sum_df = df.groupby(["day", "agent_id"]).sum().reset_index()
+        sum_df = sum_df.reset_index(drop=True)
+        count_df = count_df.reset_index(drop=True)
+        to_divide_columns = list(sum_df.columns)
+        to_divide_columns.remove("day")
+        to_divide_columns.remove("agent_id")
+        sum_df.loc[:, to_divide_columns] = sum_df.loc[:, to_divide_columns].divide(count_df["count"], axis=0)
+        #sum_df = sum_df.divide(count_df["count"], axis=0)
+        sum_df["count"] = count_df["count"]
+        return sum_df
 
     def _process_end_episode_dataframes(self, dataframes):
         processed_dfs = []
@@ -63,9 +63,9 @@ class DataAnalysis():
             grouped_df = df.groupby("episode")
             episode_dfs = []
             for episode, group_df in grouped_df:
-                last_two_rows = group_df.tail(2).loc[:, ~group_df.columns.str.contains('^Unnamed')]
-                last_two_rows["total_berries"] = last_two_rows["berries"] + last_two_rows["berries_consumed"]
-                episode_dfs.append(last_two_rows)
+                last_rows = group_df.tail(self.num_agents).loc[:, ~group_df.columns.str.contains('^Unnamed')]
+                last_rows["total_berries"] = last_rows["berries"] + last_rows["berries_consumed"]
+                episode_dfs.append(last_rows)
             processed_df = pd.concat(episode_dfs)
             processed_dfs.append(processed_df)
         return processed_dfs
