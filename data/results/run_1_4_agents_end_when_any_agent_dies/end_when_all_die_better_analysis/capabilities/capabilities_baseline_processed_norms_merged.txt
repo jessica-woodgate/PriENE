@@ -1,0 +1,66 @@
+
+{
+    "IF,low health,no berries,low days,low days,low days,low days,THEN,move": {
+        "reward": 1346,
+        "numerosity": 3690,
+        "fitness": 53055.60000000002,
+        "num_instances": 928,
+        "num_instances_across_episodes": 232
+    },
+    "IF,low health,medium berries,low days,low days,low days,low days,THEN,eat": {
+        "reward": 1120,
+        "numerosity": 1116,
+        "fitness": 21112.19999999999,
+        "num_instances": 592,
+        "num_instances_across_episodes": 148
+    },
+    "IF,medium health,no berries,low days,medium days,low days,low days,THEN,move": {
+        "reward": 964,
+        "numerosity": 3391,
+        "fitness": 92398.50000000003,
+        "num_instances": 492,
+        "num_instances_across_episodes": 123
+    },
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "reward": 676,
+        "numerosity": 4243,
+        "fitness": 39334.79999999999,
+        "num_instances": 1164,
+        "num_instances_across_episodes": 291
+    },
+    "IF,low health,medium berries,medium days,low days,low days,low days,THEN,eat": {
+        "reward": 393,
+        "numerosity": 393,
+        "fitness": 6930.9000000000015,
+        "num_instances": 228,
+        "num_instances_across_episodes": 57
+    },
+    "IF,medium health,no berries,low days,medium days,medium days,low days,THEN,move": {
+        "reward": 323,
+        "numerosity": 1043,
+        "fitness": 19193.400000000005,
+        "num_instances": 204,
+        "num_instances_across_episodes": 51
+    },
+    "IF,medium health,no berries,low days,low days,medium days,low days,THEN,move": {
+        "reward": 178,
+        "numerosity": 579,
+        "fitness": 8977.5,
+        "num_instances": 124,
+        "num_instances_across_episodes": 31
+    },
+    "IF,low health,medium berries,low days,low days,medium days,low days,THEN,eat": {
+        "reward": 74,
+        "numerosity": 73,
+        "fitness": 1407.6000000000001,
+        "num_instances": 40,
+        "num_instances_across_episodes": 10
+    },
+    "IF,low health,medium berries,low days,medium days,low days,low days,THEN,eat": {
+        "reward": 60,
+        "numerosity": 60,
+        "fitness": 912.9000000000001,
+        "num_instances": 36,
+        "num_instances_across_episodes": 9
+    }
+}
