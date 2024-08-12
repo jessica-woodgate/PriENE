@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import json
 from src.data_handling.norm_processing import NormProcessing
 
 class DataAnalysis():
@@ -23,6 +24,7 @@ class DataAnalysis():
     def _display_graphs(self, normalised_sum_df_list, agent_end_episode_list, df_labels):
         self._days_left_to_live_results(normalised_sum_df_list, df_labels, self.filepath+"days_left_to_live")
         self._berries_consumed_results(normalised_sum_df_list, df_labels, self.filepath+"berries_consumed")
+        self._display_violin_plot_df_list(normalised_sum_df_list, df_labels, "day", self.filepath+"violin_day", "Violin Plot of Days Survived", "Days Survived")
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", self.filepath+"violin_end_day", "Violin Plot of Episode Length", "End Day")
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", self.filepath+"violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
 
@@ -75,15 +77,12 @@ class DataAnalysis():
         self._display_dataframe(max_days_left_to_live, "Max Days Left To Live", "Days Left To Live", filename+"_max")
         min_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_min)
         self._display_dataframe(min_days_left_to_live, "Min Days Left To Live", "Days Left To Live", filename+"_min")
-        var_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_variance)
-        self._display_dataframe(var_days_left_to_live, "Variance Days Left To Live", "Days Left To Live", filename+"_var")
         total_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_total)
         self._display_dataframe(total_days_left_to_live, "Total Days Left To Live", "Days Left To Live", filename+"_total")
         gini_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_gini)
         self._display_dataframe(gini_days_left_to_live, "Gini Index of Days Left To Live", "Days Left To Live", filename+"_gini")
         max_days_left_to_live.to_csv(self.filepath+"max_days_left_to_live.csv")
         min_days_left_to_live.to_csv(self.filepath+"min_days_left_to_live.csv")
-        var_days_left_to_live.to_csv(self.filepath+"var_days_left_to_live.csv")
         gini_days_left_to_live.to_csv(self.filepath+"gini_days_left_to_live.csv")
         total_days_left_to_live.to_csv(self.filepath+"total_days_left_to_live.csv")
     
