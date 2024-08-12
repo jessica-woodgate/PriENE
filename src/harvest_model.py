@@ -206,6 +206,7 @@ class HarvestModel(Model):
                                "berries_thrown": [],
                                "health": [],
                                "days_left_to_live": [],
+                               "total_days": [],
                                "action": [],
                                "reward": [],
                                "num_norms": []})
@@ -244,6 +245,7 @@ class HarvestModel(Model):
                                "berries_thrown": [agent.berries_thrown],
                                "health": [agent.health],
                                "days_left_to_live": [agent.days_left_to_live],
+                               "total_days_left_to_live": [agent.total_days_left_to_live],
                                "action": [agent.current_action],
                                "reward": [agent.current_reward],
                                "num_norms": [len(agent.norms_module.behaviour_base) if self.write_norms else None]})
@@ -383,12 +385,14 @@ class HarvestModel(Model):
         return resources
 
     def _gini_berries_consumed(self):
+        if self.num_living_agents == 0:
+            return 0
         berries_consumed = [a.berries_consumed for a in self.schedule.agents if a.agent_type != "berry"]
         x = sorted(berries_consumed)
         s = sum(x)
         if s == 0:
             return 0
-        N = self.num_agents
+        N = self.num_living_agents
         B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * s)
         return 1 + (1 / N) - 2 * B
     

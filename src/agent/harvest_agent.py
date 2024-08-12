@@ -26,6 +26,7 @@ class HarvestAgent(DQNAgent):
         self.height = max_height - min_height + 1
         self.health_decay = 0.1
         self.days_left_to_live = self.health/self.health_decay
+        self.total_days_left_to_live = self.days_left_to_live
         self.berry_health_payoff = 0.6
         self.low_health_threshold = 0.6
         self.agent_type = agent_type
@@ -90,6 +91,7 @@ class HarvestAgent(DQNAgent):
         self.health = self.start_health
         self.current_reward = 0
         self.days_left_to_live = self.get_days_left_to_live()
+        self.total_days_left_to_live = self.days_left_to_live
         self.days_survived = 0
         self.norms_module.behaviour_base  = {}
         self.moving_module.reset()
@@ -197,6 +199,7 @@ class HarvestAgent(DQNAgent):
         done = False
         self.health -= self.health_decay
         self.days_left_to_live = self.get_days_left_to_live()
+        self.total_days_left_to_live += self.days_left_to_live 
         day = self.model.get_day()
         # if len(self.model.get_living_agents()) < self.model.get_num_agents():
         #     reward -= 1

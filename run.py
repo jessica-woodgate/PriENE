@@ -12,8 +12,8 @@ import numpy as np
 AGENT_TYPES = ["baseline", "maximin"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
-MAX_EPISODES = 500
-MAX_DAYS = 500
+MAX_EPISODES = 1000
+MAX_DAYS = 150
 RESULTS_FILEPATH = "data/results/current_run/"
 RUN_OPTIONS = ["current_run", "run_1"]
 

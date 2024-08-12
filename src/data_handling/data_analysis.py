@@ -24,7 +24,6 @@ class DataAnalysis():
     def _display_graphs(self, normalised_sum_df_list, agent_end_episode_list, df_labels):
         self._days_left_to_live_results(normalised_sum_df_list, df_labels, self.filepath+"days_left_to_live")
         self._berries_consumed_results(normalised_sum_df_list, df_labels, self.filepath+"berries_consumed")
-        self._display_violin_plot_df_list(normalised_sum_df_list, df_labels, "day", self.filepath+"violin_day", "Violin Plot of Days Survived", "Days Survived")
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", self.filepath+"violin_end_day", "Violin Plot of Episode Length", "End Day")
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", self.filepath+"violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
 
@@ -43,31 +42,31 @@ class DataAnalysis():
             i += 1
 
     def _normalised_sum_step_across_episodes(self, df):
-            df = df.drop(["episode", "action"], axis=1)
-            df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-            #Calculate counts for each (step, agent_id) combination
-            count_df = df.groupby(["day", "agent_id"]).size().reset_index(name="count")
-            #Sum and normalize by count
-            sum_df = df.groupby(["day", "agent_id"]).sum().reset_index()
-            sum_df = sum_df.reset_index(drop=True)
-            count_df = count_df.reset_index(drop=True)
-            to_divide_columns = list(sum_df.columns)
-            to_divide_columns.remove("day")
-            to_divide_columns.remove("agent_id")
-            sum_df.loc[:, to_divide_columns] = sum_df.loc[:, to_divide_columns].divide(count_df["count"], axis=0)
-            #sum_df = sum_df.divide(count_df["count"], axis=0)
-            sum_df["count"] = count_df["count"]
-            return sum_df
+        df = df.drop(["episode", "action"], axis=1)
+        df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
+        #Calculate counts for each (step, agent_id) combination
+        count_df = df.groupby(["day", "agent_id"]).size().reset_index(name="count")
+        #Sum and normalize by count
+        sum_df = df.groupby(["day", "agent_id"]).sum().reset_index()
+        sum_df = sum_df.reset_index(drop=True)
+        count_df = count_df.reset_index(drop=True)
+        to_divide_columns = list(sum_df.columns)
+        to_divide_columns.remove("day")
+        to_divide_columns.remove("agent_id")
+        sum_df.loc[:, to_divide_columns] = sum_df.loc[:, to_divide_columns].divide(count_df["count"], axis=0)
+        #sum_df = sum_df.divide(count_df["count"], axis=0)
+        sum_df["count"] = count_df["count"]
+        return sum_df
 
     def _process_end_episode_dataframes(self, dataframes):
         processed_dfs = []
         for i, df in enumerate(dataframes):
-            grouped_df = df.groupby("episode")
+            grouped_df = df.groupby(["episode", "agent_id"])
             episode_dfs = []
-            for episode, group_df in grouped_df:
-                last_rows = group_df.tail(self.num_agents).loc[:, ~group_df.columns.str.contains('^Unnamed')]
-                last_rows["total_berries"] = last_rows["berries"] + last_rows["berries_consumed"]
-                episode_dfs.append(last_rows)
+            for (episode, agent_id), group_df in grouped_df:
+                last_row = group_df.tail(1).loc[:, ~group_df.columns.str.contains('^Unnamed')]
+                last_row["total_berries"] = last_row["berries"] + last_row["berries_consumed"]
+                episode_dfs.append(last_row)
             processed_df = pd.concat(episode_dfs)
             processed_dfs.append(processed_df)
         return processed_dfs
