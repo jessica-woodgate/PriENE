@@ -10,7 +10,7 @@ class NormProcessing():
         f = open(input_file)
         data = json.load(f)
         data = self._merge_norms(data, output_file, filter_norms)
-        self._process_and_write_norms(data, output_file)
+        #self._process_and_write_norms(data, output_file)
 
     def _process_and_write_norms(self, data, output_file):
         """

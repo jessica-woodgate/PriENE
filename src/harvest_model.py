@@ -41,8 +41,8 @@ class HarvestModel(Model):
         self.write_data = write_data
         self.write_norms = write_norms
         self.societal_norm_emergence_threshold = 0.9
-        self.emerged_norms_current = {}
-        self.emerged_norms_history = {}
+        self.emerged_norms = {}
+        self.shared_behaviour_base = {}
         if self.training:
             self.epsilon = 0.9
         else:
@@ -55,7 +55,7 @@ class HarvestModel(Model):
         self._check_agents_and_berries()
         self.epsilon = self._mean_epsilon()
         if self.write_norms:
-            self.emerged_norms = self._check_emerged_norms()
+            self._check_emerged_norms()
         #if exceeded max days or all agents died, reset for new episode
         if self.day >= self.max_days or self.num_living_agents <= 0:
             self.end_day = self.day
@@ -67,8 +67,8 @@ class HarvestModel(Model):
                         a.days_survived = self.day
                     if self.training: 
                         a.save_models()
-                    if self.write_norms:
-                        self._append_norm_dict_to_file(a.norms_module.behaviour_base, "data/results/current_run/"+self.file_string+"_agent_"+str(a.unique_id)+"_behaviours.json")
+                    # if self.write_norms:
+                    #     self._append_norm_dict_to_file(a.norms_module.behaviour_base, "data/results/current_run/"+self.file_string+"_agent_"+str(a.unique_id)+"_behaviours.json")
             self._collect_model_episode_data()
             self._reset()
 
@@ -138,6 +138,20 @@ class HarvestModel(Model):
     
     def get_max_days(self):
         return self.max_days
+
+    def get_shared_behaviour_base(self):
+        return self.shared_behaviour_base
+    
+    def update_behaviour(self, behaviour_name, behaviour_value):
+        if behaviour_name not in self.shared_behaviour_base.keys():
+            self.shared_behaviour_base[behaviour_name] = {"reward": 0,
+                                        "numerosity": 0,
+                                        "fitness": 0,
+                                        "num_instances": 0}
+        self.shared_behaviour_base[behaviour_name]["reward"] += behaviour_value["reward"]
+        self.shared_behaviour_base[behaviour_name]["numerosity"] += behaviour_value["numerosity"]
+        self.shared_behaviour_base[behaviour_name]["fitness"] += behaviour_value["fitness"]
+        self.shared_behaviour_base[behaviour_name]["num_instances"] += 1
     
     @abstractmethod
     def _init_berries(self):
@@ -162,8 +176,7 @@ class HarvestModel(Model):
 
     def _reset(self):
         self.living_agents = []
-        self.emerged_norms_current = {}
-        self.emerged_norms_history = {}
+        self.emerged_norms = {}
         self.day = 0
         num_agents = 0
         num_berries = 0
@@ -273,7 +286,7 @@ class HarvestModel(Model):
                                "median_health": [self.agent_reporter["health"].iloc[row_index_list].median()],
                                "variance_health": [self.agent_reporter["health"].iloc[row_index_list].var(axis=0)],
                                "deceased": [self.num_agents - self.num_living_agents],
-                               "num_emerged_norms": [len(self.emerged_norms_history) if self.write_norms else None]})
+                               "num_emerged_norms": [len(self.emerged_norms) if self.write_norms else None]})
         self.model_episode_reporter = pd.concat([self.model_episode_reporter, new_entry], ignore_index=True)
         if self.write_data:
             new_entry.to_csv("data/results/current_run/model_episode_reports_"+self.file_string+".csv", header=None, mode='a')
@@ -296,22 +309,33 @@ class HarvestModel(Model):
                 file.write("}")
 
     def _check_emerged_norms(self):
-        emergence_count = self.num_agents * self.societal_norm_emergence_threshold
-        emerged_norms = {}
+        if self.num_living_agents < 2:
+            return
+        emergence_count = self.num_living_agents * self.societal_norm_emergence_threshold
+        current_emerged_norms = {}
         for agent in self.schedule.agents:
             if agent.agent_type != "berry":
                 for norm_name, norm_value in agent.norms_module.behaviour_base.items():
-                    if norm_name not in emerged_norms:
-                        emerged_norms[norm_name] = {"reward": 0,
+                    if norm_name not in current_emerged_norms.keys():
+                        current_emerged_norms[norm_name] = {"reward": 0,
                                                     "numerosity": 0,
                                                     "fitness": 0,
                                                     "num_instances": 0}
-                    emerged_norms[norm_name]["reward"] += norm_value["reward"]
-                    emerged_norms[norm_name]["numerosity"] += norm_value["numerosity"]
-                    emerged_norms[norm_name]["fitness"] += norm_value["fitness"]
-                    emerged_norms[norm_name]["num_instances"] += 1
-        emerged_norms = {norm: norm_value for norm, norm_value in emerged_norms.items() if norm_value["num_instances"] >= emergence_count}
-        return emerged_norms
+                    current_emerged_norms[norm_name]["reward"] += norm_value["reward"]
+                    current_emerged_norms[norm_name]["numerosity"] += norm_value["numerosity"]
+                    current_emerged_norms[norm_name]["fitness"] += norm_value["fitness"]
+                    current_emerged_norms[norm_name]["num_instances"] += 1
+        current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["num_instances"] >= emergence_count}
+        for norm_name, norm_value in current_emerged_norms.items():
+            if norm_name not in self.emerged_norms.keys():
+                self.emerged_norms[norm_name] = {"reward": 0,
+                                                    "numerosity": 0,
+                                                    "fitness": 0,
+                                                    "num_instances": 0}
+            self.emerged_norms[norm_name]["reward"] += norm_value["reward"]
+            self.emerged_norms[norm_name]["numerosity"] += norm_value["numerosity"]
+            self.emerged_norms[norm_name]["fitness"] += norm_value["fitness"]
+            self.emerged_norms[norm_name]["num_instances"] += 1
     
     def _check_agents_and_berries(self):
         #check for dead agents & foraged berries
