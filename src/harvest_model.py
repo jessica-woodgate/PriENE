@@ -46,7 +46,7 @@ class HarvestModel(Model):
         if self.training:
             self.epsilon = 0.9
         else:
-            self.epsilon = 0.05
+            self.epsilon = 0.0
         self._init_reporters()
             
     def step(self):
