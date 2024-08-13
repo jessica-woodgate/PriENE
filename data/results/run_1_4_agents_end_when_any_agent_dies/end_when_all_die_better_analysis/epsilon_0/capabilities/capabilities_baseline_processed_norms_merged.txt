@@ -1,0 +1,59 @@
+
+{
+    "IF,medium health,no berries,low days,medium days,low days,low days,THEN,move": {
+        "reward": 1491,
+        "numerosity": 5083,
+        "fitness": 137749.49999999997,
+        "num_instances": 776,
+        "num_instances_across_episodes": 194
+    },
+    "IF,low health,no berries,low days,low days,low days,low days,THEN,move": {
+        "reward": 1161,
+        "numerosity": 3255,
+        "fitness": 50212.2,
+        "num_instances": 788,
+        "num_instances_across_episodes": 197
+    },
+    "IF,low health,medium berries,low days,low days,low days,low days,THEN,eat": {
+        "reward": 879,
+        "numerosity": 878,
+        "fitness": 17688.300000000007,
+        "num_instances": 456,
+        "num_instances_across_episodes": 114
+    },
+    "IF,medium health,no berries,low days,medium days,medium days,low days,THEN,move": {
+        "reward": 700,
+        "numerosity": 2264,
+        "fitness": 35572.80000000001,
+        "num_instances": 480,
+        "num_instances_across_episodes": 120
+    },
+    "IF,medium health,no berries,low days,low days,low days,low days,THEN,move": {
+        "reward": 516,
+        "numerosity": 3201,
+        "fitness": 32518.500000000025,
+        "num_instances": 816,
+        "num_instances_across_episodes": 204
+    },
+    "IF,low health,medium berries,medium days,low days,low days,low days,THEN,eat": {
+        "reward": 375,
+        "numerosity": 375,
+        "fitness": 7558.800000000001,
+        "num_instances": 212,
+        "num_instances_across_episodes": 53
+    },
+    "IF,medium health,no berries,low days,low days,medium days,low days,THEN,move": {
+        "reward": 243,
+        "numerosity": 948,
+        "fitness": 16961.1,
+        "num_instances": 184,
+        "num_instances_across_episodes": 46
+    },
+    "IF,low health,medium berries,low days,medium days,low days,low days,THEN,eat": {
+        "reward": 90,
+        "numerosity": 88,
+        "fitness": 2236.5000000000005,
+        "num_instances": 44,
+        "num_instances_across_episodes": 11
+    }
+}

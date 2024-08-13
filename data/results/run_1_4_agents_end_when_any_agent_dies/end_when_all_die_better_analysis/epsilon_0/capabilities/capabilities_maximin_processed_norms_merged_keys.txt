@@ -1,0 +1,12 @@
+IF,low health,no berries,low days,low days,low days,low days,THEN,move
+IF,medium health,no berries,medium days,low days,medium days,medium days,THEN,move
+IF,low health,medium berries,low days,low days,low days,low days,THEN,eat
+IF,medium health,no berries,medium days,low days,medium days,low days,THEN,move
+IF,medium health,no berries,medium days,low days,low days,low days,THEN,move
+IF,medium health,no berries,low days,low days,low days,low days,THEN,move
+IF,medium health,no berries,medium days,low days,low days,medium days,THEN,move
+IF,medium health,no berries,low days,low days,medium days,medium days,THEN,move
+IF,medium health,no berries,medium days,medium days,low days,low days,THEN,move
+IF,medium health,no berries,low days,low days,medium days,low days,THEN,move
+IF,medium health,no berries,medium days,medium days,medium days,low days,THEN,move
+IF,medium health,no berries,low days,low days,low days,medium days,THEN,move
