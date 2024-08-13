@@ -67,6 +67,8 @@ class HarvestModel(Model):
                         a.days_survived = self.day
                     if self.training: 
                         a.save_models()
+                    if self.write_norms:
+                        self._append_norm_dict_to_file(a.norms_module.behaviour_base, "data/results/current_run/"+self.file_string+"_agent_"+str(a.unique_id)+"_behaviours.json")
             self._collect_model_episode_data()
             self._reset()
 
