@@ -1,7 +1,7 @@
 class NormsModule():
     def __init__(self,agent_id):
         self.agent_id = agent_id
-        self.max_norms = 5
+        self.max_norms = 100
         self.norm_clipping_frequency = 10
         self.behaviour_base = {}
         self.low_health_threshold = 0.6
