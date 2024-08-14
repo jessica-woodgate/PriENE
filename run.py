@@ -30,8 +30,14 @@ def generate_graphs(scenario, num_agents):
     # for file in files:
     #     df = pd.read_csv(file)
     #     dfs.append(df)
-    # data_analysis.proccess_and_display_all_data(scenario, dfs, AGENT_TYPES)
-    data_analysis._display_norm_tree(scenario, AGENT_TYPES)
+    #data_analysis.proccess_and_display_all_data(scenario, dfs, AGENT_TYPES)
+    norm_path = RESULTS_FILEPATH+"norm_reports_"+scenario+"_"
+    norm_files = [norm_path+"baseline.csv",norm_path+"maximin.csv"]
+    norm_dfs = []
+    for file in norm_files:
+        df = pd.read_csv(file)
+        norm_dfs.append(df)
+    data_analysis._process_norms(scenario, norm_dfs, AGENT_TYPES)
 
 def log_wandb_agents(model_inst, last_episode, reward_tracker):
     for i, agent in enumerate(model_inst.schedule.agents):

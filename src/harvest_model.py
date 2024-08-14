@@ -42,7 +42,8 @@ class HarvestModel(Model):
         self.write_norms = write_norms
         self.societal_norm_emergence_threshold = 0.9
         self.emerged_norms = {}
-        self.shared_behaviour_base = {}
+        self.min_fitness = 0.1
+        self.min_reward = 50
         if self.training:
             self.epsilon = 0.9
         else:
@@ -147,11 +148,11 @@ class HarvestModel(Model):
             self.shared_behaviour_base[behaviour_name] = {"reward": 0,
                                         "numerosity": 0,
                                         "fitness": 0,
-                                        "num_instances": 0}
+                                        "adoption": 0}
         self.shared_behaviour_base[behaviour_name]["reward"] += behaviour_value["reward"]
         self.shared_behaviour_base[behaviour_name]["numerosity"] += behaviour_value["numerosity"]
         self.shared_behaviour_base[behaviour_name]["fitness"] += behaviour_value["fitness"]
-        self.shared_behaviour_base[behaviour_name]["num_instances"] += 1
+        self.shared_behaviour_base[behaviour_name]["adoption"] += 1
     
     @abstractmethod
     def _init_berries(self):
@@ -250,6 +251,17 @@ class HarvestModel(Model):
             if exists("data/results/current_run/model_episode_reports_"+self.file_string+".csv"):
                 raise FileExistsException("data/results/current_run/model_episode_reports_"+self.file_string+".csv")
             self.model_episode_reporter.to_csv("data/results/current_run/model_episode_reports_"+self.file_string+".csv", mode='a')
+        # if self.write_norms:
+        #     self.norm_reporter = pd.DataFrame({"episode": [],
+        #                         "day": [],
+        #                         "action": [],
+        #                         "fitness": [],
+        #                         "reward": [],
+        #                         "numerosity": [],
+        #                         "adoption": []})
+        #     if exists("data/results/current_run/norm_reports_"+self.file_string+".csv"):
+        #         raise FileExistsException("data/results/current_run/norm_reports_"+self.file_string+".csv")
+        #     self.norm_reporter.to_csv("data/results/current_run/norm_reports_"+self.file_string+".csv", mode='a')
 
     def _collect_agent_data(self, agent):
         new_entry = pd.DataFrame({"agent_id": [agent.unique_id],
@@ -292,6 +304,20 @@ class HarvestModel(Model):
             new_entry.to_csv("data/results/current_run/model_episode_reports_"+self.file_string+".csv", header=None, mode='a')
         return new_entry
 
+    def _collect_norm_data(self, norm):
+        key, value = norm
+        action = key.split("THEN")[1].strip(",")
+        new_entry = pd.DataFrame({"episode": [self.episode],
+                                "day": [self.day],
+                                "action": [action],
+                                "fitness": [value["fitness"]],
+                                "reward": [value["reward"]],
+                                "numerosity": [value["numerosity"]],
+                                "adoption": [value["adoption"]]})
+        self.norm_reporter = pd.concat([self.norm_reporter, new_entry], ignore_index=True)
+        if self.write_norms:
+           new_entry.to_csv("data/results/current_run/norm_reports_"+self.file_string+".csv", header=None, mode='a')
+
     def _append_norm_dict_to_file(self, norm_dictionary, filename):
         with open(filename, "a+") as file:
             file.seek(0)
@@ -316,26 +342,24 @@ class HarvestModel(Model):
         for agent in self.schedule.agents:
             if agent.agent_type != "berry":
                 for norm_name, norm_value in agent.norms_module.behaviour_base.items():
-                    if norm_name not in current_emerged_norms.keys():
-                        current_emerged_norms[norm_name] = {"reward": 0,
-                                                    "numerosity": 0,
-                                                    "fitness": 0,
-                                                    "num_instances": 0}
-                    current_emerged_norms[norm_name]["reward"] += norm_value["reward"]
-                    current_emerged_norms[norm_name]["numerosity"] += norm_value["numerosity"]
-                    current_emerged_norms[norm_name]["fitness"] += norm_value["fitness"]
-                    current_emerged_norms[norm_name]["num_instances"] += 1
-        current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["num_instances"] >= emergence_count}
+                    current_emerged_norms = self._update_norm(norm_name, norm_value, current_emerged_norms)
+        # for norm in current_emerged_norms.items():
+        #     self._collect_norm_data(norm)
+        current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_count and norm_value["reward"] >= self.min_fitness}
         for norm_name, norm_value in current_emerged_norms.items():
-            if norm_name not in self.emerged_norms.keys():
-                self.emerged_norms[norm_name] = {"reward": 0,
-                                                    "numerosity": 0,
-                                                    "fitness": 0,
-                                                    "num_instances": 0}
-            self.emerged_norms[norm_name]["reward"] += norm_value["reward"]
-            self.emerged_norms[norm_name]["numerosity"] += norm_value["numerosity"]
-            self.emerged_norms[norm_name]["fitness"] += norm_value["fitness"]
-            self.emerged_norms[norm_name]["num_instances"] += 1
+            self.emerged_norms = self._update_norm(norm_name, norm_value, self.emerged_norms)
+    
+    def _update_norm(self, norm_name, norm_value, norm_base):
+        if norm_name not in norm_base.keys():
+            norm_base[norm_name] = {"reward": 0,
+                                        "numerosity": 0,
+                                        "fitness": 0,
+                                        "adoption": 0}
+        norm_base[norm_name]["reward"] += norm_value["reward"]
+        norm_base[norm_name]["numerosity"] += norm_value["numerosity"]
+        norm_base[norm_name]["fitness"] += norm_value["fitness"]
+        norm_base[norm_name]["adoption"] += 1
+        return norm_base
     
     def _check_agents_and_berries(self):
         #check for dead agents & foraged berries

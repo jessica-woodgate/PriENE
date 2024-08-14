@@ -9,10 +9,10 @@ class DataAnalysis():
         self.num_agents = num_agents
         self.filepath = filepath
     
-    def proccess_and_display_all_data(self, scenario, agent_df_list, df_labels):
+    def proccess_and_display_all_data(self, scenario, agent_df_list, df_labels, norm_df_list=None):
         normalised_sum_df_list, agent_end_episode_list = self._process_agent_dfs(agent_df_list, df_labels)
         self._display_graphs(normalised_sum_df_list, agent_end_episode_list, df_labels)
-        self._display_norm_tree(scenario, df_labels)
+        self._process_norms(scenario, norm_df_list, df_labels)
 
     def _process_agent_dfs(self, agent_df_list, df_labels):
         normalised_sum_df_list = self._apply_function_to_list(agent_df_list, self._normalised_sum_step_across_episodes)
@@ -27,13 +27,15 @@ class DataAnalysis():
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", self.filepath+"violin_end_day", "Violin Plot of Episode Length", "End Day")
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", self.filepath+"violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
 
-    def _display_norm_tree(self,scenario, df_labels):
+    def _process_norms(self,scenario, norm_df_list, df_labels):
         scenario_file = self.filepath+scenario
         norm_processing = NormProcessing()
+        cooperative_dfs = []
         for label in df_labels:
             input_file = scenario_file+"_"+label+"_emerged_norms.json"
             output_file = scenario_file+"_"+label+"_processed_norms"
-            norm_processing.proccess_and_display_tree(input_file, output_file, True)
+            cooperative_dfs.append(norm_processing.proccess_norms(input_file, output_file))
+        self._display_swarm_plot(cooperative_dfs,df_labels, "numerosity", scenario_file+"_cooperative_numerosity")
 
     def _write_df_list_to_file(self, df_list, df_labels, file_string):
         i = 0
@@ -108,25 +110,38 @@ class DataAnalysis():
             df.columns = df_labels
             return df
 
-    def _display_violin_plot_df_list(self, df_list, df_labels, column, filename, title, y_label):
-            fig, ax = plt.subplots()
-            combined_df = pd.concat([df.assign(label=label) for df, label in zip(df_list, df_labels)])
-            colors = sns.color_palette("colorblind", n_colors=len(df_labels))
-            sns.violinplot(
-                data=combined_df,
-                x="label",
-                y=column,
-                hue="label",
-                palette=colors,
-                ax=ax,
-                legend=False,
-            )
+    def _display_swarm_plot(self, df_list, df_labels, column, filename):
+        fig, ax = plt.subplots()
+        # Combine the DataFrames and add labels
+        combined_df = pd.concat([df.assign(label=label) for df, label in zip(df_list, df_labels)])
+        # Plot the swarm plot with reduced marker size
+        sns.swarmplot(data=combined_df, x=column, y='label', ax=ax, size=3, hue='label')  # Adjust size as needed
+        plt.xlabel(column)
+        plt.ylabel('Society')
+        plt.title('Swarm Plot of ' + column + ' by Society')
+        plt.tight_layout()
+        plt.show()
+        plt.savefig(str(filename).split()[0])
 
-            plt.xlabel("Society")
-            plt.ylabel(y_label)
-            plt.title(title)
-            plt.show()
-            plt.savefig(str(filename).split()[0])
+    def _display_violin_plot_df_list(self, df_list, df_labels, column, filename, title, y_label):
+        fig, ax = plt.subplots()
+        combined_df = pd.concat([df.assign(label=label) for df, label in zip(df_list, df_labels)])
+        colors = sns.color_palette("colorblind", n_colors=len(df_labels))
+        sns.violinplot(
+            data=combined_df,
+            x="label",
+            y=column,
+            hue="label",
+            palette=colors,
+            ax=ax,
+            legend=False,
+        )
+
+        plt.xlabel("Society")
+        plt.ylabel(y_label)
+        plt.title(title)
+        plt.show()
+        plt.savefig(str(filename).split()[0])
     
     def _display_dataframe(self, df, title, y_label, filename):
         sns.set_palette("colorblind")

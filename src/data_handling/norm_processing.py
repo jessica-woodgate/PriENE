@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 
 class NormProcessing():
     def __init__(self):
@@ -6,13 +7,32 @@ class NormProcessing():
         self.min_fitness = 0.1
         self.min_reward = 50
     
-    def proccess_and_display_tree(self, input_file, output_file, filter_norms):
+    def proccess_norms(self, input_file, output_file):
         f = open(input_file)
         data = json.load(f)
-        data = self._merge_norms(data, output_file, filter_norms)
-        #self._process_and_write_norms(data, output_file)
+        cooperative_data = self._count_cooperative_norms(data, output_file)
+        data = self._merge_norms(data, output_file)
+        #self._generate_norms_tree(data, output_file)
+        return cooperative_data
+    
+    def _count_cooperative_norms(self, data, output_file):
+        cooperative_norms = []
+        for episode_number, episode_norms in data.items():
+            for norm in episode_norms:
+                norm_name = list(norm.keys())[0]
+                norm_value = list(norm.values())[0]
+                consequent = norm_name.split("THEN")[1].strip(",")
+                print(consequent)
+                if consequent == "throw":
+                    norm_data = {"reward": norm_value["reward"], "numerosity": norm_value["numerosity"], "fitness": norm_value["fitness"]}
+                    cooperative_norms.append(norm_data)
+                    print("new norm")
+        df = pd.DataFrame(cooperative_norms)
+        df.to_csv(output_file+"_cooperative_data.csv")
+        return df
 
-    def _process_and_write_norms(self, data, output_file):
+
+    def _generate_norms_tree(self, data, output_file):
         """
         Processes a list of dictionaries representing norms and prints the tree structure to a file.
 
@@ -57,7 +77,7 @@ class NormProcessing():
                 output += f"{indent}{key}: {value}\n"
         return output
 
-    def _merge_norms(self,data,output_file,filter=False):
+    def _merge_norms(self,data,output_file):
         """
         Merges duplicates of norms into one dictionary
 
@@ -81,16 +101,14 @@ class NormProcessing():
                         emerged_norms[norm_name] = {"reward": norm_data["reward"],
                                                     "numerosity": norm_data["numerosity"],
                                                     "fitness": norm_data["fitness"],
-                                                    "num_instances": norm_data["num_instances"],
+                                                    "adoption": norm_data["adoption"],
                                                     "num_instances_across_episodes": 1}
                     else:
                         emerged_norms[norm_name]["reward"] += norm_data["reward"]
                         emerged_norms[norm_name]["numerosity"] += norm_data["numerosity"]
                         emerged_norms[norm_name]["fitness"] += norm_data["fitness"]
-                        emerged_norms[norm_name]["num_instances"] += norm_data["num_instances"]
+                        emerged_norms[norm_name]["adoption"] += norm_data["adoption"]
                         emerged_norms[norm_name]["num_instances_across_episodes"] += 1
-        if filter:
-            emerged_norms = {key: value for key, value in emerged_norms.items() if value["num_instances"] >= self.min_instances and value["reward"] >= self.min_reward}
         emerged_norms = dict(sorted(emerged_norms.items(), key=lambda item: item[1]["reward"], reverse=True))
         with open(filename, "a+") as file:
                     file.seek(0)
