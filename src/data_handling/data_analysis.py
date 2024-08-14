@@ -12,7 +12,7 @@ class DataAnalysis():
     def proccess_and_display_all_data(self, scenario, agent_df_list, df_labels, norm_df_list=None):
         normalised_sum_df_list, agent_end_episode_list = self._process_agent_dfs(agent_df_list, df_labels)
         self._display_graphs(normalised_sum_df_list, agent_end_episode_list, df_labels)
-        self._process_norms(scenario, norm_df_list, df_labels)
+        self._process_norms(scenario, df_labels)
 
     def _process_agent_dfs(self, agent_df_list, df_labels):
         normalised_sum_df_list = self._apply_function_to_list(agent_df_list, self._normalised_sum_step_across_episodes)
@@ -27,7 +27,7 @@ class DataAnalysis():
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", self.filepath+"violin_end_day", "Violin Plot of Episode Length", "End Day")
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", self.filepath+"violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
 
-    def _process_norms(self,scenario, norm_df_list, df_labels):
+    def _process_norms(self,scenario, df_labels):
         scenario_file = self.filepath+scenario
         norm_processing = NormProcessing()
         cooperative_dfs = []

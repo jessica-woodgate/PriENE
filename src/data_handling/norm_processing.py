@@ -17,14 +17,17 @@ class NormProcessing():
     
     def _count_cooperative_norms(self, data, output_file):
         cooperative_norms = []
+        n_norms = 0
         for episode_number, episode_norms in data.items():
             for norm in episode_norms:
+                n_norms += 1
                 norm_name = list(norm.keys())[0]
                 norm_value = list(norm.values())[0]
                 consequent = norm_name.split("THEN")[1].strip(",")
                 if consequent == "throw":
                     norm_data = {"reward": norm_value["reward"], "numerosity": norm_value["numerosity"], "fitness": norm_value["fitness"]}
                     cooperative_norms.append(norm_data)
+        print("Proportion of cooperative norms for "+output_file+" is "+str(n_norms/len(cooperative_norms)))
         df = pd.DataFrame(cooperative_norms)
         df.to_csv(output_file+"_cooperative_data.csv")
         return df

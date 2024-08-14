@@ -345,7 +345,7 @@ class HarvestModel(Model):
                     current_emerged_norms = self._update_norm(norm_name, norm_value, current_emerged_norms)
         # for norm in current_emerged_norms.items():
         #     self._collect_norm_data(norm)
-        current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_count and norm_value["reward"] >= self.min_fitness}
+        current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_count and norm_value["fitness"] >= self.min_fitness}
         for norm_name, norm_value in current_emerged_norms.items():
             self.emerged_norms = self._update_norm(norm_name, norm_value, self.emerged_norms)
     

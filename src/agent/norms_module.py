@@ -79,7 +79,7 @@ class NormsModule():
             discounted_age = self.norm_decay_rate * norm["age"]
             discounted_numerosity = norm["numerosity"] ** self.numerosity_weight
             discounted_reward = norm["reward"] ** self.reward_weight
-            fitness = discounted_age * discounted_numerosity * discounted_reward
+            fitness = discounted_numerosity * discounted_reward * discounted_age
             norm["fitness"] = round(fitness, 4)
 
     def _clip_behaviour_base(self):
