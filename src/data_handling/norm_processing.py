@@ -32,7 +32,6 @@ class NormProcessing():
         df.to_csv(output_file+"_cooperative_data.csv")
         return df
 
-
     def _generate_norms_tree(self, data, output_file):
         """
         Processes a list of dictionaries representing norms and prints the tree structure to a file.
