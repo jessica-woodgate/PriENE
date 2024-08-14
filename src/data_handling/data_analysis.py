@@ -36,6 +36,8 @@ class DataAnalysis():
             output_file = scenario_file+"_"+label+"_processed_norms"
             cooperative_dfs.append(norm_processing.proccess_norms(input_file, output_file))
         self._display_swarm_plot(cooperative_dfs,df_labels, "numerosity", scenario_file+"_cooperative_numerosity")
+        self._display_swarm_plot(cooperative_dfs,df_labels, "fitness", scenario_file+"_cooperative_fitness")
+        self._display_swarm_plot(cooperative_dfs,df_labels, "reward", scenario_file+"_cooperative_reward")
 
     def _write_df_list_to_file(self, df_list, df_labels, file_string):
         i = 0

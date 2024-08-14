@@ -22,11 +22,9 @@ class NormProcessing():
                 norm_name = list(norm.keys())[0]
                 norm_value = list(norm.values())[0]
                 consequent = norm_name.split("THEN")[1].strip(",")
-                print(consequent)
                 if consequent == "throw":
                     norm_data = {"reward": norm_value["reward"], "numerosity": norm_value["numerosity"], "fitness": norm_value["fitness"]}
                     cooperative_norms.append(norm_data)
-                    print("new norm")
         df = pd.DataFrame(cooperative_norms)
         df.to_csv(output_file+"_cooperative_data.csv")
         return df
