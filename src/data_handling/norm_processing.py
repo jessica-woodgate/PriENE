@@ -27,7 +27,8 @@ class NormProcessing():
                 if consequent == "throw":
                     norm_data = {"reward": norm_value["reward"], "numerosity": norm_value["numerosity"], "fitness": norm_value["fitness"]}
                     cooperative_norms.append(norm_data)
-        print("Proportion of cooperative norms for "+output_file+" is "+str(n_norms/len(cooperative_norms)))
+        print("n_norms", n_norms, "cooperative norms", len(cooperative_norms))
+        print("Proportion of cooperative norms for "+output_file+" is "+str((len(cooperative_norms)/n_norms)*100))
         df = pd.DataFrame(cooperative_norms)
         df.to_csv(output_file+"_cooperative_data.csv")
         return df
