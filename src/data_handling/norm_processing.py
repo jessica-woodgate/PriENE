@@ -110,7 +110,7 @@ class NormProcessing():
                         emerged_norms[norm_name]["fitness"] += norm_data["fitness"]
                         emerged_norms[norm_name]["adoption"] += norm_data["adoption"]
                         emerged_norms[norm_name]["num_instances_across_episodes"] += 1
-        emerged_norms = dict(sorted(emerged_norms.items(), key=lambda item: item[1]["reward"], reverse=True))
+        emerged_norms = dict(sorted(emerged_norms.items(), key=lambda item: item[1]["fitness"], reverse=True))
         with open(filename, "a+") as file:
                     file.seek(0)
                     if not file.read(1):
