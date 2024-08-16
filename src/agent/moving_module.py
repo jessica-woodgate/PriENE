@@ -28,7 +28,6 @@ class MovingModule():
                 self._nearest_berry = self.model.get_uneaten_berry_by_coords(self._nearest_berry_coordinates)
             else:
                 self._nearest_berry = self.model.get_uneaten_berry_by_coords(self._nearest_berry_coordinates, self.agent_id)
-            #self._nearest_berry.marked = True
             self._path = self._find_path_to_berry(current_pos,self._nearest_berry.pos)
             self._path_step = 0
         return True

@@ -112,12 +112,12 @@ class NormProcessing():
                         emerged_norms[norm_name]["num_instances_across_episodes"] += 1
         emerged_norms = dict(sorted(emerged_norms.items(), key=lambda item: item[1]["fitness"], reverse=True))
         with open(filename, "a+") as file:
-                    file.seek(0)
-                    if not file.read(1):
-                        file.write("\n")
-                    file.seek(0, 2)
-                    json.dump(emerged_norms, file, indent=4)
-                    file.write("\n")
+            file.seek(0)
+            if not file.read(1):
+                file.write("\n")
+            file.seek(0, 2)
+            json.dump(emerged_norms, file, indent=4)
+            file.write("\n")
         with open(output_file+"_merged_keys.txt", "w") as keys_file:
             keys_file.write("\n".join([key for key in emerged_norms.keys()]))
         return emerged_norms
