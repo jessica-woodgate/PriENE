@@ -5,6 +5,12 @@ import json
 from src.data_handling.norm_processing import NormProcessing
 
 class DataAnalysis():
+    """
+    Data analysis processes data of societal metrics, data of norms, and displays graphs
+    Instance variables:
+        num_agents -- number of agents in the simulation
+        filepath -- path of file to save data to
+    """
     def __init__(self, num_agents, filepath):
         self.num_agents = num_agents
         self.filepath = filepath
@@ -39,10 +45,10 @@ class DataAnalysis():
         self._display_swarm_plot(cooperative_dfs,df_labels, "fitness", scenario_file+"_cooperative_fitness")
         self._display_swarm_plot(cooperative_dfs,df_labels, "reward", scenario_file+"_cooperative_reward")
 
-    def _write_df_list_to_file(self, df_list, df_labels, file_string):
+    def _write_df_list_to_file(self, df_list, df_labels, filepath):
         i = 0
         for df in df_list:
-            df.to_csv(file_string+df_labels[i]+".csv")
+            df.to_csv(filepath+df_labels[i]+".csv")
             i += 1
 
     def _normalised_sum_step_across_episodes(self, df):
