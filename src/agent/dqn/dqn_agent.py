@@ -41,7 +41,7 @@ class DQNAgent(Agent):
             self.losses = list()
     
     @abstractmethod
-    def execute_transition(self):
+    def interaction_module(self):
         raise NotImplementedError
     
     @abstractmethod
@@ -61,7 +61,7 @@ class DQNAgent(Agent):
             if len(observation) != self.n_features:
                 raise NumFeaturesException(self.n_features, len(observation))
             action = self.q_network.choose_action(observation,self.epsilon)
-            self.current_reward, next_state, self.done = self.execute_transition(action)
+            self.current_reward, next_state, self.done = self.interaction_module(action)
             if self.training:
                 self._learn(observation, action, self.current_reward, next_state, self.done)
                 self.epsilon = max(self.min_exploration_prob, np.exp(-self.expl_decay*self.model.episode))

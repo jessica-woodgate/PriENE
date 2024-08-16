@@ -1,4 +1,18 @@
 class NormsModule():
+    """
+    Norms Module (Algorithm 2) handles tracking of behaviours and norms
+    Instance variables:
+        agent_id -- identification of agent
+        max_norms -- max size of norms and behaviour bases
+        norm_clipping_frequency -- time interval to clip norms and behaviour bases
+        low_health_threshold -- antecedent threshold for "low health"
+        high_health_threshold -- antecedent threshold for "high health"
+        low_berries_threshold -- antecedent threshold for "low berries"
+        high_berries_threshold -- antecedent threshold for "high berries"
+        low_days_left_threshold -- antecedent threshold for "low days"
+        high_days_left_threshold -- antecedent threshold for "high days"
+        norm_decay_rate -- decay of norm over time
+    """
     def __init__(self,agent_id):
         self.agent_id = agent_id
         self.max_norms = 100
@@ -11,8 +25,6 @@ class NormsModule():
         self.low_days_left_threshold = 10
         self.high_days_left_threshold = 30
         self.norm_decay_rate = 0.3
-        self.numerosity_weight = 1.0
-        self.reward_weight = 1.0
 
     def get_antecedent(self, health, berries, well_being):
         if health < self.low_health_threshold:
@@ -77,9 +89,7 @@ class NormsModule():
     def _update_norm_fitness(self, norm):
         if norm["age"] != 0:
             discounted_age = self.norm_decay_rate * norm["age"]
-            discounted_numerosity = norm["numerosity"] ** self.numerosity_weight
-            discounted_reward = norm["reward"] ** self.reward_weight
-            fitness = discounted_numerosity * discounted_reward * discounted_age
+            fitness = norm["numerosity"] * norm["reward"] * discounted_age
             norm["fitness"] = round(fitness, 4)
 
     def _clip_behaviour_base(self):

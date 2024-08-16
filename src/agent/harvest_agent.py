@@ -7,6 +7,32 @@ from src.harvest_exception import AgentTypeException
 import numpy as np
 
 class HarvestAgent(DQNAgent):
+    """
+    Agent acts in an environment and receives a reward
+    Modules:
+        Decision module -- receives action from DQN, calls norms and ethics module and updates attributes (Algorithm 3)
+        Moving module -- handles pathfinding and returns coordinates to move to
+        Norms module -- stores and generates norms from view of state (Algorithm 2)
+        Ethics module -- evaluates societal well-being before and after acting and generates a self-directed sanction (Algorithm 1)
+    Instance variables:
+        actions -- possible actions available to an agent (move, eat, throw to each agent)
+        health -- current health
+        berries -- number of berries currently carrying
+        berries_consumed -- history of eaten berries of current episode
+        days_survived -- number of days survived of current episode
+        max_days -- maximum number of days in an episode
+        max/min width/height -- dimensions of the grid agent can access
+        health_decay -- decay of health at each timestep
+        days_left_to_live -- number of days an agent can live for given their health, health decay, and number of berries they are carrying
+        total_days_left_to_live -- cumulative days left to live of current episode
+        berry_health_payoff -- payoff received from eating a berry
+        low_health_threshold -- minimum health required to throw a berry
+        agent_type -- baseline or maximin
+        write_norms -- boolean whether agent is tracking norms
+        rewards -- dictionary of rewards received
+        off_grid -- status of agent on the grid; agent is removed from the grid upon death
+        current_action -- the current action being performed
+    """
     def __init__(self,unique_id,model,agent_type,max_days,min_width,max_width,min_height,max_height,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None):
         self.actions = self._generate_actions(unique_id, model.get_num_agents())
         #dqn agent class handles learning and action selection
@@ -23,7 +49,7 @@ class HarvestAgent(DQNAgent):
         self.width = max_width - min_width + 1
         self.max_height = max_height
         self.min_height = min_height
-        self.height = max_height - min_height + 1
+        #self.height = max_height - min_height + 1
         self.health_decay = 0.1
         self.days_left_to_live = self.health/self.health_decay
         self.total_days_left_to_live = self.days_left_to_live
@@ -35,18 +61,20 @@ class HarvestAgent(DQNAgent):
         self.norms_module = NormsModule(self.unique_id)
         if agent_type != "baseline":
             self.rewards = self._ethics_rewards()
-            self.ethics_module = EthicsModule(self.unique_id,self.rewards["shaped_reward"])
+            self.ethics_module = EthicsModule(self.unique_id,self.rewards["sanction"])
         else:
             self.rewards = self._baseline_rewards()
         self.off_grid = False
         self.current_action = None
         
-    def execute_transition(self, action):
+    def interaction_module(self, action):
         """
-        execute_transition updates the ethics module with its ability to act ethically (has berries)
-        calls ethics module to store measure of social welfare appropriate for the principle
-        performs action, gets sanction from ethics module
-        updates attributes and writes norms
+        Interaction Module (Algorithm 3) receives action from DQN and performs transition
+        Observes state before acting and passes view to Norms Module for behaviour and norms handling (Algorithm 2)
+        Performs action and observes next state
+        Receives sanction from Ethics Module (Algorithm 1)
+        Updates attributes and passess to Norms Module
+        Returns reward, next state, done to DQN for learning
         """
         done = False
         self.current_action = action
@@ -242,7 +270,7 @@ class HarvestAgent(DQNAgent):
                    "no_benefactor": -0.1,
                    "insufficient_health": -0.1,
                    "neutral_reward": 0,
-                   "shaped_reward": 0.4,
+                   "sanction": 0.4,
                    "throw": 0.5,
                    "forage": 0.8,
                    "eat": 0.8,

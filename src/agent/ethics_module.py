@@ -3,37 +3,47 @@ import numpy as np
 
 class EthicsModule():
     """
-    on each step, agent updates it's ability to act cooperatively (has berries; is healthy)
-    agent calls update_state which tracks the measure of well-being before the agent acts
-    after acting, agent calls get_sanction which calls the chosen principle to generate a sanction indicating alignment
+    Ethics Module (Algorithm 1) evaluates societal well-being before and after acting and generates a self-directed sanction
+    Instance variables:
+        sanction -- amount of reward to return to agent
+        current_principle -- normative ethics principle
+        society_well_being -- list of well-being for each living agent
+        measure_of_well_being -- metric to evaluate well-being before and after acting (minimum experience)
+        number_of_minimums -- number of agents which have minimum experience
     """
-    def __init__(self,agent_id,shaped_reward):
-        self.agent_id = agent_id
-        self._shaped_reward = shaped_reward
-        self._current_principle = None
-        self._society_well_being = None
-        self._measure_of_well_being = None
-        self._number_of_minimums = None
+    def __init__(self,agent_id,sanction):
+        #self.agent_id = agent_id
+        self.sanction = sanction
+        self.current_principle = None
+        self.society_well_being = None
+        self.measure_of_well_being = None
+        self.number_of_minimums = None
     
     def update_social_welfare(self, principle, society_well_being):
+        """
+        Updates social welfare before agent acts: measure of well-being and number of minimums (Algorithm 1 Line 1)
+        """
         self._calculate_social_welfare(principle, society_well_being)
     
     def get_sanction(self, society_well_being):
+        """
+        Obtain sanction from principle comparing current society well-being with previous well-being (Algorithm 1 Lines 3-8)
+        """
         if self.current_principle == "maximin":
-            return self._maximin_sanction(self._measure_of_well_being, self._number_of_minimums, society_well_being)
+            return self._maximin_sanction(self.measure_of_well_being, self.number_of_minimums, society_well_being)
         elif self.current_principle == "egalitarian":
-            return self._egalitarian_sanction(self._measure_of_well_being, society_well_being)
+            return self._egalitarian_sanction(self.measure_of_well_being, society_well_being)
         elif self.current_principle == "utilitarian":
-            return self._utilitarian_sanction(self._measure_of_well_being, society_well_being)
+            return self._utilitarian_sanction(self.measure_of_well_being, society_well_being)
     
     def _calculate_social_welfare(self, principle, society_well_being):
         self.current_principle = principle
         if principle == "maximin":
-            self._measure_of_well_being, self._number_of_minimums = self._maximin_welfare(society_well_being)
+            self.measure_of_well_being, self.number_of_minimums = self._maximin_welfare(society_well_being)
         elif principle == "egalitarian":
-            self._measure_of_well_being = self._egalitarian_welfare(society_well_being)
+            self.measure_of_well_being = self._egalitarian_welfare(society_well_being)
         elif principle == "utilitarian":
-            self._measure_of_well_being = self._utilitarian_welfare(society_well_being)
+            self.measure_of_well_being = self._utilitarian_welfare(society_well_being)
         else:
             raise UnrecognisedPrinciple(principle)
 
@@ -61,40 +71,40 @@ class EthicsModule():
         #if the global min has been made better, pos reward
         if current_min > previous_min:
             #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning pos reward")
-            return self._shaped_reward
+            return self.sanction
         #if the global min has been made worse, neg reward
         elif current_min < previous_min:
             #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning neg reward")
-            return -self._shaped_reward
+            return -self.sanction
         #if the global min has not changed, but there are fewer instances of it, pos reward
         elif current_number_of_previous_mins < number_of_previous_mins and current_min == previous_min:
             #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning pos less numbers reward")
-            return self._shaped_reward
+            return self.sanction
         #if the global min has not changed, and there are more or same number of instances of it, neg reward
         elif current_number_of_previous_mins > number_of_previous_mins and current_min == previous_min:
             #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning neg more numbers reward")
-            return -self._shaped_reward
+            return -self.sanction
         #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning neutral reward")
         return 0
     
     def _egalitarian_sanction(self, previous_loss, society_well_being):
         current_loss = self._egalitarian_welfare(society_well_being)
         if previous_loss > current_loss:
-            #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning pos reward", "can help", self._can_help)
-            return self._shaped_reward
+            #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning pos reward")
+            return self.sanction
         elif previous_loss < current_loss:
-            #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning neg reward", "can help", self._can_help)
-            return -self._shaped_reward
-        #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning neutral reward", "can help", self._can_help)
+            #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning neg reward")
+            return -self.santion
+        #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning neutral reward")
         return 0
     
     def _utilitarian_sanction(self, previous_welfare, society_well_being):
         current_welfare = self._utilitarian_welfare(society_well_being)
         if current_welfare > previous_welfare:
-            #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning pos reward", "can help", self._can_help)
-            return self._shaped_reward
+            #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning pos reward")
+            return self.sanction
         elif current_welfare < previous_welfare:
-            #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning neg reward", "can help", self._can_help)
-            return -self._shaped_reward
-        #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning neutral reward", "can help", self._can_help)
+            #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning neg reward")
+            return -self.sanction
+        #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning neutral reward")
         return 0
