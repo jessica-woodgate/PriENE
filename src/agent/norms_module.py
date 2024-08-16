@@ -27,6 +27,9 @@ class NormsModule():
         self.norm_decay_rate = 0.3
 
     def get_antecedent(self, health, berries, well_being):
+        """
+        Get antecedent string from view of agent's health and berries and society well-being
+        """
         if health < self.low_health_threshold:
             h = "low health"
         elif health >= self.low_health_threshold and health < self.high_health_threshold:
@@ -53,6 +56,9 @@ class NormsModule():
         return antecedent
 
     def get_consequent(self, action):
+        """
+        Get consequent string from action
+        """
         consequent = "THEN,"
         if action == "north" or action == "east" or action == "south" or action == "west":
             return consequent + "move"
@@ -62,6 +68,10 @@ class NormsModule():
             return consequent + action
     
     def update_behaviour_base(self, antecedent, action, reward, day):
+        """
+        Update current behaviour and then update the age of all behaviours in behaviour base
+        If day == clipping frequency, clip behaviour base if it exceeds maximum capacity
+        """
         self._update_behaviour(antecedent,action,reward)
         self._update_behaviours_age()
         if day % self.norm_clipping_frequency == 0:

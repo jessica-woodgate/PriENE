@@ -6,60 +6,81 @@ import math
 from queue import PriorityQueue
 
 class MovingModule():
+    """
+    Moving module searches for berries, finds paths to nearest berries, returns coordinates for agent to move to, and handles foraging
+    Instance variables:
+        agent_id -- unique id of agent
+        training -- boolean to indicate if training or testing (if testing, need to check which berries the agent is allocated)
+        max_width -- width of grid agent has access to
+        max_height -- height of grid agent has access to
+        path -- current path to nearest berry
+        path_step -- current step along the path
+        nearest_berry -- the nearest berry agent
+        nearest_berry_coordinates -- coordinates of the nearest berry
+    """
     def __init__(self, agent_id, model, training, max_width, max_height):
         self.agent_id = agent_id
         self.model = model
         self.training = training
         self.max_width = max_width
         self.max_height = max_height
-        self._path = None
-        self._path_step = 0
-        self._nearest_berry = None
-        self._nearest_berry_coordinates = None
+        self.path = None
+        self.path_step = 0
+        self.nearest_berry = None
+        self.nearest_berry_coordinates = None
     
     def check_nearest_berry(self, current_pos):
-        #find nearest berry and find path towards; if a berry has been eaten it will move elsewhere which is why it won't have the same pos
-        if self._path == None or self._nearest_berry_coordinates != self._nearest_berry.pos:
-            self._nearest_berry_coordinates = self._find_nearest_berry_coordinates(current_pos)
-            #if there are no berries, have to wait - return False
-            if self._nearest_berry_coordinates == None:
+        """
+        Check nearest berry finds nearest berry and path towards
+        Check coordinates of nearest berry: if a berry has been eaten it will move elsewhere
+        If no berries are found, have to wait
+        """
+        if self.path == None or self.nearest_berry_coordinates != self.nearest_berry.pos:
+            self.nearest_berry_coordinates = self._find_nearest_berry_coordinates(current_pos)
+            if self.nearest_berry_coordinates == None:
                 return False
             if self.training:
-                self._nearest_berry = self.model.get_uneaten_berry_by_coords(self._nearest_berry_coordinates)
+                self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates)
             else:
-                self._nearest_berry = self.model.get_uneaten_berry_by_coords(self._nearest_berry_coordinates, self.agent_id)
-            self._path = self._find_path_to_berry(current_pos,self._nearest_berry.pos)
-            self._path_step = 0
+                self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates, self.agent_id)
+            self.path = self._find_path_to_berry(current_pos,self.nearest_berry.pos)
+            self.path_step = 0
         return True
     
     def move_towards_berry(self, current_pos):
-        #check berry not eaten
-        if self._nearest_berry.foraged == True:
+        """
+        Move towards nearest berry if not at the end of the path; check if it has been foraged; if at the end of the path then forage
+        """
+        if self.nearest_berry.foraged == True:
             return False, current_pos
         else:
-            #check if at end of path
-            if self._path_step == len(self._path):
+            if self.path_step == len(self.path):
                 if self._forage(current_pos):
-                    self._path = None
+                    self.path = None
                     return True, current_pos
                 else:
                     raise NoBerriesException(self.agent_id, current_pos)
-            #if not at the end of the path, move
             else:
-                new_pos = self._move(current_pos, self._path[self._path_step])
-                self._path_step += 1
+                new_pos = self._move(current_pos, self.path[self.path_step])
+                self.path_step += 1
                 return False, new_pos
     
     def reset(self):
-        self._path = None
-        self._path_step = 0
-        self._nearest_berry = None
-        self._nearest_berry_coordinates = None
+        """
+        Reset current path and nearest berry
+        """
+        self.path = None
+        self.path_step = 0
+        self.nearest_berry = None
+        self.nearest_berry_coordinates = None
     
     def get_distance_to_berry(self):
-        if self._path == None:
+        """
+        Get the distance to the nearest berry for observations
+        """
+        if self.path == None:
             return 0
-        return len(self._path) - self._path_step
+        return len(self.path) - self.path_step
     
     def _move(self, current_pos, action):
         x, y = current_pos
@@ -90,7 +111,7 @@ class MovingModule():
         location = self.model.get_cell_contents(cell)
         for b in location:
             #there can be multiple berries at one location: check we are foraging the one we were going for
-            if b.agent_type == "berry" and b.unique_id == self._nearest_berry.unique_id:
+            if b.agent_type == "berry" and b.unique_id == self.nearest_berry.unique_id:
                 if not self.training and b.allocated_agent_id != self.agent_id:
                     raise IllegalBerry(self.agent_id, f"allocated to agent {b.allocated_agent_id}")
                 else:
@@ -109,18 +130,17 @@ class MovingModule():
             uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.agent_id)
         if not uneaten_berries_coordinates:
             return None
-        # Use the key parameter of min to find the index of the minimum distance
+        #Use the key parameter of min to find the index of the minimum distance
         nearest_berry_index = min(range(len(uneaten_berries_coordinates)), key=lambda i: self._calculate_distance(agent_coordinates, uneaten_berries_coordinates[i]))
         nearest_berry_coordinates = uneaten_berries_coordinates[nearest_berry_index]
-        # Return the position of the nearest berry
+        #Return the position of the nearest berry
         return nearest_berry_coordinates
 
     def _find_path_to_berry(self, agent_coordinates, berry_coordinates):
         def get_neighbours(node):
             x, y = node
-            # Possible moves: up, down, right, left
+            #Possible moves: up, down, right, left
             possible_moves = [(0, 1), (0, -1), (1, 0), (-1, 0)] 
-            # := assigns a value to a variable as part of an expression
             return [(new_x, new_y) for dx, dy in possible_moves if 0 <= (new_x := x + dx) < self.max_width and 0 <= (new_y := y + dy) < self.max_height]
         #stores nodes to be explored; priority is sum of the cost to reach the node ("g_values") and estimated cost to goal
         open_set = PriorityQueue()

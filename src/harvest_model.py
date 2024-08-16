@@ -16,27 +16,54 @@ from os.path import exists
 from abc import abstractmethod
 
 class HarvestModel(Model):
-    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,file_string=""):
+    """
+    Harvest model handles the environment, stepping agents, and data collection
+    Instance variables:
+        num_agents -- number of agents at beginning of each episode
+        num_berries -- number of berries at beginning of each episode
+        end_day -- last day of episode
+        day -- current day
+        max_days -- max days in a single episode
+        max_episode -- maximum number of episodes (for testing; training runs until epsilon is min epsilon)
+        min_epsilon -- minimum epsilon to end training
+        schedule -- schedule of agents
+        max_with -- width of grid
+        max_height -- height of grid
+        grid -- grid object
+        shared_replay_buffer -- replay buffer to share amongst agents to reduce training time
+        agent_id -- tracker for unique agent ids
+        berry_id -- tracker for unique berry ids
+        episode -- current episode
+        training -- boolean training or testing
+        filepath -- file path for current run
+        write_data -- boolean to write data to file
+        write_norms -- boolean to track norms and write to file
+        societal_norm_emergence_threshold -- percentage of society required to have adopted a behaviour for it to become a norm
+        emerged_norms -- all norms which emerge in current episode
+        min_fitness -- minimum fitness required for a behaviour to become a norm
+        epsilon -- probability of exploration for agents (tracks when to end training)
+    """
+    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath=""):
         super().__init__()
         self.num_agents = num_agents
         if self.num_agents <= 0:
             raise NumAgentsException(">0", 0)
         self.num_berries = 0
         self.end_day = 0
+        self.day = 1
+        self.max_days = max_days
+        self.max_episodes = max_episodes
+        self.min_epsilon = 0.01
         self.schedule = RandomActivation(self)
         self.max_width = max_width
         self.max_height = max_height
         self.grid = MultiGrid(self.max_width, self.max_height, False)
-        self.max_days = max_days
-        self.max_episodes = max_episodes
-        self.min_epsilon = 0.01
-        self.day = 1
         self.shared_replay_buffer = {"s": [], "a": [], "r": [], "s_": [], "done": []}
         self.agent_id = 0
         self.berry_id = 0
         self.episode = 1
         self.training = training
-        self.file_string = file_string
+        self.filepath = filepath
         self.write_data = write_data
         self.write_norms = write_norms
         self.societal_norm_emergence_threshold = 0.9
@@ -49,6 +76,9 @@ class HarvestModel(Model):
         self._init_reporters()
             
     def step(self):
+        """
+        Steps the schedule of agents, updates data collection, handles dead agents and foraged berries
+        """
         self.schedule.step()
         self.day += 1
         self._update_schedule()
@@ -59,7 +89,7 @@ class HarvestModel(Model):
         if self.day >= self.max_days or len(self.living_agents) <= 0:
             self.end_day = self.day
             if self.write_norms:
-                self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.file_string+"_emerged_norms.json")
+                self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.filepath+"_emerged_norms.json")
             for a in self.schedule.agents:
                 if a.agent_type != "berry":
                     if a.off_grid == False:
@@ -70,15 +100,24 @@ class HarvestModel(Model):
             self._reset()
 
     def move_agent_to_cell(self, agent, new_pos):
+        """
+        Move an agent to a specified cell
+        """
         self.grid.move_agent(agent, new_pos)
     
     def get_cell_contents(self, cell):
+        """
+        Get the coordinates of a specified cell
+        """
         return self.grid.iter_cell_list_contents(cell)
 
     def get_uneaten_berries_coordinates(self, agent_id=None):
+        """
+        Get the coordinates of uneaten berries
+        """
         berries_coordinates = []
         for b in self.berries:
-            if b.foraged == False:# and b.marked == False: 
+            if b.foraged == False:
                 if agent_id==None:
                     berries_coordinates.append(b.pos)
                 else:
@@ -87,8 +126,11 @@ class HarvestModel(Model):
         return berries_coordinates
     
     def get_uneaten_berry_by_coords(self, coords, agent_id=None):
+        """
+        Get an uneaten berry by its coordinates
+        """
         for b in self.berries:
-            if b.pos == coords and b.foraged == False:# and b.marked == False:
+            if b.pos == coords and b.foraged == False:
                 if agent_id == None:
                     return b
                 elif b.allocated_agent_id == agent_id:
@@ -97,15 +139,7 @@ class HarvestModel(Model):
     
     def get_society_well_being(self, observer, include_observer):
         """
-        Gathers the well-being of a society.
-        Args:
-            observer (Agent): The observer agent.
-            include_observer (bool): Whether to include the observer's well-being in the calculation.
-        Returns:
-            numpy.ndarray: A NumPy array containing the well-being values of all agents in the society, except for the observer if `include_observer` is False.
-        This function iterates over all agents in the society, excluding the observer if the agent is observing.
-        For each active agent, it appends their `days_left_to_live` value to the `society_well_being` array.
-        For dead agents, it appends 0 if observing (`include_observer` is False), otherwise skips them.
+        Get the well-being of a society; iterates over all agents in the society, excluding the observer if the agent is observing
         """
         society_well_being = np.array([])
         for a in self.schedule.agents:
@@ -216,9 +250,9 @@ class HarvestModel(Model):
                                "reward": [],
                                "num_norms": []})
         if self.write_data and not self.training:
-           if exists("data/results/current_run/agent_reports_"+self.file_string+".csv"):
-               raise FileExistsException("data/results/current_run/agent_reports_"+self.file_string+".csv")
-           self.agent_reporter.to_csv("data/results/current_run/agent_reports_"+self.file_string+".csv", mode='a')
+           if exists("data/results/current_run/agent_reports_"+self.filepath+".csv"):
+               raise FileExistsException("data/results/current_run/agent_reports_"+self.filepath+".csv")
+           self.agent_reporter.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", mode='a')
         self.model_episode_reporter = pd.DataFrame({"episode": [], 
                                "end_day": [],
                                "epsilon": [],
@@ -237,9 +271,9 @@ class HarvestModel(Model):
                                "deceased": [],
                                "num_emerged_norms": []})
         if self.write_data:
-            if exists("data/results/current_run/model_episode_reports_"+self.file_string+".csv"):
-                raise FileExistsException("data/results/current_run/model_episode_reports_"+self.file_string+".csv")
-            self.model_episode_reporter.to_csv("data/results/current_run/model_episode_reports_"+self.file_string+".csv", mode='a')
+            if exists("data/results/current_run/model_episode_reports_"+self.filepath+".csv"):
+                raise FileExistsException("data/results/current_run/model_episode_reports_"+self.filepath+".csv")
+            self.model_episode_reporter.to_csv("data/results/current_run/model_episode_reports_"+self.filepath+".csv", mode='a')
 
     def _collect_agent_data(self, agent):
         new_entry = pd.DataFrame({"agent_id": [agent.unique_id],
@@ -256,7 +290,7 @@ class HarvestModel(Model):
                                "num_norms": [len(agent.norms_module.behaviour_base) if self.write_norms else None]})
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry], ignore_index=True)
         if self.write_data and not self.training:
-           new_entry.to_csv("data/results/current_run/agent_reports_"+self.file_string+".csv", header=None, mode='a')
+           new_entry.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", header=None, mode='a')
     
     def _collect_model_episode_data(self):
         row_index_list = self.agent_reporter.index[self.agent_reporter["episode"] == self.episode].tolist()
@@ -277,9 +311,8 @@ class HarvestModel(Model):
                                "variance_health": [self.agent_reporter["health"].iloc[row_index_list].var(axis=0)],
                                "deceased": [self.num_agents - len(self.living_agents)],
                                "num_emerged_norms": [len(self.emerged_norms) if self.write_norms else None]})
-        self.model_episode_reporter = pd.concat([self.model_episode_reporter, new_entry], ignore_index=True)
         if self.write_data:
-            new_entry.to_csv("data/results/current_run/model_episode_reports_"+self.file_string+".csv", header=None, mode='a')
+            new_entry.to_csv("data/results/current_run/model_episode_reports_"+self.filepath+".csv", header=None, mode='a')
         return new_entry
 
     def _append_norm_dict_to_file(self, norm_dictionary, filename):
@@ -339,16 +372,16 @@ class HarvestModel(Model):
             if cell[1] >= 0 and cell[1] < self.max_height:
                 return True
         return False
-    
-    #for new agents who aren't yet on the grid
-    def _place_agent_in_allotment(self, agent):
+
+    def _place_agent_in_allotment(self, agent):    
+        #for new agents who aren't yet on the grid
         if not self.grid.exists_empty_cells:
             raise NoEmptyCells
         cell = self._random_allotment_cell(agent)
         self.grid.place_agent(agent, cell)
 
-    #for agents who are on the grid
     def _move_agent_in_allotment(self, agent, cell=None):
+        #for agents who are on the grid
         if not self.grid.exists_empty_cells:
             raise NoEmptyCells
         if cell == None:

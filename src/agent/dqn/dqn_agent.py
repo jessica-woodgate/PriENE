@@ -6,6 +6,27 @@ from src.harvest_exception import NumFeaturesException
 import os
 
 class DQNAgent(Agent):
+    """
+    DQN Agent learns and selects actions using Q network
+    Instance variables:
+        epsilon -- probability of exploration
+        min_exploration_prob -- smallest that epsilon can decay to during training
+        expl_decay -- rate of exponential decay of epsilon
+        total_episode_reward -- total reward of current episode
+        actions -- possible actions available to agent
+        n_actions -- number of actions
+        n_features -- number of features in DQN (length of observation)
+        done -- whether agent has finished
+        shared_replay_buffer -- experience replay buffer shared amongst agents
+        learn_step -- current step of learning
+        replace_target_iter -- interval for updating weights of target network
+        agent_type -- baseline or maximin, for file name to saving model weights
+        current_reward -- reward of current step
+        training -- boolean training or testing
+        q_checkpoint_path -- file path for q network (saving or loading)
+        target_checkpoint_path -- file path for target network (saving or loading)
+        losses -- history of losses
+    """
     def __init__(self,unique_id,model,agent_type,actions,training,checkpoint_path,epsilon,shared_replay_buffer=None):
         super().__init__(unique_id, model)
         self.epsilon = epsilon
@@ -31,7 +52,6 @@ class DQNAgent(Agent):
             self.q_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(unique_id)+"/q_model_variables.keras"
             self.target_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(unique_id)+"/target_model_variables.keras"
 
-        self.hidden_units = round(((self.n_features/3) * 2) + (2 * self.n_actions))
         self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
         self.target_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
         if self.training:
@@ -54,7 +74,7 @@ class DQNAgent(Agent):
     
     def step(self):
         """
-        if agents are being tested, they do not learn
+        Step oberves current state, chooses an action using Q network, performs action using interaction module and learns if training
         """
         if self.done == False:
             observation = self.observe()
@@ -68,6 +88,9 @@ class DQNAgent(Agent):
             self.total_episode_reward += self.current_reward
 
     def save_models(self):
+        """
+        Save q and target networks to file
+        """
         self.q_network.dqn.save(self.q_checkpoint_path)
         self.target_network.dqn.save(self.target_checkpoint_path)
     

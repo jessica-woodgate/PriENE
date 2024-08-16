@@ -4,6 +4,17 @@ from keras import layers
 from keras import initializers as initialiser
 
 class NNetwork(keras.Model):
+    """
+    NNetwork handles the network
+    Instance variables:
+        n_features -- number of features for input (size of observation)
+        hidden_units -- number of hidden units
+        n_actions -- number of possible actions (size of output)
+        input_layer -- input layer of network
+        hidden_layer_1 and hidden_layer 2 -- hidden layers
+        output_layer -- output layer of network
+        model -- the sequential model
+    """
     def __init__(self, n_features, hidden_units, n_actions, trainable=True, dtype="float32", **kwargs):
         super().__init__()
         self.n_features = n_features

@@ -2,8 +2,15 @@ from src.harvest_model import HarvestModel
 from src.harvest_exception import NumBerriesException
 
 class CapabilitiesHarvest(HarvestModel):
-    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string=""):
-        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,file_string)
+    """
+    Capabilities harvest scenario agents have only access to specific berries: some agents are tall, and can access berries on trees; some agents are small and can access berries on the ground
+    Instance variables:
+        num_start_berries -- the number of berries initiated at the beginning of an episode
+        allocations -- dictionary of agent ids and the berries assigned to that agent
+        berries -- list of active berry objects
+    """
+    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath)
         self.num_start_berries = num_start_berries
         self.allocations = self._assign_allocations()
         self._init_agents(agent_type, checkpoint_path)

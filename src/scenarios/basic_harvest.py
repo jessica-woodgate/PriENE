@@ -1,8 +1,14 @@
 from src.harvest_model import HarvestModel
 
 class BasicHarvest(HarvestModel):
-    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string=""):
-        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,file_string)
+    """
+    Basic harvest scenario for training agents in; any agent can access any berry
+    Instance variables:
+        num_start_berries -- the number of berries initiated at the beginning of an episode
+        berries -- list of active berry objects
+    """
+    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath)
         self.num_start_berries = num_start_berries
         self._init_agents(agent_type, checkpoint_path)
         self.berries = self._init_berries()

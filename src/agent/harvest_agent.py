@@ -10,8 +10,8 @@ class HarvestAgent(DQNAgent):
     """
     Agent acts in an environment and receives a reward
     Modules:
-        Decision module -- receives action from DQN, calls norms and ethics module and updates attributes (Algorithm 3)
-        Moving module -- handles pathfinding and returns coordinates to move to
+        Interaction module -- receives action from DQN, calls norms and ethics module and updates attributes (Algorithm 3)
+        Moving module -- handles pathfinding and returns coordinates for agent to move to
         Norms module -- stores and generates norms from view of state (Algorithm 2)
         Ethics module -- evaluates societal well-being before and after acting and generates a self-directed sanction (Algorithm 1)
     Instance variables:
@@ -95,8 +95,10 @@ class HarvestAgent(DQNAgent):
             self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day())
         return reward, next_state, done
         
-    #agents can see their attributes,distance to nearest berry,well being of other agents
     def observe(self):
+        """
+        Agents observe their attributes, distance to nearest berry, well-being of other agents in society
+        """
         distance_to_berry = self.moving_module.get_distance_to_berry()
         observer_features = np.array([self.health, self.berries, self.days_left_to_live, distance_to_berry])
         agent_well_being = self.model.get_society_well_being(self, False)
@@ -106,13 +108,17 @@ class HarvestAgent(DQNAgent):
         return observation
     
     def get_n_features(self):
-        #agent health, berries, days left to live, distance to berry
+        """
+        Get number of features in observation (agent's health, days left to live, distance to berry, well-being of other agents in society)
+        """
         n_features = 4
-        #feature for each observer well being
         n_features += self.model.get_num_agents() -1
         return n_features
       
     def reset(self):
+        """
+        Reset agent for new episode
+        """
         self.done = False
         self.total_episode_reward = 0
         self.berries = 0
@@ -128,6 +134,9 @@ class HarvestAgent(DQNAgent):
         self.moving_module.reset()
 
     def get_days_left_to_live(self):
+        """
+        Get the days an agent has left to live (Equation 4)
+        """
         days_left_to_live = (self.berry_health_payoff * self.berries) + self.health
         days_left_to_live = days_left_to_live / self.health_decay
         if days_left_to_live < 0:
@@ -135,16 +144,6 @@ class HarvestAgent(DQNAgent):
         return days_left_to_live
     
     def _generate_actions(self, unique_id, num_agents):
-        """
-        Generates a list of all possible actions for the agents.
-        If there are lots of agents, should reconsider this function
-        Args:
-            num_agents: Number of agents in the environment.
-
-        Returns:
-            A list of actions, where each action is a string representing 
-            "move", "eat", or "throw_AGENT_ID" (e.g., "throw_1").
-        """
         actions = ["move", "eat"]
         for agent_id in range(num_agents):
             if agent_id != unique_id:
@@ -182,11 +181,6 @@ class HarvestAgent(DQNAgent):
         return self.rewards["neutral_reward"]
     
     def _throw(self, benefactor_id):
-        """
-        checks if it is feasible to throw a berry (have berries and have health)
-        gets the agent with the matching id to the throw action
-        benefactor immediately eats the berry
-        """
         if self.berries <= 0:
             return self.rewards["no_berries"]
         #have to have a minimum amount of health to throw
