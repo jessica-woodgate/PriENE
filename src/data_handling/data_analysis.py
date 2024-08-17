@@ -100,7 +100,7 @@ class DataAnalysis():
         min_days_left_to_live.to_csv(self.filepath+"min_days_left_to_live.csv")
         gini_days_left_to_live.to_csv(self.filepath+"gini_days_left_to_live.csv")
         total_days_left_to_live.to_csv(self.filepath+"total_days_left_to_live.csv")
-        with open(self.filepath+"tendency_berries_consumed.json", "w") as f:
+        with open(self.filepath+"tendency_well_being.json", "w") as f:
             json.dump(days_left_to_live_tendency, f, indent=4)
     
     def _berries_consumed_results(self, sum_df_list, df_labels, filename):
