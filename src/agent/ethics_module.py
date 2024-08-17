@@ -94,7 +94,7 @@ class EthicsModule():
             return self.sanction
         elif previous_loss < current_loss:
             #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning neg reward")
-            return -self.santion
+            return -self.sanction
         #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning neutral reward")
         return 0
     

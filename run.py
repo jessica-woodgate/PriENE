@@ -15,7 +15,7 @@ NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 2000
 MAX_DAYS = 50
 RESULTS_FILEPATH = "data/results/current_run/"
-RUN_OPTIONS = ["current_run", "run_1"]
+RUN_OPTIONS = ["current_run", "run_1", "run_2"]
 
 def generate_graphs(scenario, num_agents):
     """
