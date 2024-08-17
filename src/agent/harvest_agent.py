@@ -33,7 +33,7 @@ class HarvestAgent(DQNAgent):
         off_grid -- status of agent on the grid; agent is removed from the grid upon death
         current_action -- the current action being performed
     """
-    def __init__(self,unique_id,model,agent_type,max_days,min_width,max_width,min_height,max_height,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None):
+    def __init__(self,unique_id,model,agent_type,max_days,max_width,min_width,max_height,min_height,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None):
         self.actions = self._generate_actions(unique_id, model.get_num_agents())
         #dqn agent class handles learning and action selection
         super().__init__(unique_id,model,agent_type,self.actions,training,checkpoint_path,epsilon,shared_replay_buffer=shared_replay_buffer)
@@ -44,11 +44,11 @@ class HarvestAgent(DQNAgent):
         self.berries_thrown = 0
         self.days_survived = 0
         self.max_days = max_days
-        self.max_width = max_width
         self.min_width = min_width
-        self.width = max_width - min_width + 1
-        self.max_height = max_height
+        self.max_width = max_width
+        #self.width = max_width - min_width + 1
         self.min_height = min_height
+        self.max_height = max_height
         #self.height = max_height - min_height + 1
         self.health_decay = 0.1
         self.days_left_to_live = self.health/self.health_decay
@@ -57,7 +57,7 @@ class HarvestAgent(DQNAgent):
         self.low_health_threshold = 0.6
         self.agent_type = agent_type
         self.write_norms = write_norms
-        self.moving_module = MovingModule(self.unique_id, model, training, max_width, max_height)
+        self.moving_module = MovingModule(self.unique_id, model, training, min_width, max_width, min_height, max_height)
         self.norms_module = NormsModule(self.unique_id)
         if agent_type != "baseline":
             self.rewards = self._ethics_rewards()

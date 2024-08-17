@@ -18,11 +18,13 @@ class MovingModule():
         nearest_berry -- the nearest berry agent
         nearest_berry_coordinates -- coordinates of the nearest berry
     """
-    def __init__(self, agent_id, model, training, max_width, max_height):
+    def __init__(self, agent_id, model, training, min_width, max_width, min_height, max_height):
         self.agent_id = agent_id
         self.model = model
         self.training = training
+        self.min_width = min_width
         self.max_width = max_width
+        self.min_height = min_height
         self.max_height = max_height
         self.path = None
         self.path_step = 0
@@ -90,12 +92,12 @@ class MovingModule():
             else:
                 raise OutOfBounds(self.agent_id, (x,y+1))
         elif action == "east":
-            if (x - 1) >= 0:
+            if (x - 1) >= self.min_width:
                 x -= 1
             else:
                 raise OutOfBounds(self.agent_id, (x-1,y))
         elif action == "south":
-            if (y - 1) >= 0:
+            if (y - 1) >= self.min_height:
                 y -= 1
             else:
                 raise OutOfBounds(self.agent_id, (x,y-1))
@@ -141,7 +143,7 @@ class MovingModule():
             x, y = node
             #Possible moves: up, down, right, left
             possible_moves = [(0, 1), (0, -1), (1, 0), (-1, 0)] 
-            return [(new_x, new_y) for dx, dy in possible_moves if 0 <= (new_x := x + dx) < self.max_width and 0 <= (new_y := y + dy) < self.max_height]
+            return [(new_x, new_y) for dx, dy in possible_moves if self.min_width <= (new_x := x + dx) < self.max_width and self.min_height <= (new_y := y + dy) < self.max_height]
         #stores nodes to be explored; priority is sum of the cost to reach the node ("g_values") and estimated cost to goal
         open_set = PriorityQueue()
         #add start node to priority queue with initial priority of 0

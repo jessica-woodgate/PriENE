@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import json
+from numpy import std, mean, sqrt
 from src.data_handling.norm_processing import NormProcessing
 
 class DataAnalysis():
@@ -117,6 +118,26 @@ class DataAnalysis():
             df = pd.DataFrame(data).T
             df.columns = df_labels
             return df
+
+    def _calculate_central_tendency(self, baseline_series, maximin_series):
+        central_tendency = {"baseline_mean": baseline_series.mean(),
+                            "baseline_stdev": baseline_series.std(),
+                            "maximin_mean": maximin_series.mean(),
+                            "maximin_stdev": maximin_series.std(),
+                            "p_value": 0,
+                            "cohens_d": self._cohens_d(baseline_series, maximin_series),
+                            }
+
+    def _cohens_d(self, x_series, y_series):
+        #https://stackoverflow.com/questions/21532471/how-to-calculate-cohens-d-in-python
+        nx = len(x_series)
+        ny = len(y_series)
+        if nx == ny:
+            return (mean(x_series) - mean(y_series)) / sqrt((std(x_series, ddof=1) ** 2 + std(y_series, ddof=1) ** 2) / 2.0)
+        else:
+            dof = nx + ny - 2
+            return (mean(x_series) - mean(y_series)) / sqrt(((nx-1)*std(x_series, ddof=1) ** 2 + (ny-1)*std(y_series, ddof=1) ** 2) / dof)
+    
 
     def _display_swarm_plot(self, df_list, df_labels, column, filename):
         fig, ax = plt.subplots()
