@@ -2,7 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import json
-from numpy import std, mean, sqrt
+#import scipy.stats.pearsonr as pearsonr
+import numpy as np
 from src.data_handling.norm_processing import NormProcessing
 
 class DataAnalysis():
@@ -83,61 +84,44 @@ class DataAnalysis():
         return processed_dfs
 
     def _days_left_to_live_results(self, sum_df_list, df_labels, filename):
+        days_left_to_live_tendency = {}
         max_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_max)
         self._display_dataframe(max_days_left_to_live, "Max Days Left To Live", "Days Left To Live", filename+"_max")
         min_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_min)
         self._display_dataframe(min_days_left_to_live, "Min Days Left To Live", "Days Left To Live", filename+"_min")
+        days_left_to_live_tendency["min_well_being"] = self._calculate_central_tendency(min_days_left_to_live["baseline"], min_days_left_to_live["maximin"])
         total_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_total)
         self._display_dataframe(total_days_left_to_live, "Total Days Left To Live", "Days Left To Live", filename+"_total")
+        days_left_to_live_tendency["total_well_being"] = self._calculate_central_tendency(total_days_left_to_live["baseline"], total_days_left_to_live["maximin"])
         gini_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_gini)
         self._display_dataframe(gini_days_left_to_live, "Gini Index of Days Left To Live", "Days Left To Live", filename+"_gini")
+        days_left_to_live_tendency["gini_well_being"] = self._calculate_central_tendency(gini_days_left_to_live["baseline"], gini_days_left_to_live["maximin"])
         max_days_left_to_live.to_csv(self.filepath+"max_days_left_to_live.csv")
         min_days_left_to_live.to_csv(self.filepath+"min_days_left_to_live.csv")
         gini_days_left_to_live.to_csv(self.filepath+"gini_days_left_to_live.csv")
         total_days_left_to_live.to_csv(self.filepath+"total_days_left_to_live.csv")
+        with open(self.filepath+"tendency_berries_consumed.json", "w") as f:
+            json.dump(days_left_to_live_tendency, f, indent=4)
     
     def _berries_consumed_results(self, sum_df_list, df_labels, filename):
+        berries_consumed_tendency = {}
         max_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_max)
         self._display_dataframe(max_berries_consumed, "Max Berries Consumed", "Berries Consumed", filename+"_max")
         min_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_min)
         self._display_dataframe(min_berries_consumed, "Min Berries Consumed", "Berries Consumed", filename+"_min")
+        berries_consumed_tendency["min_berries"] = self._calculate_central_tendency(min_berries_consumed["baseline"], min_berries_consumed["maximin"])
         total_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_total)
         self._display_dataframe(total_berries_consumed, "Total Berries Consumed", "Berries Consumed", filename+"_total")
+        berries_consumed_tendency["total_berries"] = self._calculate_central_tendency(total_berries_consumed["baseline"], total_berries_consumed["maximin"])
         gini_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_gini)
         self._display_dataframe(gini_berries_consumed, "Gini Index of Berries Consumed", "Berries Consumed", filename+"_gini")
+        berries_consumed_tendency["gini_berries"] = self._calculate_central_tendency(gini_berries_consumed["baseline"], gini_berries_consumed["maximin"])
         max_berries_consumed.to_csv(self.filepath+"max_berries_consumed.csv")
         min_berries_consumed.to_csv(self.filepath+"min_berries_consumed.csv")
         gini_berries_consumed.to_csv(self.filepath+"gini_berries_consumed.csv")
         total_berries_consumed.to_csv(self.filepath+"total_berries_consumed.csv")
-
-    def _calculate_column_across_episode(self, df_list, df_labels, column, calculation):
-            data = []
-            for df in df_list:
-                series = df.groupby("day")[column].apply(calculation)
-                data.append(series)
-            df = pd.DataFrame(data).T
-            df.columns = df_labels
-            return df
-
-    def _calculate_central_tendency(self, baseline_series, maximin_series):
-        central_tendency = {"baseline_mean": baseline_series.mean(),
-                            "baseline_stdev": baseline_series.std(),
-                            "maximin_mean": maximin_series.mean(),
-                            "maximin_stdev": maximin_series.std(),
-                            "p_value": 0,
-                            "cohens_d": self._cohens_d(baseline_series, maximin_series),
-                            }
-
-    def _cohens_d(self, x_series, y_series):
-        #https://stackoverflow.com/questions/21532471/how-to-calculate-cohens-d-in-python
-        nx = len(x_series)
-        ny = len(y_series)
-        if nx == ny:
-            return (mean(x_series) - mean(y_series)) / sqrt((std(x_series, ddof=1) ** 2 + std(y_series, ddof=1) ** 2) / 2.0)
-        else:
-            dof = nx + ny - 2
-            return (mean(x_series) - mean(y_series)) / sqrt(((nx-1)*std(x_series, ddof=1) ** 2 + (ny-1)*std(y_series, ddof=1) ** 2) / dof)
-    
+        with open(self.filepath+"tendency_berries_consumed.json", "w") as f:
+            json.dump(berries_consumed_tendency, f, indent=4)
 
     def _display_swarm_plot(self, df_list, df_labels, column, filename):
         fig, ax = plt.subplots()
@@ -212,6 +196,37 @@ class DataAnalysis():
     
     def _calculate_total(self, series):
         return series.sum()
+    
+    def _calculate_column_across_episode(self, df_list, df_labels, column, calculation):
+            data = []
+            for df in df_list:
+                series = df.groupby("day")[column].apply(calculation)
+                data.append(series)
+            df = pd.DataFrame(data).T
+            df.columns = df_labels
+            return df
+
+    def _calculate_central_tendency(self, baseline_series, maximin_series):
+        #personsr, p_value = personsr(baseline_series, maximin_series)
+        central_tendency = {"baseline_mean": baseline_series.mean(),
+                            "maximin_mean": maximin_series.mean(),
+                            "baseline_stdev": baseline_series.std(),
+                            "maximin_stdev": maximin_series.std(),
+                            #"p_value": p_value,
+                            "cohens_d": self._cohens_d(baseline_series, maximin_series),
+                            }
+        return central_tendency
+
+    def _cohens_d(self, x_series, y_series):
+        nx = len(x_series)
+        ny = len(y_series)
+        if nx != ny:
+            nx = len(x_series)
+            ny = len(y_series)
+            dof = nx + ny - 2
+            return (x_series.mean() - y_series.mean()) / np.sqrt(((nx-1)*x_series.std() ** 2 + (ny-1)*y_series.std() ** 2) / dof)
+        else:
+            return (x_series.mean() - y_series.mean()) / np.sqrt((x_series.std() ** 2 + y_series.std() ** 2) / 2.0)
 
     def _create_norms_dataframe(self, filename, write_name=None):
         norms_data = []

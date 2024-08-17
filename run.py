@@ -8,13 +8,13 @@ import argparse
 import wandb
 import numpy as np
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian"]
-#AGENT_TYPES = ["baseline", "maximin"]
+#AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian"]
+AGENT_TYPES = ["baseline", "maximin"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 2000
 MAX_DAYS = 50
-RESULTS_FILEPATH = "data/results/current_run/"
+RESULTS_FILEPATH = "data/results/run_1/"
 RUN_OPTIONS = ["current_run", "run_1", "run_2"]
 
 def generate_graphs(scenario, num_agents):
@@ -24,7 +24,7 @@ def generate_graphs(scenario, num_agents):
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
     data_analysis = DataAnalysis(num_agents, RESULTS_FILEPATH)
-    path = RESULTS_FILEPATH+"agent_reports_"+scenario+"_"
+    path = RESULTS_FILEPATH+scenario+"/agent_reports_"+scenario+"_"
     files = [path+"baseline.csv",path+"maximin.csv"]
     dfs = []
     for file in files:
