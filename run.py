@@ -8,15 +8,15 @@ import argparse
 import wandb
 import numpy as np
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian"]
-#AGENT_TYPES = ["baseline", "maximin", "egalitarian"]
+#AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian"]
+AGENT_TYPES = ["baseline", "maximin", "utilitarian"]
 #AGENT_TYPES = ["egalitarian", "utilitarian"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 2000
 MAX_DAYS = 50
 RESULTS_FILEPATH = "data/results/current_run/"
-RUN_OPTIONS = ["current_run", "run_1", "run_2"]
+RUN_OPTIONS = ["current_run", "run_1", "run_2", "run_3"]
 
 def generate_graphs(scenario, num_agents):
     """
