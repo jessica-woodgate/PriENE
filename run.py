@@ -26,7 +26,8 @@ def generate_graphs(scenario, num_agents):
     """
     data_analysis = DataAnalysis(num_agents, RESULTS_FILEPATH)
     path = RESULTS_FILEPATH+"agent_reports_"+scenario+"_"
-    files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv"]
+    #files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv"]
+    files = [path+"baseline.csv",path+"maximin.csv",path+"utilitarian.csv"]
     dfs = []
     for file in files:
         df = pd.read_csv(file)
