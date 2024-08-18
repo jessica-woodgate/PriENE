@@ -120,4 +120,8 @@ class NormProcessing():
             file.write("\n")
         with open(output_file+"_merged_keys.txt", "w") as keys_file:
             keys_file.write("\n".join([key for key in emerged_norms.keys()]))
+        with open(output_file+"_merged_cooperative_keys.txt", "w") as keys_file:
+            for key in emerged_norms.keys():
+                if "throw" in key:
+                    keys_file.write(key+"\n")
         return emerged_norms

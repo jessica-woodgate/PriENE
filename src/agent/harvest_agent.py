@@ -44,11 +44,11 @@ class HarvestAgent(DQNAgent):
         self.berries_thrown = 0
         self.days_survived = 0
         self.max_days = max_days
-        self.min_width = min_width
         self.max_width = max_width
-        #self.width = max_width - min_width + 1
-        self.min_height = min_height
+        self.min_width = min_width
+        self.width = max_width - min_width + 1
         self.max_height = max_height
+        self.min_height = min_height
         #self.height = max_height - min_height + 1
         self.health_decay = 0.1
         self.days_left_to_live = self.health/self.health_decay
@@ -57,7 +57,7 @@ class HarvestAgent(DQNAgent):
         self.low_health_threshold = 0.6
         self.agent_type = agent_type
         self.write_norms = write_norms
-        self.moving_module = MovingModule(self.unique_id, model, training, min_width, max_width, min_height, max_height)
+        self.moving_module = MovingModule(self.unique_id, model, training, max_width, max_height)
         self.norms_module = NormsModule(self.unique_id)
         if agent_type != "baseline":
             self.rewards = self._ethics_rewards()
@@ -83,11 +83,11 @@ class HarvestAgent(DQNAgent):
             antecedent = self.norms_module.get_antecedent(self.health, self.berries, society_well_being)
         if self.agent_type != "baseline":
             self.ethics_module.day = self.model.get_day()
-            self._update_ethics(society_well_being)
+            can_help = self._update_ethics(society_well_being)
         reward = self._perform_action(action)
         next_state = self.observe()
         if self.agent_type != "baseline":
-            reward += self._ethics_sanction()
+            reward += self._ethics_sanction(can_help)
             #print("day", self.model.get_day(), "agent", self.unique_id, "reward after sanction", reward)
         done, reward = self._update_attributes(reward)
         #print("day", self.model.get_day(), "agent", self.unique_id, "action", action, "reward", reward)
@@ -208,9 +208,9 @@ class HarvestAgent(DQNAgent):
         else:
             return self.rewards["no_berries"]
 
-    def _ethics_sanction(self):
-        # if not can_help:
-        #     return 0
+    def _ethics_sanction(self, can_help):
+        if not can_help:
+            return 0
         society_well_being = self.model.get_society_well_being(self, True)
         sanction = self.ethics_module.get_sanction(society_well_being)
         #print("day", self.model.get_day(), "agent", self.unique_id, "sanction", sanction, "well being", society_well_being)
@@ -219,12 +219,11 @@ class HarvestAgent(DQNAgent):
     def _update_ethics(self, society_well_being):
         if self.berries > 0 and self.health >= self.low_health_threshold:
             can_help = True
-            #self.ethics_module.update_social_welfare(self.agent_type, can_help, society_well_being)
+            self.ethics_module.update_social_welfare(self.agent_type, society_well_being)
         else:
             can_help = False
         #print("day", self.model.get_day(), "agent", self.unique_id, "berries", self.berries, "health", self.health, "can help", can_help, "social welfare", society_well_being, "measure", self.ethics_module._measure_of_well_being, "minimums", self.ethics_module._number_of_minimums)
-        #return can_help
-        self.ethics_module.update_social_welfare(self.agent_type, can_help, society_well_being)
+        return can_help
     
     def _update_attributes(self, reward):
         done = False

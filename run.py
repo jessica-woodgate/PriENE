@@ -9,7 +9,7 @@ import wandb
 import numpy as np
 
 #AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian"]
-AGENT_TYPES = ["baseline", "maximin", "utilitarian"]
+AGENT_TYPES = ["baseline", "maximin"]
 #AGENT_TYPES = ["egalitarian", "utilitarian"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
@@ -27,12 +27,12 @@ def generate_graphs(scenario, num_agents):
     data_analysis = DataAnalysis(num_agents, RESULTS_FILEPATH)
     path = RESULTS_FILEPATH+"agent_reports_"+scenario+"_"
     #files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv"]
-    files = [path+"baseline.csv",path+"maximin.csv",path+"utilitarian.csv"]
-    dfs = []
-    for file in files:
-        df = pd.read_csv(file)
-        dfs.append(df)
-    data_analysis.proccess_and_display_all_data(scenario, dfs, AGENT_TYPES)
+    # files = [path+"baseline.csv",path+"maximin.csv",path+"utilitarian.csv"]
+    # dfs = []
+    # for file in files:
+    #     df = pd.read_csv(file)
+    #     dfs.append(df)
+    # data_analysis.proccess_and_display_all_data(scenario, dfs, AGENT_TYPES)
     data_analysis._process_norms(scenario, AGENT_TYPES)
 
 def log_wandb_agents(model_inst, last_episode, reward_tracker):
