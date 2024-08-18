@@ -432,7 +432,7 @@ class HarvestModel(Model):
         s = sum(x)
         if s == 0:
             return 0
-        N = len(self.living_agents)
+        N = self.num_agents
         B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * s)
         return 1 + (1 / N) - 2 * B
     
