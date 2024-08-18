@@ -206,8 +206,7 @@ class HarvestModel(Model):
             raise NumAgentsException(self.num_agents, num_agents)
         if num_berries != self.num_berries:
             raise NumBerriesException(self.num_berries, num_berries)
-        if self.training:
-            self.agent_reporter = pd.DataFrame({"agent_id": [],
+        self.agent_reporter = pd.DataFrame({"agent_id": [],
                                "episode": [],
                                "day": [],
                                "berries": [],
