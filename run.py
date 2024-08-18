@@ -8,8 +8,8 @@ import argparse
 import wandb
 import numpy as np
 
-#AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian"]
-AGENT_TYPES = ["baseline", "maximin", "egalitarian"]
+AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian"]
+#AGENT_TYPES = ["baseline", "maximin", "egalitarian"]
 #AGENT_TYPES = ["egalitarian", "utilitarian"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
