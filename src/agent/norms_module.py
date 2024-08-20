@@ -26,16 +26,10 @@ class NormsModule():
         self.high_days_left_threshold = 30
         self.norm_decay_rate = 0.3
 
-    def get_antecedent(self, health, berries, well_being):
+    def get_antecedent(self, berries, health, well_being):
         """
-        Get antecedent string from view of agent's health and berries and society well-being
+        Get antecedent string from view of agent's berries and health and society well-being
         """
-        if health < self.low_health_threshold:
-            h = "low health"
-        elif health >= self.low_health_threshold and health < self.high_health_threshold:
-            h = "medium health"
-        else:
-            h = "high health"
         if berries == 0:
             b = "no berries"
         elif berries > 0 and berries < self.low_berries_threshold:
@@ -44,7 +38,13 @@ class NormsModule():
             b = "medium berries"
         else:
             b = "high berries"
-        view = ["IF", h, b]
+        if health < self.low_health_threshold:
+            h = "low health"
+        elif health >= self.low_health_threshold and health < self.high_health_threshold:
+            h = "medium health"
+        else:
+            h = "high health"
+        view = ["IF", b, h]
         for w in well_being:
             if w < self.low_days_left_threshold:
                 view.append("low days")

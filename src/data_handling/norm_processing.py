@@ -12,6 +12,7 @@ class NormProcessing():
         data = json.load(f)
         cooperative_data = self._count_cooperative_norms(data, output_file)
         data = self._merge_norms(data, output_file)
+        self._generalise_norms(data.keys(), output_file)
         #self._generate_norms_tree(data, output_file)
         return cooperative_data
     
@@ -27,20 +28,50 @@ class NormProcessing():
                 if consequent == "throw":
                     norm_data = {"reward": norm_value["reward"], "numerosity": norm_value["numerosity"], "fitness": norm_value["fitness"]}
                     cooperative_norms.append(norm_data)
-        print("n_norms", n_norms, "cooperative norms", len(cooperative_norms))
+        print("Total emerged norms:", n_norms, "Total cooperative norms:", len(cooperative_norms))
         print("Proportion of cooperative norms for "+output_file+" is "+str((len(cooperative_norms)/n_norms)*100))
         df = pd.DataFrame(cooperative_norms)
         df.to_csv(output_file+"_cooperative_data.csv")
         return df
-
+    
+    def _generalise_norms(self, norms, output_file):
+        rule_dict = {}
+        for rule in norms:
+            conditions, action = rule.split("THEN")
+            conditions = conditions.split(",")[1:]
+            rule_dict[tuple(conditions)] = action.strip()
+        def merge_rules(rule_dict):
+            merged_rules = {}
+            for conditions, action in rule_dict.items():
+                if conditions in merged_rules:
+                    continue
+                generalized_conditions = []
+                for i in range(len(conditions)):
+                    shorter_conditions = conditions[:i] + conditions[i+1:]
+                    if tuple(shorter_conditions) in rule_dict and rule_dict[tuple(shorter_conditions)] == action:
+                        generalized_conditions = shorter_conditions
+                        break
+                if generalized_conditions:
+                    merged_rules[tuple(generalized_conditions)] = action
+                else:
+                    merged_rules[conditions] = action
+            return merged_rules
+        merged_rules = merge_rules(rule_dict)
+        merged_rules = self._convert_to_rule_list(merged_rules)
+        self._generate_norms_tree(merged_rules, output_file)
+    
+    def _convert_to_rule_list(self, data):
+        rule_list = []
+        for conditions, action in data.items():
+            rule = ["IF"]
+            rule.extend(conditions[:-1])
+            rule.append("THEN")
+            rule.append(action.strip(","))
+            rule_string = ", ".join(rule)
+            rule_list.append(rule_string)
+        return rule_list
+        
     def _generate_norms_tree(self, data, output_file):
-        """
-        Processes a list of dictionaries representing norms and prints the tree structure to a file.
-
-        Args:
-            data: A list of dictionaries where each dictionary represents a norm (IF,x,y,z,THEN,a) with its information.
-            output_file: The path to the file where the tree structure will be printed.
-        """
         tree = {}
         for norm in data:
             conditions = norm.split("IF")[1].split(",")[:-2]
@@ -49,26 +80,21 @@ class NormProcessing():
             for condition in conditions:
                 if condition not in current_node:
                     current_node[condition] = {}
+                if isinstance(current_node[condition], list):
+                    new_node = {}
+                    for item in current_node[condition]:
+                        new_node[item] = {}
+                    current_node[condition] = new_node
                 current_node = current_node[condition]
             consequent = norm.split("THEN")[1].strip(",")
             if isinstance(current_node, list):
                 current_node.append(consequent)
             else:
                 current_node[condition] = [consequent]
-        with open(output_file+".txt", 'w') as f:
+        with open(output_file+"_tree.txt", 'w') as f:
             f.write(self._print_tree(tree, indent="  "))
 
     def _print_tree(self, node, indent=""):
-        """
-        Recursively prints the tree structure to a string with indentation.
-
-        Args:
-            node: A node of the tree structure (dictionary).
-            indent: The indentation string for current level.
-
-        Returns:
-            A string representation of the tree with indentation.
-        """
         output = ""
         for key, value in node.items():
             if isinstance(value, dict):
@@ -98,6 +124,8 @@ class NormProcessing():
             #key is the episode number; value is the emerged norms from that episode
             for norm in episode_norms:
                 for norm_name, norm_data in norm.items():
+                    if ("throw" in norm_name and "no berries" in norm_name) or ("eat" in norm_name and "no berries" in norm_name):
+                        continue
                     if norm_name not in emerged_norms.keys():
                         emerged_norms[norm_name] = {"reward": norm_data["reward"],
                                                     "numerosity": norm_data["numerosity"],

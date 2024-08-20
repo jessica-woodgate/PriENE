@@ -25,7 +25,7 @@ class DQN:
         delta -- parameter for Huber loss
     """
     def __init__(self,actions,n_features,training,checkpoint_path=None,shared_replay_buffer=None):
-        self.gamma = 0.95 #discount
+        self.gamma = 0.95
         self.lr = 0.0001
         self.total_episode_reward = 0
         self.batch_size = 64
@@ -42,14 +42,12 @@ class DQN:
         self.min_experiences = 100
         self.max_experiences = 100000
         self.optimiser = keras.optimizers.Adam(learning_rate=self.lr)
-        self.delta = 1.0 #for Huber loss
+        self.delta = 1.0
         
         if self.training:
             self.dqn = NNetwork(self.n_features,self.hidden_units, self.n_actions)
         else:
             self.dqn = keras.models.load_model(self.checkpoint_path,compile=True)
-            #self.dqn.compile(optimiser="Adam", loss="Huber")
-            #self.dqn = keras.layers.TFSMLayer(self.checkpoint_path, call_endpoint="serving_default")
     
     def train(self, TargetNet):
         """

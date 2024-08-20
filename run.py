@@ -5,70 +5,43 @@ from src.data_handling.data_analysis import DataAnalysis
 from src.data_handling.render_pygame import RenderPygame
 import pandas as pd
 import argparse
-import wandb
 import numpy as np
 
-#AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian"]
 AGENT_TYPES = ["baseline", "maximin"]
-#AGENT_TYPES = ["egalitarian", "utilitarian"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
-NUM_AGENTS_OPTIONS = ["2", "4", "6"]
+NUM_AGENTS_OPTIONS = ["2", "4"]
 MAX_EPISODES = 2000
 MAX_DAYS = 50
-RESULTS_FILEPATH = "data/results/current_run/"
-RUN_OPTIONS = ["current_run", "run_1", "run_2", "run_3"]
+RUN_OPTIONS = ["current_run", "pretrained"]
 
-def generate_graphs(scenario, num_agents):
+def generate_graphs(scenario, run_name, num_agents):
     """
     takes raw files and generates graphs displayed in the paper
     processed dfs contain data for each agent at the end of each episode
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
-    data_analysis = DataAnalysis(num_agents, RESULTS_FILEPATH)
-    path = RESULTS_FILEPATH+"agent_reports_"+scenario+"_"
-    #files = [path+"baseline.csv",path+"egalitarian.csv",path+"maximin.csv",path+"utilitarian.csv"]
-    # files = [path+"baseline.csv",path+"maximin.csv",path+"utilitarian.csv"]
-    # dfs = []
-    # for file in files:
-    #     df = pd.read_csv(file)
-    #     dfs.append(df)
-    # data_analysis.proccess_and_display_all_data(scenario, dfs, AGENT_TYPES)
-    data_analysis._process_norms(scenario, AGENT_TYPES)
+    writing_filepath = "data/results/current_run/"
+    data_analysis = DataAnalysis(num_agents, writing_filepath)
+    reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+scenario+"_"
+    norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/"+scenario
+    files = [reading_filepath+"baseline.csv",reading_filepath+"maximin.csv"]
+    dfs = []
+    for file in files:
+        df = pd.read_csv(file)
+        dfs.append(df)
+    data_analysis.proccess_and_display_all_data(dfs, AGENT_TYPES, scenario, norms_filepath)
 
-def log_wandb_agents(model_inst, last_episode, reward_tracker):
-    for i, agent in enumerate(model_inst.schedule.agents):
-        if agent.agent_type != "berry":
-            base_string = agent.agent_type+"_agent_"+str(agent.unique_id)
-            if last_episode != model_inst.episode:
-                string = base_string+"_total_episode_reward"
-                reward = reward_tracker[i]
-                wandb.log({string: reward})
-            string = base_string+"_reward"
-            wandb.log({string: agent.current_reward})
-            mean_loss = (np.mean(agent.losses) if model_inst.training else 0)
-            string = base_string+"_mean_loss"
-            wandb.log({string: mean_loss})
-            string = base_string+"_epsilon"
-            wandb.log({string: agent.epsilon})
-
-def run_simulation(model_inst, render, log_wandb):
-    if log_wandb:
-        wandb.init(project="PriENE")
+def run_simulation(model_inst, render):
     if render:
         render_inst = RenderPygame(model_inst.max_width, model_inst.max_height)
     while (model_inst.training and model_inst.epsilon > model_inst.min_epsilon) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
         model_inst.step()
-        if log_wandb:
-            reward_tracker = [a.total_episode_reward for a in model_inst.schedule.agents if a.agent_type != "berry"]
-            log_wandb_agents(model_inst, model_inst.episode, reward_tracker)
-            mean_reward = model_inst.model_episode_reporter["mean_reward"].mean()
-            wandb.log({'mean_episode_reward': mean_reward})
         if render:
             render_inst.render_pygame(model_inst)
     num_episodes = model_inst.episode
     return num_episodes
 
-def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb):   
+def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render):   
     file_string = scenario+"_"+agent_type
     checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
     if scenario == "basic":
@@ -79,11 +52,11 @@ def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_ty
         model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     else:
         ValueError("Unknown argument: "+scenario)
-    run_simulation(model_inst,render,log_wandb)
+    run_simulation(model_inst,render)
 
-def run_all(scenario,run_name,num_agents,num_start_berries,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb):
+def run_all(scenario,run_name,num_agents,num_start_berries,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render):
     for agent_type in AGENT_TYPES:
-        create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb)
+        create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render)
 
 def get_integer_input(prompt):
     while True:
@@ -115,15 +88,11 @@ def write_data_input(data_type):
 parser = argparse.ArgumentParser(description="Program options")
 parser.add_argument("option", choices=["test", "train", "graphs"],
                     help="Choose the program operation")
-parser.add_argument("-l", "--log", type=str, default=None,
-                    help="Log wandb (optional)")
 args = parser.parse_args()
 
 parser = argparse.ArgumentParser(description="Program options")
 parser.add_argument("option", choices=["test", "train", "graphs"],
                     help="Choose the program operation")
-parser.add_argument("-l", "--log", type=str, default=None,
-                    help="Log wandb (optional)")
 args = parser.parse_args()
 
 if args.option not in ["test", "train", "graphs"]:
@@ -159,10 +128,6 @@ elif args.option == "test" or args.option == "train":
         elif render == "n":
             render = False
     #########################################################################################
-    if args.log is not None:
-        log_wandb = True
-    else:
-        log_wandb = False
     if scenario != "allotment":
         MAX_WIDTH = num_agents * 2
     else:
@@ -170,14 +135,13 @@ elif args.option == "test" or args.option == "train":
     MAX_HEIGHT = num_agents * 2
     NUM_BERRIES = num_agents * 3
     if agent_type == "all":
-        run_all(scenario,run_name,num_agents,NUM_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,log_wandb)
+        run_all(scenario,run_name,num_agents,NUM_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render)
     else:
-        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,log_wandb)
+        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render)
 #########################################################################################
 elif args.option == "graphs":
-    scenario = input("What type of scenario do you want to generate graphs for (capabilities, allotment): ")
-    while scenario not in ["capabilities", "allotment"]:
-        scenario = input("Invalid scenario. Please choose 'capabilities', or 'allotment': ")
+    run_name = get_input(f"What run do you want to generate graphs for {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
+    scenario = get_input("What type of scenario do you want to generate graphs for (capabilities, allotment): ", "Invalid scenario. Please choose 'capabilities', or 'allotment': ", ["capabilities", "allotment"])
     num_agents = int(get_input(f"How many agents do you want to implement {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
     print("Graphs will be saved in data/results/current_run")
-    generate_graphs(scenario,num_agents)
+    generate_graphs(scenario,run_name,num_agents)

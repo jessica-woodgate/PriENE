@@ -14,15 +14,18 @@ class EthicsModule():
     def __init__(self,agent_id,sanction):
         #self.agent_id = agent_id
         self.sanction = sanction
+        self.can_help = None
         self.current_principle = None
         self.society_well_being = None
         self.measure_of_well_being = None
         self.number_of_minimums = None
     
-    def update_social_welfare(self, principle, society_well_being):
+    def update_ethics_state(self, principle, can_help, society_well_being):
         """
         Updates social welfare before agent acts: measure of well-being and number of minimums (Algorithm 1 Line 1)
         """
+        self.current_principle = principle
+        self.can_help = can_help
         self._calculate_social_welfare(principle, society_well_being)
     
     def get_sanction(self, society_well_being):
@@ -37,7 +40,6 @@ class EthicsModule():
             return self._utilitarian_sanction(self.measure_of_well_being, society_well_being)
     
     def _calculate_social_welfare(self, principle, society_well_being):
-        self.current_principle = principle
         if principle == "maximin":
             self.measure_of_well_being, self.number_of_minimums = self._maximin_welfare(society_well_being)
         elif principle == "egalitarian":
@@ -103,7 +105,7 @@ class EthicsModule():
         if current_welfare > previous_welfare:
             #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning pos reward")
             return self.sanction
-        elif current_welfare < previous_welfare:
+        elif current_welfare < previous_welfare and self.can_help:
             #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning neg reward")
             return -self.sanction
         #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning neutral reward")
