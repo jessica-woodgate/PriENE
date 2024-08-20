@@ -31,13 +31,10 @@ class RenderPygame():
         self.screen = self.init_pygame()
 
     def init_pygame(self):
-        # create window
         pygame.init()
-        # setup screen
         width, height = self.max_width * self.block_size, self.max_height * self.block_size
         screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption('Harvest Model')
-        # setup timer
         pygame.time.Clock()
         return screen
 
@@ -47,7 +44,6 @@ class RenderPygame():
                 break
         self.screen.fill(self.colour_map["black"])
         for a in modelInst.schedule.agents:
-            # if a has attribute deceased
             if hasattr(a, "off_grid") and a.off_grid:
                 continue
             x = a.pos[0] * self.block_size

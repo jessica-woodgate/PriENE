@@ -413,14 +413,10 @@ class HarvestModel(Model):
     def _generate_resource_allocations(self, num_agents):
         if num_agents == 2:
             resources = [5, 1]
-            #resources = [6, 2]
-            #resources = [7, 1]
         elif num_agents == 4:
             resources = [5, 2, 3, 2]
-            #resources = [8, 2, 4, 2]
         elif num_agents == 6:
             resources = [5, 2, 3, 2, 5, 1]
-            #resources = [9, 3, 3, 2, 5, 2]
         self.num_start_berries = sum(resources)
         return resources
 
