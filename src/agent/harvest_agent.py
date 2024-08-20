@@ -4,6 +4,7 @@ from .norms_module import NormsModule
 from .ethics_module import EthicsModule
 from src.harvest_exception import NumFeaturesException
 from src.harvest_exception import AgentTypeException
+from src.harvest_exception import ImpossibleNormException
 import numpy as np
 
 class HarvestAgent(DQNAgent):
@@ -89,6 +90,9 @@ class HarvestAgent(DQNAgent):
         done, reward = self._update_attributes(reward)
         if self.write_norms:
             self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day())
+            if ("no berries" in antecedent and action == "throw") or ("eat" in antecedent and self.actions[action] == "throw"):
+                #raise ImpossibleNormException(self.unique_id, antecedent, self.actions[action], reward)
+                print(self.model.episode, self.model.day, "agent", self.agent_id, antecedent, "reward", reward, "berries", self.berries, "health", self.health)
         return reward, next_state, done
         
     def observe(self):
@@ -212,10 +216,10 @@ class HarvestAgent(DQNAgent):
     def _update_ethics(self, society_well_being):
         if self.berries > 0 and self.health >= self.low_health_threshold:
             can_help = True
-            self.ethics_module.update_social_welfare(self.agent_type, can_help, society_well_being)
+            self.ethics_module.update_ethics_state(self.agent_type, can_help, society_well_being)
         else:
             can_help = False
-            self.ethics_module.update_social_welfare(self.agent_type, can_help, society_well_being)
+            self.ethics_module.update_ethics_state(self.agent_type, can_help, society_well_being)
         #return can_help
     
     def _update_attributes(self, reward):

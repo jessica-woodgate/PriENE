@@ -18,8 +18,8 @@ class DataAnalysis():
         self.filepath = filepath
     
     def proccess_and_display_all_data(self, agent_df_list, df_labels, scenario, norms_filepath):
-        # normalised_sum_df_list, agent_end_episode_list = self._process_agent_dfs(agent_df_list, df_labels)
-        # self._display_graphs(normalised_sum_df_list, agent_end_episode_list, df_labels)
+        normalised_sum_df_list, agent_end_episode_list = self._process_agent_dfs(agent_df_list, df_labels)
+        self._display_graphs(normalised_sum_df_list, agent_end_episode_list, df_labels)
         self._process_norms(df_labels, scenario, norms_filepath)
 
     def _process_agent_dfs(self, agent_df_list, df_labels):

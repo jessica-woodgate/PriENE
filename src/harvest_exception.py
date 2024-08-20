@@ -100,3 +100,15 @@ class NumFeaturesException(HarvestException):
     
     def __str__(self):
         return (f"Expected {self.num_expected_features} berries and got {self.num_features}")
+
+class ImpossibleNormException(HarvestException):
+    def __init__(self, day, agent_id, antecedent, action, reward):
+        super().__init__
+        self.day = day
+        self.agent_id = agent_id
+        self.antecedent = antecedent
+        self.action = action
+        self.reward = reward
+    
+    def __str__(self):
+        return (f"Day {self.day}, agent {self.agent_id} saving an impossible behaviour! Antecedent {self.antecedent} consequent {self.action}; got reward {self.reward}")
