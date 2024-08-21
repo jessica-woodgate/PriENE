@@ -77,12 +77,11 @@ class HarvestAgent(DQNAgent):
         """
         done = False
         self.current_action = action
-        society_well_being = self.model.get_society_well_being(self, True)
         if self.write_norms:
-            antecedent = self.norms_module.get_antecedent(self.berries, self.health, society_well_being)
+            antecedent = self.norms_module.get_antecedent(self.berries, self.health, self.model.get_society_well_being(self, True, False))
         if self.agent_type != "baseline":
             self.ethics_module.day = self.model.get_day()
-            can_help = self._update_ethics(society_well_being)
+            can_help = self._update_ethics()
         reward = self._perform_action(action)
         next_state = self.observe()
         if self.agent_type != "baseline":
@@ -101,7 +100,7 @@ class HarvestAgent(DQNAgent):
         """
         distance_to_berry = self.moving_module.get_distance_to_berry()
         observer_features = np.array([self.health, self.berries, self.days_left_to_live, distance_to_berry])
-        agent_well_being = self.model.get_society_well_being(self, False)
+        agent_well_being = self.model.get_society_well_being(self, False, False)
         observation = np.append(observer_features, agent_well_being)
         if len(observation) != self.n_features:
             raise NumFeaturesException(self.n_features, len(observation))
@@ -209,11 +208,12 @@ class HarvestAgent(DQNAgent):
     def _ethics_sanction(self, can_help):
         # if not can_help:
         #     return 0
-        society_well_being = self.model.get_society_well_being(self, True)
+        society_well_being = self.model.get_society_well_being(self, False, True)
         sanction = self.ethics_module.get_sanction(society_well_being)
         return sanction
     
-    def _update_ethics(self, society_well_being):
+    def _update_ethics(self):
+        society_well_being = self.model.get_society_well_being(self, False, True)
         if self.berries > 0 and self.health >= self.low_health_threshold:
             can_help = True
             self.ethics_module.update_ethics_state(self.agent_type, can_help, society_well_being)

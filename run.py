@@ -22,8 +22,12 @@ def generate_graphs(scenario, run_name, num_agents):
     """
     writing_filepath = "data/results/current_run/"
     data_analysis = DataAnalysis(num_agents, writing_filepath)
-    reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+scenario+"_"
-    norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/"+scenario
+    if run_name == "current_run":
+        reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
+        norms_filepath = "data/results/"+run_name+"/"+scenario
+    else:
+        reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+scenario+"_"
+        norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/"+scenario
     files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv"]
     dfs = []
     for file in files:

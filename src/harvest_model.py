@@ -137,17 +137,17 @@ class HarvestModel(Model):
                     return b
         raise NoBerriesException(coordinates=coords)
     
-    def get_society_well_being(self, observer, norms_observation):
+    def get_society_well_being(self, observer, norms_observation, ethics_observation):
         """
         Get the well-being of a society; iterates over all agents in the society, excluding the observer if the agent is observing
         """
         society_well_being = np.array([])
         for a in self.schedule.agents:
-            if (a.unique_id == observer.unique_id) or a.agent_type == "berry":
+            if (not ethics_observation and (a.unique_id == observer.unique_id)) or a.agent_type == "berry":
                 continue
             elif a.done == False:
                 society_well_being = np.append(society_well_being, a.days_left_to_live)
-            elif a.done == True and norms_observation:
+            elif a.done == True and (norms_observation or ethics_observation):
                 continue
             else:
                 society_well_being = np.append(society_well_being, 0)
