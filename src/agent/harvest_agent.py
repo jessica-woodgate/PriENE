@@ -206,8 +206,8 @@ class HarvestAgent(DQNAgent):
             return self.rewards["no_berries"]
 
     def _ethics_sanction(self, can_help):
-        if not can_help:
-            return 0
+        # if not can_help:
+        #     return 0
         society_well_being = self.model.get_society_well_being(self, False, True)
         sanction = self.ethics_module.get_sanction(society_well_being)
         return sanction
@@ -218,9 +218,9 @@ class HarvestAgent(DQNAgent):
             can_help = True
             self.ethics_module.update_ethics_state(self.agent_type, can_help, society_well_being)
         else:
-            can_help = False
+            can_help = True #False
             self.ethics_module.update_ethics_state(self.agent_type, can_help, society_well_being)
-        return can_help
+        #return can_help
     
     def _update_attributes(self, reward):
         done = False
