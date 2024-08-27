@@ -32,30 +32,34 @@ class EthicsModule():
         """
         Obtain sanction from principle comparing current society well-being with previous well-being (Algorithm 1 Lines 3-8)
         """
-        if self.current_principle == "maximin":
-            return self._maximin_sanction(self.measure_of_well_being, self.number_of_minimums, society_well_being)
-        elif self.current_principle == "egalitarian":
+        if self.current_principle == "egalitarian":
             return self._egalitarian_sanction(self.measure_of_well_being, society_well_being)
+        elif self.current_principle == "maximin":
+            return self._maximin_sanction(self.measure_of_well_being, self.number_of_minimums, society_well_being)
         elif self.current_principle == "utilitarian":
             return self._utilitarian_sanction(self.measure_of_well_being, society_well_being)
+        elif self.current_principle == "all_principles":
+            return self._combined_sanction(society_well_being)
     
     def _calculate_social_welfare(self, principle, society_well_being):
-        if principle == "maximin":
-            self.measure_of_well_being, self.number_of_minimums = self._maximin_welfare(society_well_being)
-        elif principle == "egalitarian":
-            self.measure_of_well_being = self._egalitarian_welfare(society_well_being)
+        if principle == "egalitarian":
+            self.measure_of_well_being = self._calculate_egalitarian_welfare(society_well_being)
+        elif principle == "maximin":
+            self.measure_of_well_being, self.number_of_minimums = self._calculate_maximin_welfare(society_well_being)
         elif principle == "utilitarian":
-            self.measure_of_well_being = self._utilitarian_welfare(society_well_being)
+            self.measure_of_well_being = self._calculate_utilitarian_welfare(society_well_being)
+        elif principle == "all_principles":
+            self.measure_of_well_being = self._calculate_all_welfare(society_well_being)
         else:
             raise UnrecognisedPrinciple(principle)
 
-    def _maximin_welfare(self, society_well_being):
-        min_value = min(society_well_being)
-        num_mins = np.count_nonzero(society_well_being==min_value)
-        #print("day",self.day,"agent", self.agent_id, "maximin welfare", society_well_being, "min is", min(society_well_being), "num_mins is", num_mins)
-        return min_value, num_mins
+    def _calculate_all_welfare(self, society_well_being):
+        egalitarian_welfare = self._calculate_egalitarian_welfare(society_well_being)
+        maximin_min, maximin_num_mins = self._calculate_maximin_welfare(society_well_being)
+        utilitarian_welfare = self._calculate_utilitarian_welfare(society_well_being)
+        return egalitarian_welfare, maximin_min, maximin_num_mins, utilitarian_welfare
 
-    def _egalitarian_welfare(self, society_well_being):
+    def _calculate_egalitarian_welfare(self, society_well_being):
         n = len(society_well_being)
         total = sum(society_well_being)
         ideal = total/n
@@ -63,9 +67,22 @@ class EthicsModule():
         #print("day",self.day,"agent", self.agent_id, "egalitarian welfare", society_well_being, "n is", n, "total is", total, "ideal is", ideal, "loss is", loss)
         return loss
     
-    def _utilitarian_welfare(self, society_well_being):
+    def _calculate_maximin_welfare(self, society_well_being):
+        min_value = min(society_well_being)
+        num_mins = np.count_nonzero(society_well_being==min_value)
+        #print("day",self.day,"agent", self.agent_id, "maximin welfare", society_well_being, "min is", min(society_well_being), "num_mins is", num_mins)
+        return min_value, num_mins
+    
+    def _calculate_utilitarian_welfare(self, society_well_being):
         #print("day",self.day,"agent", self.agent_id, "utilitarian welfare", society_well_being, "total is", sum(society_well_being))
         return sum(society_well_being)
+
+    def _combined_sanction(self, society_well_being):
+        egalitarian_welfare, maximin_min, maximin_num_mins, utilitarian_welfare = self.measure_of_well_being
+        egalitarian = self._egalitarian_sanction(egalitarian_welfare, society_well_being)
+        maximin = self._maximin_sanction(maximin_min, maximin_num_mins, society_well_being)
+        utilitarian = self._utilitarian_sanction(utilitarian_welfare, society_well_being)
+        return egalitarian + maximin + utilitarian
         
     def _maximin_sanction(self, previous_min, number_of_previous_mins, society_well_being):
         current_min, current_number_of_current_mins = self._maximin_welfare(society_well_being)
