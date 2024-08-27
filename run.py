@@ -5,9 +5,8 @@ from src.data_handling.data_analysis import DataAnalysis
 from src.data_handling.render_pygame import RenderPygame
 import pandas as pd
 import argparse
-import numpy as np
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian"]
+AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 2000

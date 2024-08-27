@@ -85,7 +85,7 @@ class EthicsModule():
         return egalitarian + maximin + utilitarian
         
     def _maximin_sanction(self, previous_min, number_of_previous_mins, society_well_being):
-        current_min, current_number_of_current_mins = self._maximin_welfare(society_well_being)
+        current_min, current_number_of_current_mins = self._calculate_maximin_welfare(society_well_being)
         current_number_of_previous_mins = np.count_nonzero(society_well_being==previous_min)
         #if the global min has been made better, pos reward
         if current_min > previous_min:
@@ -107,7 +107,7 @@ class EthicsModule():
         return 0
     
     def _egalitarian_sanction(self, previous_loss, society_well_being):
-        current_loss = self._egalitarian_welfare(society_well_being)
+        current_loss = self._calculate_egalitarian_welfare(society_well_being)
         if previous_loss > current_loss:
             #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning pos reward")
             return self.sanction
@@ -118,7 +118,7 @@ class EthicsModule():
         return 0
     
     def _utilitarian_sanction(self, previous_welfare, society_well_being):
-        current_welfare = self._utilitarian_welfare(society_well_being)
+        current_welfare = self._calculate_utilitarian_welfare(society_well_being)
         if current_welfare > previous_welfare:
             #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning pos reward")
             return self.sanction
