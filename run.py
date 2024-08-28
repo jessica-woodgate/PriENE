@@ -9,7 +9,7 @@ import argparse
 AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
-MAX_EPISODES = 2000
+MAX_EPISODES = 1000
 MAX_DAYS = 200
 RUN_OPTIONS = ["current_run", "run_1", "run_2", "run_3"]
 
