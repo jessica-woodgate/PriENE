@@ -218,7 +218,7 @@ class HarvestAgent(DQNAgent):
             can_help = True
             self.ethics_module.update_ethics_state(self.agent_type, can_help, society_well_being)
         else:
-            can_help = True #False
+            can_help = False #True
             self.ethics_module.update_ethics_state(self.agent_type, can_help, society_well_being)
         #return can_help
     

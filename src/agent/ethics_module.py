@@ -92,7 +92,7 @@ class EthicsModule():
             #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning pos reward")
             return self.sanction
         #if the global min has been made worse, neg reward
-        elif current_min < previous_min:# and self.can_help:
+        elif current_min < previous_min and self.can_help:
             #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning neg reward")
             return -self.sanction
         #if the global min has not changed, but there are fewer instances of it, pos reward
@@ -100,7 +100,7 @@ class EthicsModule():
             #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning pos less numbers reward")
             return self.sanction
         #if the global min has not changed, and there are more or same number of instances of it, neg reward
-        elif current_number_of_previous_mins > number_of_previous_mins and current_min == previous_min:# and self.can_help:
+        elif current_number_of_previous_mins > number_of_previous_mins and current_min == previous_min and self.can_help:
             #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning neg more numbers reward")
             return -self.sanction
         #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning neutral reward")
@@ -111,7 +111,7 @@ class EthicsModule():
         if previous_loss > current_loss:
             #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning pos reward")
             return self.sanction
-        elif previous_loss < current_loss:# and self.can_help:
+        elif previous_loss < current_loss and self.can_help:
             #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning neg reward")
             return -self.sanction
         #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning neutral reward")
@@ -122,7 +122,7 @@ class EthicsModule():
         if current_welfare > previous_welfare:
             #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning pos reward")
             return self.sanction
-        elif current_welfare < previous_welfare:# and self.can_help:
+        elif current_welfare < previous_welfare and self.can_help:
             #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning neg reward")
             return -self.sanction
         #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning neutral reward")
