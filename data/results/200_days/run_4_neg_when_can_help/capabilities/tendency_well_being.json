@@ -1,0 +1,23 @@
+{
+    "min_well_being": {
+        "baseline_mean": 11.895659550268435,
+        "maximin_mean": 15.637767070292243,
+        "baseline_stdev": 3.5279083485380913,
+        "maximin_stdev": 5.837163128255929,
+        "cohens_d": -0.7759216888601603
+    },
+    "total_well_being": {
+        "baseline_mean": 84.60673434744967,
+        "maximin_mean": 83.43490233499494,
+        "baseline_stdev": 33.38377043583301,
+        "maximin_stdev": 30.46800771863231,
+        "cohens_d": 0.03666654780035162
+    },
+    "gini_well_being": {
+        "baseline_mean": 0.18586315416926102,
+        "maximin_mean": 0.11437733463025886,
+        "baseline_stdev": 0.05801190574892789,
+        "maximin_stdev": 0.03183601445158656,
+        "cohens_d": 1.527748052172632
+    }
+}
