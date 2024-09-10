@@ -7,7 +7,7 @@ from src.harvest_exception import AgentTypeException
 from src.harvest_exception import ImpossibleNormException
 import numpy as np
 
-class HarvestAgent(MODQNAgent):
+class MOHarvestAgent(MODQNAgent):
     """
     Agent acts in an environment and receives a reward
     Modules:

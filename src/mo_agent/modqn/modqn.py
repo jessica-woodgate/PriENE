@@ -62,12 +62,14 @@ class MODQN:
         actions = np.asarray([self.experience['a'][i] for i in ids])
         #vectorised rewards
         rewards = np.asarray([self.experience['r'][i] for i in ids])
+        print("rewards", rewards)
         states_next = np.asarray([self.experience['s_'][i] for i in ids])
         dones = np.asarray([self.experience['done'][i] for i in ids])
         #predict q value using target net - tf vector [-1, n_actions, n_rewards]
         value_next = np.max(TargetNet.predict(states_next), axis=1)
+        print("next values", value_next)
         #where done, actual value is reward; if not done, actual value is discounted rewards
-        actual_values = np.where(dones, rewards, rewards+self.gamma*value_next)
+        actual_values = np.where(dones, rewards, rewards+self.gamma*value_next) 
 
         #gradient tape uses automatic differentiation to compute gradients of loss and records operations for back prop
         with tf.GradientTape() as tape:

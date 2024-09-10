@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import json
 from .agent.harvest_agent import HarvestAgent
+from .mo_agent.mo_harvest_agent import MOHarvestAgent
 from .berry import Berry
 from .harvest_exception import FileExistsException
 from .harvest_exception import NoEmptyCells
@@ -43,7 +44,7 @@ class HarvestModel(Model):
         min_fitness -- minimum fitness required for a behaviour to become a norm
         epsilon -- probability of exploration for agents (tracks when to end training)
     """
-    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath=""):
+    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,multiobjective,filepath=""):
         super().__init__()
         self.num_agents = num_agents
         if self.num_agents <= 0:
@@ -63,6 +64,7 @@ class HarvestModel(Model):
         self.berry_id = 0
         self.episode = 1
         self.training = training
+        self.multiobjective = multiobjective
         self.filepath = filepath
         self.write_data = write_data
         self.write_norms = write_norms
@@ -172,10 +174,13 @@ class HarvestModel(Model):
     def _init_berries(self):
         raise NotImplementedError
     
-    def _init_agents(self, agent_type, checkpoint_path):
+    def _init_agents(self, agent_type, checkpoint_path, multiobjective):
         self.living_agents = []
         for i in range(self.num_agents):
-            a = HarvestAgent(i,self,agent_type,self.max_days,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+            if not multiobjective:
+                a = HarvestAgent(i,self,agent_type,self.max_days,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+            else:
+                a = MOHarvestAgent(i,self,agent_type,self.max_days,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
         self.berry_id = len(self.living_agents) + 1
 

@@ -44,22 +44,22 @@ def run_simulation(model_inst, render):
     num_episodes = model_inst.episode
     return num_episodes
 
-def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render):   
+def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,multiobjective):   
     file_string = scenario+"_"+agent_type
     checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
     if scenario == "basic":
-        model_inst = BasicHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = BasicHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string,multiobjective)
     elif scenario == "capabilities":
-        model_inst = CapabilitiesHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = CapabilitiesHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string,multiobjective)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string,multiobjective)
     else:
         ValueError("Unknown argument: "+scenario)
     run_simulation(model_inst,render)
 
-def run_all(scenario,run_name,num_agents,num_start_berries,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render):
+def run_all(scenario,run_name,num_agents,num_start_berries,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,multiobjective):
     for agent_type in AGENT_TYPES:
-        create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render)
+        create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,multiobjective)
 
 def get_integer_input(prompt):
     while True:
@@ -74,6 +74,12 @@ def get_input(input_string, error_string, valid_options):
     while variable not in valid_options:
         variable = input(error_string)
     return variable
+
+def get_bool(input):
+    if input == "y":
+        return True
+    elif input == "n":
+        return False
 
 def write_data_input(data_type):
     write_data = input(f"Do you want to write {data_type} to file? (y, n): ")
@@ -115,6 +121,9 @@ elif args.option == "test" or args.option == "train":
     types = AGENT_TYPES + ["all"]
     agent_type = get_input(f"What type of agent do you want to implement {types}: ", f"Invalid agent type. Please choose {types}: ", types)
     #########################################################################################
+    multiobjective = int(get_input(f"Single or multi-objective? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+    multiobjective = get_bool(multiobjective)
+    #########################################################################################
     num_agents = int(get_input(f"How many agents do you want to implement {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
     #########################################################################################
     write_data = write_data_input("data")
@@ -126,10 +135,7 @@ elif args.option == "test" or args.option == "train":
     else:
         write_norms = write_data_input("norms")
         render = get_input("Do you want to render the simulation? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"])
-        if render == "y":
-            render = True
-        elif render == "n":
-            render = False
+        render = get_bool(render)
     #########################################################################################
     if scenario != "allotment":
         MAX_WIDTH = num_agents * 2
@@ -138,9 +144,9 @@ elif args.option == "test" or args.option == "train":
     MAX_HEIGHT = num_agents * 2
     NUM_BERRIES = num_agents * 3
     if agent_type == "all":
-        run_all(scenario,run_name,num_agents,NUM_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render)
+        run_all(scenario,run_name,num_agents,NUM_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,multiobjective)
     else:
-        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render)
+        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,multiobjective)
 #########################################################################################
 elif args.option == "graphs":
     run_name = get_input(f"What run do you want to generate graphs for {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)

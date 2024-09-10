@@ -7,8 +7,8 @@ class BasicHarvest(HarvestModel):
         num_start_berries -- the number of berries initiated at the beginning of an episode
         berries -- list of active berry objects
     """
-    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
-        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath)
+    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,multiobjective,filepath=""):
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,multiobjective,filepath)
         self.num_start_berries = num_start_berries
         self._init_agents(agent_type, checkpoint_path)
         self.berries = self._init_berries()

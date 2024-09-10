@@ -86,7 +86,7 @@ class MODQNAgent(Agent):
             if self.training:
                 self._learn(observation, action, self.current_reward, next_state, self.done)
                 self.epsilon = max(self.min_exploration_prob, np.exp(-self.expl_decay*self.model.episode))
-            self.total_episode_reward += self.current_reward
+            self.total_episode_reward += sum(self.current_reward)
 
     def save_models(self):
         """
