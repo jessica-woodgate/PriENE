@@ -61,7 +61,6 @@ class MODQN:
         ids = np.random.randint(low=0, high=len(self.experience["s"]), size=self.batch_size)
         states = np.asarray([self.experience['s'][i] for i in ids])
         actions = np.asarray([self.experience['a'][i] for i in ids])
-        print("actions", actions)
         #vectorised rewards
         rewards = np.asarray([self.experience['r'][i] for i in ids])
         states_next = np.asarray([self.experience['s_'][i] for i in ids])
@@ -76,18 +75,13 @@ class MODQN:
             #one_hot = tf.reshape(tf.one_hot(actions, self.n_actions*self.n_rewards), [-1, self.n_actions, self.n_rewards])
             one_hot = tf.one_hot(actions, self.n_actions, axis=1)  # Create one-hot encoding for actions only
             one_hot = tf.expand_dims(one_hot, axis=-1)  # Expand dimensions to match reward vectors
-            print("one hot expanded", one_hot)
             one_hot = tf.repeat(one_hot, self.n_rewards, axis=-1)
-            print("one hot",one_hot)
             #one hot to select the action which was chosen (1 for each objective); find predicted q value; reduce to tensor of the batch size
             selected_action_values = tf.math.reduce_sum(
                 self.predict(states) * one_hot, axis=1) #mask logits through one hot
-            print("selected action values", selected_action_values)
                 #one hot actions for each objective
             huber = losses.Huber(self.delta)
-            print("actual values", actual_values)
             loss = huber(actual_values, selected_action_values)
-            print("loss", loss)
         #trainable variables are automatically watched
         variables = self.dqn.trainable_variables
         #compute gradients w.r.t. loss

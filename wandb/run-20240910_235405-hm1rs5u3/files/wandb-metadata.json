@@ -1,0 +1,132 @@
+{
+    "os": "Linux-5.15.0-119-generic-x86_64-with-glibc2.31",
+    "python": "3.11.5",
+    "heartbeatAt": "2024-09-10T22:54:06.229876",
+    "startedAt": "2024-09-10T22:54:05.632648",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "train",
+        "-l",
+        "PriENE"
+    ],
+    "state": "running",
+    "program": "/home/yp19484/repos/PriENE/run.py",
+    "codePathLocal": "run.py",
+    "codePath": "run.py",
+    "git": {
+        "remote": "https://github.com/jessica-woodgate/PriENE.git",
+        "commit": "4e012d80b5950cc7207c329900a2474f6227b0ad"
+    },
+    "email": "yp19484@bristol.ac.uk",
+    "root": "/home/yp19484/repos/PriENE",
+    "host": "it096363",
+    "username": "yp19484",
+    "executable": "/home/yp19484/anaconda3/envs/nenv/bin/python3",
+    "cpu_count": 8,
+    "cpu_count_logical": 16,
+    "cpu_freq": {
+        "current": 3568.6184375,
+        "min": 1200.0,
+        "max": 4575.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 1407.803,
+            "min": 1200.0,
+            "max": 4600.0
+        },
+        {
+            "current": 3900.0,
+            "min": 1200.0,
+            "max": 4600.0
+        },
+        {
+            "current": 3900.0,
+            "min": 1200.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3900.0,
+            "min": 1200.0,
+            "max": 4500.0
+        },
+        {
+            "current": 1312.791,
+            "min": 1200.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3900.0,
+            "min": 1200.0,
+            "max": 4500.0
+        },
+        {
+            "current": 2846.847,
+            "min": 1200.0,
+            "max": 4700.0
+        },
+        {
+            "current": 4075.372,
+            "min": 1200.0,
+            "max": 4700.0
+        },
+        {
+            "current": 3900.0,
+            "min": 1200.0,
+            "max": 4600.0
+        },
+        {
+            "current": 3900.0,
+            "min": 1200.0,
+            "max": 4600.0
+        },
+        {
+            "current": 3900.0,
+            "min": 1200.0,
+            "max": 4500.0
+        },
+        {
+            "current": 1801.068,
+            "min": 1200.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3900.0,
+            "min": 1200.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3900.0,
+            "min": 1200.0,
+            "max": 4500.0
+        },
+        {
+            "current": 3900.0,
+            "min": 1200.0,
+            "max": 4700.0
+        },
+        {
+            "current": 3900.0,
+            "min": 1200.0,
+            "max": 4700.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 934.8180313110352,
+            "used": 615.0654907226562
+        }
+    },
+    "gpu": "NVIDIA RTX A6000",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA RTX A6000",
+            "memory_total": 51527024640
+        }
+    ],
+    "memory": {
+        "total": 251.39237594604492
+    }
+}
