@@ -34,6 +34,7 @@ class MODQN:
         self.actions = actions
         self.n_actions = len(actions)
         self.n_rewards = n_rewards
+        self.reward_weights = [1, 1, 1, 1]
         self.training = training
         self.checkpoint_path = checkpoint_path
         if shared_replay_buffer == None:
@@ -60,23 +61,27 @@ class MODQN:
         ids = np.random.randint(low=0, high=len(self.experience["s"]), size=self.batch_size)
         states = np.asarray([self.experience['s'][i] for i in ids])
         actions = np.asarray([self.experience['a'][i] for i in ids])
+        print("actions", actions)
         #vectorised rewards
         rewards = np.asarray([self.experience['r'][i] for i in ids])
-        print("reward batch", rewards)
         states_next = np.asarray([self.experience['s_'][i] for i in ids])
         dones = np.asarray([self.experience['done'][i] for i in ids])
         #predict q value using target net - tf vector [-1, n_actions, n_rewards]
         value_next = np.max(TargetNet.predict(states_next), axis=1)
         #where done, actual value is reward; if not done, actual value is discounted rewards
-        actual_values = np.where(dones, rewards, rewards+self.gamma*value_next) 
+        actual_values = np.where(np.expand_dims(dones, axis=1), rewards, rewards+self.gamma*value_next) 
 
         #gradient tape uses automatic differentiation to compute gradients of loss and records operations for back prop
         with tf.GradientTape() as tape:
+            one_hot = tf.reshape(tf.one_hot(actions, self.n_actions*self.n_rewards), [-1, self.n_actions, self.n_rewards])
+            print("one hot",one_hot)
             #one hot to select the action which was chosen (1 for each objective); find predicted q value; reduce to tensor of the batch size
             selected_action_values = tf.math.reduce_sum(
-                self.predict(states) * tf.one_hot(actions, self.n_actions*self.n_rewards), axis=1) #mask logits through one hot
+                self.predict(states) * one_hot, axis=1) #mask logits through one hot
+            print("selected action values", selected_action_values)
                 #one hot actions for each objective
             huber = losses.Huber(self.delta)
+            print("actual values", actual_values)
             loss = huber(actual_values, selected_action_values)
         #trainable variables are automatically watched
         variables = self.dqn.trainable_variables
@@ -133,8 +138,12 @@ class MODQN:
     def _apply_utility(self, action_values):
         weighted_values = []
         #action_values is a tensor of shape [-1, n_actions, n_rewards]
-        for n in self.n_rewards:
-            max_action = np.max(action_values[n])
-            max_action *= self.reward_weights[n]
-            weighted_values.append(max_action)
+        for batch in action_values:
+            # Iterate over each reward dimension
+            for n in range(self.n_rewards):
+                # Find the maximum action value for the current reward dimension
+                max_action = np.max(batch[:, n])
+                # Apply the weight
+                max_action *= self.reward_weights[n]
+                weighted_values.append(max_action)
         return weighted_values
