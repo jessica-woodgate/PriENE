@@ -31,16 +31,17 @@ class EthicsModule():
         """
         Obtain sanction from principle comparing current society well-being with previous well-being (Algorithm 1 Lines 3-8)
         """
-        egalitarian_sanction = self._egalitarian_sanction(self.measure_of_well_being, society_well_being)
-        maximin_sanction = self._maximin_sanction(self.measure_of_well_being, self.number_of_minimums, society_well_being)
-        utilitarian_sanction = self._utilitarian_sanction(self.measure_of_well_being, society_well_being)
+        egalitarian_sanction = self._egalitarian_sanction(self.measure_of_well_being["egalitarian"], society_well_being)
+        maximin_sanction = self._maximin_sanction(self.measure_of_well_being["maximin_min"], self.measure_of_well_being["maximin_num_mins"], society_well_being)
+        utilitarian_sanction = self._utilitarian_sanction(self.measure_of_well_being["utilitarian"], society_well_being)
         return [egalitarian_sanction, maximin_sanction, utilitarian_sanction]
     
     def _calculate_social_welfare(self, society_well_being):
-        egalitarian_welfare = self._calculate_egalitarian_welfare(society_well_being)
         maximin_min, maximin_num_mins = self._calculate_maximin_welfare(society_well_being)
-        utilitarian_welfare = self._calculate_utilitarian_welfare(society_well_being)
-        return egalitarian_welfare, maximin_min, maximin_num_mins, utilitarian_welfare
+        return {"egalitarian": self._calculate_egalitarian_welfare(society_well_being),
+                "maximin_min": maximin_min,
+                "maximin_num_mins": maximin_num_mins,
+                "utilitarian": self._calculate_utilitarian_welfare(society_well_being)}
 
     def _calculate_egalitarian_welfare(self, society_well_being):
         n = len(society_well_being)

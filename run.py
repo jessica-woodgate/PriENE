@@ -118,11 +118,14 @@ elif args.option == "test" or args.option == "train":
         run_name = "current_run"
         max_episodes = 0
     #########################################################################################
-    types = AGENT_TYPES + ["all"]
-    agent_type = get_input(f"What type of agent do you want to implement {types}: ", f"Invalid agent type. Please choose {types}: ", types)
-    #########################################################################################
-    multiobjective = int(get_input(f"Single or multi-objective? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+    multiobjective = get_input(f"Multi-objective? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"])
     multiobjective = get_bool(multiobjective)
+    #########################################################################################
+    if not multiobjective:
+        types = AGENT_TYPES + ["all"]
+    else:
+        types = ["baseline", "ethical"]
+    agent_type = get_input(f"What type of agent do you want to implement {types}: ", f"Invalid agent type. Please choose {types}: ", types)
     #########################################################################################
     num_agents = int(get_input(f"How many agents do you want to implement {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
     #########################################################################################

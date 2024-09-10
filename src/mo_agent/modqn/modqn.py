@@ -62,12 +62,11 @@ class MODQN:
         actions = np.asarray([self.experience['a'][i] for i in ids])
         #vectorised rewards
         rewards = np.asarray([self.experience['r'][i] for i in ids])
-        print("rewards", rewards)
+        print("reward batch", rewards)
         states_next = np.asarray([self.experience['s_'][i] for i in ids])
         dones = np.asarray([self.experience['done'][i] for i in ids])
         #predict q value using target net - tf vector [-1, n_actions, n_rewards]
         value_next = np.max(TargetNet.predict(states_next), axis=1)
-        print("next values", value_next)
         #where done, actual value is reward; if not done, actual value is discounted rewards
         actual_values = np.where(dones, rewards, rewards+self.gamma*value_next) 
 
@@ -134,7 +133,7 @@ class MODQN:
     def _apply_utility(self, action_values):
         weighted_values = []
         #action_values is a tensor of shape [-1, n_actions, n_rewards]
-        for n in enumerate(self.n_rewards):
+        for n in self.n_rewards:
             max_action = np.max(action_values[n])
             max_action *= self.reward_weights[n]
             weighted_values.append(max_action)

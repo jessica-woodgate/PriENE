@@ -36,8 +36,9 @@ class MOHarvestAgent(MODQNAgent):
     """
     def __init__(self,unique_id,model,agent_type,max_days,min_width,max_width,min_height,max_height,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None):
         self.actions = self._generate_actions(unique_id, model.get_num_agents())
+        self.n_rewards = 1 if agent_type == "baseline" else 4 #1 or num principles
         #dqn agent class handles learning and action selection
-        super().__init__(unique_id,model,agent_type,self.actions,training,checkpoint_path,epsilon,shared_replay_buffer=shared_replay_buffer)
+        super().__init__(unique_id,model,agent_type,self.actions,self.n_rewards,training,checkpoint_path,epsilon,shared_replay_buffer=shared_replay_buffer)
         self.start_health = 0.8
         self.health = self.start_health
         self.berries = 0
@@ -216,10 +217,10 @@ class MOHarvestAgent(MODQNAgent):
         society_well_being = self.model.get_society_well_being(self, False, True)
         if self.berries > 0 and self.health >= self.low_health_threshold:
             can_help = True
-            self.ethics_module.update_ethics_state(self.agent_type, can_help, society_well_being)
+            self.ethics_module.update_ethics_state(can_help, society_well_being)
         else:
             can_help = False #True
-            self.ethics_module.update_ethics_state(self.agent_type, can_help, society_well_being)
+            self.ethics_module.update_ethics_state(can_help, society_well_being)
         #return can_help
     
     def _update_attributes(self, reward_vector):
@@ -236,6 +237,7 @@ class MOHarvestAgent(MODQNAgent):
             reward_vector[0] += self.rewards["death"]
         if day == self.max_days - 1:
             reward_vector[0] += self.rewards["survive"]
+        reward_vector = np.array(reward_vector)
         return done, reward_vector
     
     def _baseline_rewards(self):
