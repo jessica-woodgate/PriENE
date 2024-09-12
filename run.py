@@ -46,7 +46,7 @@ def log_wandb_agents(model_inst, last_episode, reward_tracker):
                 reward = reward_tracker[i]
                 wandb.log({string: reward})
             string = base_string+"_reward"
-            wandb.log({string: agent.current_reward})
+            wandb.log({string: sum(agent.current_reward)})
             mean_loss = (np.mean(agent.losses) if model_inst.training else 0)
             string = base_string+"_mean_loss"
             wandb.log({string: mean_loss})
@@ -59,11 +59,13 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
     if render:
         render_inst = RenderPygame(model_inst.max_width, model_inst.max_height)
     while (model_inst.training and model_inst.epsilon > model_inst.min_epsilon) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
+        last_episode = model_inst.episode
         model_inst.step()
         if log_wandb:
             reward_tracker = [a.total_episode_reward for a in model_inst.schedule.agents if a.agent_type != "berry"]
-            log_wandb_agents(model_inst, model_inst.episode, reward_tracker)
+            log_wandb_agents(model_inst, last_episode, reward_tracker)
             mean_reward = model_inst.model_episode_reporter["mean_reward"].mean()
+            print(mean_reward)
             wandb.log({'mean_episode_reward': mean_reward})
         if render:
             render_inst.render_pygame(model_inst)
