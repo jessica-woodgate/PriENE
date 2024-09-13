@@ -91,7 +91,7 @@ class HarvestAgent(DQNAgent):
             self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day())
             if ("no berries" in antecedent and action == "throw") or ("eat" in antecedent and self.actions[action] == "throw"):
                 #raise ImpossibleNormException(self.unique_id, antecedent, self.actions[action], reward)
-                print(self.model.episode, self.model.day, "agent", self.agent_id, antecedent, "reward", reward, "berries", self.berries, "health", self.health)
+                print("impossible norm:",self.model.episode, self.model.day, "agent", self.agent_id, antecedent, "reward", reward, "berries", self.berries, "health", self.health)
         return reward, next_state, done
         
     def observe(self):

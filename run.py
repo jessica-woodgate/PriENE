@@ -37,7 +37,7 @@ def generate_graphs(scenario, run_name, num_agents):
     data_analysis.proccess_and_display_all_data(dfs, AGENT_TYPES, scenario, norms_filepath)
 
 
-def log_wandb_agents(model_inst, last_episode, reward_tracker):
+def log_wandb_agents(model_inst, last_episode, reward_tracker, multiobjective):
     for i, agent in enumerate(model_inst.schedule.agents):
         if agent.agent_type != "berry":
             base_string = agent.agent_type+"_agent_"+str(agent.unique_id)
@@ -46,14 +46,17 @@ def log_wandb_agents(model_inst, last_episode, reward_tracker):
                 reward = reward_tracker[i]
                 wandb.log({string: reward})
             string = base_string+"_reward"
-            wandb.log({string: sum(agent.current_reward)})
+            if multiobjective:
+                wandb.log({string: sum(agent.current_reward)})
+            else:
+                wandb.log({string: agent.current_reward})
             mean_loss = (np.mean(agent.losses) if model_inst.training else 0)
             string = base_string+"_mean_loss"
             wandb.log({string: mean_loss})
             string = base_string+"_epsilon"
             wandb.log({string: agent.epsilon})
 
-def run_simulation(model_inst, render, log_wandb, wandb_project):
+def run_simulation(model_inst, render, log_wandb, wandb_project, multiobjective):
     if log_wandb:
         wandb.init(project=wandb_project)
     if render:
@@ -63,9 +66,8 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
         model_inst.step()
         if log_wandb:
             reward_tracker = [a.total_episode_reward for a in model_inst.schedule.agents if a.agent_type != "berry"]
-            log_wandb_agents(model_inst, last_episode, reward_tracker)
+            log_wandb_agents(model_inst, last_episode, reward_tracker, multiobjective)
             mean_reward = model_inst.model_episode_reporter["mean_reward"].mean()
-            print(mean_reward)
             wandb.log({'mean_episode_reward': mean_reward})
         if render:
             render_inst.render_pygame(model_inst)
@@ -83,7 +85,7 @@ def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_ty
         model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,multiobjective,file_string)
     else:
         ValueError("Unknown argument: "+scenario)
-    run_simulation(model_inst,render,log_wandb,wandb_project)
+    run_simulation(model_inst,render,log_wandb,wandb_project,multiobjective)
 
 def run_all(scenario,run_name,num_agents,num_start_berries,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,multiobjective,log_wandb,wandb_project=None):
     for agent_type in AGENT_TYPES:
