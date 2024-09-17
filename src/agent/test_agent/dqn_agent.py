@@ -1,10 +1,11 @@
 from .interaction_module import InteractionModule
-from src.harvest_exception import NumFeaturesException
+from .dqn.dqn import DQN
+from .dqn.mosp_dqn import MODQN
 import numpy as np
 import os
 
 class DQNAgent():
-    def __init__(self,unique_id,model,agent_type,n_rewards,training,checkpoint_path,epsilon,min_width,max_width,min_height,max_height,write_norms,shared_replay_buffer=None):
+    def __init__(self,unique_id,model,agent_type,training,checkpoint_path,epsilon,min_width,max_width,min_height,max_height,write_norms,n_rewards=1,shared_replay_buffer=None):
         self.unique_id = unique_id
         self.model = model
         self.agent_type = agent_type
