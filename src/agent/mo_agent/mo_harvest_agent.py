@@ -1,13 +1,13 @@
-from .dqn.dqn_agent import DQNAgent
-from .moving_module import MovingModule
-from .norms_module import NormsModule
-from .ethics_module import EthicsModule
+from ..mosp_agent.mosp_dqn.mosp_dqn_agent import MODQNAgent
+from src.agent.agent_utils.moving_module import MovingModule
+from src.agent.agent_utils.norms_module import NormsModule
+from .mo_ethics_module import EthicsModule
 from src.harvest_exception import NumFeaturesException
 from src.harvest_exception import AgentTypeException
 from src.harvest_exception import ImpossibleNormException
 import numpy as np
 
-class HarvestAgent(DQNAgent):
+class MOHarvestAgent(MODQNAgent):
     """
     Agent acts in an environment and receives a reward
     Modules:
@@ -34,21 +34,22 @@ class HarvestAgent(DQNAgent):
         off_grid -- status of agent on the grid; agent is removed from the grid upon death
         current_action -- the current action being performed
     """
-    def __init__(self,unique_id,model,agent_type,max_days,min_width,max_width,min_height,max_height,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None):
+    def __init__(self,unique_id,model,agent_type,min_width,max_width,min_height,max_height,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None):
         self.actions = self._generate_actions(unique_id, model.get_num_agents())
+        self.n_rewards = 1 if agent_type == "baseline" else 4 #1 or num principles
         #dqn agent class handles learning and action selection
-        super().__init__(unique_id,model,agent_type,self.actions,training,checkpoint_path,epsilon,shared_replay_buffer=shared_replay_buffer)
+        super().__init__(unique_id,model,agent_type,self.actions,self.n_rewards,training,checkpoint_path,epsilon,shared_replay_buffer=shared_replay_buffer)
         self.start_health = 0.8
         self.health = self.start_health
         self.berries = 0
         self.berries_consumed = 0
         self.berries_thrown = 0
         self.days_survived = 0
-        self.max_days = max_days
-        self.max_width = max_width
-        self.min_width = min_width
-        self.max_height = max_height
-        self.min_height = min_height
+        self.max_days = model.get_max_days()
+        # self.max_width = max_width
+        # self.min_width = min_width
+        # self.max_height = max_height
+        # self.min_height = min_height
         self.health_decay = 0.1
         self.days_left_to_live = self.health/self.health_decay
         self.total_days_left_to_live = self.days_left_to_live
@@ -82,17 +83,17 @@ class HarvestAgent(DQNAgent):
         if self.agent_type != "baseline":
             self.ethics_module.day = self.model.get_day()
             can_help = self._update_ethics()
-        reward = self._perform_action(action)
+        reward_vector = [self._perform_action(action)]
         next_state = self.observe()
         if self.agent_type != "baseline":
-            reward += self._ethics_sanction(can_help)
-        done, reward = self._update_attributes(reward)
+            reward_vector = reward_vector + self._ethics_sanction(can_help)
+        done, reward_vector = self._update_attributes(reward_vector)
         if self.write_norms:
-            self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day())
+            self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward_vector, self.model.get_day())
             if ("no berries" in antecedent and action == "throw") or ("eat" in antecedent and self.actions[action] == "throw"):
                 #raise ImpossibleNormException(self.unique_id, antecedent, self.actions[action], reward)
-                print("impossible norm:",self.model.episode, self.model.day, "agent", self.agent_id, antecedent, "reward", reward, "berries", self.berries, "health", self.health)
-        return reward, next_state, done
+                print(self.model.episode, self.model.day, "agent", self.agent_id, antecedent, "reward", reward_vector, "berries", self.berries, "health", self.health)
+        return reward_vector, next_state, done
         
     def observe(self):
         """
@@ -216,13 +217,13 @@ class HarvestAgent(DQNAgent):
         society_well_being = self.model.get_society_well_being(self, False, True)
         if self.berries > 0 and self.health >= self.low_health_threshold:
             can_help = True
-            self.ethics_module.update_ethics_state(self.agent_type, can_help, society_well_being)
+            self.ethics_module.update_ethics_state(can_help, society_well_being)
         else:
             can_help = False #True
-            self.ethics_module.update_ethics_state(self.agent_type, can_help, society_well_being)
+            self.ethics_module.update_ethics_state(can_help, society_well_being)
         #return can_help
     
-    def _update_attributes(self, reward):
+    def _update_attributes(self, reward_vector):
         done = False
         self.health -= self.health_decay
         self.days_left_to_live = self.get_days_left_to_live()
@@ -233,10 +234,11 @@ class HarvestAgent(DQNAgent):
             done = True
             self.days_survived = day
             self.health = 0
-            reward += self.rewards["death"]
+            reward_vector[0] += self.rewards["death"]
         if day == self.max_days - 1:
-            reward += self.rewards["survive"]
-        return done, reward
+            reward_vector[0] += self.rewards["survive"]
+        reward_vector = np.array(reward_vector)
+        return done, reward_vector
     
     def _baseline_rewards(self):
         rewards = {"death": -1,

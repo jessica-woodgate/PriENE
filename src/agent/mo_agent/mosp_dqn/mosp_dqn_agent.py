@@ -1,6 +1,6 @@
 from mesa import Agent
 import numpy as np
-from .modqn import MODQN
+from .mosp_dqn import MODQN
 from abc import abstractmethod
 from src.harvest_exception import NumFeaturesException
 import os

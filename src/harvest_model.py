@@ -4,8 +4,8 @@ from mesa.space import MultiGrid
 import pandas as pd
 import numpy as np
 import json
-from .agent.harvest_agent import HarvestAgent
-from .mo_agent.mo_harvest_agent import MOHarvestAgent
+from .agent.so_agent.harvest_agent import HarvestAgent
+from .agent.mo_agent.mo_harvest_agent import MOHarvestAgent
 from .berry import Berry
 from .harvest_exception import FileExistsException
 from .harvest_exception import NoEmptyCells
@@ -178,9 +178,9 @@ class HarvestModel(Model):
         self.living_agents = []
         for i in range(self.num_agents):
             if not multiobjective:
-                a = HarvestAgent(i,self,agent_type,self.max_days,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+                a = HarvestAgent(i,self,agent_type,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             else:
-                a = MOHarvestAgent(i,self,agent_type,self.max_days,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+                a = MOHarvestAgent(i,self,agent_type,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
         self.berry_id = len(self.living_agents) + 1
 

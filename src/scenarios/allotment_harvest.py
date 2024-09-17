@@ -53,9 +53,9 @@ class AllotmentHarvest(HarvestModel):
             agent_id = "agent_"+str(id)
             allotment = self.allocations[agent_id]["allotment"]
             if not multiobjective:
-                a = HarvestAgent(id,self,agent_type,self.max_days,allotment[0],allotment[1],allotment[2],allotment[3],self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+                a = HarvestAgent(id,self,agent_type,allotment[0],allotment[1],allotment[2],allotment[3],self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             else:
-                a = MOHarvestAgent(i,self,agent_type,self.max_days,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+                a = MOHarvestAgent(i,self,agent_type,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
         self.num_living_agents = len(self.living_agents)
         self.berry_id = self.num_living_agents + 1

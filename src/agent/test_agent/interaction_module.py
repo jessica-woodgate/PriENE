@@ -1,73 +1,40 @@
-from .modqn.modqn_agent import MODQNAgent
-from src.agent.moving_module import MovingModule
-from src.agent.norms_module import NormsModule
-from .mo_ethics_module import EthicsModule
+from .moving_module import MovingModule
+from .norms_module import NormsModule
+from .ethics_module import EthicsModule
 from src.harvest_exception import NumFeaturesException
 from src.harvest_exception import AgentTypeException
-from src.harvest_exception import ImpossibleNormException
 import numpy as np
 
-class MOHarvestAgent(MODQNAgent):
-    """
-    Agent acts in an environment and receives a reward
-    Modules:
-        Interaction module -- receives action from DQN, calls norms and ethics module and updates attributes (Algorithm 3)
-        Moving module -- handles pathfinding and returns coordinates for agent to move to
-        Norms module -- stores and generates norms from view of state (Algorithm 2)
-        Ethics module -- evaluates societal well-being before and after acting and generates a self-directed sanction (Algorithm 1)
-    Instance variables:
-        actions -- possible actions available to an agent (move, eat, throw to each agent)
-        health -- current health
-        berries -- number of berries currently carrying
-        berries_consumed -- history of eaten berries of current episode
-        days_survived -- number of days survived of current episode
-        max_days -- maximum number of days in an episode
-        max/min width/height -- dimensions of the grid agent can access
-        health_decay -- decay of health at each timestep
-        days_left_to_live -- number of days an agent can live for given their health, health decay, and number of berries they are carrying
-        total_days_left_to_live -- cumulative days left to live of current episode
-        berry_health_payoff -- payoff received from eating a berry
-        low_health_threshold -- minimum health required to throw a berry
-        agent_type -- baseline or maximin
-        write_norms -- boolean whether agent is tracking norms
-        rewards -- dictionary of rewards received
-        off_grid -- status of agent on the grid; agent is removed from the grid upon death
-        current_action -- the current action being performed
-    """
-    def __init__(self,unique_id,model,agent_type,max_days,min_width,max_width,min_height,max_height,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None):
-        self.actions = self._generate_actions(unique_id, model.get_num_agents())
-        self.n_rewards = 1 if agent_type == "baseline" else 4 #1 or num principles
-        #dqn agent class handles learning and action selection
-        super().__init__(unique_id,model,agent_type,self.actions,self.n_rewards,training,checkpoint_path,epsilon,shared_replay_buffer=shared_replay_buffer)
+class InteractionModule():
+    def __init__(self,unique_id,model,agent_type,n_features,min_width,max_width,min_height,max_height,training,write_norms):
+        self.unique_id = unique_id
+        self.model = model
+        self.agent_type = agent_type
+        self.n_features = n_features
         self.start_health = 0.8
         self.health = self.start_health
+        self.health_decay = 0.1
+        self.low_health_threshold = 0.6
+        self.berry_health_payoff = 0.6
         self.berries = 0
         self.berries_consumed = 0
         self.berries_thrown = 0
         self.days_survived = 0
-        self.max_days = max_days
-        self.max_width = max_width
-        self.min_width = min_width
-        self.max_height = max_height
-        self.min_height = min_height
-        self.health_decay = 0.1
-        self.days_left_to_live = self.health/self.health_decay
+        self.days_left_to_live = self.get_days_left_to_live()
         self.total_days_left_to_live = self.days_left_to_live
-        self.berry_health_payoff = 0.6
-        self.low_health_threshold = 0.6
-        self.agent_type = agent_type
-        self.write_norms = write_norms
+        self.max_days = self.model.get_max_days()
+        self.actions = self._generate_actions(self.unique_id, model.get_num_agents())
         self.moving_module = MovingModule(self.unique_id, model, training, min_width, max_width, min_height, max_height)
-        self.norms_module = NormsModule(self.unique_id)
+        self.write_norms = write_norms
+        if self.write_norms:
+            self.norms_module = NormsModule(self.unique_id)
         if agent_type != "baseline":
             self.rewards = self._ethics_rewards()
-            self.ethics_module = EthicsModule(self.rewards["sanction"])
+            self.ethics_module = EthicsModule(self.rewards["sanction"],agent_type)
         else:
             self.rewards = self._baseline_rewards()
-        self.off_grid = False
-        self.current_action = None
-        
-    def interaction_module(self, action):
+
+    def perform_transition(self, action):
         """
         Interaction Module (Algorithm 3) receives action from DQN and performs transition
         Observes state before acting and passes view to Norms Module for behaviour and norms handling (Algorithm 2)
@@ -82,11 +49,11 @@ class MOHarvestAgent(MODQNAgent):
             antecedent = self.norms_module.get_antecedent(self.berries, self.health, self.model.get_society_well_being(self, True, False))
         if self.agent_type != "baseline":
             self.ethics_module.day = self.model.get_day()
-            can_help = self._update_ethics()
+            self._update_ethics()
         reward_vector = [self._perform_action(action)]
         next_state = self.observe()
         if self.agent_type != "baseline":
-            reward_vector = reward_vector + self._ethics_sanction(can_help)
+            reward_vector = reward_vector + self._ethics_sanction()
         done, reward_vector = self._update_attributes(reward_vector)
         if self.write_norms:
             self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward_vector, self.model.get_day())
@@ -94,7 +61,7 @@ class MOHarvestAgent(MODQNAgent):
                 #raise ImpossibleNormException(self.unique_id, antecedent, self.actions[action], reward)
                 print(self.model.episode, self.model.day, "agent", self.agent_id, antecedent, "reward", reward_vector, "berries", self.berries, "health", self.health)
         return reward_vector, next_state, done
-        
+    
     def observe(self):
         """
         Agents observe their attributes, distance to nearest berry, well-being of other agents in society
@@ -107,32 +74,6 @@ class MOHarvestAgent(MODQNAgent):
             raise NumFeaturesException(self.n_features, len(observation))
         return observation
     
-    def get_n_features(self):
-        """
-        Get number of features in observation (agent's health, days left to live, distance to berry, well-being of other agents in society)
-        """
-        n_features = 4
-        n_features += self.model.get_num_agents() -1
-        return n_features
-      
-    def reset(self):
-        """
-        Reset agent for new episode
-        """
-        self.done = False
-        self.total_episode_reward = 0
-        self.berries = 0
-        self.berries_consumed = 0
-        self.berries_thrown = 0
-        self.max_berries = 0
-        self.health = self.start_health
-        self.current_reward = 0
-        self.days_left_to_live = self.get_days_left_to_live()
-        self.total_days_left_to_live = self.days_left_to_live
-        self.days_survived = 0
-        self.norms_module.behaviour_base  = {}
-        self.moving_module.reset()
-
     def get_days_left_to_live(self):
         """
         Get the days an agent has left to live (Equation 4)
@@ -142,6 +83,24 @@ class MOHarvestAgent(MODQNAgent):
         if days_left_to_live < 0:
             return 0
         return days_left_to_live
+    
+    def get_actions(self):
+        return self.actions
+    
+    def reset(self):
+        """
+        Reset agent for new episode
+        """
+        self.berries = 0
+        self.berries_consumed = 0
+        self.berries_thrown = 0
+        self.max_berries = 0
+        self.health = self.start_health
+        self.days_left_to_live = self.get_days_left_to_live()
+        self.total_days_left_to_live = self.days_left_to_live
+        self.days_survived = 0
+        self.norms_module.behaviour_base  = {}
+        self.moving_module.reset()
     
     def _generate_actions(self, unique_id, num_agents):
         actions = ["move", "eat"]
@@ -205,10 +164,8 @@ class MOHarvestAgent(MODQNAgent):
             return self.rewards["eat"]
         else:
             return self.rewards["no_berries"]
-
-    def _ethics_sanction(self, can_help):
-        # if not can_help:
-        #     return 0
+    
+    def _ethics_sanction(self):
         society_well_being = self.model.get_society_well_being(self, False, True)
         sanction = self.ethics_module.get_sanction(society_well_being)
         return sanction
@@ -221,7 +178,6 @@ class MOHarvestAgent(MODQNAgent):
         else:
             can_help = False #True
             self.ethics_module.update_ethics_state(can_help, society_well_being)
-        #return can_help
     
     def _update_attributes(self, reward_vector):
         done = False
@@ -239,7 +195,7 @@ class MOHarvestAgent(MODQNAgent):
             reward_vector[0] += self.rewards["survive"]
         reward_vector = np.array(reward_vector)
         return done, reward_vector
-    
+
     def _baseline_rewards(self):
         rewards = {"death": -1,
                    "no_berries": -0.2,
