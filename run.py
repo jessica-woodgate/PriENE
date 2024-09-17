@@ -8,7 +8,7 @@ import argparse
 import wandb
 import numpy as np
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles"]
+AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles", "multiobjective"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 500
@@ -37,7 +37,7 @@ def generate_graphs(scenario, run_name, num_agents):
     data_analysis.proccess_and_display_all_data(dfs, AGENT_TYPES, scenario, norms_filepath)
 
 
-def log_wandb_agents(model_inst, last_episode, reward_tracker, multiobjective):
+def log_wandb_agents(model_inst, last_episode, reward_tracker):
     for i, agent in enumerate(model_inst.schedule.agents):
         if agent.agent_type != "berry":
             base_string = agent.agent_type+"_agent_"+str(agent.unique_id)
@@ -46,7 +46,7 @@ def log_wandb_agents(model_inst, last_episode, reward_tracker, multiobjective):
                 reward = reward_tracker[i]
                 wandb.log({string: reward})
             string = base_string+"_reward"
-            if multiobjective:
+            if agent.agent_type == "multiobjective":
                 wandb.log({string: sum(agent.current_reward)})
             else:
                 wandb.log({string: agent.current_reward})
@@ -56,7 +56,7 @@ def log_wandb_agents(model_inst, last_episode, reward_tracker, multiobjective):
             string = base_string+"_epsilon"
             wandb.log({string: agent.epsilon})
 
-def run_simulation(model_inst, render, log_wandb, wandb_project, multiobjective):
+def run_simulation(model_inst, render, log_wandb, wandb_project):
     if log_wandb:
         wandb.init(project=wandb_project)
     if render:
@@ -66,7 +66,7 @@ def run_simulation(model_inst, render, log_wandb, wandb_project, multiobjective)
         model_inst.step()
         if log_wandb:
             reward_tracker = [a.total_episode_reward for a in model_inst.schedule.agents if a.agent_type != "berry"]
-            log_wandb_agents(model_inst, last_episode, reward_tracker, multiobjective)
+            log_wandb_agents(model_inst, last_episode, reward_tracker)
             mean_reward = model_inst.model_episode_reporter["mean_reward"].mean()
             wandb.log({'mean_episode_reward': mean_reward})
         if render:
@@ -74,22 +74,22 @@ def run_simulation(model_inst, render, log_wandb, wandb_project, multiobjective)
     num_episodes = model_inst.episode
     return num_episodes
 
-def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,multiobjective,log_wandb,wandb_project=None):   
+def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):   
     file_string = scenario+"_"+agent_type
     checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
     if scenario == "basic":
-        model_inst = BasicHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,multiobjective,file_string)
+        model_inst = BasicHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     elif scenario == "capabilities":
-        model_inst = CapabilitiesHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,multiobjective,file_string)
+        model_inst = CapabilitiesHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,multiobjective,file_string)
+        model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     else:
         ValueError("Unknown argument: "+scenario)
-    run_simulation(model_inst,render,log_wandb,wandb_project,multiobjective)
+    run_simulation(model_inst,render,log_wandb,wandb_project)
 
-def run_all(scenario,run_name,num_agents,num_start_berries,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,multiobjective,log_wandb,wandb_project=None):
+def run_all(scenario,run_name,num_agents,num_start_berries,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):
     for agent_type in AGENT_TYPES:
-        create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,multiobjective,log_wandb,wandb_project)
+        create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
 
 def get_integer_input(prompt):
     while True:
@@ -145,13 +145,7 @@ elif args.option == "test" or args.option == "train":
         run_name = "current_run"
         max_episodes = 0
     #########################################################################################
-    multiobjective = get_input(f"Multi-objective? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"])
-    multiobjective = get_bool(multiobjective)
-    #########################################################################################
-    if not multiobjective:
-        types = AGENT_TYPES + ["all"]
-    else:
-        types = ["baseline", "ethical"]
+    types = AGENT_TYPES + ["all"]
     agent_type = get_input(f"What type of agent do you want to implement {types}: ", f"Invalid agent type. Please choose {types}: ", types)
     #########################################################################################
     num_agents = int(get_input(f"How many agents do you want to implement {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
@@ -181,9 +175,9 @@ elif args.option == "test" or args.option == "train":
     MAX_HEIGHT = num_agents * 2
     NUM_BERRIES = num_agents * 3
     if agent_type == "all":
-        run_all(scenario,run_name,num_agents,NUM_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,multiobjective,log_wandb,wandb_project)
+        run_all(scenario,run_name,num_agents,NUM_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,log_wandb,wandb_project)
     else:
-        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,multiobjective,log_wandb,wandb_project)
+        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,log_wandb,wandb_project)
 #########################################################################################
 elif args.option == "graphs":
     run_name = get_input(f"What run do you want to generate graphs for {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
