@@ -79,7 +79,7 @@ class EthicsModule():
         egalitarian = self._egalitarian_sanction(self.measure_of_well_being["egalitarian"], society_well_being)
         maximin = self._maximin_sanction(self.measure_of_well_being["maximin_min"], self.measure_of_well_being["maximin_num_mins"], society_well_being)
         utilitarian = self._utilitarian_sanction(self.measure_of_well_being["utilitarian"], society_well_being)
-        if self.principle == "multiobjective":
+        if "multiobjective" in self.principle:
             combined_sanction = [egalitarian, maximin, utilitarian]
         else:
             combined_sanction = [self.sanction if any([egalitarian, maximin, utilitarian]) else 0]

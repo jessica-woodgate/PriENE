@@ -36,7 +36,6 @@ def generate_graphs(scenario, run_name, num_agents):
         dfs.append(df)
     data_analysis.proccess_and_display_all_data(dfs, AGENT_TYPES, scenario, norms_filepath)
 
-
 def log_wandb_agents(model_inst, last_episode, reward_tracker):
     for i, agent in enumerate(model_inst.schedule.agents):
         if agent.agent_type != "berry":
@@ -46,7 +45,7 @@ def log_wandb_agents(model_inst, last_episode, reward_tracker):
                 reward = reward_tracker[i]
                 wandb.log({string: reward})
             string = base_string+"_reward"
-            if agent.agent_type == "multiobjective":
+            if "multiobjective" in agent.agent_type:
                 wandb.log({string: sum(agent.current_reward)})
             else:
                 wandb.log({string: agent.current_reward})
