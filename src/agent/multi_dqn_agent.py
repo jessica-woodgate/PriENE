@@ -1,4 +1,4 @@
-from .interaction_module import InteractionModule
+from .modules.interaction_module import InteractionModule
 from .dqn.dqn import DQN
 from .dqn.mosp_dqn import MODQN
 import numpy as np
@@ -64,6 +64,7 @@ class DQNAgent():
         return n_features
 
     def _init_networks(self, checkpoint_path):
+        #need to init a network for each objective
         if self.training:
             self.q_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(self.unique_id)+"/q_model_variables.keras"
             self.target_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(self.unique_id)+"/target_model_variables.keras"
@@ -72,12 +73,8 @@ class DQNAgent():
         else:
             self.q_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(self.unique_id)+"/q_model_variables.keras"
             self.target_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(self.unique_id)+"/target_model_variables.keras"
-        if self.n_rewards == 1:
-            self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
-            self.target_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
-        else:
-            self.q_network = MODQN((self.n_features,),self.actions,self.n_rewards,self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
-            self.target_network = MODQN((self.n_features,),self.actions,self.n_rewards,self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
+        self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
+        self.target_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
         if self.training:
             inputs = np.zeros(self.n_features)
             self.q_network.dqn(np.atleast_2d(inputs.astype('float32')))

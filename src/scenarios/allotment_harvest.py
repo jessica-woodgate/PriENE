@@ -1,5 +1,5 @@
 from src.harvest_model import HarvestModel
-from src.agent.test_agent.dqn_agent import DQNAgent
+from src.agent.dqn_agent import DQNAgent
 from src.harvest_exception import NumAgentsException
 from src.harvest_exception import NumBerriesException
 

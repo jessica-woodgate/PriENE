@@ -1,5 +1,5 @@
 import numpy as np
-from .n_network import NNetwork
+from .mlp import MLP
 import tensorflow as tf
 import keras
 from keras import losses
@@ -30,9 +30,9 @@ class DQN:
         self.total_episode_reward = 0
         self.batch_size = 64
         self.hidden_units = 128
-        self.n_features = n_features
         self.actions = actions
         self.n_actions = len(actions)
+        self.n_features = n_features
         self.training = training
         self.checkpoint_path = checkpoint_path
         if shared_replay_buffer == None:
@@ -45,7 +45,7 @@ class DQN:
         self.delta = 1.0
         
         if self.training:
-            self.dqn = NNetwork(self.n_features,self.hidden_units, self.n_actions)
+            self.dqn = MLP(self.n_actions,self.n_features,self.hidden_units)
         else:
             self.dqn = keras.models.load_model(self.checkpoint_path,compile=True)
     

@@ -3,7 +3,7 @@ from tensorflow import keras
 from keras import layers
 from keras import initializers as initialiser
 
-class MONNetwork(keras.Model):
+class MLP(keras.Model):
     """
     MONNetwork handles the network
     Instance variables:
@@ -16,7 +16,7 @@ class MONNetwork(keras.Model):
         output_layer -- output layer of network
         model -- the sequential model
     """
-    def __init__(self, n_features, n_actions, n_rewards, hidden_units, trainable=True, dtype="float32", **kwargs):
+    def __init__(self, n_actions, n_features, hidden_units, n_rewards=1, trainable=True, dtype="float32", **kwargs):
         super().__init__()
         self.n_features = n_features
         self.n_actions = n_actions

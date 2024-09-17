@@ -4,7 +4,7 @@ from mesa.space import MultiGrid
 import pandas as pd
 import numpy as np
 import json
-from .agent.test_agent.dqn_agent import DQNAgent
+from .agent.dqn_agent import DQNAgent
 from .berry import Berry
 from .harvest_exception import FileExistsException
 from .harvest_exception import NoEmptyCells
