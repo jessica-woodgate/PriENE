@@ -82,7 +82,8 @@ class EthicsModule():
         egalitarian = self._egalitarian_sanction(egalitarian_welfare, society_well_being)
         maximin = self._maximin_sanction(maximin_min, maximin_num_mins, society_well_being)
         utilitarian = self._utilitarian_sanction(utilitarian_welfare, society_well_being)
-        return egalitarian + maximin + utilitarian
+        combined_sanction = self.sanction if any([egalitarian, maximin, utilitarian]) else 0
+        return combined_sanction
         
     def _maximin_sanction(self, previous_min, number_of_previous_mins, society_well_being):
         current_min, current_number_of_current_mins = self._calculate_maximin_welfare(society_well_being)
