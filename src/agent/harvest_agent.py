@@ -110,6 +110,11 @@ class HarvestAgent(Agent):
             return 0
         return days_left_to_live
     
+    def finish_episode(self, end_day):
+        if self.off_grid == False:
+            self.days_survived = end_day
+        self.decision_module.save_models()
+
     def reset(self):
         """
         Reset agent for new episode

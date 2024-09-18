@@ -92,10 +92,7 @@ class HarvestModel(Model):
                 self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.filepath+"_emerged_norms.json")
             for a in self.schedule.agents:
                 if a.agent_type != "berry":
-                    if a.off_grid == False:
-                        a.days_survived = self.day
-                    if self.training: 
-                        a.save_models()
+                    a.finish_episode(self.day)
             self._collect_model_episode_data()
             self._reset()
 
