@@ -1,3 +1,5 @@
+from mesa import Agent
+from abc import abstractmethod
 from .moving_module import MovingModule
 from .norms_module import NormsModule
 from .ethics_module import EthicsModule
@@ -5,10 +7,9 @@ from src.harvest_exception import NumFeaturesException
 from src.harvest_exception import AgentTypeException
 import numpy as np
 
-class InteractionModule():
+class InteractionModule(Agent):
     def __init__(self,unique_id,model,agent_type,n_features,min_width,max_width,min_height,max_height,training,write_norms):
-        self.unique_id = unique_id
-        self.model = model
+        super().__init__(unique_id,model)
         self.agent_type = agent_type
         self.n_features = n_features
         self.start_health = 0.8
@@ -24,6 +25,11 @@ class InteractionModule():
         self.total_days_left_to_live = self.days_left_to_live
         self.max_days = self.model.get_max_days()
         self.actions = self._generate_actions(self.unique_id, model.get_num_agents())
+        self.off_grid = False
+        self.min_width = min_width
+        self.max_width = max_width
+        self.min_height = min_height
+        self.max_height = max_height
         self.moving_module = MovingModule(self.unique_id, model, training, min_width, max_width, min_height, max_height)
         self.write_norms = write_norms
         if self.write_norms:
@@ -33,6 +39,14 @@ class InteractionModule():
             self.ethics_module = EthicsModule(self.rewards["sanction"],agent_type)
         else:
             self.rewards = self._baseline_rewards()
+    
+    @abstractmethod
+    def step(self):
+        raise NotImplementedError
+    
+    @abstractmethod
+    def reset(self):
+        raise NotImplementedError
 
     def perform_transition(self, action):
         """
@@ -99,8 +113,9 @@ class InteractionModule():
         self.days_left_to_live = self.get_days_left_to_live()
         self.total_days_left_to_live = self.days_left_to_live
         self.days_survived = 0
-        self.norms_module.behaviour_base  = {}
         self.moving_module.reset()
+        if self.write_norms:
+            self.norms_module.behaviour_base  = {}
     
     def _generate_actions(self, unique_id, num_agents):
         actions = ["move", "eat"]

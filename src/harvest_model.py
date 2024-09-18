@@ -178,12 +178,12 @@ class HarvestModel(Model):
         for i in range(self.num_agents):
             if agent_type == "multiobjective_sp":
                 n_rewards = 4
-                a = DQNAgent(i,self,agent_type,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
+                a = DQNAgent(i,self,agent_type,self.training,checkpoint_path,self.epsilon,0,self.max_width,0,self.max_height,self.write_norms,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
             elif agent_type == "multiobjective_mp":
                 n_rewards = 4
-                a = MPDQNAgent(i,self,agent_type,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
+                a = MPDQNAgent(i,self,agent_type,self.training,checkpoint_path,self.epsilon,0,self.max_width,0,self.max_height,self.write_norms,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
             else:
-                a = DQNAgent(i,self,agent_type,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+                a = DQNAgent(i,self,agent_type,self.training,checkpoint_path,self.epsilon,0,self.max_width,0,self.max_height,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
         self.berry_id = len(self.living_agents) + 1
 

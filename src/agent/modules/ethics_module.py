@@ -25,7 +25,7 @@ class EthicsModule():
         Updates social welfare before agent acts: measure of well-being and number of minimums (Algorithm 1 Line 1)
         """
         self.can_help = can_help
-        self.measure_of_well_being = self._calculate_social_welfare(society_well_being)
+        self._calculate_social_welfare(society_well_being)
     
     def get_sanction(self, society_well_being):
         """
@@ -40,12 +40,12 @@ class EthicsModule():
         else:
             return self._combined_sanction(society_well_being)
 
-    def _calculate_social_welfare(self, principle, society_well_being):
-        if principle == "egalitarian":
+    def _calculate_social_welfare(self, society_well_being):
+        if self.principle == "egalitarian":
             self.measure_of_well_being = self._calculate_egalitarian_welfare(society_well_being)
-        elif principle == "maximin":
+        elif self.principle == "maximin":
             self.measure_of_well_being, self.number_of_minimums = self._calculate_maximin_welfare(society_well_being)
-        elif principle == "utilitarian":
+        elif self.principle == "utilitarian":
             self.measure_of_well_being = self._calculate_utilitarian_welfare(society_well_being)
         else:
             self.measure_of_well_being = self._calculate_all_welfare(society_well_being)

@@ -4,15 +4,13 @@ from .dqn.mosp_dqn import MODQN
 import numpy as np
 import os
 
-class DQNAgent():
+class DQNAgent(InteractionModule):
     def __init__(self,unique_id,model,agent_type,training,checkpoint_path,epsilon,min_width,max_width,min_height,max_height,write_norms,n_rewards=1,shared_replay_buffer=None):
-        self.unique_id = unique_id
-        self.model = model
+        self.n_features = self._calculate_n_features(model)
+        super().__init__(unique_id,model,agent_type,self.n_features,min_width,max_width,min_height,max_height,training,write_norms)
         self.agent_type = agent_type
         self.training = training
-        self.n_features = self._calculate_n_features()
-        self.interaction_module = InteractionModule(unique_id,model,agent_type,self.n_features,min_width,max_width,min_height,max_height,training,write_norms)
-        self.actions = self.interaction_module.get_actions()
+        self.actions = self.get_actions()
         self.epsilon = epsilon
         self.min_exploration_prob = 0.01
         self.expl_decay = 0.001
@@ -32,15 +30,15 @@ class DQNAgent():
         Step oberves current state, chooses an action using Q network, performs action using interaction module and learns if training
         """
         if self.done == False:
-            observation = self.interaction_module.observe()
+            observation = self.observe()
             action = self.q_network.choose_action(observation,self.epsilon)
-            self.current_reward, next_state, self.done = self.interaction_module.perform_transition(action)
+            self.current_reward, next_state, self.done = self.perform_transition(action)
             if self.n_rewards == 1:
                 self.current_reward = np.sum(self.current_reward)
             if self.training:
                 self._learn(observation, action, self.current_reward, next_state, self.done)
                 self.epsilon = max(self.min_exploration_prob, np.exp(-self.expl_decay*self.model.episode))
-            self.total_episode_reward += sum(self.current_reward)
+            self.total_episode_reward += sum(self.current_reward) if self.n_rewards > 1 else self.current_reward
 
     def save_models(self):
         """
@@ -53,14 +51,14 @@ class DQNAgent():
         self.done = False
         self.total_episode_reward = 0
         self.current_reward = 0
-        self.interaction_module.reset()
+        super().reset()
     
-    def _calculate_n_features(self):
+    def _calculate_n_features(self, model):
         """
         Get number of features in observation (agent's health, days left to live, distance to berry, well-being of other agents in society)
         """
         n_features = 4
-        n_features += self.model.get_num_agents() -1
+        n_features += model.get_num_agents() - 1
         return n_features
 
     def _init_networks(self, checkpoint_path):
