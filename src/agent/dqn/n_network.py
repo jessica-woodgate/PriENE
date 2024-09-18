@@ -3,7 +3,7 @@ from tensorflow import keras
 from keras import layers
 from keras import initializers as initialiser
 
-class MLP(keras.Model):
+class NNetwork(keras.Model):
     """
     MONNetwork handles the network
     Instance variables:

@@ -181,7 +181,7 @@ class HarvestModel(Model):
                 a = DQNAgent(i,self,agent_type,self.training,checkpoint_path,self.epsilon,0,self.max_width,0,self.max_height,self.write_norms,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
             elif agent_type == "multiobjective_mp":
                 n_rewards = 4
-                a = MPDQNAgent(i,self,agent_type,self.training,checkpoint_path,self.epsilon,0,self.max_width,0,self.max_height,self.write_norms,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
+                a = MPDQNAgent(i,self,agent_type,self.training,checkpoint_path,self.epsilon,0,self.max_width,0,self.max_height,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             else:
                 a = DQNAgent(i,self,agent_type,self.training,checkpoint_path,self.epsilon,0,self.max_width,0,self.max_height,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
