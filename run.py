@@ -8,7 +8,7 @@ import argparse
 import wandb
 import numpy as np
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles", "multiobjective"]
+AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles", "multiobjective_sp"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 500

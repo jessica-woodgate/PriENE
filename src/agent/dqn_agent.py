@@ -1,6 +1,5 @@
 from .modules.interaction_module import InteractionModule
 from .dqn.dqn import DQN
-from .dqn.mosp_dqn import MODQN
 import numpy as np
 import os
 
@@ -67,12 +66,8 @@ class DQNAgent(InteractionModule):
         if self.training:
             os.makedirs(os.path.dirname(self.q_checkpoint_path), exist_ok=True)
             os.makedirs(os.path.dirname(self.target_checkpoint_path), exist_ok=True)
-        if "multiobjective" not in self.agent_type:
-            self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
-            self.target_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
-        else:
-            self.q_network = MODQN((self.n_features,),self.actions,self.n_rewards,self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
-            self.target_network = MODQN((self.n_features,),self.actions,self.n_rewards,self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
+        self.q_network = DQN(self.actions,(self.n_features,),self.training,self.n_rewards,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
+        self.target_network = DQN(self.actions,(self.n_features,),self.training,self.n_rewards,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
         if self.training:
             inputs = np.zeros(self.n_features)
             self.q_network.dqn(np.atleast_2d(inputs.astype('float32')))

@@ -1,8 +1,9 @@
-import numpy as np
 from .mlp import MLP
+import numpy as np
 import tensorflow as tf
 import keras
 from keras import losses
+from collections import Counter
 
 class DQN:
     """
@@ -24,15 +25,16 @@ class DQN:
         optimiser -- learning optimiser
         delta -- parameter for Huber loss
     """
-    def __init__(self,actions,n_features,training,checkpoint_path=None,shared_replay_buffer=None):
+    def __init__(self,actions,n_features,training,n_rewards,checkpoint_path=None,shared_replay_buffer=None):
         self.gamma = 0.95
         self.lr = 0.0001
         self.total_episode_reward = 0
         self.batch_size = 64
         self.hidden_units = 128
+        self.n_features = n_features
         self.actions = actions
         self.n_actions = len(actions)
-        self.n_features = n_features
+        self.n_rewards = n_rewards
         self.training = training
         self.checkpoint_path = checkpoint_path
         if shared_replay_buffer == None:
@@ -45,7 +47,7 @@ class DQN:
         self.delta = 1.0
         
         if self.training:
-            self.dqn = MLP(self.n_actions,self.n_features,self.hidden_units)
+            self.dqn = MLP(self.n_actions,self.n_features,self.hidden_units,self.n_rewards)
         else:
             self.dqn = keras.models.load_model(self.checkpoint_path,compile=True)
     
@@ -65,13 +67,21 @@ class DQN:
         #predict q value using target net
         value_next = np.max(TargetNet.predict(states_next), axis=1)
         #where done, actual value is reward; if not done, actual value is discounted rewards
-        actual_values = np.where(dones, rewards, rewards+self.gamma*value_next)
+        if self.n_rewards > 1:
+            actual_values = np.where(np.expand_dims(dones, axis=1), rewards, rewards+self.gamma*value_next) 
+        else:
+            actual_values = np.where(dones, rewards, rewards+self.gamma*value_next)
 
         #gradient tape uses automatic differentiation to compute gradients of loss and records operations for back prop
         with tf.GradientTape() as tape:
             #one hot to select the action which was chosen; find predicted q value; reduce to tensor of the batch size
-            selected_action_values = tf.math.reduce_sum(
-                self.predict(states) * tf.one_hot(actions, self.n_actions), axis=1) #mask logits through one hot
+            if self.n_rewards > 1:
+                one_hot = tf.one_hot(actions, self.n_actions, axis=1)  # Create one-hot encoding for actions only
+                one_hot = tf.expand_dims(one_hot, axis=-1)  # Expand dimensions to match reward vectors
+                one_hot = tf.repeat(one_hot, self.n_rewards, axis=-1)
+            else:
+                one_hot = tf.one_hot(actions, self.n_actions)
+            selected_action_values = tf.math.reduce_sum(self.predict(states) * one_hot, axis=1) #mask logits through one hot
             huber = losses.Huber(self.delta)
             loss = huber(actual_values, selected_action_values)
         #trainable variables are automatically watched
@@ -90,6 +100,8 @@ class DQN:
             action = self.actions.index(a)
         else:
             action_values = self.predict(np.atleast_2d(observation))
+            if self.n_rewards > 1:
+                action_values = self._apply_utility(action_values)
             action = np.argmax(action_values)
         return action
     
@@ -99,6 +111,8 @@ class DQN:
         Keras model by default recognises input as batch so want to have at least 2 dimensions even if a single state
         """
         actions = self.dqn(np.atleast_2d(inputs.astype('float32')))
+        if self.n_rewards > 1:
+            actions = tf.reshape(actions, [-1, self.n_actions, self.n_rewards])
         return actions
     
     def add_experience(self, experience):
@@ -121,3 +135,23 @@ class DQN:
         variables2 = QNet.dqn.trainable_variables
         for v1, v2 in zip(variables1, variables2):
             v1.assign(v2.numpy())
+    
+    def _apply_utility(self, action_values):
+        weighted_values = []
+        #action_values is a tensor of shape [-1, n_actions, n_rewards]
+        for batch in action_values:
+            max_actions = []
+            print("batch", batch)
+            # Iterate over each reward dimension
+            for n in range(self.n_rewards):
+                print("objective", batch[:, n])
+                # Find the maximum action value for the current reward dimension
+                max_action = np.argmax(batch[:, n])
+                print("max_action", max_action)
+                print("max action value", np.max(batch[:, n]))
+                max_actions.append(max_action)
+            print("max actions", max_actions)
+            most_common = Counter(max_actions).most_common(1)
+            print("most_common", most_common)
+            weighted_values.append(max_action)
+        return weighted_values

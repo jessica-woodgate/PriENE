@@ -5,7 +5,7 @@ class EthicsModule():
     Ethics Module (Algorithm 1) evaluates societal well-being before and after acting and generates a self-directed sanction
     Instance variables:
         sanction -- amount of reward to return to agent
-        current_principle -- normative ethics principle
+        principle -- normative ethics principle
         society_well_being -- list of well-being for each living agent
         measure_of_well_being -- metric to evaluate well-being before and after acting (minimum experience)
         number_of_minimums -- number of agents which have minimum experience
@@ -15,7 +15,6 @@ class EthicsModule():
         self.sanction = sanction
         self.principle = principle
         self.can_help = None
-        self.current_principle = None
         self.society_well_being = None
         self.measure_of_well_being = None
         self.number_of_minimums = None
@@ -31,11 +30,11 @@ class EthicsModule():
         """
         Obtain sanction from principle comparing current society well-being with previous well-being (Algorithm 1 Lines 3-8)
         """
-        if self.current_principle == "egalitarian":
+        if self.principle == "egalitarian":
             return [self._egalitarian_sanction(self.measure_of_well_being, society_well_being)]
-        elif self.current_principle == "maximin":
+        elif self.principle == "maximin":
             return [self._maximin_sanction(self.measure_of_well_being, self.number_of_minimums, society_well_being)]
-        elif self.current_principle == "utilitarian":
+        elif self.principle == "utilitarian":
             return [self._utilitarian_sanction(self.measure_of_well_being, society_well_being)]
         else:
             return self._combined_sanction(society_well_being)
