@@ -53,7 +53,7 @@ class DataAnalysis():
             i += 1
 
     def _normalised_sum_step_across_episodes(self, df):
-        df = df.drop(["episode", "action"], axis=1)
+        df = df.drop(["episode", "action", "reward"], axis=1)
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
         #Calculate counts for each (step, agent_id) combination
         count_df = df.groupby(["day", "agent_id"]).size().reset_index(name="count")
