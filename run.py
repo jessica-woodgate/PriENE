@@ -13,7 +13,7 @@ AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_princip
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 1000
-MAX_DAYS = 50
+MAX_DAYS = 200
 RUN_OPTIONS = ["current_run", "run_1", "run_2", "run_3", "run_4"]
 
 def generate_graphs(scenario, run_name, num_agents):
@@ -30,8 +30,8 @@ def generate_graphs(scenario, run_name, num_agents):
     else:
         # reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+scenario+"_"
         # norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/"+scenario
-        reading_filepath = "data/results/200_days/run_4_neg_when_can_help/"+scenario+"/agent_reports_"+scenario+"_"
-        norms_filepath = "data/results/200_days/run_4_neg_when_can_help/"+scenario+"/"+scenario
+        reading_filepath = "data/results/200_days/run_3_always_ethics_sanction/"+scenario+"/agent_reports_"+scenario+"_"
+        norms_filepath = "data/results/200_days/run_3_always_ethics_sanction/"+scenario+"/"+scenario
     files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"all_principles.csv",reading_filepath+"multiobjective_mp.csv"]
     dfs = []
     for file in files:

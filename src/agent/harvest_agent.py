@@ -223,7 +223,7 @@ class HarvestAgent(Agent):
             can_help = True
             self.ethics_module.update_ethics_state(can_help, society_well_being)
         else:
-            can_help = False #True
+            can_help = True
             self.ethics_module.update_ethics_state(can_help, society_well_being)
     
     def _update_attributes(self, reward_vector):
