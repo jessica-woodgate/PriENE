@@ -9,10 +9,11 @@ from src.harvest_exception import AgentTypeException
 import numpy as np
 
 class HarvestAgent(Agent):
-    def __init__(self,unique_id,model,agent_type,min_width,max_width,min_height,max_height,training,checkpoint_path,epsilon,write_norms,n_rewards=1,shared_replay_buffer):
+    def __init__(self,unique_id,model,agent_type,min_width,max_width,min_height,max_height,training,checkpoint_path,epsilon,write_norms,n_rewards=1,shared_replay_buffer=None):
         super().__init__(unique_id,model)
         self.done = False
         self.current_reward = 0
+        self.total_episode_reward = 0
         self.training = training
         self.agent_type = agent_type
         self.n_features = self._calculate_n_features()
@@ -36,9 +37,9 @@ class HarvestAgent(Agent):
         self.min_height = min_height
         self.max_height = max_height
         if self.agent_type == "multiobjective_mp":
-            self.decision_module = MPDQNDecisionModule(agent_type,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer)
+            self.decision_module = MPDQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer)
         else:
-            self.decision_module = DQNDecisionModule(agent_type,training,self.actions,self.n_features,checkpoint_path,epsilon,n_rewards,shared_replay_buffer)
+            self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,n_rewards,shared_replay_buffer)
         self.moving_module = MovingModule(self.unique_id, model, training, min_width, max_width, min_height, max_height)
         self.write_norms = write_norms
         if self.write_norms:
@@ -109,6 +110,12 @@ class HarvestAgent(Agent):
         if days_left_to_live < 0:
             return 0
         return days_left_to_live
+
+    def get_epsilon(self):
+        return self.decision_module.get_epsilon()
+
+    def get_mean_loss(self):
+        return self.decision_module.get_mean_loss()
     
     def finish_episode(self, end_day):
         if self.off_grid == False:

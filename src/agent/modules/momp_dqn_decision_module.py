@@ -4,9 +4,10 @@ import numpy as np
 import os
 
 class MPDQNDecisionModule():
-    def __init__(self,agent_type,training,actions,n_features,checkpoint_path,epsilon,shared_replay_buffer=None):
+    def __init__(self,agent_type,unique_id,training,actions,n_features,checkpoint_path,epsilon,shared_replay_buffer=None):
         self.n_features = n_features
         self.agent_type = agent_type
+        self.unique_id = unique_id
         self.training = training
         self.actions = actions
         self.n_actions = len(self.actions)
@@ -31,6 +32,14 @@ class MPDQNDecisionModule():
         for objective in self.networks:
             objective["q_network"].dqn.save(objective["q_checkpoint_path"])
             objective["target_network"].dqn.save(objective["target_checkpoint_path"])
+    
+    def get_epsilon(self):
+        return self.epsilon
+    
+    def get_mean_loss(self):
+        if len(self.losses) > 1:
+            return np.mean(self.losses)
+        return 0
 
     def _init_networks(self, checkpoint_path):
         #need to init a network for each objective

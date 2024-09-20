@@ -438,8 +438,7 @@ class HarvestModel(Model):
         if self.training:
             for agent in self.schedule.agents:
                 if agent.agent_type != "berry":
-                    if len(agent.losses) > 1:
-                        m += np.mean(agent.losses)
+                    m += agent.get_mean_loss()
             if m == 0:
                 return 0
             m /= self.num_agents
@@ -459,7 +458,7 @@ class HarvestModel(Model):
         m = 0
         for agent in self.schedule.agents:
             if agent.agent_type != "berry":
-                m += agent.epsilon
+                m += agent.get_epsilon()
         if m == 0:
             return 0
         m /= self.num_agents
