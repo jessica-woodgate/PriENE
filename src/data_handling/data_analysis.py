@@ -6,6 +6,16 @@ import json
 import numpy as np
 from src.data_handling.norm_processing import NormProcessing
 
+def get_episode_min(processed_df_list, df_labels):
+    filepath = "data/results/current_run/"
+    for i, df in enumerate(processed_df_list):
+        new_df = df.groupby("episode").agg(
+            min_total_days=('total_days', 'min'),
+            max_total_days=('total_days', 'max'),
+            average_total_days=('total_days', 'mean')
+        )
+        new_df.to_csv(filepath+df_labels[i]+"_episode_days_left_to_live.csv")
+
 class DataAnalysis():
     """
     Data analysis processes data of societal metrics, data of norms, and displays graphs
@@ -69,6 +79,14 @@ class DataAnalysis():
         sum_df["count"] = count_df["count"]
         return sum_df
 
+    def _end_episode_results(self, sum_df_list, df_labels, results_type):
+        for df, i in enumerate(sum_df_list):
+            new_df = df.groupby("episode").agg(
+                min_total_days=('total_days', 'min'),
+                max_total_days=('total_days', 'max'),
+                average_total_days=('total_days', 'mean')
+            )
+            new_df.to_csv(self.filepath+"_end_episode_"+results_type+"_"+df_labels[i]+".csv")
 
     def _process_end_episode_dataframes(self, dataframes):
         processed_dfs = []
@@ -100,9 +118,10 @@ class DataAnalysis():
         min_days_left_to_live.to_csv(self.filepath+"min_days_left_to_live.csv")
         gini_days_left_to_live.to_csv(self.filepath+"gini_days_left_to_live.csv")
         total_days_left_to_live.to_csv(self.filepath+"total_days_left_to_live.csv")
+        self._end_episode_results(sum_df_list, df_labels, filename)
         with open(self.filepath+"tendency_well_being.json", "w") as f:
             json.dump(days_left_to_live_tendency, f, indent=4)
-    
+
     def _berries_consumed_results(self, sum_df_list, df_labels, filename):
         berries_consumed_tendency = {}
         max_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_max)
