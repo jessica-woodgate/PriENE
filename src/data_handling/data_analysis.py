@@ -6,16 +6,6 @@ import json
 import numpy as np
 from src.data_handling.norm_processing import NormProcessing
 
-def get_episode_min(processed_df_list, df_labels):
-    filepath = "data/results/current_run/"
-    for i, df in enumerate(processed_df_list):
-        new_df = df.groupby("episode").agg(
-            min_total_days=('total_days', 'min'),
-            max_total_days=('total_days', 'max'),
-            average_total_days=('total_days', 'mean')
-        )
-        new_df.to_csv(filepath+df_labels[i]+"_episode_days_left_to_live.csv")
-
 class DataAnalysis():
     """
     Data analysis processes data of societal metrics, data of norms, and displays graphs
@@ -42,6 +32,7 @@ class DataAnalysis():
     def _display_graphs(self, normalised_sum_df_list, agent_end_episode_list, df_labels):
         self._days_left_to_live_results(normalised_sum_df_list, df_labels, self.filepath+"days_left_to_live")
         self._berries_consumed_results(normalised_sum_df_list, df_labels, self.filepath+"berries_consumed")
+        self._end_episode_results(agent_end_episode_list, df_labels)
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", self.filepath+"violin_end_day", "Violin Plot of Episode Length", "End Day")
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", self.filepath+"violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
 
@@ -79,14 +70,19 @@ class DataAnalysis():
         sum_df["count"] = count_df["count"]
         return sum_df
 
-    def _end_episode_results(self, sum_df_list, df_labels, results_type):
-        for df, i in enumerate(sum_df_list):
+    def _end_episode_results(self, sum_df_list, df_labels):
+        for i, df in enumerate(sum_df_list):
             new_df = df.groupby("episode").agg(
-                min_total_days=('total_days', 'min'),
-                max_total_days=('total_days', 'max'),
-                average_total_days=('total_days', 'mean')
+                min_days=('total_days', 'min'),
+                max_days=('total_days', 'max'),
+                average_days=('total_days', 'mean'),
+                total_days=('total_days', 'sum'),
+                min_berries=('total_berries', 'min'),
+                max_berries=('total_berries', 'max'),
+                average_berries=('total_berries', 'mean'),
+                total_berries=('total_berries', 'sum'),
             )
-            new_df.to_csv(self.filepath+"_end_episode_"+results_type+"_"+df_labels[i]+".csv")
+            new_df.to_csv(self.filepath+"end_episode_"+df_labels[i]+".csv")
 
     def _process_end_episode_dataframes(self, dataframes):
         processed_dfs = []
@@ -118,7 +114,6 @@ class DataAnalysis():
         min_days_left_to_live.to_csv(self.filepath+"min_days_left_to_live.csv")
         gini_days_left_to_live.to_csv(self.filepath+"gini_days_left_to_live.csv")
         total_days_left_to_live.to_csv(self.filepath+"total_days_left_to_live.csv")
-        self._end_episode_results(sum_df_list, df_labels, filename)
         with open(self.filepath+"tendency_well_being.json", "w") as f:
             json.dump(days_left_to_live_tendency, f, indent=4)
 
