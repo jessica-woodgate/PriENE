@@ -120,7 +120,8 @@ class HarvestAgent(Agent):
     def finish_episode(self, end_day):
         if self.off_grid == False:
             self.days_survived = end_day
-        self.decision_module.save_models()
+        if self.training:
+            self.decision_module.save_models()
 
     def reset(self):
         """
