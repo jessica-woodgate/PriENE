@@ -2,9 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import json
-#import scipy.stats.pearsonr as pearsonr
 import numpy as np
 from src.data_handling.norm_processing import NormProcessing
+from scipy import stats
 
 class DataAnalysis():
     """
@@ -177,6 +177,22 @@ class DataAnalysis():
         ax.set_ylabel(y_label)
         ax.legend(title="Societies", loc="upper left")
         plt.title(title)
+        plt.show()
+        plt.savefig(str(filename).split()[0])
+        plt.close()
+
+    def _display_dataframe_shaded(self, df, title, y_label, filename):
+        sns.set_palette("colorblind")
+        ax = sns.lineplot(data=df)
+        ax.set_xlabel("day")
+        ax.set_ylabel(y_label)
+        ax.legend(title="Societies", loc="upper left")
+        plt.title(title)
+        for col in df.columns:
+            mean = df[col].mean()
+            sem = df[col].sem()
+            x = df["day"]
+            ax.fill_between(x, mean + sem, mean - sem, alpha=0.2)
         plt.show()
         plt.savefig(str(filename).split()[0])
         plt.close()
