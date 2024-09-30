@@ -81,7 +81,16 @@ class EthicsModule():
         if "multiobjective" in self.principle:
             combined_sanction = [egalitarian, maximin, utilitarian]
         else:
-            combined_sanction = [self.sanction if any([egalitarian, maximin, utilitarian]) else 0]
+            #combined_sanction = [self.sanction if any([egalitarian, maximin, utilitarian]) else 0]
+            # combined_sanction = np.sum([egalitarian, maximin, utilitarian])
+            # if combined_sanction > self.sanction:
+            #     combined_sanction = [self.sanction]
+            # elif combined_sanction < -self.sanction:
+            #     combined_sanction = [-self.sanction]
+            # else:
+            #     combined_sanction = [combined_sanction]
+            combined_sanction = [min(max(np.sum([egalitarian, maximin, utilitarian]), -self.sanction), self.sanction)]
+            #print("egalita", egalitarian, "maxi", maximin, "util", utilitarian, "combined", combined_sanction)
         return combined_sanction
         
     def _maximin_sanction(self, previous_min, number_of_previous_mins, society_well_being):
