@@ -70,8 +70,8 @@ class DataAnalysis():
         sum_df["count"] = count_df["count"]
         return sum_df
 
-    def _end_episode_results(self, sum_df_list, df_labels):
-        for i, df in enumerate(sum_df_list):
+    def _end_episode_results(self, df_list, df_labels):
+        for i, df in enumerate(df_list):
             new_df = df.groupby("episode").agg(
                 min_days=('total_days', 'min'),
                 max_days=('total_days', 'max'),
@@ -81,6 +81,10 @@ class DataAnalysis():
                 max_berries=('total_berries', 'max'),
                 average_berries=('total_berries', 'mean'),
                 total_berries=('total_berries', 'sum'),
+                min_days_survived=('day', 'min'),
+                max_days_survived=('day', 'max'),
+                average_days_survived=('day', 'mean'),
+                total_days_survived=('day', 'sum'),
             )
             new_df.to_csv(self.filepath+"end_episode_"+df_labels[i]+".csv")
 

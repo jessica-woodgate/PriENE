@@ -89,7 +89,8 @@ class EthicsModule():
             #     combined_sanction = [-self.sanction]
             # else:
             #     combined_sanction = [combined_sanction]
-            combined_sanction = [min(max(np.sum([egalitarian, maximin, utilitarian]), -self.sanction), self.sanction)]
+            #combined_sanction = [min(max(np.sum([egalitarian, maximin, utilitarian]), -self.sanction), self.sanction)]
+            combined_sanction = np.mean([egalitarian, maximin, utilitarian])
             #print("egalita", egalitarian, "maxi", maximin, "util", utilitarian, "combined", combined_sanction)
         return combined_sanction
         
