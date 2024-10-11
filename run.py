@@ -32,7 +32,7 @@ def generate_graphs(scenario, run_name, num_agents):
         # norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/"+scenario
         reading_filepath = "data/results/200_days/run_3_always_ethics_sanction/"+scenario+"/agent_reports_"+scenario+"_"
         norms_filepath = "data/results/200_days/run_3_always_ethics_sanction/"+scenario+"/"+scenario
-    files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"all_principles.csv",reading_filepath+"multiobjective_mp.csv"]
+    files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"all_principles.csv"]
     dfs = []
     for file in files:
         df = pd.read_csv(file)

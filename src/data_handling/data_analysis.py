@@ -77,14 +77,17 @@ class DataAnalysis():
                 max_days=('total_days', 'max'),
                 average_days=('total_days', 'mean'),
                 total_days=('total_days', 'sum'),
+                gini_days=('total_days', lambda x: self._calculate_gini(x)),
                 min_berries=('total_berries', 'min'),
                 max_berries=('total_berries', 'max'),
                 average_berries=('total_berries', 'mean'),
                 total_berries=('total_berries', 'sum'),
+                gini_berries=('total_berries', lambda x: self._calculate_gini(x)),
                 min_days_survived=('day', 'min'),
                 max_days_survived=('day', 'max'),
                 average_days_survived=('day', 'mean'),
                 total_days_survived=('day', 'sum'),
+                gini_days_survived=('day', lambda x: self._calculate_gini(x))
             )
             new_df.to_csv(self.filepath+"end_episode_"+df_labels[i]+".csv")
 
