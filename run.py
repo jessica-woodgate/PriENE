@@ -1,5 +1,5 @@
 from src.scenarios.basic_harvest import BasicHarvest
-from scenarios.colours_harvest import ColoursHarvest
+from src.scenarios.colours_harvest import ColoursHarvest
 from src.scenarios.allotment_harvest import AllotmentHarvest
 from src.data_handling.data_analysis import DataAnalysis
 from src.data_handling.render_pygame import RenderPygame
@@ -18,7 +18,6 @@ AGGREGATION = "average"
 SCENARIO_TYPES = ["colours", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 1000
-MAX_DAYS = 200
 RUN_OPTIONS = ["current_run", "50_days", "200_days"]
 
 def generate_graphs(scenario, run_name, num_agents):
@@ -125,6 +124,13 @@ def write_data_input(data_type):
         write_data = False
     return write_data
 
+def extract_number(string):
+  number = np.fromregex(string, r"(\d+)_days", dtype=int)
+  if number.size > 0:
+    return number[0]
+  else:
+    return None
+
 #########################################################################################
 
 parser = argparse.ArgumentParser(description="Program options")
@@ -142,11 +148,16 @@ elif args.option == "test" or args.option == "train":
         run_name = get_input(f"What run do you want to test {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
         max_episodes = MAX_EPISODES #get_integer_input("How many episodes do you want to run: ")
         training = False
+        if run_name != "current_run":
+            max_days = extract_number(run_name)
+        else:
+            max_days = get_integer_input("How many days in each episode: ")
     else:
         training = True
         scenario = "basic"
         run_name = "current_run"
         max_episodes = 0
+        max_days = get_integer_input("How many days in each episode: ")
     #########################################################################################
     types = AGENT_TYPES + ["all"]
     agent_type = get_input(f"What type of agent do you want to implement {types}: ", f"Invalid agent type. Please choose {types}: ", types)
@@ -178,13 +189,13 @@ elif args.option == "test" or args.option == "train":
     MAX_HEIGHT = num_agents * 2
     NUM_BERRIES = num_agents * 3
     if agent_type == "all":
-        run_all(scenario,run_name,num_agents,NUM_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,log_wandb,wandb_project)
+        run_all(scenario,run_name,num_agents,NUM_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
     else:
-        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,log_wandb,wandb_project)
+        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
 #########################################################################################
 elif args.option == "graphs":
     run_name = get_input(f"What run do you want to generate graphs for {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
     scenario = get_input("What type of scenario do you want to generate graphs for (colours, allotment): ", "Invalid scenario. Please choose 'colours', or 'allotment': ", ["colours", "allotment"])
-    num_agents = int(get_input(f"How many agents do you want to implement {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
+    num_agents = 4
     print("Graphs will be saved in data/results/current_run")
     generate_graphs(scenario,run_name,num_agents)
