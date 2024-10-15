@@ -4,15 +4,28 @@ from keras import layers
 from keras import initializers as initialiser
 
 class NNetwork(keras.Model):
-    def __init__(self, n_features, hidden_units, n_actions, trainable=True, dtype="float32", **kwargs):
+    """
+    MONNetwork handles the network
+    Instance variables:
+        n_features -- number of features for input (size of observation)
+        hidden_units -- number of hidden units
+        n_actions -- number of possible actions (size of output)
+        n_rewards -- number of objectives/length of reward vector
+        input_layer -- input layer of network
+        hidden_layer_1 and hidden_layer 2 -- hidden layers
+        output_layer -- output layer of network
+        model -- the sequential model
+    """
+    def __init__(self, n_actions, n_features, hidden_units, n_rewards=1, trainable=True, dtype="float32", **kwargs):
         super().__init__()
         self.n_features = n_features
-        self.hidden_units = hidden_units
         self.n_actions = n_actions
+        self.n_rewards = n_rewards
+        self.hidden_units = hidden_units
         self.input_layer = layers.InputLayer(shape=n_features,)
         self.hidden_layer_1 = layers.Dense(hidden_units, activation="relu", kernel_initializer=initialiser.HeNormal())
         self.hidden_layer_2 = layers.Dense(hidden_units, activation="relu", kernel_initializer=initialiser.HeNormal())
-        self.output_layer = layers.Dense(n_actions, activation="linear", kernel_initializer=initialiser.HeNormal())
+        self.output_layer = layers.Dense(n_actions*n_rewards, activation="linear", kernel_initializer=initialiser.HeNormal())
         
         self.model = keras.Sequential([
             self.input_layer,
@@ -35,8 +48,9 @@ class NNetwork(keras.Model):
         config.update(
             {
                 "n_features": self.n_features,
-                "hidden_units": self.hidden_units,
                 "n_actions": self.n_actions,
+                "n_rewards": self.n_rewards,
+                "hidden_units": self.hidden_units,
             }
         )
         return config

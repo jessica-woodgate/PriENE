@@ -1,31 +1,34 @@
 from src.harvest_model import HarvestModel
-from src.agent.harvest_agent import HarvestAgent
+from ..agent.harvest_agent import HarvestAgent
+from src.harvest_exception import NumAgentsException
+from src.harvest_exception import NumBerriesException
 
 class AllotmentHarvest(HarvestModel):
-    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,checkpoint_path,write_data,write_norms,file_string=""):
-        super().__init__(num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
+    """
+    Allotment harvest scenario agents have only access to specific parts of the grid within which different amounts of berries grow
+        num_start_berries -- the number of berries initiated at the beginning of an episode
+        allocations -- dictionary of agent ids, the part of the grid they have access to, and the berries assigned to that agent
+        berries -- list of active berry objects
+    """
+    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath)
         self.num_start_berries = num_start_berries
-        #allocations is a nested dictionary with allotments for each agent (list of coordinates for max/min width/height) and berry allocation;
-        allocation_interval = int(max_width / num_agents)
-        self.allocations = {"agent_0": {
-                                "id": 0,
-                                "berry_allocation": 5,
-                                "allotment": [0,allocation_interval,0,self.max_height]},
-                            "agent_1": {
-                                "id": 1,
-                                "berry_allocation": 2,
-                                "allotment": [allocation_interval,allocation_interval*2,0,self.max_height]},
-                            "agent_2": {
-                                "id": 2,
-                                "berry_allocation": 3,
-                                "allotment": [allocation_interval*2,allocation_interval*3,0,self.max_height]},
-                            "agent_3": {
-                                "id": 3,
-                                "berry_allocation": 2,
-                                "allotment": [allocation_interval*3,self.max_width,0,self.max_height]},
-                            }
-        self._init_agents(agent_type,checkpoint_path)
+        allotment_interval = int(max_width / num_agents)
+        self.allocations = self._assign_allocations(allotment_interval)
+        self._init_agents(agent_type, checkpoint_path)
         self.berries = self._init_berries()
+
+    def _assign_allocations(self, allotment_interval):
+        resources = self._generate_resource_allocations(self.num_agents)
+        allocations = {}
+        allotment_start = 0
+        allotment_end = allotment_interval
+        for i in range(self.num_agents):
+            key = "agent_"+str(i)
+            allocations[key] = {"id": i, "berry_allocation": resources[i], "allotment":[allotment_start,allotment_end,0,self.max_height]}
+            allotment_start += allotment_interval
+            allotment_end += allotment_interval
+        return allocations
 
     def _init_berries(self):
         self.num_berries = 0
@@ -39,16 +42,22 @@ class AllotmentHarvest(HarvestModel):
                 self._place_agent_in_allotment(b)
                 self.num_berries += 1
                 berries.append(b)
-        assert(self.num_berries==self.num_start_berries)
+        if self.num_berries != self.num_start_berries:
+            raise NumBerriesException(self.num_start_berries, self.num_berries)
         return berries
       
-    def _init_agents(self, agent_type,checkpoint_path):
-        self._living_agents = []
-        for id in range(self._num_agents):
+    def _init_agents(self, agent_type, checkpoint_path):
+        self.living_agents = []
+        for id in range(self.num_agents):
             agent_id = "agent_"+str(id)
             allotment = self.allocations[agent_id]["allotment"]
-            a = HarvestAgent(id,self,agent_type,self.max_days,allotment[0],allotment[1],allotment[2],allotment[3],self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+            if agent_type == "multiobjective_sp":
+                n_rewards = 4
+                a = HarvestAgent(id,self,agent_type,0,self.max_width,0,self.max_height,self.write_norms,self.training,checkpoint_path,self.epsilon,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
+            else:
+                a = HarvestAgent(id,self,agent_type,allotment[0],allotment[1],allotment[2],allotment[3],self.write_norms,self.training,checkpoint_path,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
-        self._num_living_agents = len(self._living_agents)
-        self.berry_id = self._num_living_agents + 1
-        assert self._num_living_agents == self._num_agents, f"init {self.num_living_agents} instead of {self._num_agents}"
+        self.num_living_agents = len(self.living_agents)
+        self.berry_id = self.num_living_agents + 1
+        if self.num_living_agents != self.num_agents:
+            raise NumAgentsException(self.num_agents, self.num_living_agents)

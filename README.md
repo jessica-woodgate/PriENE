@@ -1,5 +1,5 @@
-# PriNE
-Principles for (ethical) norm emergence using reinforcement learning in multi-agent systems
+# PriENE
+Principles for ethical norm emergence in reinforcement learning agents in multi-agent systems.
 
 Create virtual environment using: 
 
@@ -7,8 +7,4 @@ Create virtual environment using:
 
 To run:
 
-`run.py [train] [test] [generate_graphs]`
-
-## UML Diagram
-
-![UML Diagram of PriNE](PriNE.drawio.png "UML Diagram")
+`run.py [train] [test] [graphs]`

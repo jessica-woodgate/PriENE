@@ -2,24 +2,27 @@ from src.harvest_model import HarvestModel
 from src.harvest_exception import NumBerriesException
 
 class CapabilitiesHarvest(HarvestModel):
-    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,training,checkpoint_path,write_data,write_norms,file_string=""):
-        super().__init__(num_agents,max_width,max_height,max_episodes,training,write_data,write_norms,file_string)
+    """
+    Capabilities harvest scenario agents have only access to specific berries: some agents are tall, and can access berries on trees; some agents are small and can access berries on the ground
+    Instance variables:
+        num_start_berries -- the number of berries initiated at the beginning of an episode
+        allocations -- dictionary of agent ids and the berries assigned to that agent
+        berries -- list of active berry objects
+    """
+    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath)
         self.num_start_berries = num_start_berries
-        self.allocations = {"agent_0": {
-                                "id": 0,
-                                "berry_allocation": 5},
-                            "agent_1": {
-                                "id": 1,
-                                "berry_allocation": 2},
-                            "agent_2": {
-                                "id": 2,
-                                "berry_allocation": 3},
-                            "agent_3": {
-                                "id": 3,
-                                "berry_allocation": 2},
-                            }
-        self._init_agents(agent_type,checkpoint_path)
+        self.allocations = self._assign_allocations()
+        self._init_agents(agent_type, checkpoint_path)
         self.berries = self._init_berries()
+    
+    def _assign_allocations(self):
+        resources = self._generate_resource_allocations(self.num_agents)
+        allocations = {}
+        for i in range(self.num_agents):
+            key = "agent_"+str(i)
+            allocations[key] = {"id": i, "berry_allocation": resources[i]}
+        return allocations
 
     def _init_berries(self):
         berries = []
