@@ -8,7 +8,6 @@ import argparse
 import wandb
 import numpy as np
 
-#AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles", "multiobjective_mp"]
 AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
@@ -28,10 +27,8 @@ def generate_graphs(scenario, run_name, num_agents):
         reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
         norms_filepath = "data/results/"+run_name+"/"+scenario
     else:
-        # reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+scenario+"_"
-        # norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/"+scenario
-        reading_filepath = "data/results/200_days/run_3_always_ethics_sanction/"+scenario+"/agent_reports_"+scenario+"_"
-        norms_filepath = "data/results/200_days/run_3_always_ethics_sanction/"+scenario+"/"+scenario
+        reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+scenario+"_"
+        norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/"+scenario
     files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"all_principles.csv"]
     dfs = []
     for file in files:
