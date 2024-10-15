@@ -9,7 +9,7 @@ from src.harvest_exception import AgentTypeException
 import numpy as np
 
 class HarvestAgent(Agent):
-    def __init__(self,unique_id,model,agent_type,min_width,max_width,min_height,max_height,training,checkpoint_path,epsilon,write_norms,n_rewards=1,shared_replay_buffer=None):
+    def __init__(self,unique_id,model,agent_type,aggregation,min_width,max_width,min_height,max_height,training,checkpoint_path,epsilon,write_norms,n_rewards=1,shared_replay_buffer=None):
         super().__init__(unique_id,model)
         self.done = False
         self.current_reward = 0
@@ -46,7 +46,7 @@ class HarvestAgent(Agent):
             self.norms_module = NormsModule(self.unique_id)
         if agent_type != "baseline":
             self.rewards = self._ethics_rewards()
-            self.ethics_module = EthicsModule(self.rewards["sanction"],agent_type)
+            self.ethics_module = EthicsModule(self.rewards["sanction"],agent_type,aggregation)
         else:
             self.rewards = self._baseline_rewards()
     

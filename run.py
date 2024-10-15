@@ -1,5 +1,5 @@
 from src.scenarios.basic_harvest import BasicHarvest
-from src.scenarios.capabilities_harvest import CapabilitiesHarvest
+from scenarios.colours_harvest import ColoursHarvest
 from src.scenarios.allotment_harvest import AllotmentHarvest
 from src.data_handling.data_analysis import DataAnalysis
 from src.data_handling.render_pygame import RenderPygame
@@ -8,17 +8,18 @@ import argparse
 import wandb
 import numpy as np
 
+#all_principles = average
 #all_principles_3 = majoritarian
-#all_principles_4 = average
 #all_principles_5 = do_no_harm
 #all_principles_6 = optimist
 
 AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles"]
-SCENARIO_TYPES = ["capabilities", "allotment"]
+AGGREGATION = "average"
+SCENARIO_TYPES = ["colours", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 1000
 MAX_DAYS = 200
-RUN_OPTIONS = ["current_run", "run_1", "run_2", "run_3", "run_4"]
+RUN_OPTIONS = ["current_run", "50_days", "200_days"]
 
 def generate_graphs(scenario, run_name, num_agents):
     """
@@ -30,16 +31,14 @@ def generate_graphs(scenario, run_name, num_agents):
     data_analysis = DataAnalysis(num_agents, writing_filepath)
     if run_name == "current_run":
         reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
-        norms_filepath = "data/results/"+run_name+"/"+scenario
     else:
-        reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+scenario+"_"
-        norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/"+scenario
+        reading_filepath = "data/results/"+run_name+"/"+scenario+"/agent_reports_"+scenario+"_"
     files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"all_principles.csv"]
     dfs = []
     for file in files:
         df = pd.read_csv(file)
         dfs.append(df)
-    data_analysis.proccess_and_display_all_data(dfs, AGENT_TYPES, scenario, norms_filepath)
+    data_analysis.proccess_and_display_all_data(dfs, AGENT_TYPES)
 
 def log_wandb_agents(model_inst, last_episode, reward_tracker):
     for i, agent in enumerate(model_inst.schedule.agents):
@@ -82,11 +81,11 @@ def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_ty
     file_string = scenario+"_"+agent_type
     checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
     if scenario == "basic":
-        model_inst = BasicHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
-    elif scenario == "capabilities":
-        model_inst = CapabilitiesHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = BasicHarvest(num_agents,num_start_berries,agent_type,AGGREGATION,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+    elif scenario == "colours":
+        model_inst = ColoursHarvest(num_agents,num_start_berries,agent_type,AGGREGATION,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,AGGREGATION,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     else:
         ValueError("Unknown argument: "+scenario)
     run_simulation(model_inst,render,log_wandb,wandb_project)
@@ -185,7 +184,7 @@ elif args.option == "test" or args.option == "train":
 #########################################################################################
 elif args.option == "graphs":
     run_name = get_input(f"What run do you want to generate graphs for {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
-    scenario = get_input("What type of scenario do you want to generate graphs for (capabilities, allotment): ", "Invalid scenario. Please choose 'capabilities', or 'allotment': ", ["capabilities", "allotment"])
+    scenario = get_input("What type of scenario do you want to generate graphs for (colours, allotment): ", "Invalid scenario. Please choose 'colours', or 'allotment': ", ["colours", "allotment"])
     num_agents = int(get_input(f"How many agents do you want to implement {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
     print("Graphs will be saved in data/results/current_run")
     generate_graphs(scenario,run_name,num_agents)

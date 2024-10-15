@@ -17,10 +17,10 @@ class DataAnalysis():
         self.num_agents = num_agents
         self.filepath = filepath
     
-    def proccess_and_display_all_data(self, agent_df_list, df_labels, scenario, norms_filepath):
+    def proccess_and_display_all_data(self, agent_df_list, df_labels):
         normalised_sum_df_list, agent_end_episode_list = self._process_agent_dfs(agent_df_list, df_labels)
         self._display_graphs(normalised_sum_df_list, agent_end_episode_list, df_labels)
-        self._process_norms(df_labels, scenario, norms_filepath)
+        #self._process_norms(df_labels, scenario, norms_filepath)
 
     def _process_agent_dfs(self, agent_df_list, df_labels):
         normalised_sum_df_list = self._apply_function_to_list(agent_df_list, self._normalised_sum_step_across_episodes)

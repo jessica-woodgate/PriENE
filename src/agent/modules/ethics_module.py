@@ -10,10 +10,10 @@ class EthicsModule():
         measure_of_well_being -- metric to evaluate well-being before and after acting (minimum experience)
         number_of_minimums -- number of agents which have minimum experience
     """
-    def __init__(self,sanction,principle):
-        #self.agent_id = agent_id
+    def __init__(self,sanction,principle,aggregation):
         self.sanction = sanction
         self.principle = principle
+        self.aggregation = aggregation
         self.can_help = None
         self.society_well_being = None
         self.measure_of_well_being = None
@@ -61,17 +61,14 @@ class EthicsModule():
         total = sum(society_well_being)
         ideal = total/n
         loss = sum(abs(x - ideal) for x in society_well_being)
-        #print("day",self.day,"agent", self.agent_id, "egalitarian welfare", society_well_being, "n is", n, "total is", total, "ideal is", ideal, "loss is", loss)
         return loss
     
     def _calculate_maximin_welfare(self, society_well_being):
         min_value = min(society_well_being)
         num_mins = np.count_nonzero(society_well_being==min_value)
-        #print("day",self.day,"agent", self.agent_id, "maximin welfare", society_well_being, "min is", min(society_well_being), "num_mins is", num_mins)
         return min_value, num_mins
     
     def _calculate_utilitarian_welfare(self, society_well_being):
-        #print("day",self.day,"agent", self.agent_id, "utilitarian welfare", society_well_being, "total is", sum(society_well_being))
         return sum(society_well_being)
 
     def _combined_sanction(self, society_well_being):
@@ -81,22 +78,38 @@ class EthicsModule():
         if "multiobjective" in self.principle:
             combined_sanction = [egalitarian, maximin, utilitarian]
         else:
-            #combined_sanction = [self.sanction if any([egalitarian, maximin, utilitarian]) else 0]
-            # combined_sanction = np.sum([egalitarian, maximin, utilitarian])
-            # if combined_sanction > self.sanction:
-            #     combined_sanction = [self.sanction]
-            # elif combined_sanction < -self.sanction:
-            #     combined_sanction = [-self.sanction]
-            # else:
-            #     combined_sanction = [combined_sanction]
-            #combined_sanction = [min(max(np.sum([egalitarian, maximin, utilitarian]), -self.sanction), self.sanction)]
-            #combined_sanction = np.mean([egalitarian, maximin, utilitarian])
-            if any(num > 0 for num in [egalitarian, maximin, utilitarian]):
-                combined_sanction = [self.sanction]
-            elif -self.sanction in [egalitarian, maximin, utilitarian]:
-                combined_sanction = [-self.sanction]
-            else:
-                combined_sanction = [0]
+            if self.aggregation == "veto":
+                combined_sanction = self._veto_aggregation([egalitarian, maximin, utilitarian])
+            elif self.aggregation == "optimist":
+                combined_sanction = self._optimist_aggregation([egalitarian, maximin, utilitarian])
+            elif self.aggregation == "majority":
+                combined_sanction = self._majority_aggregation([egalitarian, maximin, utilitarian])
+            elif self.aggregation == "average":
+                combined_sanction = self._average_aggregation([egalitarian, maximin, utilitarian])
+        return combined_sanction
+    
+    def _average_aggregation(self, sanction_list):
+        return np.mean(sanction_list)
+
+    def _majority_aggregation(self, sanction_list):
+        return [min(max(np.sum(sanction_list), -self.sanction), self.sanction)]
+
+    def _veto_aggregation(self, sanction_list):
+        if -self.sanction in sanction_list:
+            combined_sanction = [-self.sanction]
+        elif any(num > 0 for num in sanction_list):
+            combined_sanction = [self.sanction]
+        else:
+            combined_sanction = [0]
+        return combined_sanction
+    
+    def _optimist_aggregation(self, sanction_list):
+        if any(num > 0 for num in sanction_list):
+            combined_sanction = [self.sanction]
+        elif -self.sanction in sanction_list:
+            combined_sanction = [-self.sanction]
+        else:
+            combined_sanction = [0]
         return combined_sanction
         
     def _maximin_sanction(self, previous_min, number_of_previous_mins, society_well_being):

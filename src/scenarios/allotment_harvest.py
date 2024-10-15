@@ -10,12 +10,12 @@ class AllotmentHarvest(HarvestModel):
         allocations -- dictionary of agent ids, the part of the grid they have access to, and the berries assigned to that agent
         berries -- list of active berry objects
     """
-    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
+    def __init__(self,num_agents,num_start_berries,agent_type,aggregation,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
         super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath)
         self.num_start_berries = num_start_berries
         allotment_interval = int(max_width / num_agents)
         self.allocations = self._assign_allocations(allotment_interval)
-        self._init_agents(agent_type, checkpoint_path)
+        self._init_agents(agent_type, aggregation, checkpoint_path)
         self.berries = self._init_berries()
 
     def _assign_allocations(self, allotment_interval):
@@ -46,16 +46,16 @@ class AllotmentHarvest(HarvestModel):
             raise NumBerriesException(self.num_start_berries, self.num_berries)
         return berries
       
-    def _init_agents(self, agent_type, checkpoint_path):
+    def _init_agents(self, agent_type, aggregation, checkpoint_path):
         self.living_agents = []
         for id in range(self.num_agents):
             agent_id = "agent_"+str(id)
             allotment = self.allocations[agent_id]["allotment"]
             if agent_type == "multiobjective_sp":
                 n_rewards = 4
-                a = HarvestAgent(id,self,agent_type,0,self.max_width,0,self.max_height,self.write_norms,self.training,checkpoint_path,self.epsilon,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
+                a = HarvestAgent(id,self,agent_type,aggregation,0,self.max_width,0,self.max_height,self.write_norms,self.training,checkpoint_path,self.epsilon,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
             else:
-                a = HarvestAgent(id,self,agent_type,allotment[0],allotment[1],allotment[2],allotment[3],self.write_norms,self.training,checkpoint_path,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
+                a = HarvestAgent(id,self,agent_type,aggregation,allotment[0],allotment[1],allotment[2],allotment[3],self.write_norms,self.training,checkpoint_path,self.epsilon,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
         self.num_living_agents = len(self.living_agents)
         self.berry_id = self.num_living_agents + 1

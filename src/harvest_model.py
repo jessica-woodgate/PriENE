@@ -169,14 +169,14 @@ class HarvestModel(Model):
     def _init_berries(self):
         raise NotImplementedError
     
-    def _init_agents(self, agent_type, checkpoint_path):
+    def _init_agents(self, agent_type, aggregation, checkpoint_path):
         self.living_agents = []
         for i in range(self.num_agents):
             if agent_type == "multiobjective_sp":
                 n_rewards = 4
-                a = HarvestAgent(i,self,agent_type,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
+                a = HarvestAgent(i,self,agent_type,aggregation,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
             else:
-                a = HarvestAgent(i,self,agent_type,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+                a = HarvestAgent(i,self,agent_type,aggregation,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
         self.berry_id = len(self.living_agents) + 1
 
