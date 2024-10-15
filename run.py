@@ -8,6 +8,11 @@ import argparse
 import wandb
 import numpy as np
 
+#all_principles_3 = majoritarian
+#all_principles_4 = average
+#all_principles_5 = do_no_harm
+#all_principles_6 = optimist
+
 AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles"]
 SCENARIO_TYPES = ["capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
