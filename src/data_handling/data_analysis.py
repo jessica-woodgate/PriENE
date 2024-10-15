@@ -23,18 +23,20 @@ class DataAnalysis():
         #self._process_norms(df_labels, scenario, norms_filepath)
 
     def _process_agent_dfs(self, agent_df_list, df_labels):
-        normalised_sum_df_list = self._apply_function_to_list(agent_df_list, self._normalised_sum_step_across_episodes)
-        self._write_df_list_to_file(normalised_sum_df_list, df_labels, self.filepath+"normalised_sum_df_")
+        #normalised_sum_df_list = self._apply_function_to_list(agent_df_list, self._normalised_sum_step_across_episodes)
+        #self._write_df_list_to_file(normalised_sum_df_list, df_labels, self.filepath+"normalised_sum_df_")
+        normalised_sum_df_list = []
         agent_end_episode_list = self._process_end_episode_dataframes(agent_df_list)
         self._write_df_list_to_file(agent_end_episode_list, df_labels, self.filepath+"processed_episode_df_")
         return normalised_sum_df_list, agent_end_episode_list
     
     def _display_graphs(self, normalised_sum_df_list, agent_end_episode_list, df_labels):
-        self._days_left_to_live_results(normalised_sum_df_list, df_labels, self.filepath+"days_left_to_live")
-        self._berries_consumed_results(normalised_sum_df_list, df_labels, self.filepath+"berries_consumed")
-        self._end_episode_results(agent_end_episode_list, df_labels)
+        #self._days_left_to_live_results(normalised_sum_df_list, df_labels, self.filepath+"days_left_to_live")
+        #self._berries_consumed_results(normalised_sum_df_list, df_labels, self.filepath+"berries_consumed")
+        end_episode_df_list = self._end_episode_results(agent_end_episode_list, df_labels)
+        self._display_end_episode(end_episode_df_list, df_labels)
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", self.filepath+"violin_end_day", "Violin Plot of Episode Length", "End Day")
-        self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", self.filepath+"violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
+        #self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", self.filepath+"violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
 
     def _process_norms(self, df_labels, scenario, filepath):
         norm_processing = NormProcessing()
@@ -71,6 +73,7 @@ class DataAnalysis():
         return sum_df
 
     def _end_episode_results(self, df_list, df_labels):
+        new_df_list = []
         for i, df in enumerate(df_list):
             new_df = df.groupby("episode").agg(
                 min_days=('total_days', 'min'),
@@ -90,6 +93,8 @@ class DataAnalysis():
                 gini_days_survived=('day', lambda x: self._calculate_gini(x))
             )
             new_df.to_csv(self.filepath+"end_episode_"+df_labels[i]+".csv")
+            new_df_list.append(new_df)
+        return new_df_list
 
     def _process_end_episode_dataframes(self, dataframes):
         processed_dfs = []
@@ -156,6 +161,16 @@ class DataAnalysis():
         plt.tight_layout()
         plt.show()
         plt.savefig(str(filename).split()[0])
+    
+    def _display_end_episode(self, df_list, df_labels):
+        self._display_violin_plot_df_list(df_list, df_labels, "gini_days_survived", self.filepath+"gini_days_survived", "Violin Plot of Gini Days Survived", "Days Survived")
+        self._display_violin_plot_df_list(df_list, df_labels, "min_days_survived", self.filepath+"min_days_survived", "Violin Plot of Min Days Survived", "Days Survived")
+        self._display_violin_plot_df_list(df_list, df_labels, "max_days_survived", self.filepath+"max_days_survived", "Violin Plot of Max Days Survived", "Days Survived")
+        self._display_violin_plot_df_list(df_list, df_labels, "total_days_survived", self.filepath+"total_days_survived", "Violin Plot of Total Days Survived", "Days Survived")
+        self._display_violin_plot_df_list(df_list, df_labels, "gini_berries", self.filepath+"gini_berries", "Violin Plot of Gini Berries Eaten", "Berries Eaten")
+        self._display_violin_plot_df_list(df_list, df_labels, "min_berries", self.filepath+"min_berries", "Violin Plot of Min Berries Eaten", "Berries Eaten")
+        self._display_violin_plot_df_list(df_list, df_labels, "max_berries", self.filepath+"max_berries", "Violin Plot of Max Berries Eaten", "Berries Eaten")
+        self._display_violin_plot_df_list(df_list, df_labels, "total_berries", self.filepath+"total_berries", "Violin Plot of Total Berries Eaten", "Berries Eaten")
 
     def _display_violin_plot_df_list(self, df_list, df_labels, column, filename, title, y_label):
         fig, ax = plt.subplots()
