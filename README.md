@@ -8,3 +8,11 @@ Create virtual environment using:
 To run:
 
 `run.py [train] [test] [graphs]`
+
+To reproduce graphs in the paper:
+
+`run.py graphs`
+
+To reproduce tests from the paper:
+
+`run.py test`
