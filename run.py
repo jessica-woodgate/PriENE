@@ -146,7 +146,7 @@ elif args.option == "test" or args.option == "train":
     if args.option == "test":
         scenario = get_input(f"What type of scenario do you want to run {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES)#########################################################################################
         run_name = get_input(f"What run do you want to test {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
-        max_episodes = MAX_EPISODES #get_integer_input("How many episodes do you want to run: ")
+        max_episodes = MAX_EPISODES
         training = False
         if run_name != "current_run":
             max_days = extract_number(run_name)
@@ -194,7 +194,7 @@ elif args.option == "test" or args.option == "train":
         create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
 #########################################################################################
 elif args.option == "graphs":
-    graph_runs = ["current_run", "200_days"]
+    graph_runs = ["current_run", "50_days", "200_days"]
     run_name = get_input(f"What run do you want to generate graphs for (select 200_days to reproduce graphs in the paper) {graph_runs}: ", f"Invalid name of run. Please choose {graph_runs}: ", graph_runs)
     scenario = get_input("What type of scenario do you want to generate graphs for (colours, allotment): ", "Invalid scenario. Please choose 'colours', or 'allotment': ", ["colours", "allotment"])
     num_agents = 4
