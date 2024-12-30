@@ -7,6 +7,7 @@ import pandas as pd
 import argparse
 import wandb
 import numpy as np
+import re
 
 #all_principles = average
 #all_principles_3 = majoritarian
@@ -125,10 +126,9 @@ def write_data_input(data_type):
     return write_data
 
 def extract_number(string):
-  number = np.fromregex(string, r"(\d+)_days", dtype=int)
-  if number.size > 0:
-    return number[0]
-  else:
+    match = re.match(r"(\d+)_days", string)
+    if match:
+        return int(match.group(1))
     return None
 
 #########################################################################################
