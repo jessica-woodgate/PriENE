@@ -15,7 +15,7 @@ import re
 #all_principles_6 = optimist
 
 AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles"]
-AGGREGATION = "average"
+AGGREGATION = "majoritarian"#"average"
 SCENARIO_TYPES = ["colours", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 1000
