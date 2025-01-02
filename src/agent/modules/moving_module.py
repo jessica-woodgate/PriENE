@@ -18,14 +18,15 @@ class MovingModule():
         nearest_berry -- the nearest berry agent
         nearest_berry_coordinates -- coordinates of the nearest berry
     """
-    def __init__(self, agent_id, model, training, min_width, max_width, min_height, max_height):
+    def __init__(self, agent_id, model, training, allotment, allotment_id):
         self.agent_id = agent_id
+        self.allotment_id = allotment_id
         self.model = model
         self.training = training
-        self.min_width = min_width
-        self.max_width = max_width
-        self.min_height = min_height
-        self.max_height = max_height
+        self.min_width = allotment[0]
+        self.max_width = allotment[1]
+        self.min_height = allotment[2]
+        self.max_height = allotment[3]
         self.path = None
         self.path_step = 0
         self.nearest_berry = None
@@ -114,8 +115,8 @@ class MovingModule():
         for b in location:
             #there can be multiple berries at one location: check we are foraging the one we were going for
             if b.agent_type == "berry" and b.unique_id == self.nearest_berry.unique_id:
-                if not self.training and b.allocated_agent_id != self.agent_id:
-                    raise IllegalBerry(self.agent_id, f"allocated to agent {b.allocated_agent_id}")
+                if not self.training and b.allocation_id != self.allocation_id:
+                    raise IllegalBerry(self.agent_id, f"allocated to agent {b.allocation_id}")
                 else:
                     b.foraged = True
                     return True

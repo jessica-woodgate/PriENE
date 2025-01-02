@@ -33,6 +33,15 @@ class NumAgentsException(HarvestException):
     def __str__(self):
         return (f"Expected {self.num_expected_agents} agents and got {self.num_agents}")
 
+class NumAllotmentsException(HarvestException):
+    def __init__(self, num_agents, num_allotments):
+        super().__init__
+        self.num_agents = num_agents
+        self.num_allotments = num_allotments
+    
+    def __str__(self):
+        return (f"Can't have more agents than allotments: currently asking for {self.num_agents} agents and {self.num_allotments} allotments")
+
 class AgentTypeException(HarvestException):
     def __init__(self, expected_type, agent_type):
         super().__init__
@@ -57,6 +66,13 @@ class NoEmptyCells(HarvestException):
 
     def __str__(self):
         return ("No empty cells in grid")
+    
+class NoAllotmentException(HarvestException):
+    def __init__(self, agent_id):
+        self.agent_id = agent_id
+
+    def __str__(self):
+        return (f"No allotment found for agent {self.agent_id}")
     
 class UnrecognisedPrinciple(HarvestException):
     def __init__(self, principle):

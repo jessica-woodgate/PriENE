@@ -15,7 +15,7 @@ import re
 #all_principles_6 = optimist
 
 AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles"]
-AGGREGATION = "optimist"#"average"
+AGGREGATION = "average"
 SCENARIO_TYPES = ["colours", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 1000
@@ -77,7 +77,7 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
     num_episodes = model_inst.episode
     return num_episodes
 
-def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):   
+def create_and_run_model(scenario,run_name,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):   
     file_string = scenario+"_"+agent_type
     checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
     if scenario == "basic":
@@ -85,14 +85,14 @@ def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_ty
     elif scenario == "colours":
         model_inst = ColoursHarvest(num_agents,num_start_berries,agent_type,AGGREGATION,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,AGGREGATION,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = AllotmentHarvest(num_agents,num_start_berries,num_allotments,agent_type,AGGREGATION,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     else:
         ValueError("Unknown argument: "+scenario)
     run_simulation(model_inst,render,log_wandb,wandb_project)
 
-def run_all(scenario,run_name,num_agents,num_start_berries,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):
+def run_all(scenario,run_name,num_agents,num_start_berries,num_allotments,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):
     for agent_type in AGENT_TYPES:
-        create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
+        create_and_run_model(scenario,run_name,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project,num_allotments)
 
 def get_integer_input(prompt):
     while True:
@@ -144,7 +144,7 @@ if args.option not in ["test", "train", "graphs"]:
     print("Please choose 'test', 'train', or 'graphs'.")
 elif args.option == "test" or args.option == "train":
     if args.option == "test":
-        scenario = get_input(f"What type of scenario do you want to run {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES)#########################################################################################
+        scenario = get_input(f"What type of scenario do you want to run {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES)
         run_name = get_input(f"What run do you want to test {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
         max_episodes = MAX_EPISODES
         training = False
@@ -184,14 +184,16 @@ elif args.option == "test" or args.option == "train":
     #########################################################################################
     if scenario != "allotment":
         MAX_WIDTH = num_agents * 2
+        num_allotments = 1
     else:
         MAX_WIDTH = num_agents * 4
+        num_allotments = 2
     MAX_HEIGHT = num_agents * 2
     NUM_BERRIES = num_agents * 3
     if agent_type == "all":
-        run_all(scenario,run_name,num_agents,NUM_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
+        run_all(scenario,run_name,num_agents,NUM_BERRIES,num_allotments,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
     else:
-        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
+        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,num_allotments,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
 #########################################################################################
 elif args.option == "graphs":
     graph_runs = ["current_run", "50_days", "200_days"]

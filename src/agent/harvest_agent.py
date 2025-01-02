@@ -9,7 +9,7 @@ from src.harvest_exception import AgentTypeException
 import numpy as np
 
 class HarvestAgent(Agent):
-    def __init__(self,unique_id,model,agent_type,aggregation,min_width,max_width,min_height,max_height,training,checkpoint_path,epsilon,write_norms,n_rewards=1,shared_replay_buffer=None):
+    def __init__(self,unique_id,model,agent_type,aggregation,allotment,training,checkpoint_path,epsilon,write_norms,n_rewards=1,shared_replay_buffer=None,allotment_id=None):
         super().__init__(unique_id,model)
         self.done = False
         self.current_reward = 0
@@ -32,15 +32,17 @@ class HarvestAgent(Agent):
         self.max_days = self.model.get_max_days()
         self.actions = self._generate_actions(self.unique_id, model.get_num_agents())
         self.off_grid = False
-        self.min_width = min_width
-        self.max_width = max_width
-        self.min_height = min_height
-        self.max_height = max_height
+        self.min_width = allotment[0]
+        self.max_width = allotment[1]
+        self.min_height = allotment[2]
+        self.max_height = allotment[3]
+        if allotment_id == None:
+            self.allotment_id = self.unique_id
         if self.agent_type == "multiobjective_mp":
             self.decision_module = MPDQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer)
         else:
             self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,n_rewards,shared_replay_buffer)
-        self.moving_module = MovingModule(self.unique_id, model, training, min_width, max_width, min_height, max_height)
+        self.moving_module = MovingModule(self.unique_id, model, training, allotment, allotment_id)
         self.write_norms = write_norms
         if self.write_norms:
             self.norms_module = NormsModule(self.unique_id)

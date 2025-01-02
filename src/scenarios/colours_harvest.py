@@ -27,10 +27,11 @@ class ColoursHarvest(HarvestModel):
     def _init_berries(self):
         berries = []
         self.num_berries = 0
+        allotment = [0,self.max_width,0,self.max_height]
         for agent_data in self.allocations.values():
             berry_allocation = agent_data["berry_allocation"]
             for i in range(berry_allocation):
-                b = self._new_berry(0,self.max_width,0,self.max_height,agent_data["id"])
+                b = self._new_berry(allotment,agent_data["id"])
                 self._place_agent_in_allotment(b)
                 self.num_berries += 1
                 berries.append(b)

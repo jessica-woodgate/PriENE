@@ -8,15 +8,15 @@ class Berry(Agent):
         allocated_agent_id -- id of agent allocated to (None for training)
         min/max width/height -- dimensions of grid berry can be assigned to (whole grid for training)
     """
-    def __init__(self,unique_id,model,min_width,max_width,min_height,max_height,allocated_agent_id=None):
+    def __init__(self,unique_id,model,allotment,allotment_id=None):
         super().__init__(unique_id, model)
         self.agent_type = "berry"
         self.foraged = False
-        self.allocated_agent_id = allocated_agent_id
-        self.min_width = min_width
-        self.max_width = max_width
-        self.min_height = min_height
-        self.max_height = max_height
+        self.allotment_id = allotment_id
+        self.min_width = allotment[0]
+        self.max_width = allotment[1]
+        self.min_height = allotment[2]
+        self.max_height = allotment[3]
     
     def step(self):
         pass

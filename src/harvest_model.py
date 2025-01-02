@@ -108,29 +108,29 @@ class HarvestModel(Model):
         """
         return self.grid.iter_cell_list_contents(cell)
 
-    def get_uneaten_berries_coordinates(self, agent_id=None):
+    def get_uneaten_berries_coordinates(self, allotment_id=None):
         """
         Get the coordinates of uneaten berries
         """
         berries_coordinates = []
         for b in self.berries:
             if b.foraged == False:
-                if agent_id==None:
+                if allotment_id==None:
                     berries_coordinates.append(b.pos)
                 else:
-                    if b.allocated_agent_id == agent_id:
+                    if b.allotment_id == allotment_id:
                         berries_coordinates.append(b.pos)
         return berries_coordinates
     
-    def get_uneaten_berry_by_coords(self, coords, agent_id=None):
+    def get_uneaten_berry_by_coords(self, coords, allotment_id=None):
         """
         Get an uneaten berry by its coordinates
         """
         for b in self.berries:
             if b.pos == coords and b.foraged == False:
-                if agent_id == None:
+                if allotment_id == None:
                     return b
-                elif b.allocated_agent_id == agent_id:
+                elif b.allotment_id == allotment_id:
                     return b
         raise NoBerriesException(coordinates=coords)
     
@@ -171,12 +171,9 @@ class HarvestModel(Model):
     
     def _init_agents(self, agent_type, aggregation, checkpoint_path):
         self.living_agents = []
+        allotment = [0,self.max_width,0,self.max_height]
         for i in range(self.num_agents):
-            if agent_type == "multiobjective_sp":
-                n_rewards = 4
-                a = HarvestAgent(i,self,agent_type,aggregation,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
-            else:
-                a = HarvestAgent(i,self,agent_type,aggregation,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+            a = HarvestAgent(i,self,agent_type,aggregation,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
         self.berry_id = len(self.living_agents) + 1
 
