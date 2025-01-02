@@ -92,7 +92,7 @@ def create_and_run_model(scenario,run_name,num_agents,num_start_berries,num_allo
 
 def run_all(scenario,run_name,num_agents,num_start_berries,num_allotments,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):
     for agent_type in AGENT_TYPES:
-        create_and_run_model(scenario,run_name,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project,num_allotments)
+        create_and_run_model(scenario,run_name,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
 
 def get_integer_input(prompt):
     while True:

@@ -29,21 +29,17 @@ class AllotmentHarvest(HarvestModel):
         allotment_start = 0
         allotment_end = allotment_interval
         group_size = self.num_agents // self.num_allotments
-        print("group size", group_size)
         remainder = self.num_agents % self.num_allotments
         start_index = 0
         for i in range(self.num_allotments):
             end_index = start_index + group_size + (1 if i < remainder else 0)
             current_resource = sum(resources[start_index:end_index])
-            print("start", start_index, "end", end_index)
             agent_ids = list(range(start_index, end_index))
-            print("agent_ids", agent_ids)
             start_index = end_index
             key = "allotment_"+str(i)
             allocations[key] = {"id": i, "berry_allocation": current_resource, "allotment":[allotment_start,allotment_end,0,self.max_height], "agent_ids": agent_ids}
             allotment_start += allotment_interval
             allotment_end += allotment_interval
-        print("allocations", allocations)
         return allocations
 
     def _init_berries(self):
@@ -65,10 +61,8 @@ class AllotmentHarvest(HarvestModel):
     def _init_agents(self, agent_type, aggregation, checkpoint_path):
         self.living_agents = []
         for id in range(self.num_agents):
-            agent_id = "agent_"+str(id)
             allotment_id = self._get_allotment_id(id)
             allotment = self.allocations[allotment_id]["allotment"]
-            print("agent", id, "allotment id", allotment_id, "allotment", allotment)
             a = HarvestAgent(id,self,agent_type,aggregation,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer,allotment_id=allotment_id)
             self._add_agent(a)
         self.num_living_agents = len(self.living_agents)

@@ -130,7 +130,7 @@ class MovingModule():
         if self.training:
             uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates()
         else:
-            uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.agent_id)
+            uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.allotment_id)
         if not uneaten_berries_coordinates:
             return None
         #Use the key parameter of min to find the index of the minimum distance

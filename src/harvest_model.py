@@ -397,8 +397,8 @@ class HarvestModel(Model):
         agent.days_left_to_live = 0
         self.living_agents = [a for a in self.schedule.agents if a.agent_type != "berry" and a.off_grid == False]
     
-    def _new_berry(self,min_width,max_width,min_height,max_height,allocation_id=None):
-        berry = Berry(self.berry_id,self,min_width,max_width,min_height,max_height,allocation_id)
+    def _new_berry(self,allotment,allotment_id=None):
+        berry = Berry(self.berry_id,self,allotment,allotment_id)
         self.schedule.add(berry)
         self.berry_id += 1
         return berry
@@ -412,7 +412,7 @@ class HarvestModel(Model):
         if num_agents == 2:
             resources = [5, 1]
         elif num_agents == 4:
-            resources = [5, 2, 3, 2]
+            resources = [5, 3, 2, 2]
         elif num_agents == 6:
             resources = [5, 2, 3, 2, 5, 1]
         self.num_start_berries = sum(resources)
