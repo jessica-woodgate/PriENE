@@ -26,7 +26,8 @@ class RenderPygame():
             "egalitarian": "yellow",
             "maximin": "blue",
             "utilitarian": "green",
-            "berry": "purple"
+            "berry": "purple",
+            "all_principles": "white"
         }
         self.screen = self.init_pygame()
 
