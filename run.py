@@ -171,7 +171,7 @@ elif args.option == "test" or args.option == "train":
         write_norms = False
         render = False
     else:
-        write_norms = False #write_data_input("norms")
+        write_norms = write_data_input("norms")
         render = get_input("Do you want to render the simulation? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"])
         render = get_bool(render)
      #########################################################################################
