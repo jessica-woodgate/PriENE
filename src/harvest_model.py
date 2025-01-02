@@ -398,6 +398,8 @@ class HarvestModel(Model):
         self.living_agents = [a for a in self.schedule.agents if a.agent_type != "berry" and a.off_grid == False]
     
     def _new_berry(self,allotment,allotment_id=None):
+        if allotment_id != None:
+            allotment_id = "allotment_"+str(allotment_id)
         berry = Berry(self.berry_id,self,allotment,allotment_id)
         self.schedule.add(berry)
         self.berry_id += 1

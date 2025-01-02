@@ -45,7 +45,7 @@ class MovingModule():
             if self.training:
                 self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates)
             else:
-                self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates, self.agent_id)
+                self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates, self.allotment_id)
             self.path = self._find_path_to_berry(current_pos,self.nearest_berry.pos)
             self.path_step = 0
         return True
@@ -115,8 +115,8 @@ class MovingModule():
         for b in location:
             #there can be multiple berries at one location: check we are foraging the one we were going for
             if b.agent_type == "berry" and b.unique_id == self.nearest_berry.unique_id:
-                if not self.training and b.allocation_id != self.allocation_id:
-                    raise IllegalBerry(self.agent_id, f"allocated to agent {b.allocation_id}")
+                if not self.training and b.allotment_id != self.allotment_id:
+                    raise IllegalBerry(self.agent_id, f"allocated to agent {b.allotment_id}")
                 else:
                     b.foraged = True
                     return True
