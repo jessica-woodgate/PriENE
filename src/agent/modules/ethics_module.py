@@ -1,4 +1,5 @@
 import numpy as np
+from src.harvest_exception import AgentTypeException
 
 class EthicsModule():
     """
@@ -13,6 +14,9 @@ class EthicsModule():
     def __init__(self,sanction,principle,aggregation):
         self.sanction = sanction
         self.principle = principle
+        aggregation_methods = ["average", "majoritarian", "do_no_harm", "optimist"]
+        if aggregation not in aggregation_methods:
+            raise AgentTypeException(aggregation_methods, aggregation)
         self.aggregation = aggregation
         self.can_help = None
         self.society_well_being = None
@@ -82,8 +86,8 @@ class EthicsModule():
                 combined_sanction = self._veto_aggregation([egalitarian, maximin, utilitarian])
             elif self.aggregation == "optimist":
                 combined_sanction = self._optimist_aggregation([egalitarian, maximin, utilitarian])
-            elif self.aggregation == "majority":
-                combined_sanction = self._majority_aggregation([egalitarian, maximin, utilitarian])
+            elif self.aggregation == "majoritarian":
+                combined_sanction = self._majoritarian_aggregation([egalitarian, maximin, utilitarian])
             elif self.aggregation == "average":
                 combined_sanction = self._average_aggregation([egalitarian, maximin, utilitarian])
         return combined_sanction
@@ -91,7 +95,7 @@ class EthicsModule():
     def _average_aggregation(self, sanction_list):
         return np.mean(sanction_list)
 
-    def _majority_aggregation(self, sanction_list):
+    def _majoritarian_aggregation(self, sanction_list):
         return [min(max(np.sum(sanction_list), -self.sanction), self.sanction)]
 
     def _veto_aggregation(self, sanction_list):
