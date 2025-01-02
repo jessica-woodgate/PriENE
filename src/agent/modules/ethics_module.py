@@ -82,7 +82,7 @@ class EthicsModule():
         if "multiobjective" in self.principle:
             combined_sanction = [egalitarian, maximin, utilitarian]
         else:
-            if self.aggregation == "veto":
+            if self.aggregation == "do_no_harm":
                 combined_sanction = self._veto_aggregation([egalitarian, maximin, utilitarian])
             elif self.aggregation == "optimist":
                 combined_sanction = self._optimist_aggregation([egalitarian, maximin, utilitarian])
