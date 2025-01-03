@@ -14,7 +14,7 @@ class EthicsModule():
     def __init__(self,sanction,principle,aggregation):
         self.sanction = sanction
         self.principle = principle
-        aggregation_methods = ["average", "majoritarian", "do_no_harm", "optimist"]
+        aggregation_methods = ["average", "majoritarian", "veto", "optimist"]
         if aggregation not in aggregation_methods:
             raise AgentTypeException(aggregation_methods, aggregation)
         self.aggregation = aggregation
@@ -82,7 +82,7 @@ class EthicsModule():
         if "multiobjective" in self.principle:
             combined_sanction = [egalitarian, maximin, utilitarian]
         else:
-            if self.aggregation == "do_no_harm":
+            if self.aggregation == "veto":
                 combined_sanction = self._veto_aggregation([egalitarian, maximin, utilitarian])
             elif self.aggregation == "optimist":
                 combined_sanction = self._optimist_aggregation([egalitarian, maximin, utilitarian])

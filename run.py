@@ -11,7 +11,7 @@ import re
 
 #all_principles = average
 #all_principles_3 = majoritarian
-#all_principles_5 = do_no_harm
+#all_principles_5 = veto (do_no_harm in model variables)
 #all_principles_6 = optimist
 
 AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles"]
