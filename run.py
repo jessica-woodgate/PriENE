@@ -14,8 +14,7 @@ import re
 #all_principles_5 = veto (do_no_harm in model variables)
 #all_principles_6 = optimist
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles"]
-AGGREGATION = "average"
+AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "average", "majoritarian", "veto", "optimist"]
 SCENARIO_TYPES = ["colours", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 1000
@@ -81,11 +80,11 @@ def create_and_run_model(scenario,run_name,num_agents,num_start_berries,num_allo
     file_string = scenario+"_"+agent_type
     checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
     if scenario == "basic":
-        model_inst = BasicHarvest(num_agents,num_start_berries,agent_type,AGGREGATION,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = BasicHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     elif scenario == "colours":
-        model_inst = ColoursHarvest(num_agents,num_start_berries,agent_type,AGGREGATION,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = ColoursHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(num_agents,num_start_berries,num_allotments,agent_type,AGGREGATION,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = AllotmentHarvest(num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     else:
         ValueError("Unknown argument: "+scenario)
     run_simulation(model_inst,render,log_wandb,wandb_project)

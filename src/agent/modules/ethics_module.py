@@ -1,5 +1,4 @@
 import numpy as np
-from src.harvest_exception import AgentTypeException
 
 class EthicsModule():
     """
@@ -11,13 +10,9 @@ class EthicsModule():
         measure_of_well_being -- metric to evaluate well-being before and after acting (minimum experience)
         number_of_minimums -- number of agents which have minimum experience
     """
-    def __init__(self,sanction,principle,aggregation):
+    def __init__(self,sanction,principle):
         self.sanction = sanction
         self.principle = principle
-        aggregation_methods = ["average", "majoritarian", "veto", "optimist"]
-        if aggregation not in aggregation_methods:
-            raise AgentTypeException(aggregation_methods, aggregation)
-        self.aggregation = aggregation
         self.can_help = None
         self.society_well_being = None
         self.measure_of_well_being = None
@@ -82,13 +77,13 @@ class EthicsModule():
         if "multiobjective" in self.principle:
             combined_sanction = [egalitarian, maximin, utilitarian]
         else:
-            if self.aggregation == "veto":
+            if self.principle == "veto":
                 combined_sanction = self._veto_aggregation([egalitarian, maximin, utilitarian])
-            elif self.aggregation == "optimist":
+            elif self.principle == "optimist":
                 combined_sanction = self._optimist_aggregation([egalitarian, maximin, utilitarian])
-            elif self.aggregation == "majoritarian":
+            elif self.principle == "majoritarian":
                 combined_sanction = self._majoritarian_aggregation([egalitarian, maximin, utilitarian])
-            elif self.aggregation == "average":
+            elif self.principle == "average":
                 combined_sanction = self._average_aggregation([egalitarian, maximin, utilitarian])
         return combined_sanction
     

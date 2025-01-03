@@ -12,7 +12,7 @@ class AllotmentHarvest(HarvestModel):
         allocations -- dictionary of agent ids, the part of the grid they have access to, and the berries assigned to that agent
         berries -- list of active berry objects
     """
-    def __init__(self,num_agents,num_start_berries,num_allotments,agent_type,aggregation,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
+    def __init__(self,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
         super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath)
         self.num_start_berries = num_start_berries
         if num_allotments > num_agents or num_allotments < 1:
@@ -20,7 +20,7 @@ class AllotmentHarvest(HarvestModel):
         self.num_allotments = num_allotments
         allotment_interval = int(max_width // num_allotments)
         self.allocations = self._assign_allocations(allotment_interval)
-        self._init_agents(agent_type, aggregation, checkpoint_path)
+        self._init_agents(agent_type, checkpoint_path)
         self.berries = self._init_berries()
 
     def _assign_allocations(self, allotment_interval):
@@ -58,12 +58,12 @@ class AllotmentHarvest(HarvestModel):
             raise NumBerriesException(self.num_start_berries, self.num_berries)
         return berries
       
-    def _init_agents(self, agent_type, aggregation, checkpoint_path):
+    def _init_agents(self, agent_type, checkpoint_path):
         self.living_agents = []
         for id in range(self.num_agents):
             allotment_id = self._get_allotment_id(id)
             allotment = self.allocations[allotment_id]["allotment"]
-            a = HarvestAgent(id,self,agent_type,aggregation,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer,allotment_id=allotment_id)
+            a = HarvestAgent(id,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer,allotment_id=allotment_id)
             self._add_agent(a)
         self.num_living_agents = len(self.living_agents)
         self.berry_id = self.num_living_agents + 1

@@ -1,6 +1,5 @@
 from mesa import Agent
 from .modules.dqn_decision_module import DQNDecisionModule
-from .modules.momp_dqn_decision_module import MPDQNDecisionModule
 from .modules.moving_module import MovingModule
 from .modules.norms_module import NormsModule
 from .modules.ethics_module import EthicsModule
@@ -9,7 +8,7 @@ from src.harvest_exception import AgentTypeException
 import numpy as np
 
 class HarvestAgent(Agent):
-    def __init__(self,unique_id,model,agent_type,aggregation,allotment,training,checkpoint_path,epsilon,write_norms,n_rewards=1,shared_replay_buffer=None,allotment_id=None):
+    def __init__(self,unique_id,model,agent_type,allotment,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None,allotment_id=None):
         super().__init__(unique_id,model)
         self.done = False
         self.current_reward = 0
@@ -17,7 +16,6 @@ class HarvestAgent(Agent):
         self.training = training
         self.agent_type = agent_type
         self.n_features = self._calculate_n_features()
-        self.n_rewards = n_rewards
         self.start_health = 0.8
         self.health = self.start_health
         self.health_decay = 0.1
@@ -38,17 +36,14 @@ class HarvestAgent(Agent):
         self.max_height = allotment[3]
         if allotment_id == None:
             self.allotment_id = self.unique_id
-        if self.agent_type == "multiobjective_mp":
-            self.decision_module = MPDQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer)
-        else:
-            self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,n_rewards,shared_replay_buffer)
+        self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer)
         self.moving_module = MovingModule(self.unique_id, model, training, allotment, allotment_id)
         self.write_norms = write_norms
         if self.write_norms:
             self.norms_module = NormsModule(self.unique_id)
         if agent_type != "baseline":
             self.rewards = self._ethics_rewards()
-            self.ethics_module = EthicsModule(self.rewards["sanction"],agent_type,aggregation)
+            self.ethics_module = EthicsModule(self.rewards["sanction"],agent_type)
         else:
             self.rewards = self._baseline_rewards()
     
@@ -57,11 +52,10 @@ class HarvestAgent(Agent):
             observation = self.observe()
             action = self.decision_module.choose_action(observation)
             self.current_reward, next_state, self.done = self.perform_transition(action)
-            if self.n_rewards == 1:
-                self.current_reward = np.sum(self.current_reward)
+            self.current_reward = np.sum(self.current_reward)
             if self.training:
                 self.decision_module.learn(observation, action, self.current_reward, next_state, self.done, self.model.episode)
-            self.total_episode_reward += sum(self.current_reward) if self.n_rewards > 1 else self.current_reward
+            self.total_episode_reward += self.current_reward
 
     def perform_transition(self, action):
         """
