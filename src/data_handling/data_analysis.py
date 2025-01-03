@@ -17,23 +17,26 @@ class DataAnalysis():
         self.num_agents = num_agents
         self.filepath = filepath
     
-    def proccess_and_display_all_data(self, agent_df_list, df_labels):
-        normalised_sum_df_list, agent_end_episode_list = self._process_agent_dfs(agent_df_list, df_labels)
-        self._display_graphs(normalised_sum_df_list, agent_end_episode_list, df_labels)
+    def proccess_and_display_all_data(self, agent_df_list, df_labels, get_normalised=False):
+        normalised_sum_df_list, agent_end_episode_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
+        end_episode_df_list = self._end_episode_results(agent_end_episode_list, df_labels)
+        self._display_graphs(agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list)
         #self._process_norms(df_labels, scenario, norms_filepath)
 
-    def _process_agent_dfs(self, agent_df_list, df_labels):
-        #normalised_sum_df_list = self._apply_function_to_list(agent_df_list, self._normalised_sum_step_across_episodes)
-        #self._write_df_list_to_file(normalised_sum_df_list, df_labels, self.filepath+"normalised_sum_df_")
-        normalised_sum_df_list = []
-        agent_end_episode_list = self._process_end_episode_dataframes(agent_df_list)
-        self._write_df_list_to_file(agent_end_episode_list, df_labels, self.filepath+"processed_episode_df_")
-        return normalised_sum_df_list, agent_end_episode_list
+    def _process_agent_dfs(self, agent_df_list, df_labels, get_normalised):
+        agent_end_episode_list = self._process_end_episode_dataframes(agent_df_list, df_labels)
+        if not get_normalised:
+            return None, agent_end_episode_list
+        if get_normalised:
+            normalised_sum_df_list = self._apply_function_to_list(agent_df_list, self._normalised_sum_step_across_episodes)
+            self._write_df_list_to_file(normalised_sum_df_list, df_labels, self.filepath+"normalised_sum_df_")
+            return normalised_sum_df_list, agent_end_episode_list
+        #self._write_df_list_to_file(agent_end_episode_list, df_labels, self.filepath+"processed_episode_df_")
     
-    def _display_graphs(self, normalised_sum_df_list, agent_end_episode_list, df_labels):
-        #self._days_left_to_live_results(normalised_sum_df_list, df_labels, self.filepath+"days_left_to_live")
-        #self._berries_consumed_results(normalised_sum_df_list, df_labels, self.filepath+"berries_consumed")
-        end_episode_df_list = self._end_episode_results(agent_end_episode_list, df_labels)
+    def _display_graphs(self, agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list=None):
+        if normalised_sum_df_list != None:
+            self._days_left_to_live_results(normalised_sum_df_list, df_labels, self.filepath+"days_left_to_live")
+            self._berries_consumed_results(normalised_sum_df_list, df_labels, self.filepath+"berries_consumed")
         self._display_end_episode(end_episode_df_list, df_labels)
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", self.filepath+"violin_end_day", "Violin Plot of Episode Length", "End Day")
         #self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", self.filepath+"violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
@@ -96,9 +99,9 @@ class DataAnalysis():
             new_df_list.append(new_df)
         return new_df_list
 
-    def _process_end_episode_dataframes(self, dataframes):
+    def _process_end_episode_dataframes(self, df_list, df_labels):
         processed_dfs = []
-        for i, df in enumerate(dataframes):
+        for i, df in enumerate(df_list):
             grouped_df = df.groupby(["episode", "agent_id"])
             episode_dfs = []
             for (episode, agent_id), group_df in grouped_df:
@@ -106,6 +109,7 @@ class DataAnalysis():
                 last_row["total_berries"] = last_row["berries"] + last_row["berries_consumed"]
                 episode_dfs.append(last_row)
             processed_df = pd.concat(episode_dfs)
+            processed_df.to_csv(self.filepath+"processed_episode_df_"+df_labels[i]+".csv")
             processed_dfs.append(processed_df)
         return processed_dfs
 
@@ -259,12 +263,10 @@ class DataAnalysis():
             return df
 
     def _calculate_central_tendency(self, baseline_series, maximin_series):
-        #personsr, p_value = personsr(baseline_series, maximin_series)
         central_tendency = {"baseline_mean": baseline_series.mean(),
                             "maximin_mean": maximin_series.mean(),
                             "baseline_stdev": baseline_series.std(),
                             "maximin_stdev": maximin_series.std(),
-                            #"p_value": p_value,
                             "cohens_d": self._cohens_d(baseline_series, maximin_series),
                             }
         return central_tendency
