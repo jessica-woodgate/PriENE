@@ -18,20 +18,23 @@ class DataAnalysis():
         self.filepath = filepath
     
     def proccess_and_display_data(self, agent_df_list, df_labels, get_normalised=False):
-        normalised_sum_df_list, agent_end_episode_list, end_episode_totals_df_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
-        self._display_graphs(agent_end_episode_list, end_episode_totals_df_list, df_labels, normalised_sum_df_list)
+        end_episode_totals_df_list, agent_final_rows_df_list, normalised_df_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
+        self._display_graphs(agent_final_rows_df_list, end_episode_totals_df_list, df_labels, normalised_df_list)
         #self._process_norms(df_labels, scenario, norms_filepath)
 
     def _process_agent_dfs(self, agent_df_list, df_labels, get_normalised):
         end_episode_totals_df_list = []
-        final_rows_df_list = []
+        end_episode_central_tendencies = []
+        agent_end_episode_df_list = []
         normalised_df_list = []
         for i, df in enumerate(agent_df_list):
             end_episode_totals_df_list.append(self._end_episode_totals(df, df_labels[i]))
-            final_rows_df_list.append(self._agent_end_episode_dataframes(df, df_labels[i]))
+            end_episode_central_tendencies.append(self._calculate_central_tendency(df, df_labels[i]))
+            agent_end_episode_df_list.append(self._agent_end_episode_dataframes(df, df_labels[i]))
             if get_normalised:
                 normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i]))
-        return end_episode_totals_df_list, final_rows_df_list, normalised_df_list
+        pd.DataFrame(end_episode_central_tendencies).to_csv(self.filepath+"end_episode_totals_central_tendencies.csv")
+        return end_episode_totals_df_list, agent_end_episode_df_list, normalised_df_list
     
     def _display_graphs(self, agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list=None):
         if normalised_sum_df_list != None:
@@ -275,12 +278,13 @@ class DataAnalysis():
             df.columns = df_labels
             return df
 
-    def _calculate_central_tendency(self, baseline_series, maximin_series):
-        central_tendency = {"baseline_mean": baseline_series.mean(),
-                            "maximin_mean": maximin_series.mean(),
-                            "baseline_stdev": baseline_series.std(),
-                            "maximin_stdev": maximin_series.std(),
-                            "cohens_d": self._cohens_d(baseline_series, maximin_series),
+    def _calculate_central_tendency(self, df, df_label):
+        central_tendency = {df_label+"_mean": df["total_days"].mean(),
+                            df_label+"_mean": df["total_berries"].mean(),
+                            df_label+"_median": df["total_days"].median(),
+                            df_label+"_median": df["total_berries"].median(),
+                            df_label+"_stdev": df["total_days"].std(),
+                            df_label+"_stdev": df["total_berries"].std(),
                             }
         return central_tendency
 
