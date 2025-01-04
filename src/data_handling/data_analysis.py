@@ -23,6 +23,7 @@ class DataAnalysis():
         #self._process_norms(df_labels, scenario, norms_filepath)
 
     def _process_agent_dfs(self, agent_df_list, df_labels, get_normalised):
+        write = False
         end_episode_totals_df_list = []
         end_episode_central_tendencies = []
         agent_end_episode_df_list = []
@@ -31,14 +32,14 @@ class DataAnalysis():
         else:
             normalised_df_list = None
         for i, df in enumerate(agent_df_list):
-            agent_end_episode = self._agent_end_episode_dataframes(df, df_labels[i])
+            agent_end_episode = self._agent_end_episode_dataframes(df, df_labels[i], write)
             agent_end_episode_df_list.append(agent_end_episode)
-            end_episode_totals = self._end_episode_totals(agent_end_episode, df_labels[i])
+            end_episode_totals = self._end_episode_totals(agent_end_episode, df_labels[i], write)
             end_episode_totals_df_list.append(end_episode_totals)
             end_episode_central_tendencies.append(self._calculate_central_tendency(end_episode_totals, df_labels[i]))
             if get_normalised:
                 normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i]))
-        pd.DataFrame(end_episode_central_tendencies).to_csv(self.filepath+"end_episode_totals_central_tendencies.csv",index=False)
+        pd.DataFrame(end_episode_central_tendencies).to_csv(self.filepath+"central_tendencies_end_episode_totals.csv",index=False)
         return end_episode_totals_df_list, agent_end_episode_df_list, normalised_df_list
     
     def _display_graphs(self, agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list=None):
@@ -60,7 +61,7 @@ class DataAnalysis():
         self._display_swarm_plot(cooperative_dfs,df_labels, "fitness", filepath+"_cooperative_fitness")
         self._display_swarm_plot(cooperative_dfs,df_labels, "reward", filepath+"_cooperative_reward")
 
-    def _normalise_step_across_episodes(self, df, df_label):
+    def _normalise_step_across_episodes(self, df, df_label, write):
         """
         normalises results for each step in each episode by how frequently the step occurred
         final df has one row for each step for the length of one episode
@@ -81,10 +82,11 @@ class DataAnalysis():
         sum_df.loc[:, to_divide_columns] = sum_df.loc[:, to_divide_columns]
         sum_df.loc[:, to_divide_columns] = sum_df.loc[:, to_divide_columns].divide(count_df["count"], axis=0)
         sum_df["count"] = count_df["count"]
-        sum_df.to_csv(self.filepath+"normalised_sum_df_"+df_label+".csv")
+        if write:
+            sum_df.to_csv(self.filepath+"normalised_sum_df_"+df_label+".csv")
         return sum_df
 
-    def _end_episode_totals(self, df, df_label):
+    def _end_episode_totals(self, df, df_label, write):
         """
         gets metric totals at the end of each episode
         final df has one row for each episode
@@ -108,10 +110,11 @@ class DataAnalysis():
             total_days_survived=('day', 'sum'),
             gini_days_survived=('day', lambda x: self._calculate_gini(x))
         )
-        episode_totals_df.to_csv(self.filepath+"end_episode_totals_"+df_label+".csv")
+        if write:
+            episode_totals_df.to_csv(self.filepath+"end_episode_totals_"+df_label+".csv")
         return episode_totals_df
 
-    def _agent_end_episode_dataframes(self, df, df_label):
+    def _agent_end_episode_dataframes(self, df, df_label, write):
         """
         for each agent, sum up the berries they're holding and the berries they've eaten to get total across episode
         final df has one row for each agent for each episode
@@ -125,7 +128,8 @@ class DataAnalysis():
             last_row["total_berries"] = last_row["berries"] + last_row["berries_consumed"]
             last_rows_list.append(last_row)
         agent_end_episode_df = pd.concat(last_rows_list)
-        agent_end_episode_df.to_csv(self.filepath+"agent_end_episode_df_"+df_label+".csv",index=False)
+        if write:
+            agent_end_episode_df.to_csv(self.filepath+"agent_end_episode_df_"+df_label+".csv",index=False)
         return agent_end_episode_df
 
     def _days_left_to_live_results(self, sum_df_list, df_labels, filename):
@@ -285,12 +289,30 @@ class DataAnalysis():
 
     def _calculate_central_tendency(self, df, df_label):
         central_tendency = {"df_label": df_label,
-                            "mean_days": df["total_days"].mean(),
-                            "median_days": df["total_days"].median(),
-                            "stdev_days": df["total_days"].std(),
-                            "mean_berries": df["total_berries"].mean(),
-                            "median_berries": df["total_berries"].median(),
-                            "stdev_berries": df["total_berries"].std(),
+                            "mean_gini_days": df["gini_days_survived"].mean(),
+                            "median_gini_days": df["gini_days_survived"].median(),
+                            "stdev_gini_days": df["gini_days_survived"].std(),
+                            "mean_min_days": df["min_days_survived"].mean(),
+                            "median_min_days": df["min_days_survived"].median(),
+                            "stdev_min_days": df["min_days_survived"].std(),
+                            "mean_max_days": df["max_days_survived"].mean(),
+                            "median_max_days": df["max_days_survived"].median(),
+                            "stdev_max_days": df["max_days_survived"].std(),
+                            "mean_total_days": df["total_days_survived"].mean(),
+                            "median_total_days": df["total_days_survived"].median(),
+                            "stdev_total_days": df["total_days_survived"].std(),
+                            "mean_gini_berries": df["gini_berries"].mean(),
+                            "median_gini_berries": df["gini_berries"].median(),
+                            "stdev_gini_berries": df["gini_berries"].std(),
+                            "mean_min_berries": df["min_berries"].mean(),
+                            "median_min_berries": df["min_berries"].median(),
+                            "stdev_min_berries": df["min_berries"].std(),
+                            "mean_max_berries": df["max_berries"].mean(),
+                            "median_max_berries": df["max_berries"].median(),
+                            "stdev_max_berries": df["max_berries"].std(),
+                            "mean_total_berries": df["total_berries"].mean(),
+                            "median_total_berries": df["total_berries"].median(),
+                            "stdev_total_berries": df["total_berries"].std(),
                             }
         return central_tendency
 
