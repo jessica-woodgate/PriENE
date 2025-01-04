@@ -103,7 +103,7 @@ class DataAnalysis():
             total_days_survived=('day', 'sum'),
             gini_days_survived=('day', lambda x: self._calculate_gini(x))
         )
-        episode_totals_df.to_csv(self.filepath+"end_episode_"+df_label+".csv")
+        episode_totals_df.to_csv(self.filepath+"end_episode_totals_"+df_label+".csv")
         return episode_totals_df
 
     def _agent_end_episode_dataframes(self, df, df_label):
