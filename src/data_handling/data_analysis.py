@@ -38,11 +38,7 @@ class DataAnalysis():
             end_episode_central_tendencies.append(self._calculate_central_tendency(end_episode_totals, df_labels[i]))
             if get_normalised:
                 normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i]))
-        dfs = []
-        for df, label in zip(end_episode_central_tendencies, df_labels):
-            df["df_label"] = label
-            dfs.append(df)
-        pd.DataFrame(dfs).to_csv(self.filepath+"end_episode_totals_central_tendencies.csv",index=False)
+        pd.DataFrame(end_episode_central_tendencies).to_csv(self.filepath+"end_episode_totals_central_tendencies.csv",index=False)
         return end_episode_totals_df_list, agent_end_episode_df_list, normalised_df_list
     
     def _display_graphs(self, agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list=None):
@@ -128,9 +124,9 @@ class DataAnalysis():
             last_row = group_df.tail(1).loc[:, ~group_df.columns.str.contains('^Unnamed')]
             last_row["total_berries"] = last_row["berries"] + last_row["berries_consumed"]
             last_rows_list.append(last_row)
-        end_episode_df = pd.concat(last_rows_list)
-        end_episode_df.to_csv(self.filepath+"agent_end_episode_df_"+df_label+".csv",index=False)
-        return end_episode_df
+        agent_end_episode_df = pd.concat(last_rows_list)
+        agent_end_episode_df.to_csv(self.filepath+"agent_end_episode_df_"+df_label+".csv",index=False)
+        return agent_end_episode_df
 
     def _days_left_to_live_results(self, sum_df_list, df_labels, filename):
         days_left_to_live_tendency = {}
@@ -288,12 +284,13 @@ class DataAnalysis():
             return df
 
     def _calculate_central_tendency(self, df, df_label):
-        central_tendency = {df_label+"_days_mean": df["total_days"].mean(),
-                            df_label+"_berries_mean": df["total_berries"].mean(),
-                            df_label+"_days__median": df["total_days"].median(),
-                            df_label+"_berries_median": df["total_berries"].median(),
-                            df_label+"_days_stdev": df["total_days"].std(),
-                            df_label+"_berries_stdev": df["total_berries"].std(),
+        central_tendency = {"df_label": df_label,
+                            "mean_days": df["total_days"].mean(),
+                            "median_days": df["total_days"].median(),
+                            "stdev_days": df["total_days"].std(),
+                            "mean_berries": df["total_berries"].mean(),
+                            "median_berries": df["total_berries"].median(),
+                            "stdev_berries": df["total_berries"].std(),
                             }
         return central_tendency
 
