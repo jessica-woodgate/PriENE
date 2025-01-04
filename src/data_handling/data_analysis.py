@@ -17,21 +17,21 @@ class DataAnalysis():
         self.num_agents = num_agents
         self.filepath = filepath
     
-    def proccess_and_display_all_data(self, agent_df_list, df_labels, get_normalised=False):
-        normalised_sum_df_list, agent_end_episode_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
-        end_episode_df_list = self._end_episode_results(agent_end_episode_list, df_labels)
-        self._display_graphs(agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list)
+    def proccess_and_display_data(self, agent_df_list, df_labels, get_normalised=False):
+        normalised_sum_df_list, agent_end_episode_list, end_episode_totals_df_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
+        self._display_graphs(agent_end_episode_list, end_episode_totals_df_list, df_labels, normalised_sum_df_list)
         #self._process_norms(df_labels, scenario, norms_filepath)
 
     def _process_agent_dfs(self, agent_df_list, df_labels, get_normalised):
-        agent_end_episode_list = self._process_end_episode_dataframes(agent_df_list, df_labels)
-        if not get_normalised:
-            return None, agent_end_episode_list
-        if get_normalised:
-            normalised_sum_df_list = self._apply_function_to_list(agent_df_list, self._normalised_sum_step_across_episodes)
-            self._write_df_list_to_file(normalised_sum_df_list, df_labels, self.filepath+"normalised_sum_df_")
-            return normalised_sum_df_list, agent_end_episode_list
-        #self._write_df_list_to_file(agent_end_episode_list, df_labels, self.filepath+"processed_episode_df_")
+        end_episode_totals_df_list = []
+        final_rows_df_list = []
+        normalised_df_list = []
+        for i, df in enumerate(agent_df_list):
+            end_episode_totals_df_list.append(self._end_episode_totals(df, df_labels[i]))
+            final_rows_df_list.append(self._agent_end_episode_dataframes(df, df_labels[i]))
+            if get_normalised:
+                normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i]))
+        return end_episode_totals_df_list, final_rows_df_list, normalised_df_list
     
     def _display_graphs(self, agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list=None):
         if normalised_sum_df_list != None:
@@ -52,13 +52,13 @@ class DataAnalysis():
         self._display_swarm_plot(cooperative_dfs,df_labels, "fitness", filepath+"_cooperative_fitness")
         self._display_swarm_plot(cooperative_dfs,df_labels, "reward", filepath+"_cooperative_reward")
 
-    def _write_df_list_to_file(self, df_list, df_labels, filepath):
-        i = 0
-        for df in df_list:
-            df.to_csv(filepath+df_labels[i]+".csv")
-            i += 1
-
-    def _normalised_sum_step_across_episodes(self, df):
+    def _normalise_step_across_episodes(self, df, df_label):
+        """
+        normalises results for each step in each episode by how frequently the step occurred
+        final df has one row for each step for the length of one episode
+        writes each normalised sum df to file
+        returns list of dfs
+        """
         df = df.drop(["episode", "action", "reward"], axis=1)
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
         #Calculate counts for each (step, agent_id) combination
@@ -73,45 +73,52 @@ class DataAnalysis():
         sum_df.loc[:, to_divide_columns] = sum_df.loc[:, to_divide_columns]
         sum_df.loc[:, to_divide_columns] = sum_df.loc[:, to_divide_columns].divide(count_df["count"], axis=0)
         sum_df["count"] = count_df["count"]
+        sum_df.to_csv(self.filepath+"normalised_sum_df_"+df_label+".csv")
         return sum_df
 
-    def _end_episode_results(self, df_list, df_labels):
-        new_df_list = []
-        for i, df in enumerate(df_list):
-            new_df = df.groupby("episode").agg(
-                min_days=('total_days', 'min'),
-                max_days=('total_days', 'max'),
-                average_days=('total_days', 'mean'),
-                total_days=('total_days', 'sum'),
-                gini_days=('total_days', lambda x: self._calculate_gini(x)),
-                min_berries=('total_berries', 'min'),
-                max_berries=('total_berries', 'max'),
-                average_berries=('total_berries', 'mean'),
-                total_berries=('total_berries', 'sum'),
-                gini_berries=('total_berries', lambda x: self._calculate_gini(x)),
-                min_days_survived=('day', 'min'),
-                max_days_survived=('day', 'max'),
-                average_days_survived=('day', 'mean'),
-                total_days_survived=('day', 'sum'),
-                gini_days_survived=('day', lambda x: self._calculate_gini(x))
-            )
-            new_df.to_csv(self.filepath+"end_episode_"+df_labels[i]+".csv")
-            new_df_list.append(new_df)
-        return new_df_list
+    def _end_episode_totals(self, df, df_label):
+        """
+        gets metric totals at the end of each episode
+        final df has one row for each episode
+        writes each metric totals df to file
+        returns list of dfs
+        """
+        episode_totals_df = df.groupby("episode").agg(
+            min_days=('total_days', 'min'),
+            max_days=('total_days', 'max'),
+            average_days=('total_days', 'mean'),
+            total_days=('total_days', 'sum'),
+            gini_days=('total_days', lambda x: self._calculate_gini(x)),
+            min_berries=('total_berries', 'min'),
+            max_berries=('total_berries', 'max'),
+            average_berries=('total_berries', 'mean'),
+            total_berries=('total_berries', 'sum'),
+            gini_berries=('total_berries', lambda x: self._calculate_gini(x)),
+            min_days_survived=('day', 'min'),
+            max_days_survived=('day', 'max'),
+            average_days_survived=('day', 'mean'),
+            total_days_survived=('day', 'sum'),
+            gini_days_survived=('day', lambda x: self._calculate_gini(x))
+        )
+        episode_totals_df.to_csv(self.filepath+"end_episode_"+df_label+".csv")
+        return episode_totals_df
 
-    def _process_end_episode_dataframes(self, df_list, df_labels):
-        processed_dfs = []
-        for i, df in enumerate(df_list):
-            grouped_df = df.groupby(["episode", "agent_id"])
-            episode_dfs = []
-            for (episode, agent_id), group_df in grouped_df:
-                last_row = group_df.tail(1).loc[:, ~group_df.columns.str.contains('^Unnamed')]
-                last_row["total_berries"] = last_row["berries"] + last_row["berries_consumed"]
-                episode_dfs.append(last_row)
-            processed_df = pd.concat(episode_dfs)
-            processed_df.to_csv(self.filepath+"processed_episode_df_"+df_labels[i]+".csv")
-            processed_dfs.append(processed_df)
-        return processed_dfs
+    def _agent_end_episode_dataframes(self, df, df_label):
+        """
+        for each agent, sum up the berries they're holding and the berries they've eaten to get total across episode
+        final df has one row for each agent for each episode
+        write each end episode df to file
+        returns list of dfs
+        """
+        grouped_df = df.groupby(["episode", "agent_id"])
+        last_rows_list = []
+        for (episode, agent_id), group_df in grouped_df:
+            last_row = group_df.tail(1).loc[:, ~group_df.columns.str.contains('^Unnamed')]
+            last_row["total_berries"] = last_row["berries"] + last_row["berries_consumed"]
+            last_rows_list.append(last_row)
+        end_episode_df = pd.concat(last_rows_list)
+        end_episode_df.to_csv(self.filepath+"agent_end_episode_df_"+df_label+".csv")
+        return end_episode_df
 
     def _days_left_to_live_results(self, sum_df_list, df_labels, filename):
         days_left_to_live_tendency = {}
@@ -222,6 +229,12 @@ class DataAnalysis():
         plt.show()
         plt.savefig(str(filename).split()[0])
         plt.close()
+    
+    def _write_df_list_to_file(self, df_list, df_labels, filepath):
+        i = 0
+        for df in df_list:
+            df.to_csv(filepath+df_labels[i]+".csv")
+            i += 1
 
     def _apply_function_to_list(self, list, function):
             results_list = []

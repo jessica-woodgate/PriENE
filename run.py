@@ -14,7 +14,8 @@ import re
 #all_principles_5 = veto (do_no_harm in model variables)
 #all_principles_6 = optimist
 
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "average", "majoritarian", "veto", "optimist"]
+#AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "average", "majoritarian", "veto", "optimist"]
+AGENT_TYPES = ["average", "majoritarian", "veto", "optimist"]
 SCENARIO_TYPES = ["colours", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 1000
@@ -32,12 +33,13 @@ def generate_graphs(scenario, run_name, num_agents):
         reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
     else:
         reading_filepath = "data/results/"+run_name+"/"+scenario+"/agent_reports_"+scenario+"_"
-    files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"all_principles.csv"]
+    #files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv"]
+    files = [reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
     dfs = []
     for file in files:
         df = pd.read_csv(file)
         dfs.append(df)
-    data_analysis.proccess_and_display_all_data(dfs, AGENT_TYPES)
+    data_analysis.proccess_and_display_data(dfs, AGENT_TYPES)
 
 def log_wandb_agents(model_inst, last_episode, reward_tracker):
     for i, agent in enumerate(model_inst.schedule.agents):
