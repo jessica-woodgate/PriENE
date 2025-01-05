@@ -22,17 +22,12 @@ class DataAnalysis():
         df_labels = principles + aggregations
         self.principles = principles
         self.aggregations = aggregations
-        central_tendencies = pd.read_csv("data/results/200_days/4_agents/allotment/6_5/central_tendencies.csv")
-        most_common = self._get_best_results(central_tendencies, "aggregations")
-        self.principles += [most_common]
-        most_common = self._get_best_results(central_tendencies, "principles")
-        most_common = self._get_best_results(central_tendencies, "all")
-        #end_episode_totals_df_list, agent_final_rows_df_list, normalised_df_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
-        #self._display_graphs(agent_final_rows_df_list, end_episode_totals_df_list, df_labels, normalised_df_list)
+        end_episode_totals_df_list, agent_final_rows_df_list, normalised_df_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
+        self._display_graphs(agent_final_rows_df_list, end_episode_totals_df_list, df_labels, normalised_df_list)
         #self._process_norms(df_labels, scenario, norms_filepath)
 
     def _process_agent_dfs(self, agent_df_list, df_labels, get_normalised):
-        write = True
+        write = False
         end_episode_totals_df_list = []
         end_episode_central_tendencies = []
         agent_end_episode_df_list = []
@@ -52,16 +47,17 @@ class DataAnalysis():
             end_episode_central_tendencies.append(central_tendency)
             if get_normalised:
                 normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i]))
-        self._dictionary_to_file(end_episode_central_tendencies,self.filepath+"central_tendencies.csv")
-        most_common = self._get_best_results(end_episode_central_tendencies, "aggregations")
+        central_tendencies = self._dictionary_to_file(end_episode_central_tendencies,self.filepath+"central_tendencies.csv")
+        most_common = self._get_best_results(central_tendencies, "aggregations")
         self.principles += [most_common]
-        most_common = self._get_best_results(end_episode_central_tendencies, "principles")
-        most_common = self._get_best_results(end_episode_central_tendencies, "all")
+        self._get_best_results(central_tendencies, "principles")
+        self._get_best_results(central_tendencies, "all")
         return end_episode_totals_df_list, agent_end_episode_df_list, normalised_df_list
     
     def _dictionary_to_file(self, dictionary, filepath):
         df = pd.DataFrame(dictionary)
         df.to_csv(filepath, index=False)
+        return df
     
     def _display_graphs(self, agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list=None):
         if normalised_sum_df_list != None:

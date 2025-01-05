@@ -3,7 +3,7 @@ from src.harvest_exception import NumBerriesException
 
 class ColoursHarvest(HarvestModel):
     """
-    Capabilities harvest scenario agents have only access to specific berries: some agents are tall, and can access berries on trees; some agents are small and can access berries on the ground
+    Colours harvest scenario agents have only access to berries of a particular colour
     Instance variables:
         num_start_berries -- the number of berries initiated at the beginning of an episode
         allocations -- dictionary of agent ids and the berries assigned to that agent
