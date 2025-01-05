@@ -8,7 +8,7 @@ from src.harvest_exception import AgentTypeException
 import numpy as np
 
 class HarvestAgent(Agent):
-    def __init__(self,unique_id,model,agent_type,allotment,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None,allotment_id=None):
+    def __init__(self,unique_id,model,agent_type,allotment,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None,allocation_id=None):
         super().__init__(unique_id,model)
         self.done = False
         self.current_reward = 0
@@ -34,10 +34,12 @@ class HarvestAgent(Agent):
         self.max_width = allotment[1]
         self.min_height = allotment[2]
         self.max_height = allotment[3]
-        if allotment_id == None:
-            self.allotment_id = self.unique_id
+        if allocation_id == None:
+            self.allocation_id = self.unique_id
+        else:
+            self.allocation_id = allocation_id
         self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer)
-        self.moving_module = MovingModule(self.unique_id, model, training, allotment, allotment_id)
+        self.moving_module = MovingModule(self.unique_id, model, training, allotment, self.allocation_id)
         self.write_norms = write_norms
         if self.write_norms:
             self.norms_module = NormsModule(self.unique_id)

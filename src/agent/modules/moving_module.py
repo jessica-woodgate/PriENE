@@ -18,9 +18,9 @@ class MovingModule():
         nearest_berry -- the nearest berry agent
         nearest_berry_coordinates -- coordinates of the nearest berry
     """
-    def __init__(self, agent_id, model, training, allotment, allotment_id):
+    def __init__(self, agent_id, model, training, allotment, allocation_id):
         self.agent_id = agent_id
-        self.allotment_id = allotment_id
+        self.allocation_id = allocation_id
         self.model = model
         self.training = training
         self.min_width = allotment[0]
@@ -45,7 +45,7 @@ class MovingModule():
             if self.training:
                 self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates)
             else:
-                self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates, self.allotment_id)
+                self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates, self.allocation_id)
             self.path = self._find_path_to_berry(current_pos,self.nearest_berry.pos)
             self.path_step = 0
         return True
@@ -115,8 +115,8 @@ class MovingModule():
         for b in location:
             #there can be multiple berries at one location: check we are foraging the one we were going for
             if b.agent_type == "berry" and b.unique_id == self.nearest_berry.unique_id:
-                if not self.training and b.allotment_id != self.allotment_id:
-                    raise IllegalBerry(self.agent_id, f"allocated to agent {b.allotment_id}")
+                if not self.training and b.allocation_id != self.allocation_id:
+                    raise IllegalBerry(self.agent_id, f"allocated to {b.allocation_id}")
                 else:
                     b.foraged = True
                     return True
@@ -130,7 +130,7 @@ class MovingModule():
         if self.training:
             uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates()
         else:
-            uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.allotment_id)
+            uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.allocation_id)
         if not uneaten_berries_coordinates:
             return None
         #Use the key parameter of min to find the index of the minimum distance

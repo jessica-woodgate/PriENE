@@ -67,12 +67,12 @@ class NoEmptyCells(HarvestException):
     def __str__(self):
         return ("No empty cells in grid")
     
-class NoAllotmentException(HarvestException):
+class NoAllocationException(HarvestException):
     def __init__(self, agent_id):
         self.agent_id = agent_id
 
     def __str__(self):
-        return (f"No allotment found for agent {self.agent_id}")
+        return (f"No allocation found for agent {self.agent_id}")
     
 class UnrecognisedPrinciple(HarvestException):
     def __init__(self, principle):

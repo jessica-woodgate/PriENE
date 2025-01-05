@@ -108,29 +108,29 @@ class HarvestModel(Model):
         """
         return self.grid.iter_cell_list_contents(cell)
 
-    def get_uneaten_berries_coordinates(self, allotment_id=None):
+    def get_uneaten_berries_coordinates(self, allocation_id=None):
         """
         Get the coordinates of uneaten berries
         """
         berries_coordinates = []
         for b in self.berries:
             if b.foraged == False:
-                if allotment_id==None:
+                if allocation_id==None:
                     berries_coordinates.append(b.pos)
                 else:
-                    if b.allotment_id == allotment_id:
+                    if b.allocation_id == allocation_id:
                         berries_coordinates.append(b.pos)
         return berries_coordinates
     
-    def get_uneaten_berry_by_coords(self, coords, allotment_id=None):
+    def get_uneaten_berry_by_coords(self, coords, allocation_id=None):
         """
         Get an uneaten berry by its coordinates
         """
         for b in self.berries:
             if b.pos == coords and b.foraged == False:
-                if allotment_id == None:
+                if allocation_id == None:
                     return b
-                elif b.allotment_id == allotment_id:
+                elif b.allocation_id == allocation_id:
                     return b
         raise NoBerriesException(coordinates=coords)
     
@@ -397,10 +397,10 @@ class HarvestModel(Model):
         agent.days_left_to_live = 0
         self.living_agents = [a for a in self.schedule.agents if a.agent_type != "berry" and a.off_grid == False]
     
-    def _new_berry(self,allotment,allotment_id=None):
-        if allotment_id != None:
-            allotment_id = "allotment_"+str(allotment_id)
-        berry = Berry(self.berry_id,self,allotment,allotment_id)
+    def _new_berry(self,allotment,allocation_id=None):
+        if allocation_id != None:
+            allocation_id = "allocation_"+str(allocation_id)
+        berry = Berry(self.berry_id,self,allotment,allocation_id)
         self.schedule.add(berry)
         self.berry_id += 1
         return berry
@@ -415,7 +415,7 @@ class HarvestModel(Model):
             resources = [5, 1]
         elif num_agents == 4:
             #resources = [5, 2, 3, 2]
-            resources = [5, 3, 2, 2]
+            resources = [5, 4, 1, 2]
         elif num_agents == 6:
             resources = [5, 2, 3, 2, 5, 1]
         self.num_start_berries = sum(resources)
