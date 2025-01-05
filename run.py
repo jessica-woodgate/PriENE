@@ -30,18 +30,21 @@ def generate_graphs(scenario, run_name, num_agents):
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
     writing_filepath = "data/results/current_run/"
+    #norms_filepath = "data/results/"+run_name+"/"+scenario+"_"
+    norms_filepath = "data/results/200_days/4_agents/allotment/8_4-5,3,2,2/norms/allotment_"
+    writing_filepath = "data/results/200_days/4_agents/allotment/8_4-5,3,2,2/norms/"
     data_analysis = DataAnalysis(num_agents, writing_filepath)
-    if run_name == "current_run":
-        reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
-    else:
-        reading_filepath = "data/results/"+run_name+"/"+scenario+"/agent_reports_"+scenario+"_"
-    files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
+    # if run_name == "current_run":
+    #     reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
+    # else:
+    #     reading_filepath = "data/results/"+run_name+"/"+scenario+"/agent_reports_"+scenario+"_"
+    # files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
     #files = [reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
     dfs = []
-    for file in files:
-        df = pd.read_csv(file)
-        dfs.append(df)
-    data_analysis.proccess_and_display_data(dfs, PRINCIPLES, AGGREGATIONS)
+    # for file in files:
+    #     df = pd.read_csv(file)
+    #     dfs.append(df)
+    data_analysis.proccess_and_display_data(dfs, PRINCIPLES, AGGREGATIONS, scenario, norms_filepath)
 
 def log_wandb_agents(model_inst, last_episode, reward_tracker):
     for i, agent in enumerate(model_inst.schedule.agents):

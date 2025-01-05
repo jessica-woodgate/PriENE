@@ -18,13 +18,13 @@ class DataAnalysis():
         self.num_agents = num_agents
         self.filepath = filepath
     
-    def proccess_and_display_data(self, agent_df_list, principles, aggregations, get_normalised=False):
+    def proccess_and_display_data(self, agent_df_list, principles, aggregations, scenario, norms_filepath, get_normalised=False):
         df_labels = principles + aggregations
-        self.principles = principles
-        self.aggregations = aggregations
-        end_episode_totals_df_list, agent_final_rows_df_list, normalised_df_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
-        self._display_graphs(agent_final_rows_df_list, end_episode_totals_df_list, df_labels, normalised_df_list)
-        #self._process_norms(df_labels, scenario, norms_filepath)
+        #self.principles = principles
+        #self.aggregations = aggregations
+        #end_episode_totals_df_list, agent_final_rows_df_list, normalised_df_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
+        #self._display_graphs(agent_final_rows_df_list, end_episode_totals_df_list, df_labels, normalised_df_list)
+        self._process_norms(df_labels, scenario, norms_filepath)
 
     def _process_agent_dfs(self, agent_df_list, df_labels, get_normalised):
         write = False
@@ -47,17 +47,12 @@ class DataAnalysis():
             end_episode_central_tendencies.append(central_tendency)
             if get_normalised:
                 normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i]))
-        central_tendencies = self._dictionary_to_file(end_episode_central_tendencies,self.filepath+"central_tendencies.csv")
+        central_tendencies = self._write_dictionary_to_file(end_episode_central_tendencies,self.filepath+"central_tendencies.csv")
         most_common = self._get_best_results(central_tendencies, "aggregations")
         self.principles += [most_common]
         self._get_best_results(central_tendencies, "principles")
         self._get_best_results(central_tendencies, "all")
         return end_episode_totals_df_list, agent_end_episode_df_list, normalised_df_list
-    
-    def _dictionary_to_file(self, dictionary, filepath):
-        df = pd.DataFrame(dictionary)
-        df.to_csv(filepath, index=False)
-        return df
     
     def _display_graphs(self, agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list=None):
         if normalised_sum_df_list != None:
@@ -71,12 +66,12 @@ class DataAnalysis():
         norm_processing = NormProcessing()
         cooperative_dfs = []
         for label in df_labels:
-            input_file = filepath+"_"+label+"_emerged_norms.json"
+            input_file = filepath+label+"_emerged_norms.json"
             output_file = self.filepath+scenario+"_"+label+"_norms"
             cooperative_dfs.append(norm_processing.proccess_norms(input_file, output_file))
-        self._display_swarm_plot(cooperative_dfs,df_labels, "numerosity", filepath+"_cooperative_numerosity")
-        self._display_swarm_plot(cooperative_dfs,df_labels, "fitness", filepath+"_cooperative_fitness")
-        self._display_swarm_plot(cooperative_dfs,df_labels, "reward", filepath+"_cooperative_reward")
+        self._display_swarm_plot(cooperative_dfs,df_labels, "numerosity", filepath+"cooperative_numerosity")
+        self._display_swarm_plot(cooperative_dfs,df_labels, "fitness", filepath+"cooperative_fitness")
+        self._display_swarm_plot(cooperative_dfs,df_labels, "reward", filepath+"cooperative_reward")
 
     def _normalise_step_across_episodes(self, df, df_label, write):
         """
@@ -258,6 +253,11 @@ class DataAnalysis():
         plt.show()
         plt.savefig(str(filename).split()[0])
         plt.close()
+        
+    def _write_dictionary_to_file(self, dictionary, filepath):
+        df = pd.DataFrame(dictionary)
+        df.to_csv(filepath, index=False)
+        return df
     
     def _write_df_list_to_file(self, df_list, df_labels, filepath):
         i = 0
@@ -364,7 +364,7 @@ class DataAnalysis():
                 "Value": tally,
                 "Type": np.nan
             })
-        self._dictionary_to_file(best_results,self.filepath+"best_results_"+run_type+".csv")
+        self._write_dictionary_to_file(best_results,self.filepath+"best_results_"+run_type+".csv")
         return most_common
 
 
