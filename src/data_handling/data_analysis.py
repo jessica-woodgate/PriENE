@@ -44,7 +44,7 @@ class DataAnalysis():
             if get_normalised:
                 normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i]))
         central_tendencies = pd.DataFrame(end_episode_central_tendencies)
-        best_results = pd.DataFrame(self._get_best_results(end_episode_central_tendencies))
+        best_results = pd.DataFrame(self._get_best_results(central_tendencies))
         central_tendencies.to_csv(self.filepath+"central_tendencies.csv",index=False)
         best_results.to_csv(self.filepath+"best_results.csv",index=False)
         return end_episode_totals_df_list, agent_end_episode_df_list, normalised_df_list
@@ -324,6 +324,25 @@ class DataAnalysis():
         return central_tendency
     
     def _get_best_results(self, df):
+        best_results = []
+        test_name_column = df.columns[0]
+        for column in df.columns[1:]:
+            if "gini" in column.lower() or "stdev" in column.lower():
+                index = df[column].idxmin()
+                type = "Minimum"
+            else:
+                index = df[column].idxmax()
+                type = "Maximum"
+            value = df.loc[index, column]
+            test_name = df.loc[index, test_name_column]
+            best_results.append({
+                "Metric": column,
+                "Test Name": test_name,
+                "Value": value,
+                "Extremum Type": type
+            })
+        return best_results
+
 
     def _cohens_d(self, x_series, y_series):
         nx = len(x_series)

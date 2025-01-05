@@ -14,8 +14,8 @@ import re
 #all_principles_5 = veto (do_no_harm in model variables)
 #all_principles_6 = optimist
 
-AGENT_TYPES = ["baseline", "utilitarian", "maximin", "egalitarian", "average", "majoritarian", "veto", "optimist"]
-#AGENT_TYPES = ["average", "majoritarian", "veto", "optimist"]
+#AGENT_TYPES = ["baseline", "utilitarian", "maximin", "egalitarian", "average", "majoritarian", "veto", "optimist"]
+AGENT_TYPES = ["majoritarian", "veto", "optimist"]
 SCENARIO_TYPES = ["colours", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 1000
