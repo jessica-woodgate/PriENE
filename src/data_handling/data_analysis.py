@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import json
 import numpy as np
+from collections import Counter
 from src.data_handling.norm_processing import NormProcessing
 from scipy import stats
 
@@ -17,9 +18,17 @@ class DataAnalysis():
         self.num_agents = num_agents
         self.filepath = filepath
     
-    def proccess_and_display_data(self, agent_df_list, df_labels, get_normalised=False):
-        end_episode_totals_df_list, agent_final_rows_df_list, normalised_df_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
-        self._display_graphs(agent_final_rows_df_list, end_episode_totals_df_list, df_labels, normalised_df_list)
+    def proccess_and_display_data(self, agent_df_list, principles, aggregations, get_normalised=False):
+        df_labels = principles + aggregations
+        self.principles = principles
+        self.aggregations = aggregations
+        central_tendencies = pd.read_csv("data/results/200_days/4_agents/allotment/6_5/central_tendencies.csv")
+        most_common = self._get_best_results(central_tendencies, "aggregations")
+        self.principles += [most_common]
+        most_common = self._get_best_results(central_tendencies, "principles")
+        most_common = self._get_best_results(central_tendencies, "all")
+        #end_episode_totals_df_list, agent_final_rows_df_list, normalised_df_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
+        #self._display_graphs(agent_final_rows_df_list, end_episode_totals_df_list, df_labels, normalised_df_list)
         #self._process_norms(df_labels, scenario, norms_filepath)
 
     def _process_agent_dfs(self, agent_df_list, df_labels, get_normalised):
@@ -43,11 +52,16 @@ class DataAnalysis():
             end_episode_central_tendencies.append(central_tendency)
             if get_normalised:
                 normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i]))
-        central_tendencies = pd.DataFrame(end_episode_central_tendencies)
-        best_results = pd.DataFrame(self._get_best_results(central_tendencies))
-        central_tendencies.to_csv(self.filepath+"central_tendencies.csv",index=False)
-        best_results.to_csv(self.filepath+"best_results.csv",index=False)
+        self._dictionary_to_file(end_episode_central_tendencies,self.filepath+"central_tendencies.csv")
+        most_common = self._get_best_results(end_episode_central_tendencies, "aggregations")
+        self.principles += [most_common]
+        most_common = self._get_best_results(end_episode_central_tendencies, "principles")
+        most_common = self._get_best_results(end_episode_central_tendencies, "all")
         return end_episode_totals_df_list, agent_end_episode_df_list, normalised_df_list
+    
+    def _dictionary_to_file(self, dictionary, filepath):
+        df = pd.DataFrame(dictionary)
+        df.to_csv(filepath, index=False)
     
     def _display_graphs(self, agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list=None):
         if normalised_sum_df_list != None:
@@ -323,9 +337,14 @@ class DataAnalysis():
                             }
         return central_tendency
     
-    def _get_best_results(self, df):
+    def _get_best_results(self, df, run_type):
         best_results = []
+        test_names = []
         test_name_column = df.columns[0]
+        if run_type == "principles":
+            df = df[df[test_name_column].isin(self.principles)]
+        elif run_type == "aggregations":
+            df = df[df[test_name_column].isin(self.aggregations)]
         for column in df.columns[1:]:
             if "gini" in column.lower() or "stdev" in column.lower():
                 index = df[column].idxmin()
@@ -339,9 +358,18 @@ class DataAnalysis():
                 "Metric": column,
                 "Test Name": test_name,
                 "Value": value,
-                "Extremum Type": type
+                "Type": type
             })
-        return best_results
+            test_names.append(test_name)
+        most_common, tally = Counter(test_names).most_common(1)[0] #Find the most common test and the tally
+        best_results.append({
+                "Metric": "most_common",
+                "Test Name": most_common,
+                "Value": tally,
+                "Type": np.nan
+            })
+        self._dictionary_to_file(best_results,self.filepath+"best_results_"+run_type+".csv")
+        return most_common
 
 
     def _cohens_d(self, x_series, y_series):
