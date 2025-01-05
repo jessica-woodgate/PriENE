@@ -23,7 +23,7 @@ class DataAnalysis():
         #self._process_norms(df_labels, scenario, norms_filepath)
 
     def _process_agent_dfs(self, agent_df_list, df_labels, get_normalised):
-        write = False
+        write = True
         end_episode_totals_df_list = []
         end_episode_central_tendencies = []
         agent_end_episode_df_list = []
@@ -36,10 +36,17 @@ class DataAnalysis():
             agent_end_episode_df_list.append(agent_end_episode)
             end_episode_totals = self._end_episode_totals(agent_end_episode, df_labels[i], write)
             end_episode_totals_df_list.append(end_episode_totals)
-            end_episode_central_tendencies.append(self._calculate_central_tendency(end_episode_totals, df_labels[i]))
+            central_tendency = self._calculate_central_tendency(end_episode_totals, df_labels[i])
+            central_tendency["episode_length_mean"] = agent_end_episode["day"].mean()
+            central_tendency["episode_length_median"] = agent_end_episode["day"].median()
+            central_tendency["episode_length_stdev"] = agent_end_episode["day"].std()
+            end_episode_central_tendencies.append(central_tendency)
             if get_normalised:
                 normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i]))
-        pd.DataFrame(end_episode_central_tendencies).to_csv(self.filepath+"central_tendencies_end_episode_totals.csv",index=False)
+        central_tendencies = pd.DataFrame(end_episode_central_tendencies)
+        best_results = pd.DataFrame(self._get_best_results(end_episode_central_tendencies))
+        central_tendencies.to_csv(self.filepath+"central_tendencies.csv",index=False)
+        best_results.to_csv(self.filepath+"best_results.csv",index=False)
         return end_episode_totals_df_list, agent_end_episode_df_list, normalised_df_list
     
     def _display_graphs(self, agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list=None):
@@ -315,6 +322,8 @@ class DataAnalysis():
                             "total_berries_stdev": df["total_berries"].std(),
                             }
         return central_tendency
+    
+    def _get_best_results(self, df):
 
     def _cohens_d(self, x_series, y_series):
         nx = len(x_series)
