@@ -415,7 +415,7 @@ class HarvestModel(Model):
             resources = [5, 1]
         elif num_agents == 4:
             #resources = [5, 2, 3, 2]
-            resources = [5, 2, 3, 2]
+            resources = [5, 3, 2, 2]
         elif num_agents == 6:
             resources = [5, 2, 3, 2, 5, 1]
         self.num_start_berries = sum(resources)
