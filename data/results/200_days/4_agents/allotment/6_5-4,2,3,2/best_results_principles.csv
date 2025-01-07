@@ -1,9 +1,9 @@
 Metric,Test Name,Value,Type
 gini_days_mean,utilitarian,0.3072433209275945,Minimum
 gini_days_median,utilitarian,0.2983249930497637,Minimum
-gini_days_stdev,maximin,0.1062693920285003,Minimum
-gini_berries_mean,utilitarian,0.361146788721404,Minimum
-gini_berries_median,utilitarian,0.3644345238095238,Minimum
+gini_days_stdev,maximin,0.10626939202850036,Minimum
+gini_berries_mean,utilitarian,0.36114678872140404,Minimum
+gini_berries_median,utilitarian,0.36443452380952385,Minimum
 gini_berries_stdev,maximin,0.1110900283475179,Minimum
 min_days_mean,utilitarian,30.951,Maximum
 min_days_median,utilitarian,21.0,Maximum
@@ -13,7 +13,7 @@ min_berries_median,baseline,2.0,Maximum
 min_berries_stdev,maximin,2.6769703341968825,Minimum
 max_days_mean,veto,199.278,Maximum
 max_days_median,baseline,200.0,Maximum
-max_days_stdev,veto,9.74133510406092,Minimum
+max_days_stdev,veto,9.741335104060921,Minimum
 max_berries_mean,baseline,45.948,Maximum
 max_berries_median,baseline,46.0,Maximum
 max_berries_stdev,baseline,4.476978818281291,Minimum
