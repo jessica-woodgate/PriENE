@@ -32,10 +32,11 @@ def generate_graphs(scenario, run_name, num_agents):
     writing_filepath = "data/results/current_run/"
     norms_filepath = "data/results/"+run_name+"/"+scenario+"_"
     #norms_filepath = "data/results/200_days/4_agents/allotment/8_4-5,3,2,2/norms/allotment_"
-    #writing_filepath = "data/results/200_days/4_agents/capabilities/9_3-5,4,1,2/"
+    writing_filepath = "data/results/200_days/4_agents/allotment/5_3_2_2/"
     data_analysis = DataAnalysis(num_agents, writing_filepath)
     if run_name == "current_run":
-        reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
+        #reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
+        reading_filepath = "data/results/200_days/4_agents/allotment/5_3_2_2/agent_reports_allotment_"
     else:
         reading_filepath = "data/results/"+run_name+"/"+scenario+"/agent_reports_"+scenario+"_"
     files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
@@ -44,7 +45,7 @@ def generate_graphs(scenario, run_name, num_agents):
     for file in files:
         df = pd.read_csv(file)
         dfs.append(df)
-    data_analysis.proccess_and_display_data(dfs, PRINCIPLES, AGGREGATIONS, scenario, norms_filepath)
+    data_analysis.proccess_and_display_data(dfs, PRINCIPLES, AGGREGATIONS, scenario, norms_filepath, write=False, get_normalised=True, process_norms=False)
 
 def log_wandb_agents(model_inst, last_episode, reward_tracker):
     for i, agent in enumerate(model_inst.schedule.agents):
@@ -102,10 +103,16 @@ def run_all(scenario,run_name,num_agents,num_start_berries,num_allocations,max_w
     for agent_type in AGENT_TYPES:
         create_and_run_model(scenario,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
 
-def get_integer_input(prompt):
+def get_integer_input(prompt, error_string=None, max_value=None, min_value=None):
     while True:
         try:
             value = int(input(prompt))
+            if max_value != None and value > max_value:
+                print(error_string)
+                continue
+            if min_value != None and value < min_value:
+                print(error_string)
+                continue
             return value
         except ValueError:
             print("Invalid input. Please enter an integer.")
@@ -172,6 +179,18 @@ elif args.option == "test" or args.option == "train":
     #########################################################################################
     num_agents = int(get_input(f"How many agents do you want to implement {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
     #########################################################################################
+    if scenario == "allotment":
+        MAX_WIDTH = num_agents * 4
+        num_allocations = get_integer_input(f"How many allotments do you want? (must be more than 0 and less than {num_agents+1}): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1)
+    elif scenario == "capabilities":
+        MAX_WIDTH = num_agents * 2
+        num_allocations = get_integer_input(f"How many capabilities do you want? (must be more than 0 and less than {num_agents+1}): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1)
+    else:
+        MAX_WIDTH = num_agents * 2
+        num_allocations = 1
+    MAX_HEIGHT = num_agents * 2
+    NUM_BERRIES = num_agents * 3
+    #########################################################################################
     write_data = write_data_input("data")
     #########################################################################################
     if args.option == "train":
@@ -189,18 +208,6 @@ elif args.option == "test" or args.option == "train":
     else:
         log_wandb = False
         wandb_project = None
-    #########################################################################################
-    if scenario != "allotment":
-        MAX_WIDTH = num_agents * 4
-        num_allocations = 2
-    elif scenario == "capabilities":
-        MAX_WIDTH = num_agents * 2
-        num_allocations = 2
-    else:
-        MAX_WIDTH = num_agents * 2
-        num_allocations = 1
-    MAX_HEIGHT = num_agents * 2
-    NUM_BERRIES = num_agents * 3
     if agent_type == "all":
         run_all(scenario,run_name,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
     else:

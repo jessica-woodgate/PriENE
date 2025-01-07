@@ -18,21 +18,22 @@ class DataAnalysis():
         self.num_agents = num_agents
         self.filepath = filepath
     
-    def proccess_and_display_data(self, agent_df_list, principles, aggregations, scenario, norms_filepath, get_normalised=False):
+    def proccess_and_display_data(self, agent_df_list, principles, aggregations, scenario, norms_filepath, write=True, get_normalised=False, process_norms=True):
         df_labels = principles + aggregations
         self.principles = principles
         self.aggregations = aggregations
-        end_episode_totals_df_list, agent_final_rows_df_list, normalised_df_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
+        end_episode_totals_df_list, agent_final_rows_df_list, normalised_df_list = self._process_agent_dfs(agent_df_list, df_labels, write, get_normalised)
         self._display_graphs(agent_final_rows_df_list, end_episode_totals_df_list, df_labels, normalised_df_list)
-        self._process_norms(df_labels, scenario, norms_filepath)
+        if process_norms:
+            self._process_norms(df_labels, scenario, norms_filepath)
 
-    def _process_agent_dfs(self, agent_df_list, df_labels, get_normalised):
-        write = True
+    def _process_agent_dfs(self, agent_df_list, df_labels, write, get_normalised):
         end_episode_totals_df_list = []
         end_episode_central_tendencies = []
         agent_end_episode_df_list = []
         if get_normalised:
             normalised_df_list = []
+            write_normalised = True
         else:
             normalised_df_list = None
         for i, df in enumerate(agent_df_list):
@@ -46,7 +47,7 @@ class DataAnalysis():
             central_tendency["episode_length_stdev"] = agent_end_episode["day"].std()
             end_episode_central_tendencies.append(central_tendency)
             if get_normalised:
-                normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i]))
+                normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i], write_normalised))
         central_tendencies = self._write_dictionary_to_file(end_episode_central_tendencies,self.filepath+"central_tendencies.csv")
         most_common = self._get_best_results(central_tendencies, "aggregations")
         self.principles += [most_common]
@@ -150,19 +151,19 @@ class DataAnalysis():
         self._display_dataframe(max_days_left_to_live, "Max Days Left To Live", "Days Left To Live", filename+"_max")
         min_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_min)
         self._display_dataframe(min_days_left_to_live, "Min Days Left To Live", "Days Left To Live", filename+"_min")
-        days_left_to_live_tendency["min_well_being"] = self._calculate_central_tendency(min_days_left_to_live["baseline"], min_days_left_to_live["maximin"])
+        days_left_to_live_tendency["min_well_being"] = self._calculate_normalised_central_tendency(min_days_left_to_live, df_labels)
         total_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_total)
         self._display_dataframe(total_days_left_to_live, "Total Days Left To Live", "Days Left To Live", filename+"_total")
-        days_left_to_live_tendency["total_well_being"] = self._calculate_central_tendency(total_days_left_to_live["baseline"], total_days_left_to_live["maximin"])
+        days_left_to_live_tendency["total_well_being"] = self._calculate_normalised_central_tendency(total_days_left_to_live, df_labels)
         gini_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_gini)
         self._display_dataframe(gini_days_left_to_live, "Gini Index of Days Left To Live", "Days Left To Live", filename+"_gini")
-        days_left_to_live_tendency["gini_well_being"] = self._calculate_central_tendency(gini_days_left_to_live["baseline"], gini_days_left_to_live["maximin"])
+        days_left_to_live_tendency["gini_well_being"] = self._calculate_normalised_central_tendency(gini_days_left_to_live, df_labels)
         max_days_left_to_live.to_csv(self.filepath+"max_days_left_to_live.csv")
         min_days_left_to_live.to_csv(self.filepath+"min_days_left_to_live.csv")
         gini_days_left_to_live.to_csv(self.filepath+"gini_days_left_to_live.csv")
         total_days_left_to_live.to_csv(self.filepath+"total_days_left_to_live.csv")
-        with open(self.filepath+"tendency_well_being.json", "w") as f:
-            json.dump(days_left_to_live_tendency, f, indent=4)
+        # with open(self.filepath+"tendency_well_being.json", "w") as f:
+        #     json.dump(days_left_to_live_tendency, f, indent=4)
 
     def _berries_consumed_results(self, sum_df_list, df_labels, filename):
         berries_consumed_tendency = {}
@@ -170,19 +171,19 @@ class DataAnalysis():
         self._display_dataframe(max_berries_consumed, "Max Berries Consumed", "Berries Consumed", filename+"_max")
         min_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_min)
         self._display_dataframe(min_berries_consumed, "Min Berries Consumed", "Berries Consumed", filename+"_min")
-        berries_consumed_tendency["min_berries"] = self._calculate_central_tendency(min_berries_consumed["baseline"], min_berries_consumed["maximin"])
+        berries_consumed_tendency["min_berries"] = self._calculate_normalised_central_tendency(min_berries_consumed, df_labels)
         total_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_total)
         self._display_dataframe(total_berries_consumed, "Total Berries Consumed", "Berries Consumed", filename+"_total")
-        berries_consumed_tendency["total_berries"] = self._calculate_central_tendency(total_berries_consumed["baseline"], total_berries_consumed["maximin"])
+        berries_consumed_tendency["total_berries"] = self._calculate_normalised_central_tendency(total_berries_consumed, df_labels)
         gini_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_gini)
         self._display_dataframe(gini_berries_consumed, "Gini Index of Berries Consumed", "Berries Consumed", filename+"_gini")
-        berries_consumed_tendency["gini_berries"] = self._calculate_central_tendency(gini_berries_consumed["baseline"], gini_berries_consumed["maximin"])
+        berries_consumed_tendency["gini_berries"] = self._calculate_normalised_central_tendency(gini_berries_consumed, df_labels)
         max_berries_consumed.to_csv(self.filepath+"max_berries_consumed.csv")
         min_berries_consumed.to_csv(self.filepath+"min_berries_consumed.csv")
         gini_berries_consumed.to_csv(self.filepath+"gini_berries_consumed.csv")
         total_berries_consumed.to_csv(self.filepath+"total_berries_consumed.csv")
-        with open(self.filepath+"tendency_berries_consumed.json", "w") as f:
-            json.dump(berries_consumed_tendency, f, indent=4)
+        # with open(self.filepath+"tendency_berries_consumed.json", "w") as f:
+        #     json.dump(berries_consumed_tendency, f, indent=4)
 
     def _display_swarm_plot(self, df_list, df_labels, column, filename):
         fig, ax = plt.subplots()
@@ -332,6 +333,9 @@ class DataAnalysis():
                             "total_berries_stdev": df["total_berries"].std(),
                             }
         return central_tendency
+    
+    def _calculate_normalised_central_tendency(self, df, df_labels):
+        pass
     
     def _get_best_results(self, df, run_type):
         best_results = []
