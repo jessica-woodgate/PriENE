@@ -30,20 +30,20 @@ def generate_graphs(scenario, run_name, num_agents):
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
     writing_filepath = "data/results/current_run/"
-    #norms_filepath = "data/results/"+run_name+"/"+scenario+"_"
-    norms_filepath = "data/results/200_days/4_agents/allotment/8_4-5,3,2,2/norms/allotment_"
-    writing_filepath = "data/results/200_days/4_agents/allotment/8_4-5,3,2,2/norms/"
+    norms_filepath = "data/results/"+run_name+"/"+scenario+"_"
+    #norms_filepath = "data/results/200_days/4_agents/allotment/8_4-5,3,2,2/norms/allotment_"
+    #writing_filepath = "data/results/200_days/4_agents/capabilities/9_3-5,4,1,2/"
     data_analysis = DataAnalysis(num_agents, writing_filepath)
-    # if run_name == "current_run":
-    #     reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
-    # else:
-    #     reading_filepath = "data/results/"+run_name+"/"+scenario+"/agent_reports_"+scenario+"_"
-    # files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
+    if run_name == "current_run":
+        reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
+    else:
+        reading_filepath = "data/results/"+run_name+"/"+scenario+"/agent_reports_"+scenario+"_"
+    files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
     #files = [reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
     dfs = []
-    # for file in files:
-    #     df = pd.read_csv(file)
-    #     dfs.append(df)
+    for file in files:
+        df = pd.read_csv(file)
+        dfs.append(df)
     data_analysis.proccess_and_display_data(dfs, PRINCIPLES, AGGREGATIONS, scenario, norms_filepath)
 
 def log_wandb_agents(model_inst, last_episode, reward_tracker):
@@ -209,7 +209,7 @@ elif args.option == "test" or args.option == "train":
 elif args.option == "graphs":
     graph_runs = ["current_run", "50_days", "200_days"]
     run_name = get_input(f"What run do you want to generate graphs for (select 200_days to reproduce graphs in the paper) {graph_runs}: ", f"Invalid name of run. Please choose {graph_runs}: ", graph_runs)
-    scenario = get_input("What type of scenario do you want to generate graphs for (colours, allotment): ", "Invalid scenario. Please choose 'colours', or 'allotment': ", ["colours", "allotment"])
+    scenario = get_input(f"What type of scenario do you want to generate graphs for {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES} ", SCENARIO_TYPES)
     num_agents = 4
     print("Graphs will be saved in data/results/current_run")
     generate_graphs(scenario,run_name,num_agents)

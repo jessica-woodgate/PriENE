@@ -1,0 +1,31 @@
+   medium berries
+     high health
+       high days
+         high days: [' eat']
+       medium days
+         high days
+           high days: [' move']
+         medium days: [' throw']
+     medium health
+       high days
+         high days: [' eat']
+       medium days
+         medium days: [' eat']
+       low days
+         low days: [' eat']
+   high berries
+     high health
+       high days
+         high days: [' eat']
+   no berries
+     medium health
+       medium days
+         medium days: [' move']
+       low days
+         low days
+           low days: [' move']
+     high health
+       medium days
+         medium days: [' move']
+       high days
+         high days: [' move']

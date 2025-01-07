@@ -20,14 +20,14 @@ class DataAnalysis():
     
     def proccess_and_display_data(self, agent_df_list, principles, aggregations, scenario, norms_filepath, get_normalised=False):
         df_labels = principles + aggregations
-        #self.principles = principles
-        #self.aggregations = aggregations
-        #end_episode_totals_df_list, agent_final_rows_df_list, normalised_df_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
-        #self._display_graphs(agent_final_rows_df_list, end_episode_totals_df_list, df_labels, normalised_df_list)
+        self.principles = principles
+        self.aggregations = aggregations
+        end_episode_totals_df_list, agent_final_rows_df_list, normalised_df_list = self._process_agent_dfs(agent_df_list, df_labels, get_normalised)
+        self._display_graphs(agent_final_rows_df_list, end_episode_totals_df_list, df_labels, normalised_df_list)
         self._process_norms(df_labels, scenario, norms_filepath)
 
     def _process_agent_dfs(self, agent_df_list, df_labels, get_normalised):
-        write = False
+        write = True
         end_episode_totals_df_list = []
         end_episode_central_tendencies = []
         agent_end_episode_df_list = []
