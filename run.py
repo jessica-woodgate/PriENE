@@ -31,12 +31,12 @@ def generate_graphs(scenario, run_name, num_agents):
     """
     writing_filepath = "data/results/current_run/"
     norms_filepath = "data/results/"+run_name+"/"+scenario+"_"
-    #norms_filepath = "data/results/200_days/4_agents/allotment/5_3_2_2/norms/allotment_"
-    #writing_filepath = "data/results/200_days/4_agents/allotment/5_3_2_2/"
+    #norms_filepath = "data/results/200_days/4_agents/colours/norms/colours_"
+    #writing_filepath = "data/results/200_days/4_agents/colours/"
     data_analysis = DataAnalysis(num_agents, writing_filepath)
     if run_name == "current_run":
         reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
-        #reading_filepath = "data/results/200_days/4_agents/allotment/5_3_2_2/agent_reports_allotment_"
+        #reading_filepath = "data/results/200_days/4_agents/colours/agent_reports_colours_"
     else:
         reading_filepath = "data/results/"+run_name+"/"+scenario+"/agent_reports_"+scenario+"_"
     files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]

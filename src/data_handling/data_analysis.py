@@ -66,13 +66,17 @@ class DataAnalysis():
     def _process_norms(self, df_labels, scenario, filepath):
         norm_processing = NormProcessing()
         cooperative_dfs = []
+        cooperative_tendencies = []
         for label in df_labels:
             input_file = filepath+label+"_emerged_norms.json"
             output_file = self.filepath+scenario+"_"+label+"_norms"
-            cooperative_dfs.append(norm_processing.proccess_norms(input_file, output_file))
+            df = norm_processing.proccess_norms(input_file, output_file, label)
+            cooperative_dfs.append(df)
+            cooperative_tendencies.append(self._calculate_norms_tendency(df, label))
         self._display_swarm_plot(cooperative_dfs,df_labels, "numerosity", filepath+"cooperative_numerosity")
         self._display_swarm_plot(cooperative_dfs,df_labels, "fitness", filepath+"cooperative_fitness")
         self._display_swarm_plot(cooperative_dfs,df_labels, "reward", filepath+"cooperative_reward")
+        self._write_dictionary_to_file(cooperative_tendencies,self.filepath+"cooperative_norms_tendencies.csv")
 
     def _normalise_step_across_episodes(self, df, df_label, write):
         """
@@ -331,6 +335,34 @@ class DataAnalysis():
                             "total_berries_mean": df["total_berries"].mean(),
                             "total_berries_median": df["total_berries"].median(),
                             "total_berries_stdev": df["total_berries"].std(),
+                            }
+        return central_tendency
+    
+    def _calculate_norms_tendency(self, df, df_label):
+        if "reward" in df.columns:
+            central_tendency = {"df_label": df_label,
+                            "reward_mean": df["reward"].mean(),
+                            "reward_median": df["reward"].median(),
+                            "reward_stdev": df["reward"].std(),
+                            "numerosity_mean": df["numerosity"].mean(),
+                            "numerosity_median": df["numerosity"].median(),
+                            "numerosity_stdev": df["numerosity"].std(),
+                            "fitness_mean": df["fitness"].mean(),
+                            "fitness_median": df["fitness"].median(),
+                            "fitness_stdev": df["fitness"].std(),
+                            }
+        else:
+            #no cooperative norms found
+            central_tendency = {"df_label": df_label,
+                            "reward_mean": 0,
+                            "reward_median": 0,
+                            "reward_stdev": 0,
+                            "numerosity_mean": 0,
+                            "numerosity_median": 0,
+                            "numerosity_stdev": 0,
+                            "fitness_mean": 0,
+                            "fitness_median": 0,
+                            "fitness_stdev": 0,
                             }
         return central_tendency
     
