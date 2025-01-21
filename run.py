@@ -18,7 +18,7 @@ import re
 PRINCIPLES = ["baseline", "utilitarian", "maximin", "egalitarian"]
 AGGREGATIONS = ["average", "majoritarian", "veto", "optimist"]
 AGENT_TYPES = PRINCIPLES + AGGREGATIONS
-SCENARIO_TYPES = ["colours", "allotment", "capabilities"]
+SCENARIO_TYPES = ["colours", "capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 1000
 RUN_OPTIONS = ["current_run", "50_days", "200_days"]
@@ -30,18 +30,18 @@ def generate_graphs(scenario, run_name, num_agents):
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
     writing_filepath = "data/results/current_run/"
-    norms_filepath = "data/results/"+run_name+"/"+scenario+"_"
+    norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/norms/"+scenario+"_"
     data_analysis = DataAnalysis(num_agents, writing_filepath)
     if run_name == "current_run":
         reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
     else:
-        reading_filepath = "data/results/"+run_name+"/"+scenario+"/agent_reports_"+scenario+"_"
+        reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+scenario+"_"
     files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
     dfs = []
     for file in files:
         df = pd.read_csv(file)
         dfs.append(df)
-    data_analysis.proccess_and_display_data(dfs, PRINCIPLES, AGGREGATIONS, scenario, norms_filepath, write=True, get_normalised=True, process_norms=True)
+    data_analysis.proccess_and_display_data(dfs, PRINCIPLES, AGGREGATIONS, scenario, norms_filepath, write=True, get_normalised=False, process_norms=True)
 
 def log_wandb_agents(model_inst, last_episode, reward_tracker):
     for i, agent in enumerate(model_inst.schedule.agents):
@@ -156,7 +156,7 @@ if args.option not in ["test", "train", "graphs"]:
 elif args.option == "test" or args.option == "train":
     if args.option == "test":
         scenario = get_input(f"What type of scenario do you want to run {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES)
-        run_name = get_input(f"What run do you want to test {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
+        run_name = get_input(f"What run do you want to test (select 200_days to replicate results in the paper) {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
         max_episodes = MAX_EPISODES
         training = False
         if run_name != "current_run":
@@ -173,14 +173,14 @@ elif args.option == "test" or args.option == "train":
     types = AGENT_TYPES + ["all"]
     agent_type = get_input(f"What type of agent do you want to implement {types}: ", f"Invalid agent type. Please choose {types}: ", types)
     #########################################################################################
-    num_agents = int(get_input(f"How many agents do you want to implement {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
+    num_agents = int(get_input(f"How many agents do you want to implement (select 4 to replicate results in the paper) {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
     #########################################################################################
     if scenario == "allotment":
         MAX_WIDTH = num_agents * 4
-        num_allocations = get_integer_input(f"How many allotments do you want? (must be more than 0 and less than {num_agents+1}): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1)
+        num_allocations = get_integer_input(f"How many allotments do you want? (select 2 to replicate results in the paper) (must be more than 0 and less than {num_agents+1}): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1)
     elif scenario == "capabilities":
         MAX_WIDTH = num_agents * 2
-        num_allocations = get_integer_input(f"How many capabilities do you want? (must be more than 0 and less than {num_agents+1}): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1)
+        num_allocations = get_integer_input(f"How many capabilities do you want? (must be more than 0 and less than {num_agents+1}) (select 2 to replicate results in the paper): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1)
     else:
         MAX_WIDTH = num_agents * 2
         num_allocations = 1
