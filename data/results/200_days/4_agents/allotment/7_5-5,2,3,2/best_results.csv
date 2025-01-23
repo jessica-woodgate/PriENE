@@ -1,0 +1,25 @@
+Metric,Test Name,Value,Extremum Type
+mean_gini_days,egalitarian,0.294696010479994,Minimum
+median_gini_days,optimist,0.2352216748768472,Minimum
+stdev_gini_days,maximin,0.1099587523918182,Minimum
+mean_min_days,majoritarian,34.684,Maximum
+median_min_days,egalitarian,21.0,Maximum
+stdev_min_days,baseline,17.00958029528718,Minimum
+mean_max_days,baseline,199.462,Maximum
+median_max_days,baseline,200.0,Maximum
+stdev_max_days,baseline,9.178278531227782,Minimum
+mean_total_days,utilitarian,512.744,Maximum
+median_total_days,optimist,609.0,Maximum
+stdev_total_days,utilitarian,114.46738944890484,Minimum
+mean_gini_berries,egalitarian,0.3477928810823295,Minimum
+median_gini_berries,optimist,0.28515625,Minimum
+stdev_gini_berries,maximin,0.1153542974495788,Minimum
+mean_min_berries,majoritarian,5.035,Maximum
+median_min_berries,egalitarian,3.0,Maximum
+stdev_min_berries,baseline,2.8665812893215303,Minimum
+mean_max_berries,baseline,47.717,Maximum
+median_max_berries,baseline,48.0,Maximum
+stdev_max_berries,majoritarian,4.472348589041545,Minimum
+mean_total_berries,utilitarian,105.024,Maximum
+median_total_berries,optimist,114.0,Maximum
+stdev_total_berries,utilitarian,22.81021108472541,Minimum

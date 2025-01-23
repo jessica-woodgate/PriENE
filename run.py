@@ -1,20 +1,27 @@
 from src.scenarios.basic_harvest import BasicHarvest
-from src.scenarios.capabilities_harvest import CapabilitiesHarvest
+from src.scenarios.colours_harvest import ColoursHarvest
 from src.scenarios.allotment_harvest import AllotmentHarvest
+from src.scenarios.capabilities_harvest import CapabilitiesHarvest
 from src.data_handling.data_analysis import DataAnalysis
 from src.data_handling.render_pygame import RenderPygame
 import pandas as pd
 import argparse
 import wandb
 import numpy as np
+import re
 
-#AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles", "multiobjective_mp"]
-AGENT_TYPES = ["baseline", "egalitarian", "maximin", "utilitarian", "all_principles"]
-SCENARIO_TYPES = ["capabilities", "allotment"]
+#all_principles = average
+#all_principles_3 = majoritarian
+#all_principles_5 = veto (do_no_harm in model variables)
+#all_principles_6 = optimist
+
+PRINCIPLES = ["baseline", "utilitarian", "maximin", "egalitarian"]
+AGGREGATIONS = ["average", "majoritarian", "veto", "optimist"]
+AGENT_TYPES = PRINCIPLES + AGGREGATIONS
+SCENARIO_TYPES = ["colours", "capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 1000
-MAX_DAYS = 200
-RUN_OPTIONS = ["current_run", "run_1", "run_2", "run_3", "run_4"]
+RUN_OPTIONS = ["current_run", "50_days", "200_days"]
 
 def generate_graphs(scenario, run_name, num_agents):
     """
@@ -23,21 +30,18 @@ def generate_graphs(scenario, run_name, num_agents):
     e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
     writing_filepath = "data/results/current_run/"
+    norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/norms/"+scenario+"_"
     data_analysis = DataAnalysis(num_agents, writing_filepath)
     if run_name == "current_run":
         reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
-        norms_filepath = "data/results/"+run_name+"/"+scenario
     else:
         reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+scenario+"_"
-        norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/"+scenario
-        #reading_filepath = "data/results/200_days/run_3_always_ethics_sanction/"+scenario+"/agent_reports_"+scenario+"_"
-        #norms_filepath = "data/results/200_days/run_3_always_ethics_sanction/"+scenario+"/"+scenario
-    files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"all_principles.csv"]
+    files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
     dfs = []
     for file in files:
         df = pd.read_csv(file)
         dfs.append(df)
-    data_analysis.proccess_and_display_all_data(dfs, AGENT_TYPES, scenario, norms_filepath)
+    data_analysis.proccess_and_display_data(dfs, PRINCIPLES, AGGREGATIONS, scenario, norms_filepath, write=True, get_normalised=False, process_norms=True)
 
 def log_wandb_agents(model_inst, last_episode, reward_tracker):
     for i, agent in enumerate(model_inst.schedule.agents):
@@ -76,27 +80,35 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
     num_episodes = model_inst.episode
     return num_episodes
 
-def create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):   
+def create_and_run_model(scenario,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):   
     file_string = scenario+"_"+agent_type
     checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
     if scenario == "basic":
         model_inst = BasicHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
-    elif scenario == "capabilities":
-        model_inst = CapabilitiesHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+    elif scenario == "colours":
+        model_inst = ColoursHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+        model_inst = AllotmentHarvest(num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+    elif scenario == "capabilities":
+        model_inst = CapabilitiesHarvest(num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
     else:
         ValueError("Unknown argument: "+scenario)
     run_simulation(model_inst,render,log_wandb,wandb_project)
 
-def run_all(scenario,run_name,num_agents,num_start_berries,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):
+def run_all(scenario,run_name,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):
     for agent_type in AGENT_TYPES:
-        create_and_run_model(scenario,run_name,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
+        create_and_run_model(scenario,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
 
-def get_integer_input(prompt):
+def get_integer_input(prompt, error_string=None, max_value=None, min_value=None):
     while True:
         try:
             value = int(input(prompt))
+            if max_value != None and value > max_value:
+                print(error_string)
+                continue
+            if min_value != None and value < min_value:
+                print(error_string)
+                continue
             return value
         except ValueError:
             print("Invalid input. Please enter an integer.")
@@ -123,6 +135,13 @@ def write_data_input(data_type):
     elif write_data == "n":
         write_data = False
     return write_data
+
+def extract_number(string):
+    match = re.match(r"(\d+)_days", string)
+    if match:
+        return int(match.group(1))
+    return None
+
 #########################################################################################
 
 parser = argparse.ArgumentParser(description="Program options")
@@ -136,20 +155,37 @@ if args.option not in ["test", "train", "graphs"]:
     print("Please choose 'test', 'train', or 'graphs'.")
 elif args.option == "test" or args.option == "train":
     if args.option == "test":
-        scenario = get_input(f"What type of scenario do you want to run {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES)#########################################################################################
-        run_name = get_input(f"What run do you want to test {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
-        max_episodes = MAX_EPISODES #get_integer_input("How many episodes do you want to run: ")
+        scenario = get_input(f"What type of scenario do you want to run {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES)
+        run_name = get_input(f"What run do you want to test (select 200_days to replicate results in the paper) {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
+        max_episodes = MAX_EPISODES
         training = False
+        if run_name != "current_run":
+            max_days = extract_number(run_name)
+        else:
+            max_days = get_integer_input("How many days in each episode: ")
     else:
         training = True
         scenario = "basic"
         run_name = "current_run"
         max_episodes = 0
+        max_days = get_integer_input("How many days in each episode: ")
     #########################################################################################
     types = AGENT_TYPES + ["all"]
     agent_type = get_input(f"What type of agent do you want to implement {types}: ", f"Invalid agent type. Please choose {types}: ", types)
     #########################################################################################
-    num_agents = int(get_input(f"How many agents do you want to implement {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
+    num_agents = int(get_input(f"How many agents do you want to implement (select 4 to replicate results in the paper) {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
+    #########################################################################################
+    if scenario == "allotment":
+        MAX_WIDTH = num_agents * 4
+        num_allocations = get_integer_input(f"How many allotments do you want? (select 2 to replicate results in the paper) (must be more than 0 and less than {num_agents+1}): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1)
+    elif scenario == "capabilities":
+        MAX_WIDTH = num_agents * 2
+        num_allocations = get_integer_input(f"How many capabilities do you want? (must be more than 0 and less than {num_agents+1}) (select 2 to replicate results in the paper): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1)
+    else:
+        MAX_WIDTH = num_agents * 2
+        num_allocations = 1
+    MAX_HEIGHT = num_agents * 2
+    NUM_BERRIES = num_agents * 3
     #########################################################################################
     write_data = write_data_input("data")
     #########################################################################################
@@ -168,21 +204,15 @@ elif args.option == "test" or args.option == "train":
     else:
         log_wandb = False
         wandb_project = None
-    #########################################################################################
-    if scenario != "allotment":
-        MAX_WIDTH = num_agents * 2
-    else:
-        MAX_WIDTH = num_agents * 4
-    MAX_HEIGHT = num_agents * 2
-    NUM_BERRIES = num_agents * 3
     if agent_type == "all":
-        run_all(scenario,run_name,num_agents,NUM_BERRIES,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,log_wandb,wandb_project)
+        run_all(scenario,run_name,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
     else:
-        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,MAX_DAYS,training,write_data,write_norms,render,log_wandb,wandb_project)
+        create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
 #########################################################################################
 elif args.option == "graphs":
-    run_name = get_input(f"What run do you want to generate graphs for {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
-    scenario = get_input("What type of scenario do you want to generate graphs for (capabilities, allotment): ", "Invalid scenario. Please choose 'capabilities', or 'allotment': ", ["capabilities", "allotment"])
-    num_agents = int(get_input(f"How many agents do you want to implement {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
+    graph_runs = ["current_run", "50_days", "200_days"]
+    run_name = get_input(f"What run do you want to generate graphs for (select 200_days to reproduce graphs in the paper) {graph_runs}: ", f"Invalid name of run. Please choose {graph_runs}: ", graph_runs)
+    scenario = get_input(f"What type of scenario do you want to generate graphs for {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES} ", SCENARIO_TYPES)
+    num_agents = 4
     print("Graphs will be saved in data/results/current_run")
     generate_graphs(scenario,run_name,num_agents)

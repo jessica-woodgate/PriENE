@@ -17,8 +17,9 @@ class BasicHarvest(HarvestModel):
     def _init_berries(self):
         berries = []
         self.num_berries = 0
+        allotment = [0,self.max_width,0,self.max_height]
         for i in range(self.num_start_berries):
-            b = self._new_berry(0, self.max_width, 0, self.max_height)
+            b = self._new_berry(allotment)
             self._place_agent_in_allotment(b)
             self.num_berries += 1
             berries.append(b)

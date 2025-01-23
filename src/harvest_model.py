@@ -108,29 +108,29 @@ class HarvestModel(Model):
         """
         return self.grid.iter_cell_list_contents(cell)
 
-    def get_uneaten_berries_coordinates(self, agent_id=None):
+    def get_uneaten_berries_coordinates(self, allocation_id=None):
         """
         Get the coordinates of uneaten berries
         """
         berries_coordinates = []
         for b in self.berries:
             if b.foraged == False:
-                if agent_id==None:
+                if allocation_id==None:
                     berries_coordinates.append(b.pos)
                 else:
-                    if b.allocated_agent_id == agent_id:
+                    if b.allocation_id == allocation_id:
                         berries_coordinates.append(b.pos)
         return berries_coordinates
     
-    def get_uneaten_berry_by_coords(self, coords, agent_id=None):
+    def get_uneaten_berry_by_coords(self, coords, allocation_id=None):
         """
         Get an uneaten berry by its coordinates
         """
         for b in self.berries:
             if b.pos == coords and b.foraged == False:
-                if agent_id == None:
+                if allocation_id == None:
                     return b
-                elif b.allocated_agent_id == agent_id:
+                elif b.allocation_id == allocation_id:
                     return b
         raise NoBerriesException(coordinates=coords)
     
@@ -171,12 +171,9 @@ class HarvestModel(Model):
     
     def _init_agents(self, agent_type, checkpoint_path):
         self.living_agents = []
+        allotment = [0,self.max_width,0,self.max_height]
         for i in range(self.num_agents):
-            if agent_type == "multiobjective_sp":
-                n_rewards = 4
-                a = HarvestAgent(i,self,agent_type,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,n_rewards=n_rewards,shared_replay_buffer=self.shared_replay_buffer)
-            else:
-                a = HarvestAgent(i,self,agent_type,0,self.max_width,0,self.max_height,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+            a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
             self._add_agent(a)
         self.berry_id = len(self.living_agents) + 1
 
@@ -400,8 +397,10 @@ class HarvestModel(Model):
         agent.days_left_to_live = 0
         self.living_agents = [a for a in self.schedule.agents if a.agent_type != "berry" and a.off_grid == False]
     
-    def _new_berry(self,min_width,max_width,min_height,max_height,allocation_id=None):
-        berry = Berry(self.berry_id,self,min_width,max_width,min_height,max_height,allocation_id)
+    def _new_berry(self,allotment,allocation_id=None):
+        if allocation_id != None:
+            allocation_id = "allocation_"+str(allocation_id)
+        berry = Berry(self.berry_id,self,allotment,allocation_id)
         self.schedule.add(berry)
         self.berry_id += 1
         return berry
@@ -415,7 +414,7 @@ class HarvestModel(Model):
         if num_agents == 2:
             resources = [5, 1]
         elif num_agents == 4:
-            resources = [5, 2, 3, 2]
+            resources = [5, 3, 2, 2]
         elif num_agents == 6:
             resources = [5, 2, 3, 2, 5, 1]
         self.num_start_berries = sum(resources)

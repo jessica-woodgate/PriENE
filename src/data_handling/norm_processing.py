@@ -7,7 +7,7 @@ class NormProcessing():
         self.min_fitness = 0.1
         self.min_reward = 50
     
-    def proccess_norms(self, input_file, output_file):
+    def proccess_norms(self, input_file, output_file, df_label):
         f = open(input_file)
         data = json.load(f)
         cooperative_data = self._count_cooperative_norms(data, output_file)
@@ -31,7 +31,7 @@ class NormProcessing():
         print("Total emerged norms:", n_norms, "Total cooperative norms:", len(cooperative_norms))
         print("Proportion of cooperative norms for "+output_file+" is "+str((len(cooperative_norms)/n_norms)*100))
         df = pd.DataFrame(cooperative_norms)
-        df.to_csv(output_file+"_cooperative_data.csv")
+        df.to_csv(output_file+"_cooperative_data.csv",index=False)
         return df
     
     def _generalise_norms(self, norms, output_file):

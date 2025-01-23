@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 class DQNDecisionModule():
-    def __init__(self,agent_type,unique_id,training,actions,n_features,checkpoint_path,epsilon,n_rewards=1,shared_replay_buffer=None):
+    def __init__(self,agent_type,unique_id,training,actions,n_features,checkpoint_path,epsilon,shared_replay_buffer=None):
         self.n_features = n_features
         self.agent_type = agent_type
         self.unique_id = unique_id
@@ -14,7 +14,6 @@ class DQNDecisionModule():
         self.total_episode_reward = 0
         self.actions = actions
         self.n_actions = len(actions)
-        self.n_rewards = n_rewards
         self.shared_replay_buffer = shared_replay_buffer
         self.learn_step = 0
         self.replace_target_iter = 50
@@ -63,8 +62,8 @@ class DQNDecisionModule():
         if self.training:
             os.makedirs(os.path.dirname(self.q_checkpoint_path), exist_ok=True)
             os.makedirs(os.path.dirname(self.target_checkpoint_path), exist_ok=True)
-        self.q_network = DQN(self.actions,(self.n_features,),self.training,self.n_rewards,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
-        self.target_network = DQN(self.actions,(self.n_features,),self.training,self.n_rewards,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
+        self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
+        self.target_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
         if self.training:
             inputs = np.zeros(self.n_features)
             self.q_network.dqn(np.atleast_2d(inputs.astype('float32')))
