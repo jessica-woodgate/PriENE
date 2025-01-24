@@ -5,7 +5,6 @@ import json
 import numpy as np
 from collections import Counter
 from src.data_handling.norm_processing import NormProcessing
-from scipy import stats
 
 class DataAnalysis():
     """
@@ -17,6 +16,12 @@ class DataAnalysis():
     def __init__(self, num_agents, filepath):
         self.num_agents = num_agents
         self.filepath = filepath
+
+    def display_paper_graphs(self, agent_end_episode_dfs, end_episode_totals_dfs, principles, aggregations):
+        df_labels = principles + aggregations
+        self.principles = principles
+        self.aggregations = aggregations
+        self._display_graphs(agent_end_episode_dfs, end_episode_totals_dfs, df_labels)
     
     def proccess_and_display_data(self, agent_df_list, principles, aggregations, scenario, norms_filepath, write=True, get_normalised=False, process_norms=True):
         df_labels = principles + aggregations

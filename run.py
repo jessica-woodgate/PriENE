@@ -10,11 +10,6 @@ import wandb
 import numpy as np
 import re
 
-#all_principles = average
-#all_principles_3 = majoritarian
-#all_principles_5 = veto (do_no_harm in model variables)
-#all_principles_6 = optimist
-
 PRINCIPLES = ["baseline", "utilitarian", "maximin", "egalitarian"]
 AGGREGATIONS = ["average", "majoritarian", "veto", "optimist"]
 AGENT_TYPES = PRINCIPLES + AGGREGATIONS
@@ -23,11 +18,33 @@ NUM_AGENTS_OPTIONS = ["2", "4", "6"]
 MAX_EPISODES = 1000
 RUN_OPTIONS = ["current_run", "50_days", "200_days"]
 
+def generate_paper_graphs(scenario):
+    """
+    takes data files and generates graphs displayed in the paper
+    agent_end_episode dfs contain data for each agent at the end of each episode
+    end_episode_totals contain the totals across the society at the end of each episode
+    """
+    run_name = "200_days"
+    num_agents = 4
+    writing_filepath = "data/results/current_run/"
+    data_analysis = DataAnalysis(num_agents, writing_filepath)
+    agents_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_end_episode_df_"
+    episodes_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/end_episode_totals_"
+    agent_end_episode_files = [agents_filepath+"baseline.csv",agents_filepath+"egalitarian.csv",agents_filepath+"maximin.csv",agents_filepath+"utilitarian.csv",agents_filepath+"average.csv",agents_filepath+"majoritarian.csv",agents_filepath+"optimist.csv",agents_filepath+"veto.csv"]
+    end_episode_totals_files = [episodes_filepath+"baseline.csv",episodes_filepath+"egalitarian.csv",episodes_filepath+"maximin.csv",episodes_filepath+"utilitarian.csv",episodes_filepath+"average.csv",episodes_filepath+"majoritarian.csv",episodes_filepath+"optimist.csv",episodes_filepath+"veto.csv"]
+    agent_end_episode_dfs = []
+    end_episode_totals_dfs = []
+    for i, file in enumerate(agent_end_episode_files):
+        df = pd.read_csv(file)
+        agent_end_episode_dfs.append(df)
+        df = pd.read_csv(end_episode_totals_files[i])
+        end_episode_totals_dfs.append(df)
+    data_analysis.display_paper_graphs(agent_end_episode_dfs, end_episode_totals_dfs, PRINCIPLES, AGGREGATIONS)
+
 def generate_graphs(scenario, run_name, num_agents):
     """
-    takes raw files and generates graphs displayed in the paper
+    takes raw files and generates graphs
     processed dfs contain data for each agent at the end of each episode
-    e_epochs are run for at most t_max steps; results are normalised by frequency of step
     """
     writing_filepath = "data/results/current_run/"
     norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/norms/"+scenario+"_"
@@ -210,9 +227,12 @@ elif args.option == "test" or args.option == "train":
         create_and_run_model(scenario,run_name,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
 #########################################################################################
 elif args.option == "graphs":
-    graph_runs = ["current_run", "50_days", "200_days"]
-    run_name = get_input(f"What run do you want to generate graphs for (select 200_days to reproduce graphs in the paper) {graph_runs}: ", f"Invalid name of run. Please choose {graph_runs}: ", graph_runs)
+    graph_runs = ["current_run", "50_days", "200_days", "paper"]
+    run_name = get_input(f"What run do you want to generate graphs for (select paper to reproduce graphs in the paper) {graph_runs}: ", f"Invalid name of run. Please choose {graph_runs}: ", graph_runs)
     scenario = get_input(f"What type of scenario do you want to generate graphs for {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES} ", SCENARIO_TYPES)
-    num_agents = 4
     print("Graphs will be saved in data/results/current_run")
-    generate_graphs(scenario,run_name,num_agents)
+    if run_name == "paper":
+        generate_paper_graphs(scenario)
+    else:
+        num_agents = int(get_input(f"How many agents {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
+        generate_graphs(scenario,run_name,num_agents)
