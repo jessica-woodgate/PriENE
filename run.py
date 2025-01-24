@@ -39,7 +39,7 @@ def generate_paper_graphs(scenario):
         agent_end_episode_dfs.append(df)
         df = pd.read_csv(end_episode_totals_files[i])
         end_episode_totals_dfs.append(df)
-    data_analysis.display_paper_graphs(agent_end_episode_dfs, end_episode_totals_dfs, PRINCIPLES, AGGREGATIONS)
+    data_analysis.proccess_and_display_data(agent_end_episode_dfs, PRINCIPLES, AGGREGATIONS, scenario, end_episode_totals_dfs=end_episode_totals_dfs, write=True, get_normalised=False, process_norms=False)
 
 def generate_graphs(scenario, run_name, num_agents):
     """
