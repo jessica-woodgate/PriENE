@@ -2,9 +2,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import json
+import csv
 import numpy as np
 from collections import Counter
 from src.data_handling.norm_processing import NormProcessing
+import scipy.stats as stats
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 class DataAnalysis():
     """
@@ -21,7 +26,9 @@ class DataAnalysis():
         df_labels = principles + aggregations
         self.principles = principles
         self.aggregations = aggregations
-        self._display_graphs(agent_end_episode_dfs, end_episode_totals_dfs, df_labels)
+        #self._display_graphs(agent_end_episode_dfs, end_episode_totals_dfs, df_labels)
+        self._test_all_variables_significance(agent_end_episode_dfs, df_labels, "agent_end")
+        self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode")
     
     def proccess_and_display_data(self, agent_df_list, principles, aggregations, scenario, norms_filepath, write=True, get_normalised=False, process_norms=True):
         df_labels = principles + aggregations
@@ -31,6 +38,42 @@ class DataAnalysis():
         self._display_graphs(agent_final_rows_df_list, end_episode_totals_df_list, df_labels, normalised_df_list)
         if process_norms:
             self._process_norms(df_labels, scenario, norms_filepath)
+
+    def _test_all_variables_significance(self, dfs, df_labels, df_type):
+        variables = dfs[0].columns
+        variables = variables[1:]
+        exclude_list = ["agent_id", "episode", "day", "action"]
+        variables = [var for var in variables if var not in exclude_list]
+        for dependent_variable in variables:
+            anova_table, tukey_results, anova, tukey = self._perform_anova(dfs, df_labels, dependent_variable)
+            if tukey:
+                with open(self.filepath+"tukey_results_"+df_type+"_"+dependent_variable+".txt", "w") as f:
+                    f.write(str(tukey_results.summary()))
+    
+    def _perform_anova(self, dfs, df_labels, dependent_variable):
+        all_data = []
+        for i, df in enumerate(dfs):
+            temp_df = df[[dependent_variable]].copy()
+            temp_df["society"] = df_labels[i]
+            all_data.append(temp_df)
+        combined_df = pd.concat(all_data, ignore_index=True)
+        try:
+            #ordinary least squares: dependent variable is predicted by society (which is a category)
+            #fit linear regression model to data
+            model = ols(f'{dependent_variable} ~ C(society)', data=combined_df).fit()
+            #perform anova test based on fitted linear model, use type 2 sum of squares
+            anova_table = sm.stats.anova_lm(model, typ=2)
+        except Exception as e:
+            print(f"Exception during ANOVA test for {dependent_variable}: {e}")
+            return None, None, False, False
+        try:
+            #perform Tukey's HSD post-hoc test used after a significant anova to determine which specific groups are significantly different
+            #significance level 0.05 (95% confidence level)
+            tukey_results = pairwise_tukeyhsd(combined_df[dependent_variable], combined_df["society"], alpha=0.05)
+            return anova_table, tukey_results, True, True
+        except Exception as e:
+            print(f"Exception during post hoc test for {dependent_variable}: {e}")
+            return anova_table, None, True, False
 
     def _process_agent_dfs(self, agent_df_list, df_labels, write, get_normalised):
         end_episode_totals_df_list = []
