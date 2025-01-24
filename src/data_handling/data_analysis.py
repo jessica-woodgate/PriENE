@@ -424,8 +424,6 @@ class DataAnalysis():
             return (x_series.mean() - y_series.mean()) / np.sqrt(((nx-1)*x_series.std() ** 2 + (ny-1)*y_series.std() ** 2) / dof)
         else:
             return (x_series.mean() - y_series.mean()) / np.sqrt((x_series.std() ** 2 + y_series.std() ** 2) / 2.0)
-    
-    
 
     def _test_all_variables_significance(self, dfs, df_labels, df_type):
         variables = dfs[0].columns
