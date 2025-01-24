@@ -42,7 +42,7 @@ class DataAnalysis():
     def _test_all_variables_significance(self, dfs, df_labels, df_type):
         variables = dfs[0].columns
         variables = variables[1:]
-        exclude_list = ["agent_id", "episode", "day", "action"]
+        exclude_list = ["agent_id", "episode", "action"]
         variables = [var for var in variables if var not in exclude_list]
         for dependent_variable in variables:
             anova_table, tukey_results, anova, tukey = self._perform_anova(dfs, df_labels, dependent_variable)
