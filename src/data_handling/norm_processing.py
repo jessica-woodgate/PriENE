@@ -29,7 +29,8 @@ class NormProcessing():
                     norm_data = {"reward": norm_value["reward"], "numerosity": norm_value["numerosity"], "fitness": norm_value["fitness"]}
                     cooperative_norms.append(norm_data)
         print("Total emerged norms:", n_norms, "Total cooperative norms:", len(cooperative_norms))
-        print("Proportion of cooperative norms for "+output_file+" is "+str((len(cooperative_norms)/n_norms)*100))
+        if len(cooperative_norms) != 0 and n_norms != 0:
+            print("Proportion of cooperative norms for "+output_file+" is "+str((len(cooperative_norms)/n_norms)*100))
         df = pd.DataFrame(cooperative_norms)
         df.to_csv(output_file+"_cooperative_data.csv",index=False)
         return df

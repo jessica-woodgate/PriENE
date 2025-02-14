@@ -23,7 +23,6 @@ class DQNDecisionModule():
         return self.q_network.choose_action(observation, self.epsilon)
     
     def learn(self, observation, action, reward, next_state, done, episode):
-        #vectorised rewards
         experience = {"s":observation, "a":action, "r":reward, "s_":next_state, "done":done}
         self.q_network.add_experience(experience)
         loss = self.q_network.train(self.target_network)
