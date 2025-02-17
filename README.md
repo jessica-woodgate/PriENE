@@ -1,5 +1,5 @@
 # PriENE
-This repository includes the codebase for the paper "Operationalising Rawlsian Ethics for Fairness in Norm-Learning Agents."
+This repository includes the codebase for the paper "Combining Normative Ethics Principles to Learn Prosocial Behaviour".
 
 
 ## Table of Contents
