@@ -8,7 +8,7 @@ This repository includes the codebase for the paper "Combining Normative Ethics 
 - [Usage](#usage)
 
 ## Introduction
-PriENE is a framework for implementing multiple normative ethics principles in decision-making capacities of norm-learning agents. This codebase facilitates the creation of agents that aggregate multiple principles to evaluate the effects of their actions on the well-being of other agents. By operationalising principles, PriENE agents learn behaviours which promote prosocial norms that balance individual interests with collective well-being. Evaluations in simulated harvesting scenarios demonstrate that PriENE agents enhance fairness and sustainability compared to agents that implement individual principles.
+PriENE is a framework for implementing multiple normative ethics principles in decision-making capacities of norm-learning agents. This codebase facilitates the creation of agents that aggregate multiple principles to evaluate the effects of their actions on the well-being of other agents. By operationalising principles, PriENE agents learn behaviours that promote prosocial norms which balance individual interests with collective well-being. Evaluations in simulated harvesting scenarios demonstrate that PriENE agents enhance fairness and sustainability compared to agents that implement individual principles.
 
 ## Initialisation
 To set up the environment, create a virtual environment using:
