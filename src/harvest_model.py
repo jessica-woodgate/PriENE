@@ -169,15 +169,24 @@ class HarvestModel(Model):
     def _init_berries(self):
         raise NotImplementedError
     
-    def _init_agents(self, agent_type, checkpoint_path):
+    def _init_agents(self, society_mix, agent_type, checkpoint_path):
         self.living_agents = []
         allotment = [0,self.max_width,0,self.max_height]
-        for i in range(self.num_agents):
-            a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
-            self._add_agent(a)
+        if society_mix == "homogeneous":
+            for i in range(self.num_agents):
+                self._add_agent(i, agent_type, allotment, checkpoint_path)
+        else:
+            assert self.num_agents%2 == 0
+            half_pop = int(self.num_agents/2)
+            for i in range(half_pop):
+                self._add_agent(i, agent_type, allotment, checkpoint_path)
+            for i in range(half_pop):
+                self._add_agent(i+half_pop, "baseline", allotment, checkpoint_path)
+        assert self.num_agents == len(self.living_agents)
         self.berry_id = len(self.living_agents) + 1
 
-    def _add_agent(self, a):
+    def _add_agent(self, i, agent_type, allotment, checkpoint_path):
+        a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
         self.schedule.add(a)
         self._place_agent_in_allotment(a)
         if a.agent_type != "berry":
@@ -205,6 +214,7 @@ class HarvestModel(Model):
         if num_berries != self.num_berries:
             raise NumBerriesException(self.num_berries, num_berries)
         self.agent_reporter = pd.DataFrame({"agent_id": [],
+                               "agent_type": [],
                                "episode": [],
                                "day": [],
                                "berries": [],
@@ -235,6 +245,7 @@ class HarvestModel(Model):
         
     def _init_reporters(self):
         self.agent_reporter = pd.DataFrame({"agent_id": [],
+                               "agent_type": [],
                                "episode": [],
                                "day": [],
                                "berries": [],
@@ -249,7 +260,7 @@ class HarvestModel(Model):
         if self.write_data and not self.training:
            if exists("data/results/current_run/agent_reports_"+self.filepath+".csv"):
                raise FileExistsException("data/results/current_run/agent_reports_"+self.filepath+".csv")
-           self.agent_reporter.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", mode='a')
+           self.agent_reporter.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", mode='a',index=False)
         self.model_episode_reporter = pd.DataFrame({"episode": [], 
                                "end_day": [],
                                "epsilon": [],
@@ -270,10 +281,11 @@ class HarvestModel(Model):
         if self.write_data:
             if exists("data/results/current_run/model_episode_reports_"+self.filepath+".csv"):
                 raise FileExistsException("data/results/current_run/model_episode_reports_"+self.filepath+".csv")
-            self.model_episode_reporter.to_csv("data/results/current_run/model_episode_reports_"+self.filepath+".csv", mode='a')
+            self.model_episode_reporter.to_csv("data/results/current_run/model_episode_reports_"+self.filepath+".csv", mode='a',index=False)
 
     def _collect_agent_data(self, agent):
         new_entry = pd.DataFrame({"agent_id": [agent.unique_id],
+                               "agent_type": [agent.agent_type],
                                "episode": [self.episode],
                                "day": [self.day],
                                "berries": [agent.berries],
@@ -285,9 +297,9 @@ class HarvestModel(Model):
                                "action": [agent.current_action],
                                "reward": [agent.current_reward],
                                "num_norms": [len(agent.norms_module.behaviour_base) if self.write_norms else None]})
-        self.agent_reporter = pd.concat([self.agent_reporter, new_entry], ignore_index=True)
+        self.agent_reporter = pd.concat([self.agent_reporter, new_entry])
         if self.write_data and not self.training:
-           new_entry.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", header=None, mode='a')
+           new_entry.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
     
     def _collect_model_episode_data(self):
         row_index_list = self.agent_reporter.index[self.agent_reporter["episode"] == self.episode].tolist()
@@ -309,7 +321,7 @@ class HarvestModel(Model):
                                "deceased": [self.num_agents - len(self.living_agents)],
                                "num_emerged_norms": [len(self.emerged_norms) if self.write_norms else None]})
         if self.write_data:
-            new_entry.to_csv("data/results/current_run/model_episode_reports_"+self.filepath+".csv", header=None, mode='a')
+            new_entry.to_csv("data/results/current_run/model_episode_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
         return new_entry
 
     def _append_norm_dict_to_file(self, norm_dictionary, filename):

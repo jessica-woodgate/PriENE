@@ -9,12 +9,16 @@ class ColoursHarvest(HarvestModel):
         allocations -- dictionary of agent ids and the berries assigned to that agent
         berries -- list of active berry objects
     """
-    def __init__(self,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
+    def __init__(self,society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
         super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath)
         self.num_start_berries = num_start_berries
         self.allocations = self._assign_allocations()
-        self._init_agents(agent_type, checkpoint_path)
+        self._init_agents(society_mix, agent_type, checkpoint_path)
         self.berries = self._init_berries()
+        print(self.living_agents)
+        print(self.berries)
+        print(self.schedule)
+        print(self.grid)
     
     def _assign_allocations(self):
         resources = self._generate_resource_allocations(self.num_agents)

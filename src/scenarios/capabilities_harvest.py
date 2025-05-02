@@ -12,12 +12,12 @@ class CapabilitiesHarvest(HarvestModel):
         allocations -- dictionary of agent ids and the berries assigned to that agent
         berries -- list of active berry objects
     """
-    def __init__(self,num_agents,num_start_berries,num_capabilities,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
+    def __init__(self,society_mix,num_agents,num_start_berries,num_capabilities,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
         super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath)
         self.num_start_berries = num_start_berries
         self.num_capabilities = num_capabilities
         self.allocations = self._assign_allocations()
-        self._init_agents(agent_type, checkpoint_path)
+        self._init_agents(society_mix,agent_type, checkpoint_path)
         self.berries = self._init_berries()
     
     def _assign_allocations(self):
@@ -50,7 +50,7 @@ class CapabilitiesHarvest(HarvestModel):
             raise NumBerriesException(self.num_start_berries, self.num_berries)
         return berries
     
-    def _init_agents(self, agent_type, checkpoint_path):
+    def _init_agents(self, society_mix, agent_type, checkpoint_path):
         self.living_agents = []
         allotment = [0,self.max_width,0,self.max_height]
         for id in range(self.num_agents):
