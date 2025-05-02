@@ -20,7 +20,8 @@ class DQNDecisionModule():
         self._init_networks(checkpoint_path)
 
     def choose_action(self, observation):
-        return self.q_network.choose_action(observation, self.epsilon)
+        action = self.q_network.choose_action(observation, self.epsilon)
+        return action
     
     def learn(self, observation, action, reward, next_state, done, episode):
         experience = {"s":observation, "a":action, "r":reward, "s_":next_state, "done":done}

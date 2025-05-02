@@ -184,14 +184,27 @@ class HarvestModel(Model):
                 self._add_agent(i+half_pop, "baseline", allotment, checkpoint_path)
         assert self.num_agents == len(self.living_agents)
         self.berry_id = len(self.living_agents) + 1
+    # def _init_agents(self, scenario, agent_type, checkpoint_path):
+    #     self.living_agents = []
+    #     allotment = [0,self.max_width,0,self.max_height]
+    #     for i in range(self.num_agents):
+    #         a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+    #         self._add_agent(a)
+    #     self.berry_id = len(self.living_agents) + 1
 
-    def _add_agent(self, i, agent_type, allotment, checkpoint_path):
-        a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer)
+    def _add_agent(self, i, agent_type, allotment, checkpoint_path, allocation_id=None):
+        a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer,allocation_id=allocation_id)
         self.schedule.add(a)
         self._place_agent_in_allotment(a)
         if a.agent_type != "berry":
             self.agent_id += 1
             self.living_agents.append(a)
+    # def _add_agent(self, a):
+    #     self.schedule.add(a)
+    #     self._place_agent_in_allotment(a)
+    #     if a.agent_type != "berry":
+    #         self.agent_id += 1
+    #         self.living_agents.append(a)
 
     def _reset(self):
         self.living_agents = []

@@ -114,7 +114,11 @@ def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berr
     run_simulation(model_inst,render,log_wandb,wandb_project)
 
 def run_all(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):
-    for agent_type in AGENT_TYPES:
+    if society_mix == "heterogeneous":
+        agent_types = AGENT_TYPES[1:]
+    else:
+        agent_types = AGENT_TYPES
+    for agent_type in agent_types:
         create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
 
 def get_integer_input(prompt, error_string=None, max_value=None, min_value=None):
