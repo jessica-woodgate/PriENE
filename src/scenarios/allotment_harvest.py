@@ -55,13 +55,24 @@ class AllotmentHarvest(HarvestModel):
             raise NumBerriesException(self.num_start_berries, self.num_berries)
         return berries
       
-    def _init_agents(self, agent_type, checkpoint_path):
+    def _init_agents(self, society_mix, agent_type, checkpoint_path):
         self.living_agents = []
-        for id in range(self.num_agents):
-            allocation_id = self._get_allocation_id(id)
-            allotment = self.allocations[allocation_id]["allotment"]
-            a = HarvestAgent(id,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer,allocation_id=allocation_id)
-            self._add_agent(a)
+        if society_mix == "homogeneous":
+            for id in range(self.num_agents):
+                allocation_id = self._get_allocation_id(id)
+                allotment = self.allocations[allocation_id]["allotment"]
+                self._add_agent(id, agent_type, allotment, checkpoint_path, allocation_id=allocation_id)
+        else:
+            assert self.num_agents%2 == 0
+            half_pop = int(self.num_agents/2)
+            for id in range(half_pop):
+                allocation_id = self._get_allocation_id(id)
+                allotment = self.allocations[allocation_id]["allotment"]
+                self._add_agent(id, agent_type, allotment, checkpoint_path, allocation_id=allocation_id)
+            for id in range(half_pop):
+                allocation_id = self._get_allocation_id(id)
+                allotment = self.allocations[allocation_id]["allotment"]
+                self._add_agent(id+half_pop, "baseline", allotment, checkpoint_path, allocation_id=allocation_id)
         self.num_living_agents = len(self.living_agents)
         self.berry_id = self.num_living_agents + 1
         if self.num_living_agents != self.num_agents:

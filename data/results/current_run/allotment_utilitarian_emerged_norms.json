@@ -1,0 +1,343 @@
+{"1": [
+    {
+        "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+            "reward": 181,
+            "numerosity": 3620,
+            "fitness": 1629.0,
+            "adoption": 181
+        }
+    },
+    {
+        "IF,no berries,low health,medium days,low days,low days,THEN,move": {
+            "reward": 720,
+            "numerosity": 1980,
+            "fitness": 8261.999999999973,
+            "adoption": 180
+        }
+    },
+    {
+        "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+            "reward": 179,
+            "numerosity": 1253,
+            "fitness": 1288.8000000000043,
+            "adoption": 179
+        }
+    },
+    {
+        "IF,medium berries,low health,medium days,low days,low days,THEN,eat": {
+            "reward": 537,
+            "numerosity": 537,
+            "fitness": 1074.0,
+            "adoption": 179
+        }
+    },
+    {
+        "IF,no berries,medium health,medium days,THEN,move": {
+            "reward": 990,
+            "numerosity": 4840,
+            "fitness": 176487.89999999976,
+            "adoption": 177
+        }
+    },
+    {
+        "IF,medium berries,medium health,medium days,THEN,eat": {
+            "reward": 830,
+            "numerosity": 1504,
+            "fitness": 24109.2,
+            "adoption": 173
+        }
+    },
+    {
+        "IF,medium berries,high health,high days,THEN,eat": {
+            "reward": 726,
+            "numerosity": 1339,
+            "fitness": 132267.29999999996,
+            "adoption": 67
+        }
+    },
+    {
+        "IF,no berries,high health,high days,THEN,move": {
+            "reward": 742,
+            "numerosity": 3747,
+            "fitness": 540107.7,
+            "adoption": 66
+        }
+    }
+]
+,"2": [
+    {
+        "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+            "reward": 576,
+            "numerosity": 2688,
+            "fitness": 5184.0,
+            "adoption": 192
+        }
+    },
+    {
+        "IF,no berries,medium health,medium days,medium days,THEN,move": {
+            "reward": 1160,
+            "numerosity": 11088,
+            "fitness": 510282.6,
+            "adoption": 187
+        }
+    },
+    {
+        "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+            "reward": 1320,
+            "numerosity": 3399,
+            "fitness": 143106.29999999987,
+            "adoption": 183
+        }
+    },
+    {
+        "IF,no berries,high health,medium days,medium days,THEN,move": {
+            "reward": 500,
+            "numerosity": 13072,
+            "fitness": 108478.20000000029,
+            "adoption": 171
+        }
+    },
+    {
+        "IF,medium berries,high health,medium days,medium days,THEN,eat": {
+            "reward": 320,
+            "numerosity": 1998,
+            "fitness": 1344.0000000000016,
+            "adoption": 160
+        }
+    },
+    {
+        "IF,medium berries,high health,high days,THEN,eat": {
+            "reward": 159,
+            "numerosity": 242,
+            "fitness": 8197.8,
+            "adoption": 26
+        }
+    }
+]
+,"3": [
+    {
+        "IF,medium berries,low health,medium days,low days,low days,THEN,eat": {
+            "reward": 18,
+            "numerosity": 24,
+            "fitness": 43.2,
+            "adoption": 6
+        }
+    },
+    {
+        "IF,no berries,low health,medium days,medium days,low days,THEN,move": {
+            "reward": 6,
+            "numerosity": 24,
+            "fitness": 21.6,
+            "adoption": 6
+        }
+    }
+]
+,"4": [
+    {
+        "IF,no berries,medium health,low days,THEN,move": {
+            "reward": 555,
+            "numerosity": 1838,
+            "fitness": 18977.099999999937,
+            "adoption": 188
+        }
+    },
+    {
+        "IF,no berries,medium health,medium days,THEN,move": {
+            "reward": 1229,
+            "numerosity": 5956,
+            "fitness": 687807.3000000018,
+            "adoption": 173
+        }
+    },
+    {
+        "IF,medium berries,medium health,medium days,THEN,eat": {
+            "reward": 2780,
+            "numerosity": 2780,
+            "fitness": 311651.0999999992,
+            "adoption": 172
+        }
+    },
+    {
+        "IF,medium berries,high health,high days,THEN,move": {
+            "reward": 581,
+            "numerosity": 3058,
+            "fitness": 378362.7,
+            "adoption": 69
+        }
+    },
+    {
+        "IF,medium berries,high health,high days,THEN,eat": {
+            "reward": 443,
+            "numerosity": 443,
+            "fitness": 25521.600000000006,
+            "adoption": 51
+        }
+    }
+]
+,"5": [
+    {
+        "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+            "reward": 72,
+            "numerosity": 1495,
+            "fitness": 43.20000000000006,
+            "adoption": 72
+        }
+    },
+    {
+        "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+            "reward": 49,
+            "numerosity": 732,
+            "fitness": 1570.800000000001,
+            "adoption": 49
+        }
+    },
+    {
+        "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+            "reward": 41,
+            "numerosity": 123,
+            "fitness": 24.600000000000016,
+            "adoption": 41
+        }
+    },
+    {
+        "IF,medium berries,low health,low days,medium days,low days,THEN,eat": {
+            "reward": 287,
+            "numerosity": 287,
+            "fitness": 4255.800000000003,
+            "adoption": 41
+        }
+    },
+    {
+        "IF,no berries,low health,low days,medium days,low days,THEN,move": {
+            "reward": 123,
+            "numerosity": 451,
+            "fitness": 2386.2000000000003,
+            "adoption": 41
+        }
+    }
+]
+,"6": [
+    {
+        "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+            "reward": 199,
+            "numerosity": 3139,
+            "fitness": 1629.6000000000047,
+            "adoption": 199
+        }
+    },
+    {
+        "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+            "reward": 374,
+            "numerosity": 3795,
+            "fitness": 22576.799999999963,
+            "adoption": 187
+        }
+    },
+    {
+        "IF,medium berries,low health,medium days,medium days,low days,THEN,eat": {
+            "reward": 1134,
+            "numerosity": 1134,
+            "fitness": 21870.0,
+            "adoption": 162
+        }
+    },
+    {
+        "IF,no berries,low health,medium days,medium days,low days,THEN,move": {
+            "reward": 1134,
+            "numerosity": 4536,
+            "fitness": 104101.20000000024,
+            "adoption": 162
+        }
+    },
+    {
+        "IF,no berries,high health,high days,THEN,move": {
+            "reward": 2,
+            "numerosity": 197,
+            "fitness": 9278.4,
+            "adoption": 1
+        }
+    }
+]
+,"7": [
+    {
+        "IF,medium berries,low health,medium days,low days,low days,THEN,eat": {
+            "reward": 672,
+            "numerosity": 1008,
+            "fitness": 4536.0,
+            "adoption": 168
+        }
+    },
+    {
+        "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+            "reward": 336,
+            "numerosity": 2520,
+            "fitness": 7560.0,
+            "adoption": 168
+        }
+    },
+    {
+        "IF,no berries,medium health,high days,low days,THEN,move": {
+            "reward": 85,
+            "numerosity": 1020,
+            "fitness": 2065.4999999999973,
+            "adoption": 85
+        }
+    },
+    {
+        "IF,no berries,medium health,high days,medium days,THEN,move": {
+            "reward": 1020,
+            "numerosity": 6970,
+            "fitness": 1005210.0,
+            "adoption": 85
+        }
+    },
+    {
+        "IF,medium berries,medium health,high days,medium days,THEN,eat": {
+            "reward": 1020,
+            "numerosity": 1870,
+            "fitness": 238680.0,
+            "adoption": 85
+        }
+    },
+    {
+        "IF,no berries,high health,high days,medium days,THEN,move": {
+            "reward": 85,
+            "numerosity": 2380,
+            "fitness": 6630.0,
+            "adoption": 85
+        }
+    },
+    {
+        "IF,no berries,low health,medium days,medium days,low days,THEN,move": {
+            "reward": 170,
+            "numerosity": 425,
+            "fitness": 356.99999999999943,
+            "adoption": 85
+        }
+    },
+    {
+        "IF,no berries,medium health,high days,medium days,low days,THEN,move": {
+            "reward": 85,
+            "numerosity": 595,
+            "fitness": 612.0,
+            "adoption": 85
+        }
+    },
+    {
+        "IF,no berries,low health,high days,medium days,low days,THEN,move": {
+            "reward": 255,
+            "numerosity": 1020,
+            "fitness": 4003.4999999999945,
+            "adoption": 85
+        }
+    },
+    {
+        "IF,medium berries,low health,high days,medium days,low days,THEN,eat": {
+            "reward": 255,
+            "numerosity": 255,
+            "fitness": 816.0000000000013,
+            "adoption": 85
+        }
+    }
+]
+,
