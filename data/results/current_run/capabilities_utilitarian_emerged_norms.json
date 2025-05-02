@@ -1,0 +1,233 @@
+{"1": [
+    {
+        "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+            "reward": 108,
+            "numerosity": 486,
+            "fitness": 777.5999999999992,
+            "adoption": 54
+        }
+    },
+    {
+        "IF,no berries,low health,medium days,low days,medium days,THEN,move": {
+            "reward": 48,
+            "numerosity": 480,
+            "fitness": 936.0,
+            "adoption": 48
+        }
+    },
+    {
+        "IF,medium berries,low health,medium days,low days,low days,THEN,eat": {
+            "reward": 144,
+            "numerosity": 144,
+            "fitness": 288.0,
+            "adoption": 48
+        }
+    }
+]
+,"2": [
+    {
+        "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+            "reward": 390,
+            "numerosity": 1760,
+            "fitness": 2785.50000000001,
+            "adoption": 197
+        }
+    },
+    {
+        "IF,medium berries,high health,high days,THEN,eat": {
+            "reward": 1,
+            "numerosity": 51,
+            "fitness": 1386.0,
+            "adoption": 1
+        }
+    },
+    {
+        "IF,no berries,high health,high days,THEN,move": {
+            "reward": 1,
+            "numerosity": 245,
+            "fitness": 4636.8,
+            "adoption": 1
+        }
+    }
+]
+,"3": [
+    {
+        "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+            "reward": 58,
+            "numerosity": 464,
+            "fitness": 104.39999999999989,
+            "adoption": 58
+        }
+    }
+]
+,"4": [
+    {
+        "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+            "reward": 83,
+            "numerosity": 652,
+            "fitness": 222.59999999999968,
+            "adoption": 83
+        }
+    },
+    {
+        "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+            "reward": 71,
+            "numerosity": 355,
+            "fitness": 127.79999999999986,
+            "adoption": 71
+        }
+    },
+    {
+        "IF,no berries,medium health,low days,THEN,move": {
+            "reward": 174,
+            "numerosity": 1312,
+            "fitness": 12691.8,
+            "adoption": 67
+        }
+    },
+    {
+        "IF,no berries,medium health,medium days,THEN,move": {
+            "reward": 219,
+            "numerosity": 1995,
+            "fitness": 52731.3,
+            "adoption": 57
+        }
+    },
+    {
+        "IF,medium berries,medium health,low days,THEN,eat": {
+            "reward": 100,
+            "numerosity": 166,
+            "fitness": 300.0,
+            "adoption": 50
+        }
+    },
+    {
+        "IF,medium berries,medium health,medium days,THEN,eat": {
+            "reward": 154,
+            "numerosity": 376,
+            "fitness": 3076.8000000000015,
+            "adoption": 44
+        }
+    },
+    {
+        "IF,no berries,low health,medium days,THEN,move": {
+            "reward": 39,
+            "numerosity": 154,
+            "fitness": 6139.2,
+            "adoption": 17
+        }
+    }
+]
+,"5": [
+    {
+        "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+            "reward": 162,
+            "numerosity": 4203,
+            "fitness": 2527.1999999999925,
+            "adoption": 162
+        }
+    },
+    {
+        "IF,no berries,low health,medium days,low days,low days,THEN,move": {
+            "reward": 155,
+            "numerosity": 1550,
+            "fitness": 2510.9999999999986,
+            "adoption": 155
+        }
+    }
+]
+,"6": [
+    {
+        "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+            "reward": 109,
+            "numerosity": 318,
+            "fitness": 2015.1,
+            "adoption": 43
+        }
+    },
+    {
+        "IF,medium berries,medium health,medium days,low days,low days,THEN,eat": {
+            "reward": 38,
+            "numerosity": 76,
+            "fitness": 136.8,
+            "adoption": 19
+        }
+    },
+    {
+        "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+            "reward": 18,
+            "numerosity": 54,
+            "fitness": 10.799999999999997,
+            "adoption": 18
+        }
+    },
+    {
+        "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+            "reward": 18,
+            "numerosity": 126,
+            "fitness": 10.799999999999997,
+            "adoption": 18
+        }
+    },
+    {
+        "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+            "reward": 18,
+            "numerosity": 54,
+            "fitness": 10.799999999999997,
+            "adoption": 18
+        }
+    }
+]
+,"7": [
+    {
+        "IF,no berries,low health,low days,medium days,low days,THEN,move": {
+            "reward": 18,
+            "numerosity": 54,
+            "fitness": 147.6,
+            "adoption": 6
+        }
+    },
+    {
+        "IF,medium berries,low health,low days,medium days,low days,THEN,eat": {
+            "reward": 24,
+            "numerosity": 24,
+            "fitness": 108.0,
+            "adoption": 6
+        }
+    },
+    {
+        "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+            "reward": 6,
+            "numerosity": 60,
+            "fitness": 129.6,
+            "adoption": 6
+        }
+    }
+]
+,"8": [
+    {
+        "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+            "reward": 18,
+            "numerosity": 126,
+            "fitness": 64.80000000000001,
+            "adoption": 18
+        }
+    },
+    {
+        "IF,no berries,low health,low days,low days,THEN,move": {
+            "reward": 16,
+            "numerosity": 113,
+            "fitness": 229.20000000000005,
+            "adoption": 13
+        }
+    },
+    {
+        "IF,no berries,low health,low days,low days,medium days,THEN,move": {
+            "reward": 6,
+            "numerosity": 18,
+            "fitness": 3.6,
+            "adoption": 6
+        }
+    }
+]
+,
