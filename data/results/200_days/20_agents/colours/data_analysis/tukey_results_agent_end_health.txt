@@ -1,0 +1,33 @@
+     Multiple Comparison of Means - Tukey HSD, FWER=0.05     
+=============================================================
+   group1       group2    meandiff p-adj  lower upper  reject
+-------------------------------------------------------------
+     average     baseline      0.0    1.0  -0.0    0.0  False
+     average  egalitarian      0.0    1.0  -0.0    0.0  False
+     average majoritarian      0.0    1.0  -0.0    0.0  False
+     average      maximin      0.0    1.0  -0.0    0.0  False
+     average     optimist      0.0    1.0  -0.0    0.0  False
+     average  utilitarian      0.0    1.0  -0.0    0.0  False
+     average         veto      0.0 0.4818  -0.0 0.0001  False
+    baseline  egalitarian      0.0    1.0  -0.0    0.0  False
+    baseline majoritarian      0.0    1.0  -0.0    0.0  False
+    baseline      maximin      0.0    1.0  -0.0    0.0  False
+    baseline     optimist      0.0    1.0  -0.0    0.0  False
+    baseline  utilitarian      0.0    1.0  -0.0    0.0  False
+    baseline         veto      0.0 0.4818  -0.0 0.0001  False
+ egalitarian majoritarian      0.0    1.0  -0.0    0.0  False
+ egalitarian      maximin      0.0    1.0  -0.0    0.0  False
+ egalitarian     optimist      0.0    1.0  -0.0    0.0  False
+ egalitarian  utilitarian      0.0    1.0  -0.0    0.0  False
+ egalitarian         veto      0.0 0.4818  -0.0 0.0001  False
+majoritarian      maximin      0.0    1.0  -0.0    0.0  False
+majoritarian     optimist      0.0    1.0  -0.0    0.0  False
+majoritarian  utilitarian      0.0    1.0  -0.0    0.0  False
+majoritarian         veto      0.0 0.4818  -0.0 0.0001  False
+     maximin     optimist      0.0    1.0  -0.0    0.0  False
+     maximin  utilitarian      0.0    1.0  -0.0    0.0  False
+     maximin         veto      0.0 0.4818  -0.0 0.0001  False
+    optimist  utilitarian      0.0    1.0  -0.0    0.0  False
+    optimist         veto      0.0 0.4818  -0.0 0.0001  False
+ utilitarian         veto      0.0 0.4818  -0.0 0.0001  False
+-------------------------------------------------------------

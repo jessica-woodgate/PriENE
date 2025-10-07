@@ -1,0 +1,33 @@
+     Multiple Comparison of Means - Tukey HSD, FWER=0.05      
+==============================================================
+   group1       group2    meandiff p-adj  lower  upper  reject
+--------------------------------------------------------------
+     average     baseline    0.019 0.9979 -0.068  0.106  False
+     average  egalitarian   -0.301    0.0 -0.388 -0.214   True
+     average majoritarian     -0.1 0.0116 -0.187 -0.013   True
+     average      maximin   -0.017  0.999 -0.104   0.07  False
+     average     optimist   -0.051 0.6351 -0.138  0.036  False
+     average  utilitarian   -0.035 0.9262 -0.122  0.052  False
+     average         veto    0.006    1.0 -0.081  0.093  False
+    baseline  egalitarian    -0.32    0.0 -0.407 -0.233   True
+    baseline majoritarian   -0.119 0.0009 -0.206 -0.032   True
+    baseline      maximin   -0.036  0.915 -0.123  0.051  False
+    baseline     optimist    -0.07 0.2219 -0.157  0.017  False
+    baseline  utilitarian   -0.054 0.5629 -0.141  0.033  False
+    baseline         veto   -0.013 0.9998   -0.1  0.074  False
+ egalitarian majoritarian    0.201    0.0  0.114  0.288   True
+ egalitarian      maximin    0.284    0.0  0.197  0.371   True
+ egalitarian     optimist     0.25    0.0  0.163  0.337   True
+ egalitarian  utilitarian    0.266    0.0  0.179  0.353   True
+ egalitarian         veto    0.307    0.0   0.22  0.394   True
+majoritarian      maximin    0.083 0.0739 -0.004   0.17  False
+majoritarian     optimist    0.049 0.6818 -0.038  0.136  False
+majoritarian  utilitarian    0.065 0.3125 -0.022  0.152  False
+majoritarian         veto    0.106 0.0054  0.019  0.193   True
+     maximin     optimist   -0.034 0.9363 -0.121  0.053  False
+     maximin  utilitarian   -0.018 0.9985 -0.105  0.069  False
+     maximin         veto    0.023 0.9931 -0.064   0.11  False
+    optimist  utilitarian    0.016 0.9993 -0.071  0.103  False
+    optimist         veto    0.057 0.4905  -0.03  0.144  False
+ utilitarian         veto    0.041 0.8438 -0.046  0.128  False
+--------------------------------------------------------------

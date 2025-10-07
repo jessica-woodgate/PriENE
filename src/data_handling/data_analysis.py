@@ -122,11 +122,11 @@ class DataAnalysis():
         returns list of dfs
         """
         episode_totals_df = df.groupby("episode").agg(
-            min_days=('total_days', 'min'),
-            max_days=('total_days', 'max'),
-            average_days=('total_days', 'mean'),
-            total_days=('total_days', 'sum'),
-            gini_days=('total_days', lambda x: self._calculate_gini(x)),
+            min_days=('total_days_left_to_live', 'min'),
+            max_days=('total_days_left_to_live', 'max'),
+            average_days=('total_days_left_to_live', 'mean'),
+            total_days=('total_days_left_to_live', 'sum'),
+            gini_days=('total_days_left_to_live', lambda x: self._calculate_gini(x)),
             min_berries=('total_berries', 'min'),
             max_berries=('total_berries', 'max'),
             average_berries=('total_berries', 'mean'),
@@ -205,13 +205,13 @@ class DataAnalysis():
         #combine the DataFrames and add labels
         combined_df = pd.concat([df.assign(label=label) for df, label in zip(df_list, df_labels)])
         #plot the swarm plot with reduced marker size
-        sns.swarmplot(data=combined_df, x=column, y='label', ax=ax, size=3, hue='label')  # Adjust size as needed
+        sns.stripplot(data=combined_df, x=column, y='label', ax=ax, size=2, hue='label', dodge=True, alpha=0.6)
         plt.xlabel(column)
         plt.ylabel('Society')
         plt.title('Swarm Plot of ' + column + ' by Society')
         plt.tight_layout()
-        plt.show()
         plt.savefig(str(filename).split()[0])
+        plt.close(fig)
     
     def _display_end_episode(self, df_list, df_labels):
         self._display_violin_plot_df_list(df_list, df_labels, "gini_days_survived", self.filepath+"gini_days_survived", "Violin Plot of Gini Days Survived", "Days Survived")
@@ -240,8 +240,8 @@ class DataAnalysis():
         plt.xlabel("Society")
         plt.ylabel(y_label)
         plt.title(title)
-        plt.show()
         plt.savefig(str(filename).split()[0])
+        plt.close(fig)
     
     def _display_dataframe(self, df, title, y_label, filename):
         sns.set_palette("colorblind")
@@ -250,7 +250,6 @@ class DataAnalysis():
         ax.set_ylabel(y_label)
         ax.legend(title="Societies", loc="upper left")
         plt.title(title)
-        plt.show()
         plt.savefig(str(filename).split()[0])
         plt.close()
 
@@ -266,7 +265,6 @@ class DataAnalysis():
             sem = df[col].sem()
             x = df["day"]
             ax.fill_between(x, mean + sem, mean - sem, alpha=0.2)
-        plt.show()
         plt.savefig(str(filename).split()[0])
         plt.close()
         
@@ -414,16 +412,28 @@ class DataAnalysis():
         self._write_dictionary_to_file(best_results,self.filepath+"best_results_"+run_type+".csv")
         return most_common
 
+    # def _cohens_d(self, x_series, y_series):
+    #     nx = len(x_series)
+    #     ny = len(y_series)
+    #     if nx != ny:
+    #         nx = len(x_series)
+    #         ny = len(y_series)
+    #         dof = nx + ny - 2
+    #         return (x_series.mean() - y_series.mean()) / np.sqrt(((nx-1)*x_series.std() ** 2 + (ny-1)*y_series.std() ** 2) / dof)
+    #     else:
+    #         return (x_series.mean() - y_series.mean()) / np.sqrt((x_series.std() ** 2 + y_series.std() ** 2) / 2.0)
+
     def _cohens_d(self, x_series, y_series):
-        nx = len(x_series)
-        ny = len(y_series)
-        if nx != ny:
-            nx = len(x_series)
-            ny = len(y_series)
-            dof = nx + ny - 2
-            return (x_series.mean() - y_series.mean()) / np.sqrt(((nx-1)*x_series.std() ** 2 + (ny-1)*y_series.std() ** 2) / dof)
-        else:
-            return (x_series.mean() - y_series.mean()) / np.sqrt((x_series.std() ** 2 + y_series.std() ** 2) / 2.0)
+        """
+        Compute Cohen's d for two samples (works for unequal lengths).
+        """
+        nx, ny = len(x_series), len(y_series)
+        mean_diff = x_series.mean() - y_series.mean()
+        # pooled standard deviation
+        s_pooled = np.sqrt(((nx - 1) * x_series.std(ddof=1) ** 2 + (ny - 1) * y_series.std(ddof=1) ** 2) / (nx + ny - 2))
+        if s_pooled == 0:
+            return 0.0  # avoid division by zero
+        return mean_diff / s_pooled
 
     def _test_all_variables_significance(self, dfs, df_labels, df_type):
         variables = dfs[0].columns
@@ -431,6 +441,9 @@ class DataAnalysis():
         exclude_list = ["agent_id", "episode", "action"]
         variables = [var for var in variables if var not in exclude_list]
         for dependent_variable in variables:
+            if not np.issubdtype(dfs[0][dependent_variable].dtype, np.number):
+                #skip non-numeric variables
+                continue
             anova_table, tukey_results, anova, tukey = self._perform_anova(dfs, df_labels, dependent_variable)
             if tukey:
                 with open(self.filepath+"tukey_results_"+df_type+"_"+dependent_variable+".txt", "w") as f:
