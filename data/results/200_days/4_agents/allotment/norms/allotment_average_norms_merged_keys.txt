@@ -1,0 +1,27 @@
+IF,medium berries,high health,high days,THEN,move
+IF,high berries,high health,high days,THEN,move
+IF,no berries,high health,high days,THEN,move
+IF,no berries,high health,medium days,high days,THEN,move
+IF,high berries,high health,high days,THEN,eat
+IF,no berries,high health,medium days,THEN,move
+IF,no berries,high health,high days,high days,THEN,move
+IF,no berries,medium health,medium days,medium days,THEN,move
+IF,medium berries,high health,high days,THEN,eat
+IF,medium berries,high health,medium days,high days,THEN,move
+IF,no berries,high health,medium days,medium days,THEN,move
+IF,no berries,medium health,medium days,THEN,move
+IF,no berries,medium health,medium days,high days,THEN,move
+IF,medium berries,high health,high days,high days,THEN,move
+IF,medium berries,medium health,high days,THEN,move
+IF,medium berries,medium health,medium days,medium days,THEN,move
+IF,medium berries,medium health,medium days,medium days,THEN,eat
+IF,medium berries,high health,medium days,THEN,throw
+IF,medium berries,high health,high days,high days,THEN,throw
+IF,medium berries,high health,low days,high days,THEN,move
+IF,medium berries,high health,medium days,THEN,eat
+IF,medium berries,high health,high days,high days,THEN,eat
+IF,medium berries,medium health,medium days,THEN,eat
+IF,medium berries,high health,medium days,high days,THEN,throw
+IF,medium berries,medium health,medium days,high days,THEN,eat
+IF,no berries,medium health,low days,THEN,move
+IF,no berries,low health,medium days,THEN,move

@@ -1,0 +1,57 @@
+pygame 2.6.1 (SDL 2.32.54, Python 3.11.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+What type of scenario do you want to run ['colours', 'capabilities', 'allotment']: What run do you want to test (select 200_days to replicate results in the paper) ['current_run', '50_days', '200_days']: What mix of society do you want to test ['homogeneous', 'heterogeneous']: What type of agent do you want to implement ['baseline', 'utilitarian', 'maximin', 'egalitarian', 'average', 'majoritarian', 'veto', 'optimist', 'all']: How many agents do you want to implement (select 4 to replicate results in the paper) ['2', '4', '6', '20', '50', '100']: Do you want to write data to file? (y, n): data will be written into data/results/current_run.
+Do you want to write norms to file? (y, n): norms will be written into data/results/current_run.
+Do you want to render the simulation? (y, n): wandb: Currently logged in as: jessica-woodgate to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.11
+wandb: Run data is saved locally in /lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/wandb/run-20250815_014553-31083lxo
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run royal-cherry-57
+wandb: ⭐️ View project at https://wandb.ai/jessica-woodgate/PriENE
+wandb: 🚀 View run at https://wandb.ai/jessica-woodgate/PriENE/runs/31083lxo
+60
+[1, 4, 9, 3, 1, 1, 1, 4, 0, 16, 1, 1, 3, 1, 3, 1, 4, 0, 5, 1]
+dict_values([{'id': 0, 'berry_allocation': 1}, {'id': 1, 'berry_allocation': 4}, {'id': 2, 'berry_allocation': 9}, {'id': 3, 'berry_allocation': 3}, {'id': 4, 'berry_allocation': 1}, {'id': 5, 'berry_allocation': 1}, {'id': 6, 'berry_allocation': 1}, {'id': 7, 'berry_allocation': 4}, {'id': 8, 'berry_allocation': 0}, {'id': 9, 'berry_allocation': 16}, {'id': 10, 'berry_allocation': 1}, {'id': 11, 'berry_allocation': 1}, {'id': 12, 'berry_allocation': 3}, {'id': 13, 'berry_allocation': 1}, {'id': 14, 'berry_allocation': 3}, {'id': 15, 'berry_allocation': 1}, {'id': 16, 'berry_allocation': 4}, {'id': 17, 'berry_allocation': 0}, {'id': 18, 'berry_allocation': 5}, {'id': 19, 'berry_allocation': 1}])
+dict_keys(['allocation_0', 'allocation_1', 'allocation_2', 'allocation_3', 'allocation_4', 'allocation_5', 'allocation_6', 'allocation_7', 'allocation_8', 'allocation_9', 'allocation_10', 'allocation_11', 'allocation_12', 'allocation_13', 'allocation_14', 'allocation_15', 'allocation_16', 'allocation_17', 'allocation_18', 'allocation_19'])
+60
+[0, 4, 1, 1, 2, 4, 0, 3, 2, 1, 17, 9, 0, 2, 2, 1, 6, 2, 0, 3]
+dict_values([{'id': 0, 'berry_allocation': 0}, {'id': 1, 'berry_allocation': 4}, {'id': 2, 'berry_allocation': 1}, {'id': 3, 'berry_allocation': 1}, {'id': 4, 'berry_allocation': 2}, {'id': 5, 'berry_allocation': 4}, {'id': 6, 'berry_allocation': 0}, {'id': 7, 'berry_allocation': 3}, {'id': 8, 'berry_allocation': 2}, {'id': 9, 'berry_allocation': 1}, {'id': 10, 'berry_allocation': 17}, {'id': 11, 'berry_allocation': 9}, {'id': 12, 'berry_allocation': 0}, {'id': 13, 'berry_allocation': 2}, {'id': 14, 'berry_allocation': 2}, {'id': 15, 'berry_allocation': 1}, {'id': 16, 'berry_allocation': 6}, {'id': 17, 'berry_allocation': 2}, {'id': 18, 'berry_allocation': 0}, {'id': 19, 'berry_allocation': 3}])
+dict_keys(['allocation_0', 'allocation_1', 'allocation_2', 'allocation_3', 'allocation_4', 'allocation_5', 'allocation_6', 'allocation_7', 'allocation_8', 'allocation_9', 'allocation_10', 'allocation_11', 'allocation_12', 'allocation_13', 'allocation_14', 'allocation_15', 'allocation_16', 'allocation_17', 'allocation_18', 'allocation_19'])
+Traceback (most recent call last):
+  File "/home/b5v/jwoodgate.b5v/PriENE/run.py", line 241, in <module>
+    run_all(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
+  File "/home/b5v/jwoodgate.b5v/PriENE/run.py", line 131, in run_all
+    create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
+  File "/home/b5v/jwoodgate.b5v/PriENE/run.py", line 116, in create_and_run_model
+    model_inst = ColoursHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/src/scenarios/colours_harvest.py", line 19, in __init__
+    self._init_agents(society_mix, agent_type, checkpoint_path)
+  File "/lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/src/scenarios/colours_harvest.py", line 51, in _init_agents
+    self._add_agent(i, agent_type, allotment, checkpoint_path, allocation_id=f"allocation_{i}")
+  File "/lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/src/harvest_model.py", line 197, in _add_agent
+    a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer,allocation_id=allocation_id)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/src/agent/harvest_agent.py", line 41, in __init__
+    self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/src/agent/modules/dqn_decision_module.py", line 20, in __init__
+    self._init_networks(checkpoint_path)
+  File "/lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/src/agent/modules/dqn_decision_module.py", line 65, in _init_networks
+    self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/src/agent/dqn/dqn.py", line 55, in __init__
+    self.dqn = keras.models.load_model(self.checkpoint_path,compile=True, custom_objects={"NNetwork": NNetwork})
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/b5v/jwoodgate.b5v/miniforge3/envs/PriENE/lib/python3.11/site-packages/keras/src/saving/saving_api.py", line 189, in load_model
+    return saving_lib.load_model(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/b5v/jwoodgate.b5v/miniforge3/envs/PriENE/lib/python3.11/site-packages/keras/src/saving/saving_lib.py", line 367, in load_model
+    return _load_model_from_fileobj(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/b5v/jwoodgate.b5v/miniforge3/envs/PriENE/lib/python3.11/site-packages/keras/src/saving/saving_lib.py", line 482, in _load_model_from_fileobj
+    raise ValueError(
+ValueError: Expected a model.weights.h5 or model.weights.npz file.
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mroyal-cherry-57[0m at: [34mhttps://wandb.ai/jessica-woodgate/PriENE/runs/31083lxo[0m
+[1;34mwandb[0m: Find logs at: [1;35m../../../../lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/wandb/run-20250815_014553-31083lxo/logs[0m

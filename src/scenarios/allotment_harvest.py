@@ -20,6 +20,8 @@ class AllotmentHarvest(HarvestModel):
         self.num_allotments = num_allotments
         allotment_interval = int(max_width // num_allotments)
         self.allocations = self._assign_allocations(allotment_interval)
+        print(self.allocations.values())
+        print(self.allocations.keys())
         self._init_agents(society_mix, agent_type, checkpoint_path)
         self.berries = self._init_berries()
 

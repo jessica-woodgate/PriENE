@@ -25,7 +25,7 @@ class DQN:
         optimiser -- learning optimiser
         delta -- parameter for Huber loss
     """
-    def __init__(self,actions,n_features,training,n_rewards=1,checkpoint_path=None,shared_replay_buffer=None):
+    def __init__(self,actions,n_features,training,n_rewards=1,checkpoint_path=None,shared_replay_buffer=None,new_train=False):
         self.gamma = 0.95
         self.lr = 0.0001
         self.total_episode_reward = 0
@@ -47,9 +47,12 @@ class DQN:
         self.delta = 1.0
         
         if self.training:
-            self.dqn = NNetwork(self.n_actions,self.n_features,self.hidden_units,self.n_rewards)
+            if new_train:
+                self.dqn = NNetwork(self.n_actions,self.n_features,self.hidden_units,self.n_rewards)
+            else:
+                self.dqn = keras.models.load_model(self.checkpoint_path,compile=True, custom_objects={"NNetwork": NNetwork})
         else:
-            self.dqn = keras.models.load_model(self.checkpoint_path,compile=True)
+            self.dqn = keras.models.load_model(self.checkpoint_path,compile=True, custom_objects={"NNetwork": NNetwork})
     
     def train(self, TargetNet):
         """

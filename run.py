@@ -5,17 +5,20 @@ from src.scenarios.capabilities_harvest import CapabilitiesHarvest
 from src.data_handling.data_analysis import DataAnalysis
 from src.data_handling.render_pygame import RenderPygame
 import pandas as pd
+import numpy as np
 import argparse
 import wandb
-import numpy as np
+import time
 import re
 
 PRINCIPLES = ["baseline", "utilitarian", "maximin", "egalitarian"]
 AGGREGATIONS = ["average", "majoritarian", "veto", "optimist"]
 AGENT_TYPES = PRINCIPLES + AGGREGATIONS
 SCENARIO_TYPES = ["colours", "capabilities", "allotment"]
-NUM_AGENTS_OPTIONS = ["2", "4", "6"]
+NUM_AGENTS_OPTIONS = ["2", "4", "6", "20", "50", "100"]
 MAX_EPISODES = 1000
+MAX_TRAINING_EPISODES = 17000
+TIME_LIMIT = 24*3600-15*60
 RUN_OPTIONS = ["current_run", "50_days", "200_days"]
 SOCIETY_MIXES = ["homogeneous", "heterogeneous"]
 
@@ -74,28 +77,36 @@ def log_wandb_agents(model_inst, last_episode, reward_tracker):
                 wandb.log({string: sum(agent.current_reward)})
             else:
                 wandb.log({string: agent.current_reward})
-            mean_loss = (np.mean(agent.losses) if model_inst.training else 0)
+            mean_loss = (agent.get_mean_loss() if model_inst.training else 0)
             string = base_string+"_mean_loss"
             wandb.log({string: mean_loss})
             string = base_string+"_epsilon"
-            wandb.log({string: agent.epsilon})
+            wandb.log({string: agent.get_epsilon()})
 
 def run_simulation(model_inst, render, log_wandb, wandb_project):
+    start_time = time.time()
+    elapsed_time = time.time() - start_time
     if log_wandb:
         wandb.init(project=wandb_project)
     if render:
         render_inst = RenderPygame(model_inst.max_width, model_inst.max_height)
-    while (model_inst.training and model_inst.epsilon > model_inst.min_epsilon) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
-        last_episode = model_inst.episode
+    while (
+    (model_inst.training and model_inst.episode <= MAX_TRAINING_EPISODES and elapsed_time < TIME_LIMIT)
+    or (not model_inst.training and model_inst.episode <= model_inst.max_episodes)
+    ):
+    #while (model_inst.training and round(model_inst.epsilon, 5) > model_inst.min_epsilon) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
         model_inst.step()
         if log_wandb:
-            reward_tracker = [a.total_episode_reward for a in model_inst.schedule.agents if a.agent_type != "berry"]
-            log_wandb_agents(model_inst, last_episode, reward_tracker)
-            mean_reward = model_inst.model_episode_reporter["mean_reward"].mean()
+            #reward_tracker = [a.total_episode_reward for a in model_inst.schedule.agents if a.agent_type != "berry"]
+            #log_wandb_agents(model_inst, last_episode, reward_tracker)
+            mean_reward = model_inst._mean_reward()
             wandb.log({'mean_episode_reward': mean_reward})
         if render:
             render_inst.render_pygame(model_inst)
+        elapsed_time = time.time() - start_time
+    model_inst.finish_episode(collect_data=False)
     num_episodes = model_inst.episode
+    print(f"simulation finished {time.time()}")
     return num_episodes
 
 def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):   

@@ -1,0 +1,5 @@
+pygame 2.6.1 (SDL 2.32.54, Python 3.11.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+What type of scenario do you want to run ['colours', 'capabilities', 'allotment']: What run do you want to test (select 200_days to replicate results in the paper) ['current_run', '50_days', '200_days']: What mix of society do you want to test ['homogeneous', 'heterogeneous']: What type of agent do you want to implement ['maximin', 'egalitarian', 'majoritarian', 'veto', 'optimist', 'all']: How many agents do you want to implement (select 4 to replicate results in the paper) ['2', '4', '6', '20', '50', '100']: How many capabilities do you want? (must be more than 0 and less than 21) (select 2 to replicate results in the paper): Do you want to write data to file? (y, n): data will be written into data/results/current_run.
+Do you want to write norms to file? (y, n): norms will be written into data/results/current_run.
+Do you want to render the simulation? (y, n): slurmstepd: error: Detected 1 oom_kill event in StepId=264706.batch. Some of the step tasks have been OOM Killed.

@@ -1,0 +1,33 @@
+pygame 2.6.1 (SDL 2.32.54, Python 3.11.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+What type of scenario do you want to run ['colours', 'capabilities', 'allotment']: What run do you want to test (select 200_days to replicate results in the paper) ['current_run', '50_days', '200_days']: What mix of society do you want to test ['homogeneous', 'heterogeneous']: What type of agent do you want to implement ['baseline', 'utilitarian', 'maximin', 'egalitarian', 'average', 'majoritarian', 'veto', 'optimist', 'all']: How many agents do you want to implement (select 4 to replicate results in the paper) ['2', '4', '6', '20', '50', '100']: How many allotments do you want? (select 2 to replicate results in the paper) (must be more than 0 and less than 21): Do you want to write data to file? (y, n): data will be written into data/results/current_run.
+Do you want to write norms to file? (y, n): norms will be written into data/results/current_run.
+Do you want to render the simulation? (y, n): pygame 2.6.1 (SDL 2.32.54, Python 3.11.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+What type of scenario do you want to run ['colours', 'capabilities', 'allotment']: What run do you want to test (select 200_days to replicate results in the paper) ['current_run', '50_days', '200_days']: What mix of society do you want to test ['homogeneous', 'heterogeneous']: What type of agent do you want to implement ['baseline', 'utilitarian', 'maximin', 'egalitarian', 'average', 'majoritarian', 'veto', 'optimist', 'all']: How many agents do you want to implement (select 4 to replicate results in the paper) ['2', '4', '6', '20', '50', '100']: How many allotments do you want? (select 2 to replicate results in the paper) (must be more than 0 and less than 21): Do you want to write data to file? (y, n): data will be written into data/results/current_run.
+Do you want to write norms to file? (y, n): norms will be written into data/results/current_run.
+Do you want to render the simulation? (y, n): Traceback (most recent call last):
+  File "/home/b5v/jwoodgate.b5v/PriENE/run.py", line 243, in <module>
+    create_and_run_model(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project)
+  File "/home/b5v/jwoodgate.b5v/PriENE/run.py", line 118, in create_and_run_model
+    model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,file_string)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/src/scenarios/allotment_harvest.py", line 16, in __init__
+    super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath)
+  File "/lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/src/harvest_model.py", line 77, in __init__
+    self._init_reporters()
+  File "/lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/src/harvest_model.py", line 277, in _init_reporters
+    raise FileExistsException("data/results/current_run/agent_reports_"+self.filepath+".csv")
+src.harvest_exception.FileExistsException: File data/results/current_run/agent_reports_allotment_egalitarian.csv already exists
+wandb: Currently logged in as: jessica-woodgate to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.11
+wandb: Run data is saved locally in /lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/wandb/run-20250816_143338-f4kh7ve6
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run royal-monkey-65
+wandb: ⭐️ View project at https://wandb.ai/jessica-woodgate/PriENE
+wandb: 🚀 View run at https://wandb.ai/jessica-woodgate/PriENE/runs/f4kh7ve6
+dict_values([{'id': 0, 'berry_allocation': 38, 'allotment': [0, 40, 0, 40], 'agent_ids': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}, {'id': 1, 'berry_allocation': 22, 'allotment': [40, 80, 0, 40], 'agent_ids': [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]}])
+dict_keys(['allocation_0', 'allocation_1'])
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mroyal-monkey-65[0m at: [34mhttps://wandb.ai/jessica-woodgate/PriENE/runs/f4kh7ve6[0m
+[1;34mwandb[0m: Find logs at: [1;35m../../../../lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/wandb/run-20250816_143338-f4kh7ve6/logs[0m

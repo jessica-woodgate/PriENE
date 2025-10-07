@@ -2,7 +2,9 @@ import tensorflow
 from tensorflow import keras
 from keras import layers
 from keras import initializers as initialiser
+from keras.saving import register_keras_serializable
 
+@register_keras_serializable(package="Custom")
 class NNetwork(keras.Model):
     """
     MONNetwork handles the network
@@ -54,3 +56,7 @@ class NNetwork(keras.Model):
             }
         )
         return config
+    
+    @classmethod
+    def from_config(cls, config):
+        return cls(**config)

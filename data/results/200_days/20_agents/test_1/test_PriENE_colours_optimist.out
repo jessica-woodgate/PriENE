@@ -1,0 +1,18 @@
+pygame 2.6.1 (SDL 2.32.54, Python 3.11.12)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+What type of scenario do you want to run ['colours', 'capabilities', 'allotment']: What run do you want to test (select 200_days to replicate results in the paper) ['current_run', '50_days', '200_days']: What mix of society do you want to test ['homogeneous', 'heterogeneous']: What type of agent do you want to implement ['baseline', 'utilitarian', 'maximin', 'egalitarian', 'average', 'majoritarian', 'veto', 'optimist', 'all']: How many agents do you want to implement (select 4 to replicate results in the paper) ['2', '4', '6', '20', '50', '100']: Do you want to write data to file? (y, n): data will be written into data/results/current_run.
+Do you want to write norms to file? (y, n): norms will be written into data/results/current_run.
+Do you want to render the simulation? (y, n): wandb: Currently logged in as: jessica-woodgate to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.19.11
+wandb: Run data is saved locally in /lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/wandb/run-20250816_144903-g5x7r3gl
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run swept-disco-71
+wandb: ⭐️ View project at https://wandb.ai/jessica-woodgate/PriENE
+wandb: 🚀 View run at https://wandb.ai/jessica-woodgate/PriENE/runs/g5x7r3gl
+60
+[7, 8, 3, 3, 1, 1, 1, 1, 1, 4, 0, 4, 2, 0, 1, 1, 2, 17, 2, 1]
+dict_values([{'id': 0, 'berry_allocation': 7}, {'id': 1, 'berry_allocation': 8}, {'id': 2, 'berry_allocation': 3}, {'id': 3, 'berry_allocation': 3}, {'id': 4, 'berry_allocation': 1}, {'id': 5, 'berry_allocation': 1}, {'id': 6, 'berry_allocation': 1}, {'id': 7, 'berry_allocation': 1}, {'id': 8, 'berry_allocation': 1}, {'id': 9, 'berry_allocation': 4}, {'id': 10, 'berry_allocation': 0}, {'id': 11, 'berry_allocation': 4}, {'id': 12, 'berry_allocation': 2}, {'id': 13, 'berry_allocation': 0}, {'id': 14, 'berry_allocation': 1}, {'id': 15, 'berry_allocation': 1}, {'id': 16, 'berry_allocation': 2}, {'id': 17, 'berry_allocation': 17}, {'id': 18, 'berry_allocation': 2}, {'id': 19, 'berry_allocation': 1}])
+dict_keys(['allocation_0', 'allocation_1', 'allocation_2', 'allocation_3', 'allocation_4', 'allocation_5', 'allocation_6', 'allocation_7', 'allocation_8', 'allocation_9', 'allocation_10', 'allocation_11', 'allocation_12', 'allocation_13', 'allocation_14', 'allocation_15', 'allocation_16', 'allocation_17', 'allocation_18', 'allocation_19'])
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mswept-disco-71[0m at: [34mhttps://wandb.ai/jessica-woodgate/PriENE/runs/g5x7r3gl[0m
+[1;34mwandb[0m: Find logs at: [1;35m../../../../lus/lfs1aip1/home/b5v/jwoodgate.b5v/PriENE/wandb/run-20250816_144903-g5x7r3gl/logs[0m

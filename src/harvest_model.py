@@ -4,6 +4,7 @@ from mesa.space import MultiGrid
 import pandas as pd
 import numpy as np
 import json
+import os
 from .agent.harvest_agent import HarvestAgent
 from .berry import Berry
 from .harvest_exception import FileExistsException
@@ -68,7 +69,7 @@ class HarvestModel(Model):
         self.write_norms = write_norms
         self.societal_norm_emergence_threshold = 0.9
         self.emerged_norms = {}
-        self.min_fitness = 0.1
+        #self.min_fitness = 0.0
         if self.training:
             self.epsilon = 0.9
         else:
@@ -87,14 +88,18 @@ class HarvestModel(Model):
             self._check_emerged_norms()
         #if exceeded max days or all agents died, reset for new episode
         if self.day >= self.max_days or len(self.living_agents) <= 0:
-            self.end_day = self.day
-            if self.write_norms:
-                self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.filepath+"_emerged_norms.json")
-            for a in self.schedule.agents:
-                if a.agent_type != "berry":
-                    a.finish_episode(self.day)
+            self.finish_episode()
+    
+    def finish_episode(self, collect_data=True):
+        self.end_day = self.day
+        if self.write_norms:
+            self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.filepath+"_emerged_norms.json")
+        for a in self.schedule.agents:
+            if a.agent_type != "berry":
+                a.finish_episode(self.day)
+        if collect_data:
             self._collect_model_episode_data()
-            self._reset()
+        self._reset()
 
     def move_agent_to_cell(self, agent, new_pos):
         """
@@ -235,7 +240,7 @@ class HarvestModel(Model):
                                "berries_thrown": [],
                                "health": [],
                                "days_left_to_live": [],
-                               "total_days": [],
+                               "total_days_left_to_live": [],
                                "action": [],
                                "reward": [],
                                "num_norms": []})
@@ -257,6 +262,7 @@ class HarvestModel(Model):
         self._place_agent_in_allotment(berry)
         
     def _init_reporters(self):
+        os.makedirs("data/results/current_run", exist_ok=True)
         self.agent_reporter = pd.DataFrame({"agent_id": [],
                                "agent_type": [],
                                "episode": [],
@@ -266,7 +272,7 @@ class HarvestModel(Model):
                                "berries_thrown": [],
                                "health": [],
                                "days_left_to_live": [],
-                               "total_days": [],
+                               "total_days_left_to_live": [],
                                "action": [],
                                "reward": [],
                                "num_norms": []})
@@ -321,16 +327,16 @@ class HarvestModel(Model):
                                "epsilon": [self.epsilon],
                                "mean_reward": [self._mean_reward()],
                                "mean_loss": [self._mean_loss()],
-                               "max_berries": [self.agent_reporter["berries"].iloc[row_index_list].max()],
+                               "max_berries": [self.agent_reporter["berries"].loc[row_index_list].max()],
                                "mean_berries": [self.agent_reporter["berries"].iloc[row_index_list].mean(axis=0)],
-                               "max_berries_consumed": [self.agent_reporter["berries_consumed"].iloc[row_index_list].max()],
-                               "mean_berries_consumed": [self.agent_reporter["berries_consumed"].iloc[row_index_list].mean(axis=0)],
+                               "max_berries_consumed": [self.agent_reporter["berries_consumed"].loc[row_index_list].max()],
+                               "mean_berries_consumed": [self.agent_reporter["berries_consumed"].loc[row_index_list].mean(axis=0)],
                                "gini_berries_consumed": [self._gini_berries_consumed()],
-                               "mean_berries_thrown": [self.agent_reporter["berries_thrown"].iloc[row_index_list].mean(axis=0)],
-                               "max_health": [self.agent_reporter["health"].iloc[row_index_list].max()],
-                               "mean_health": [self.agent_reporter["health"].iloc[row_index_list].mean(axis=0)],
-                               "median_health": [self.agent_reporter["health"].iloc[row_index_list].median()],
-                               "variance_health": [self.agent_reporter["health"].iloc[row_index_list].var(axis=0)],
+                               "mean_berries_thrown": [self.agent_reporter["berries_thrown"].loc[row_index_list].mean(axis=0)],
+                               "max_health": [self.agent_reporter["health"].loc[row_index_list].max()],
+                               "mean_health": [self.agent_reporter["health"].loc[row_index_list].mean(axis=0)],
+                               "median_health": [self.agent_reporter["health"].loc[row_index_list].median()],
+                               "variance_health": [self.agent_reporter["health"].loc[row_index_list].var(axis=0)],
                                "deceased": [self.num_agents - len(self.living_agents)],
                                "num_emerged_norms": [len(self.emerged_norms) if self.write_norms else None]})
         if self.write_data:
@@ -362,7 +368,8 @@ class HarvestModel(Model):
             if agent.agent_type != "berry":
                 for norm_name, norm_value in agent.norms_module.behaviour_base.items():
                     current_emerged_norms = self._update_norm(norm_name, norm_value, current_emerged_norms)
-        current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_count and norm_value["fitness"] >= self.min_fitness}
+        #current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_count and norm_value["fitness"] >= self.min_fitness}
+        current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_count}
         for norm_name, norm_value in current_emerged_norms.items():
             self.emerged_norms = self._update_norm(norm_name, norm_value, self.emerged_norms)
     
@@ -442,8 +449,30 @@ class HarvestModel(Model):
             resources = [5, 3, 2, 2]
         elif num_agents == 6:
             resources = [5, 2, 3, 2, 5, 1]
+        elif num_agents == 20:
+            resources = [5, 5, 3, 5, 5, 3, 5, 2, 3, 2, 5, 1, 5, 2, 1, 2, 2, 1, 2, 2]
+        else:
+            resources = self._generate_zipf_distribution(num_agents)
         self.num_start_berries = sum(resources)
         return resources
+    
+    def _generate_zipf_distribution(self, num_agents):
+        total_resources = self.num_start_berries
+
+        # Generate Zipf-like distribution
+        weights = 1 / np.arange(1, num_agents + 1)  # [1, 1/2, 1/3, ...]
+        weights /= weights.sum()
+        allocations = (weights * total_resources).astype(int)
+
+        # Adjust rounding error
+        diff = total_resources - allocations.sum()
+        for _ in range(abs(diff)):
+            i = np.random.randint(num_agents)
+            allocations[i] += np.sign(diff)
+            
+        np.random.shuffle(allocations)  # Shuffle to avoid order bias
+        self.num_start_berries = int(allocations.sum())
+        return allocations.tolist()
 
     def _gini_berries_consumed(self):
         if len(self.living_agents) == 0:
