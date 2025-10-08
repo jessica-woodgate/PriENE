@@ -2,32 +2,32 @@
 ==================================================================
    group1       group2    meandiff p-adj   lower    upper   reject
 ------------------------------------------------------------------
-     average     baseline    6.817    0.0   3.2028  10.4312   True
-     average  egalitarian  -34.749    0.0 -38.3632 -31.1348   True
-     average majoritarian   -9.176    0.0 -12.7902  -5.5618   True
-     average      maximin    0.762 0.9983  -2.8522   4.3762  False
-     average     optimist   5.7834 0.0001   2.0862   9.4805   True
-     average  utilitarian   -3.459 0.0724  -7.0732   0.1552  False
-     average         veto   -3.374 0.0878  -6.9882   0.2402  False
-    baseline  egalitarian  -41.566    0.0 -45.1802 -37.9518   True
-    baseline majoritarian  -15.993    0.0 -19.6072 -12.3788   True
-    baseline      maximin   -6.055    0.0  -9.6692  -2.4408   True
-    baseline     optimist  -1.0336 0.9903  -4.7308   2.6635  False
-    baseline  utilitarian  -10.276    0.0 -13.8902  -6.6618   True
-    baseline         veto  -10.191    0.0 -13.8052  -6.5768   True
- egalitarian majoritarian   25.573    0.0  21.9588  29.1872   True
- egalitarian      maximin   35.511    0.0  31.8968  39.1252   True
- egalitarian     optimist  40.5324    0.0  36.8352  44.2295   True
- egalitarian  utilitarian    31.29    0.0  27.6758  34.9042   True
- egalitarian         veto   31.375    0.0  27.7608  34.9892   True
-majoritarian      maximin    9.938    0.0   6.3238  13.5522   True
-majoritarian     optimist  14.9594    0.0  11.2622  18.6565   True
-majoritarian  utilitarian    5.717    0.0   2.1028   9.3312   True
-majoritarian         veto    5.802    0.0   2.1878   9.4162   True
-     maximin     optimist   5.0214  0.001   1.3242   8.7185   True
-     maximin  utilitarian   -4.221 0.0096  -7.8352  -0.6068   True
-     maximin         veto   -4.136 0.0123  -7.7502  -0.5218   True
-    optimist  utilitarian  -9.2424    0.0 -12.9395  -5.5452   True
-    optimist         veto  -9.1574    0.0 -12.8545  -5.4602   True
- utilitarian         veto    0.085    1.0  -3.5292   3.6992  False
+     average     baseline    6.817    0.0   3.1425  10.4915   True
+     average  egalitarian  -34.749    0.0 -38.4235 -31.0745   True
+     average majoritarian   -9.176    0.0 -12.8505  -5.5015   True
+     average      maximin    0.762 0.9985  -2.9125   4.4365  False
+     average     optimist    6.045    0.0   2.3705   9.7195   True
+     average  utilitarian   -3.459 0.0824  -7.1335   0.2155  False
+     average         veto   -3.374 0.0992  -7.0485   0.3005  False
+    baseline  egalitarian  -41.566    0.0 -45.2405 -37.8915   True
+    baseline majoritarian  -15.993    0.0 -19.6675 -12.3185   True
+    baseline      maximin   -6.055    0.0  -9.7295  -2.3805   True
+    baseline     optimist   -0.772 0.9984  -4.4465   2.9025  False
+    baseline  utilitarian  -10.276    0.0 -13.9505  -6.6015   True
+    baseline         veto  -10.191    0.0 -13.8655  -6.5165   True
+ egalitarian majoritarian   25.573    0.0  21.8985  29.2475   True
+ egalitarian      maximin   35.511    0.0  31.8365  39.1855   True
+ egalitarian     optimist   40.794    0.0  37.1195  44.4685   True
+ egalitarian  utilitarian    31.29    0.0  27.6155  34.9645   True
+ egalitarian         veto   31.375    0.0  27.7005  35.0495   True
+majoritarian      maximin    9.938    0.0   6.2635  13.6125   True
+majoritarian     optimist   15.221    0.0  11.5465  18.8955   True
+majoritarian  utilitarian    5.717 0.0001   2.0425   9.3915   True
+majoritarian         veto    5.802    0.0   2.1275   9.4765   True
+     maximin     optimist    5.283 0.0004   1.6085   8.9575   True
+     maximin  utilitarian   -4.221 0.0117  -7.8955  -0.5465   True
+     maximin         veto   -4.136 0.0149  -7.8105  -0.4615   True
+    optimist  utilitarian   -9.504    0.0 -13.1785  -5.8295   True
+    optimist         veto   -9.419    0.0 -13.0935  -5.7445   True
+ utilitarian         veto    0.085    1.0  -3.5895   3.7595  False
 ------------------------------------------------------------------

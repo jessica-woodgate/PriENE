@@ -2,32 +2,32 @@
 ================================================================
    group1       group2    meandiff p-adj   lower   upper  reject
 ----------------------------------------------------------------
-     average     baseline    0.367    0.0  0.3098  0.4242   True
-     average  egalitarian  -0.8235    0.0 -0.8807 -0.7663   True
-     average majoritarian   -0.268    0.0 -0.3252 -0.2108   True
-     average      maximin  -0.0927    0.0 -0.1499 -0.0354   True
-     average     optimist  -0.0197 0.9715 -0.0783  0.0388  False
-     average  utilitarian  -0.1399    0.0 -0.1971 -0.0827   True
-     average         veto  -0.1331    0.0 -0.1903 -0.0759   True
-    baseline  egalitarian  -1.1905    0.0 -1.2477 -1.1333   True
-    baseline majoritarian   -0.635    0.0 -0.6922 -0.5778   True
-    baseline      maximin  -0.4596    0.0 -0.5169 -0.4024   True
-    baseline     optimist  -0.3867    0.0 -0.4453 -0.3282   True
-    baseline  utilitarian  -0.5069    0.0 -0.5641 -0.4497   True
-    baseline         veto  -0.5001    0.0 -0.5573 -0.4429   True
- egalitarian majoritarian   0.5555    0.0  0.4983  0.6127   True
- egalitarian      maximin   0.7309    0.0  0.6736  0.7881   True
- egalitarian     optimist   0.8038    0.0  0.7452  0.8623   True
- egalitarian  utilitarian   0.6836    0.0  0.6264  0.7408   True
- egalitarian         veto   0.6904    0.0  0.6332  0.7476   True
-majoritarian      maximin   0.1753    0.0  0.1181  0.2326   True
-majoritarian     optimist   0.2483    0.0  0.1897  0.3068   True
-majoritarian  utilitarian   0.1281    0.0  0.0709  0.1853   True
-majoritarian         veto   0.1349    0.0  0.0777  0.1921   True
-     maximin     optimist   0.0729  0.004  0.0144  0.1315   True
-     maximin  utilitarian  -0.0472 0.1942 -0.1045    0.01  False
-     maximin         veto  -0.0405 0.3874 -0.0977  0.0168  False
-    optimist  utilitarian  -0.1202    0.0 -0.1787 -0.0616   True
-    optimist         veto  -0.1134    0.0 -0.1719 -0.0548   True
- utilitarian         veto   0.0068    1.0 -0.0504   0.064  False
+     average     baseline    0.367    0.0  0.3092  0.4248   True
+     average  egalitarian  -0.8235    0.0 -0.8813 -0.7657   True
+     average majoritarian   -0.268    0.0 -0.3258 -0.2102   True
+     average      maximin  -0.0927    0.0 -0.1505 -0.0348   True
+     average     optimist  -0.0099 0.9996 -0.0677  0.0479  False
+     average  utilitarian  -0.1399    0.0 -0.1977 -0.0821   True
+     average         veto  -0.1331    0.0 -0.1909 -0.0753   True
+    baseline  egalitarian  -1.1905    0.0 -1.2483 -1.1327   True
+    baseline majoritarian   -0.635    0.0 -0.6928 -0.5772   True
+    baseline      maximin  -0.4596    0.0 -0.5175 -0.4018   True
+    baseline     optimist  -0.3769    0.0 -0.4347 -0.3191   True
+    baseline  utilitarian  -0.5069    0.0 -0.5647 -0.4491   True
+    baseline         veto  -0.5001    0.0 -0.5579 -0.4423   True
+ egalitarian majoritarian   0.5555    0.0  0.4977  0.6133   True
+ egalitarian      maximin   0.7309    0.0   0.673  0.7887   True
+ egalitarian     optimist   0.8136    0.0  0.7558  0.8714   True
+ egalitarian  utilitarian   0.6836    0.0  0.6258  0.7414   True
+ egalitarian         veto   0.6904    0.0  0.6326  0.7482   True
+majoritarian      maximin   0.1753    0.0  0.1175  0.2332   True
+majoritarian     optimist   0.2581    0.0  0.2003  0.3159   True
+majoritarian  utilitarian   0.1281    0.0  0.0703  0.1859   True
+majoritarian         veto   0.1349    0.0  0.0771  0.1927   True
+     maximin     optimist   0.0828 0.0004  0.0249  0.1406   True
+     maximin  utilitarian  -0.0472 0.2052 -0.1051  0.0106  False
+     maximin         veto  -0.0405 0.4013 -0.0983  0.0174  False
+    optimist  utilitarian    -0.13    0.0 -0.1878 -0.0722   True
+    optimist         veto  -0.1232    0.0  -0.181 -0.0654   True
+ utilitarian         veto   0.0068    1.0  -0.051  0.0646  False
 ----------------------------------------------------------------
