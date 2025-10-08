@@ -92,7 +92,7 @@ class HarvestModel(Model):
     
     def finish_episode(self, collect_data=True):
         self.end_day = self.day
-        if self.write_norms:
+        if self.write_norms and collect_data:
             self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.filepath+"_emerged_norms.json")
         for a in self.schedule.agents:
             if a.agent_type != "berry":

@@ -1,0 +1,2527 @@
+
+{
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 161223,
+        "fitness": 0.0,
+        "adoption": 7118,
+        "num_instances_across_episodes": 829
+    },
+    "IF,no berries,low health,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 5136,
+        "fitness": 0.0,
+        "adoption": 451,
+        "num_instances_across_episodes": 89
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 4278,
+        "fitness": 0,
+        "adoption": 1632,
+        "num_instances_across_episodes": 260
+    },
+    "IF,no berries,low health,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 7169,
+        "fitness": 0.0,
+        "adoption": 886,
+        "num_instances_across_episodes": 177
+    },
+    "IF,no berries,low health,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 6842,
+        "fitness": 0.0,
+        "adoption": 1299,
+        "num_instances_across_episodes": 267
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 114,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1458,
+        "fitness": 0.0,
+        "adoption": 132,
+        "num_instances_across_episodes": 22
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 948,
+        "fitness": 0.0,
+        "adoption": 162,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1086,
+        "fitness": 0,
+        "adoption": 168,
+        "num_instances_across_episodes": 26
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1470,
+        "fitness": 0,
+        "adoption": 186,
+        "num_instances_across_episodes": 26
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 672,
+        "fitness": 0,
+        "adoption": 168,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 594,
+        "fitness": 0.0,
+        "adoption": 35,
+        "num_instances_across_episodes": 6
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1164,
+        "fitness": 0.0,
+        "adoption": 174,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 912,
+        "fitness": 0,
+        "adoption": 120,
+        "num_instances_across_episodes": 18
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 810,
+        "fitness": 0,
+        "adoption": 120,
+        "num_instances_across_episodes": 17
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1044,
+        "fitness": 0.0,
+        "adoption": 162,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1026,
+        "fitness": 0,
+        "adoption": 144,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 2023,
+        "fitness": 0.0,
+        "adoption": 137,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,medium days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,medium days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 126,
+        "fitness": 0,
+        "adoption": 36,
+        "num_instances_across_episodes": 6
+    },
+    "IF,no berries,medium health,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 384,
+        "fitness": 0,
+        "adoption": 54,
+        "num_instances_across_episodes": 8
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 48,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,medium days,medium days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 102,
+        "fitness": 0,
+        "adoption": 48,
+        "num_instances_across_episodes": 8
+    },
+    "IF,no berries,medium health,low days,low days,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 792,
+        "fitness": 0.0,
+        "adoption": 126,
+        "num_instances_across_episodes": 21
+    },
+    "IF,no berries,low health,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1086,
+        "fitness": 0.0,
+        "adoption": 102,
+        "num_instances_across_episodes": 15
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1500,
+        "fitness": 0.0,
+        "adoption": 126,
+        "num_instances_across_episodes": 20
+    },
+    "IF,medium berries,low health,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 63,
+        "fitness": 0.0,
+        "adoption": 30,
+        "num_instances_across_episodes": 6
+    },
+    "IF,medium berries,low health,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 183,
+        "fitness": 0,
+        "adoption": 85,
+        "num_instances_across_episodes": 12
+    },
+    "IF,no berries,medium health,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 798,
+        "fitness": 0,
+        "adoption": 72,
+        "num_instances_across_episodes": 9
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1152,
+        "fitness": 0,
+        "adoption": 180,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 156,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1074,
+        "fitness": 0,
+        "adoption": 174,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1158,
+        "fitness": 0.0,
+        "adoption": 150,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 54,
+        "fitness": 0.0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 348,
+        "fitness": 0,
+        "adoption": 48,
+        "num_instances_across_episodes": 6
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,medium days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1182,
+        "fitness": 0,
+        "adoption": 186,
+        "num_instances_across_episodes": 29
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 228,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1338,
+        "fitness": 0.0,
+        "adoption": 156,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0.0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 138,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 126,
+        "fitness": 0.0,
+        "adoption": 39,
+        "num_instances_across_episodes": 7
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 144,
+        "fitness": 0.0,
+        "adoption": 36,
+        "num_instances_across_episodes": 5
+    },
+    "IF,no berries,medium health,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 288,
+        "fitness": 0,
+        "adoption": 30,
+        "num_instances_across_episodes": 5
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 600,
+        "fitness": 0.0,
+        "adoption": 84,
+        "num_instances_across_episodes": 14
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 420,
+        "fitness": 0,
+        "adoption": 48,
+        "num_instances_across_episodes": 7
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 54,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 186,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 120,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 72,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 42,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 96,
+        "fitness": 0,
+        "adoption": 30,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 54,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 120,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 48,
+        "fitness": 0.0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,low health,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 120,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 96,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 246,
+        "fitness": 0,
+        "adoption": 42,
+        "num_instances_across_episodes": 7
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 42,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 66,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,medium days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 48,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 66,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,medium health,medium days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 132,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 42,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 48,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 54,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": -108,
+        "numerosity": 257992,
+        "fitness": -766.8000000000001,
+        "adoption": 4556,
+        "num_instances_across_episodes": 722
+    }
+}
+{
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 161223,
+        "fitness": 0.0,
+        "adoption": 7118,
+        "num_instances_across_episodes": 829
+    },
+    "IF,no berries,low health,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 5136,
+        "fitness": 0.0,
+        "adoption": 451,
+        "num_instances_across_episodes": 89
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 4278,
+        "fitness": 0,
+        "adoption": 1632,
+        "num_instances_across_episodes": 260
+    },
+    "IF,no berries,low health,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 7169,
+        "fitness": 0.0,
+        "adoption": 886,
+        "num_instances_across_episodes": 177
+    },
+    "IF,no berries,low health,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 6842,
+        "fitness": 0.0,
+        "adoption": 1299,
+        "num_instances_across_episodes": 267
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 114,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1458,
+        "fitness": 0.0,
+        "adoption": 132,
+        "num_instances_across_episodes": 22
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 948,
+        "fitness": 0.0,
+        "adoption": 162,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1086,
+        "fitness": 0,
+        "adoption": 168,
+        "num_instances_across_episodes": 26
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1470,
+        "fitness": 0,
+        "adoption": 186,
+        "num_instances_across_episodes": 26
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 672,
+        "fitness": 0,
+        "adoption": 168,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 594,
+        "fitness": 0.0,
+        "adoption": 35,
+        "num_instances_across_episodes": 6
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1164,
+        "fitness": 0.0,
+        "adoption": 174,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 912,
+        "fitness": 0,
+        "adoption": 120,
+        "num_instances_across_episodes": 18
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 810,
+        "fitness": 0,
+        "adoption": 120,
+        "num_instances_across_episodes": 17
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1044,
+        "fitness": 0.0,
+        "adoption": 162,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1026,
+        "fitness": 0,
+        "adoption": 144,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 2023,
+        "fitness": 0.0,
+        "adoption": 137,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,medium days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,medium days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 126,
+        "fitness": 0,
+        "adoption": 36,
+        "num_instances_across_episodes": 6
+    },
+    "IF,no berries,medium health,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 384,
+        "fitness": 0,
+        "adoption": 54,
+        "num_instances_across_episodes": 8
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 48,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,medium days,medium days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 102,
+        "fitness": 0,
+        "adoption": 48,
+        "num_instances_across_episodes": 8
+    },
+    "IF,no berries,medium health,low days,low days,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 792,
+        "fitness": 0.0,
+        "adoption": 126,
+        "num_instances_across_episodes": 21
+    },
+    "IF,no berries,low health,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1086,
+        "fitness": 0.0,
+        "adoption": 102,
+        "num_instances_across_episodes": 15
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1500,
+        "fitness": 0.0,
+        "adoption": 126,
+        "num_instances_across_episodes": 20
+    },
+    "IF,medium berries,low health,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 63,
+        "fitness": 0.0,
+        "adoption": 30,
+        "num_instances_across_episodes": 6
+    },
+    "IF,medium berries,low health,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 183,
+        "fitness": 0,
+        "adoption": 85,
+        "num_instances_across_episodes": 12
+    },
+    "IF,no berries,medium health,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 798,
+        "fitness": 0,
+        "adoption": 72,
+        "num_instances_across_episodes": 9
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1152,
+        "fitness": 0,
+        "adoption": 180,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 156,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1074,
+        "fitness": 0,
+        "adoption": 174,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1158,
+        "fitness": 0.0,
+        "adoption": 150,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 54,
+        "fitness": 0.0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 348,
+        "fitness": 0,
+        "adoption": 48,
+        "num_instances_across_episodes": 6
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,medium days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1182,
+        "fitness": 0,
+        "adoption": 186,
+        "num_instances_across_episodes": 29
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 228,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1338,
+        "fitness": 0.0,
+        "adoption": 156,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0.0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 138,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 126,
+        "fitness": 0.0,
+        "adoption": 39,
+        "num_instances_across_episodes": 7
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 144,
+        "fitness": 0.0,
+        "adoption": 36,
+        "num_instances_across_episodes": 5
+    },
+    "IF,no berries,medium health,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 288,
+        "fitness": 0,
+        "adoption": 30,
+        "num_instances_across_episodes": 5
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 600,
+        "fitness": 0.0,
+        "adoption": 84,
+        "num_instances_across_episodes": 14
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 420,
+        "fitness": 0,
+        "adoption": 48,
+        "num_instances_across_episodes": 7
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 54,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 186,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 120,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 72,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 42,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 96,
+        "fitness": 0,
+        "adoption": 30,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 54,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 120,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 48,
+        "fitness": 0.0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,low health,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 120,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 96,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 246,
+        "fitness": 0,
+        "adoption": 42,
+        "num_instances_across_episodes": 7
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 42,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 66,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,medium days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 48,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 66,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,medium health,medium days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 132,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 42,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 48,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 54,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": -108,
+        "numerosity": 257992,
+        "fitness": -766.8000000000001,
+        "adoption": 4556,
+        "num_instances_across_episodes": 722
+    }
+}
+{
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 161223,
+        "fitness": 0.0,
+        "adoption": 7118,
+        "num_instances_across_episodes": 829
+    },
+    "IF,no berries,low health,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 5136,
+        "fitness": 0.0,
+        "adoption": 451,
+        "num_instances_across_episodes": 89
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 4278,
+        "fitness": 0,
+        "adoption": 1632,
+        "num_instances_across_episodes": 260
+    },
+    "IF,no berries,low health,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 7169,
+        "fitness": 0.0,
+        "adoption": 886,
+        "num_instances_across_episodes": 177
+    },
+    "IF,no berries,low health,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 6842,
+        "fitness": 0.0,
+        "adoption": 1299,
+        "num_instances_across_episodes": 267
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 114,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1458,
+        "fitness": 0.0,
+        "adoption": 132,
+        "num_instances_across_episodes": 22
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 948,
+        "fitness": 0.0,
+        "adoption": 162,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1086,
+        "fitness": 0,
+        "adoption": 168,
+        "num_instances_across_episodes": 26
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1470,
+        "fitness": 0,
+        "adoption": 186,
+        "num_instances_across_episodes": 26
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 672,
+        "fitness": 0,
+        "adoption": 168,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 594,
+        "fitness": 0.0,
+        "adoption": 35,
+        "num_instances_across_episodes": 6
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1164,
+        "fitness": 0.0,
+        "adoption": 174,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 912,
+        "fitness": 0,
+        "adoption": 120,
+        "num_instances_across_episodes": 18
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 810,
+        "fitness": 0,
+        "adoption": 120,
+        "num_instances_across_episodes": 17
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1044,
+        "fitness": 0.0,
+        "adoption": 162,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1026,
+        "fitness": 0,
+        "adoption": 144,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 2023,
+        "fitness": 0.0,
+        "adoption": 137,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,medium days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,medium days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 126,
+        "fitness": 0,
+        "adoption": 36,
+        "num_instances_across_episodes": 6
+    },
+    "IF,no berries,medium health,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 384,
+        "fitness": 0,
+        "adoption": 54,
+        "num_instances_across_episodes": 8
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 48,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,medium days,medium days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 102,
+        "fitness": 0,
+        "adoption": 48,
+        "num_instances_across_episodes": 8
+    },
+    "IF,no berries,medium health,low days,low days,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 792,
+        "fitness": 0.0,
+        "adoption": 126,
+        "num_instances_across_episodes": 21
+    },
+    "IF,no berries,low health,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1086,
+        "fitness": 0.0,
+        "adoption": 102,
+        "num_instances_across_episodes": 15
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1500,
+        "fitness": 0.0,
+        "adoption": 126,
+        "num_instances_across_episodes": 20
+    },
+    "IF,medium berries,low health,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 63,
+        "fitness": 0.0,
+        "adoption": 30,
+        "num_instances_across_episodes": 6
+    },
+    "IF,medium berries,low health,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 183,
+        "fitness": 0,
+        "adoption": 85,
+        "num_instances_across_episodes": 12
+    },
+    "IF,no berries,medium health,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 798,
+        "fitness": 0,
+        "adoption": 72,
+        "num_instances_across_episodes": 9
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1152,
+        "fitness": 0,
+        "adoption": 180,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 156,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1074,
+        "fitness": 0,
+        "adoption": 174,
+        "num_instances_across_episodes": 27
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1158,
+        "fitness": 0.0,
+        "adoption": 150,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 54,
+        "fitness": 0.0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 348,
+        "fitness": 0,
+        "adoption": 48,
+        "num_instances_across_episodes": 6
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,medium days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1182,
+        "fitness": 0,
+        "adoption": 186,
+        "num_instances_across_episodes": 29
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 228,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1338,
+        "fitness": 0.0,
+        "adoption": 156,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0.0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 138,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 126,
+        "fitness": 0.0,
+        "adoption": 39,
+        "num_instances_across_episodes": 7
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 144,
+        "fitness": 0.0,
+        "adoption": 36,
+        "num_instances_across_episodes": 5
+    },
+    "IF,no berries,medium health,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 288,
+        "fitness": 0,
+        "adoption": 30,
+        "num_instances_across_episodes": 5
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 600,
+        "fitness": 0.0,
+        "adoption": 84,
+        "num_instances_across_episodes": 14
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 420,
+        "fitness": 0,
+        "adoption": 48,
+        "num_instances_across_episodes": 7
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 54,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 186,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 120,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 72,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 42,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 96,
+        "fitness": 0,
+        "adoption": 30,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 54,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 120,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 48,
+        "fitness": 0.0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,low health,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 120,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 96,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 246,
+        "fitness": 0,
+        "adoption": 42,
+        "num_instances_across_episodes": 7
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 42,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 66,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,medium days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 48,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 66,
+        "fitness": 0,
+        "adoption": 18,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,medium health,medium days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 132,
+        "fitness": 0,
+        "adoption": 24,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,medium health,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 60,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,medium days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 42,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 30,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 18,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,medium days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 12,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,eat": {
+        "reward": 0,
+        "numerosity": 12,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 48,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 54,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,medium days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 36,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,medium days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,medium days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 24,
+        "fitness": 0,
+        "adoption": 6,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,low days,THEN,move": {
+        "reward": -108,
+        "numerosity": 257992,
+        "fitness": -766.8000000000001,
+        "adoption": 4556,
+        "num_instances_across_episodes": 722
+    }
+}

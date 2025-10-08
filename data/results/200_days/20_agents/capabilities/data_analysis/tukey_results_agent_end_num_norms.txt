@@ -1,0 +1,33 @@
+      Multiple Comparison of Means - Tukey HSD, FWER=0.05       
+================================================================
+   group1       group2    meandiff p-adj   lower   upper  reject
+----------------------------------------------------------------
+     average     baseline   1.7156    0.0  1.5354  1.8958   True
+     average  egalitarian  -3.2254    0.0 -3.4056 -3.0452   True
+     average majoritarian  -1.7088    0.0  -1.889 -1.5285   True
+     average      maximin  -1.2488    0.0  -1.429 -1.0685   True
+     average     optimist  -1.0266    0.0  -1.211 -0.8423   True
+     average  utilitarian  -0.9217    0.0 -1.1019 -0.7415   True
+     average         veto  -1.4357    0.0 -1.6159 -1.2555   True
+    baseline  egalitarian   -4.941    0.0 -5.1212 -4.7608   True
+    baseline majoritarian  -3.4244    0.0 -3.6046 -3.2441   True
+    baseline      maximin  -2.9644    0.0 -3.1446 -2.7841   True
+    baseline     optimist  -2.7422    0.0 -2.9266 -2.5579   True
+    baseline  utilitarian  -2.6373    0.0 -2.8175 -2.4571   True
+    baseline         veto  -3.1513    0.0 -3.3315 -2.9711   True
+ egalitarian majoritarian   1.5167    0.0  1.3364  1.6969   True
+ egalitarian      maximin   1.9766    0.0  1.7964  2.1569   True
+ egalitarian     optimist   2.1988    0.0  2.0144  2.3831   True
+ egalitarian  utilitarian   2.3037    0.0  2.1235  2.4839   True
+ egalitarian         veto   1.7897    0.0  1.6095  1.9699   True
+majoritarian      maximin     0.46    0.0  0.2798  0.6402   True
+majoritarian     optimist   0.6821    0.0  0.4978  0.8665   True
+majoritarian  utilitarian   0.7871    0.0  0.6068  0.9673   True
+majoritarian         veto    0.273 0.0001  0.0928  0.4533   True
+     maximin     optimist   0.2221 0.0063  0.0378  0.4065   True
+     maximin  utilitarian   0.3271    0.0  0.1468  0.5073   True
+     maximin         veto  -0.1869 0.0356 -0.3672 -0.0067   True
+    optimist  utilitarian   0.1049  0.671 -0.0794  0.2893  False
+    optimist         veto  -0.4091    0.0 -0.5934 -0.2247   True
+ utilitarian         veto   -0.514    0.0 -0.6942 -0.3338   True
+----------------------------------------------------------------
