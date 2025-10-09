@@ -1,0 +1,33 @@
+    Multiple Comparison of Means - Tukey HSD, FWER=0.05    
+===========================================================
+   group1       group2    meandiff p-adj lower upper reject
+-----------------------------------------------------------
+     average     baseline      nan   nan   nan   nan  False
+     average  egalitarian      nan   nan   nan   nan  False
+     average majoritarian      nan   nan   nan   nan  False
+     average      maximin      nan   nan   nan   nan  False
+     average     optimist      nan   nan   nan   nan  False
+     average  utilitarian      nan   nan   nan   nan  False
+     average         veto      nan   nan   nan   nan  False
+    baseline  egalitarian   0.7075   nan   nan   nan  False
+    baseline majoritarian      nan   nan   nan   nan  False
+    baseline      maximin   2.1483   nan   nan   nan  False
+    baseline     optimist      nan   nan   nan   nan  False
+    baseline  utilitarian   3.0442   nan   nan   nan  False
+    baseline         veto      nan   nan   nan   nan  False
+ egalitarian majoritarian      nan   nan   nan   nan  False
+ egalitarian      maximin   1.4408   nan   nan   nan  False
+ egalitarian     optimist      nan   nan   nan   nan  False
+ egalitarian  utilitarian   2.3367   nan   nan   nan  False
+ egalitarian         veto      nan   nan   nan   nan  False
+majoritarian      maximin      nan   nan   nan   nan  False
+majoritarian     optimist      nan   nan   nan   nan  False
+majoritarian  utilitarian      nan   nan   nan   nan  False
+majoritarian         veto      nan   nan   nan   nan  False
+     maximin     optimist      nan   nan   nan   nan  False
+     maximin  utilitarian    0.896   nan   nan   nan  False
+     maximin         veto      nan   nan   nan   nan  False
+    optimist  utilitarian      nan   nan   nan   nan  False
+    optimist         veto      nan   nan   nan   nan  False
+ utilitarian         veto      nan   nan   nan   nan  False
+-----------------------------------------------------------
