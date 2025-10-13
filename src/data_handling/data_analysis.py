@@ -24,19 +24,29 @@ class DataAnalysis():
 
     def proccess_and_display_data(self, agent_df_list, principles, aggregations, scenario, norms_filepath=None, end_episode_totals_dfs=None, write=True, get_normalised=False, process_norms=True):
         df_labels = principles + aggregations
+        self.write = write
         self.principles = principles
         self.aggregations = aggregations
         #if need to analyse data
         if end_episode_totals_dfs == None:
-            end_episode_totals_dfs, agent_final_rows_dfs, normalised_df_list = self._process_agent_dfs(agent_df_list, df_labels, write, get_normalised)
+            end_episode_totals_dfs, agent_final_rows_dfs, normalised_df_list, self.best_aggregation = self._process_agent_dfs(agent_df_list, df_labels, write, get_normalised)
         else:
             #if data has already been analysed
             agent_final_rows_dfs = agent_df_list
-        self._display_graphs(agent_final_rows_dfs, end_episode_totals_dfs, df_labels, normalised_df_list)
-        self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end")
-        self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode")
+        if write:
+            self._display_graphs(agent_final_rows_dfs, end_episode_totals_dfs, df_labels, normalised_df_list)
+        self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "principles")
+        self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "principles")
+        self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "aggregations")
+        self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "aggregations")
         if process_norms:
-            self._process_norms(df_labels, scenario, norms_filepath)
+            norm_processing = NormProcessing()
+            cooperative_norm_dfs, cooperative_tendencies, emerged_norms_proportions = norm_processing.process_norms(df_labels, scenario, norms_filepath, self.filepath)
+            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "numerosity", norms_filepath+"cooperative_numerosity")
+            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "fitness", norms_filepath+"cooperative_fitness")
+            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "reward", norms_filepath+"cooperative_reward")
+            self._write_dictionary_to_file(cooperative_tendencies,self.filepath+"cooperative_norms_tendencies.csv")
+            self._write_dictionary_to_file(emerged_norms_proportions,self.filepath+"emerged_norms_proportions.csv")
 
     def _process_agent_dfs(self, agent_df_list, df_labels, write, get_normalised):
         end_episode_totals_df_list = []
@@ -60,11 +70,10 @@ class DataAnalysis():
             if get_normalised:
                 normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i], write_normalised))
         central_tendencies = self._write_dictionary_to_file(end_episode_central_tendencies,self.filepath+"central_tendencies.csv")
-        most_common = self._get_best_results(central_tendencies, "aggregations")
-        self.principles += [most_common]
-        self._get_best_results(central_tendencies, "principles")
+        best_aggregation = self._get_best_results(central_tendencies, "aggregations")
+        self._get_best_results(central_tendencies, "principles", best_aggregation)
         self._get_best_results(central_tendencies, "all")
-        return end_episode_totals_df_list, agent_end_episode_df_list, normalised_df_list
+        return end_episode_totals_df_list, agent_end_episode_df_list, normalised_df_list, best_aggregation
     
     def _display_graphs(self, agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list=None):
         if normalised_sum_df_list != None:
@@ -73,21 +82,6 @@ class DataAnalysis():
         self._display_end_episode(end_episode_df_list, df_labels)
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", self.filepath+"violin_end_day", "Violin Plot of Episode Length", "End Day")
         #self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", self.filepath+"violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
-
-    def _process_norms(self, df_labels, scenario, filepath):
-        norm_processing = NormProcessing()
-        cooperative_dfs = []
-        cooperative_tendencies = []
-        for label in df_labels:
-            input_file = filepath+label+"_emerged_norms.json"
-            output_file = self.filepath+scenario+"_"+label+"_norms"
-            df = norm_processing.proccess_norms(input_file, output_file, label)
-            cooperative_dfs.append(df)
-            cooperative_tendencies.append(self._calculate_norms_tendency(df, label))
-        self._display_swarm_plot(cooperative_dfs,df_labels, "numerosity", filepath+"cooperative_numerosity")
-        self._display_swarm_plot(cooperative_dfs,df_labels, "fitness", filepath+"cooperative_fitness")
-        self._display_swarm_plot(cooperative_dfs,df_labels, "reward", filepath+"cooperative_reward")
-        self._write_dictionary_to_file(cooperative_tendencies,self.filepath+"cooperative_norms_tendencies.csv")
 
     def _normalise_step_across_episodes(self, df, df_label, write):
         """
@@ -323,67 +317,47 @@ class DataAnalysis():
                             "gini_days_mean": df["gini_days_survived"].mean(),
                             "gini_days_median": df["gini_days_survived"].median(),
                             "gini_days_stdev": df["gini_days_survived"].std(),
+                            "gini_days_summary": (df["gini_days_survived"].mean() + df["gini_days_survived"].median()) - df["gini_days_survived"].std(),
                             "gini_berries_mean": df["gini_berries"].mean(),
                             "gini_berries_median": df["gini_berries"].median(),
                             "gini_berries_stdev": df["gini_berries"].std(),
+                            "gini_berries_summary": (df["gini_berries"].mean() + df["gini_berries"].median()) - df["gini_berries"].std(),
                             "min_days_mean": df["min_days_survived"].mean(),
                             "min_days_median": df["min_days_survived"].median(),
                             "min_days_stdev": df["min_days_survived"].std(),
+                            "min_days_summary": (df["min_days_survived"].mean() + df["min_days_survived"].median()) - df["min_days_survived"].std(),
                             "min_berries_mean": df["min_berries"].mean(),
                             "min_berries_median": df["min_berries"].median(),
                             "min_berries_stdev": df["min_berries"].std(),
+                            "min_berries_summary": (df["min_berries"].mean() + df["min_berries"].median()) - df["min_berries"].std(),
                             "max_days_mean": df["max_days_survived"].mean(),
                             "max_days_median": df["max_days_survived"].median(),
                             "max_days_stdev": df["max_days_survived"].std(),
+                            "max_days_summary": (df["max_days_survived"].mean() + df["max_days_survived"].median()) - df["max_days_survived"].std(),
                             "max_berries_mean": df["max_berries"].mean(),
                             "max_berries_median": df["max_berries"].median(),
                             "max_berries_stdev": df["max_berries"].std(),
+                            "max_berries_summary": (df["max_berries"].mean() + df["max_berries"].median()) - df["max_berries"].std(),
                             "total_days_mean": df["total_days_survived"].mean(),
                             "total_days_median": df["total_days_survived"].median(),
                             "total_days_stdev": df["total_days_survived"].std(),
+                            "total_days_summary": (df["total_days_survived"].mean() + df["total_days_survived"].median()) - df["total_days_survived"].std(),
                             "total_berries_mean": df["total_berries"].mean(),
                             "total_berries_median": df["total_berries"].median(),
                             "total_berries_stdev": df["total_berries"].std(),
-                            }
-        return central_tendency
-    
-    def _calculate_norms_tendency(self, df, df_label):
-        if "reward" in df.columns:
-            central_tendency = {"df_label": df_label,
-                            "reward_mean": df["reward"].mean(),
-                            "reward_median": df["reward"].median(),
-                            "reward_stdev": df["reward"].std(),
-                            "numerosity_mean": df["numerosity"].mean(),
-                            "numerosity_median": df["numerosity"].median(),
-                            "numerosity_stdev": df["numerosity"].std(),
-                            "fitness_mean": df["fitness"].mean(),
-                            "fitness_median": df["fitness"].median(),
-                            "fitness_stdev": df["fitness"].std(),
-                            }
-        else:
-            #no cooperative norms found
-            central_tendency = {"df_label": df_label,
-                            "reward_mean": 0,
-                            "reward_median": 0,
-                            "reward_stdev": 0,
-                            "numerosity_mean": 0,
-                            "numerosity_median": 0,
-                            "numerosity_stdev": 0,
-                            "fitness_mean": 0,
-                            "fitness_median": 0,
-                            "fitness_stdev": 0,
+                            "total_berries_summary": (df["total_berries"].mean() + df["total_berries"].median()) - df["total_berries"].std(),
                             }
         return central_tendency
     
     def _calculate_normalised_central_tendency(self, df, df_labels):
         pass
     
-    def _get_best_results(self, df, run_type):
+    def _get_best_results(self, df, run_type, best_aggregation=None):
         best_results = []
         test_names = []
         test_name_column = df.columns[0]
         if run_type == "principles":
-            df = df[df[test_name_column].isin(self.principles)]
+            df = df[df[test_name_column].isin(self.principles+[best_aggregation])]
         elif run_type == "aggregations":
             df = df[df[test_name_column].isin(self.aggregations)]
         for column in df.columns[1:]:
@@ -404,38 +378,31 @@ class DataAnalysis():
             test_names.append(test_name)
         most_common, tally = Counter(test_names).most_common(1)[0] #Find the most common test and the tally
         best_results.append({
-                "Metric": "most_common",
-                "Test Name": most_common,
-                "Value": tally,
-                "Type": np.nan
-            })
-        self._write_dictionary_to_file(best_results,self.filepath+"best_results_"+run_type+".csv")
-        return most_common
+                    "Metric": "most_common",
+                    "Test Name": most_common,
+                    "Value": tally,
+                    "Type": np.nan
+                })
+        # Filter rows where Metric contains "summary"
+        summary_rows = [row for row in best_results if "summary" in str(row["Metric"]).lower()]
+        summary_test_names = [row["Test Name"] for row in summary_rows]
+        # Get most common Test Name in summary rows
+        if summary_test_names:
+            most_common_best_summary, summary_tally = Counter(summary_test_names).most_common(1)[0]
+        else:
+            most_common_best_summary, summary_tally = None, 0
+        best_results.append({
+                    "Metric": "most_common_summary",
+                    "Test Name": most_common_best_summary,
+                    "Value": summary_tally,
+                    "Type": np.nan
+                })
+        if self.write:
+            self._write_dictionary_to_file(best_results,self.filepath+"best_results_"+run_type+".csv")
+        return most_common_best_summary
 
-    # def _cohens_d(self, x_series, y_series):
-    #     nx = len(x_series)
-    #     ny = len(y_series)
-    #     if nx != ny:
-    #         nx = len(x_series)
-    #         ny = len(y_series)
-    #         dof = nx + ny - 2
-    #         return (x_series.mean() - y_series.mean()) / np.sqrt(((nx-1)*x_series.std() ** 2 + (ny-1)*y_series.std() ** 2) / dof)
-    #     else:
-    #         return (x_series.mean() - y_series.mean()) / np.sqrt((x_series.std() ** 2 + y_series.std() ** 2) / 2.0)
-
-    def _cohens_d(self, x_series, y_series):
-        """
-        Compute Cohen's d for two samples (works for unequal lengths).
-        """
-        nx, ny = len(x_series), len(y_series)
-        mean_diff = x_series.mean() - y_series.mean()
-        # pooled standard deviation
-        s_pooled = np.sqrt(((nx - 1) * x_series.std(ddof=1) ** 2 + (ny - 1) * y_series.std(ddof=1) ** 2) / (nx + ny - 2))
-        if s_pooled == 0:
-            return 0.0  # avoid division by zero
-        return mean_diff / s_pooled
-
-    def _test_all_variables_significance(self, dfs, df_labels, df_type):
+    def _test_all_variables_significance(self, dfs, df_labels, df_type, agent_types):
+        dfs, df_labels = self._extract_relevant_dfs(dfs, df_labels, agent_types)
         variables = dfs[0].columns
         variables = variables[1:]
         exclude_list = ["agent_id", "episode", "action"]
@@ -444,18 +411,41 @@ class DataAnalysis():
             if not np.issubdtype(dfs[0][dependent_variable].dtype, np.number):
                 #skip non-numeric variables
                 continue
-            anova_table, tukey_results, anova, tukey = self._perform_anova(dfs, df_labels, dependent_variable)
-            if tukey:
-                with open(self.filepath+"tukey_results_"+df_type+"_"+dependent_variable+".txt", "w") as f:
-                    f.write(str(tukey_results.summary()))
+            anova_table, merged_results, anova, tukey, alpha_bonf = self._perform_anova(dfs, df_labels, dependent_variable)
+            if tukey and self.write:
+                with open(self.filepath+agent_types+"_tukey_results_"+df_type+"_"+dependent_variable+".txt", "w") as f:
+                    f.write(str(merged_results.to_string()))
+                    f.write(f"\np = {alpha_bonf}")
+        return anova_table, merged_results, anova, tukey
+    
+    def _extract_relevant_dfs(self, dfs, df_labels, agent_types):
+        if agent_types == "principles":
+            principle_dfs = dfs[:len(self.principles)]
+            print(f"df_labels {df_labels}")
+            print(f"best_aggregation {self.best_aggregation}")
+            print(f"index of best {df_labels.index(self.best_aggregation)}")
+            best_aggregation_df = dfs[df_labels.index(self.best_aggregation)]
+            relevant_dfs = principle_dfs + [best_aggregation_df]
+            relevant_df_labels = self.principles + [self.best_aggregation]
+            print(f"relevant df labels {relevant_df_labels}")
+        elif agent_types == "aggregations":
+            relevant_dfs = dfs[-len(self.aggregations):]
+            relevant_df_labels = self.aggregations
+        assert len(relevant_dfs) == len(relevant_df_labels)
+        return relevant_dfs, relevant_df_labels
     
     def _perform_anova(self, dfs, df_labels, dependent_variable):
+        """
+        Performs one-way ANOVA and post-hoc Tukey test
+        Returns ANOVA table and Tukey results with cohen's d for effect size if successful
+        """
         all_data = []
         for i, df in enumerate(dfs):
             temp_df = df[[dependent_variable]].copy()
             temp_df["society"] = df_labels[i]
             all_data.append(temp_df)
         combined_df = pd.concat(all_data, ignore_index=True)
+        value_counts = combined_df["society"].value_counts()
         try:
             #ordinary least squares: dependent variable is predicted by society (which is a category)
             #fit linear regression model to data
@@ -467,9 +457,47 @@ class DataAnalysis():
             return None, None, False, False
         try:
             #perform Tukey's HSD post-hoc test used after a significant anova to determine which specific groups are significantly different
-            #significance level 0.05 (95% confidence level)
-            tukey_results = pairwise_tukeyhsd(combined_df[dependent_variable], combined_df["society"], alpha=0.05)
-            return anova_table, tukey_results, True, True
+            #significance level = 0.05 / num_comparisons (Bonferonni correction)
+            #number of unique groups
+            k = combined_df["society"].nunique()
+            # number of pairwise comparisons
+            num_comparisons = k * (k - 1) // 2
+            #bonferonni correction
+            alpha_bonf = 0.05 / num_comparisons
+            tukey_results = pairwise_tukeyhsd(combined_df[dependent_variable], combined_df["society"], alpha=alpha_bonf)
+            cohens_d_df = self._compute_pairwise_cohens_d(combined_df, dependent_variable)
+            tukey_df = pd.DataFrame(data=tukey_results._results_table.data[1:], columns=tukey_results._results_table.data[0])
+            merged_results = pd.merge(tukey_df, cohens_d_df, on=['group1','group2'])
+            return anova_table, merged_results, True, True, alpha_bonf
         except Exception as e:
             print(f"Exception during post hoc test for {dependent_variable}: {e}")
-            return anova_table, None, True, False
+            return anova_table, None, True, False,0
+    
+    def _compute_pairwise_cohens_d(self, combined_df, dependent_variable):
+        groups = combined_df["society"].unique()
+        cohens_d_results = []
+
+        for i in range(len(groups)):
+            for j in range(i+1, len(groups)):
+                g1, g2 = groups[i], groups[j]
+                x_series = combined_df[combined_df['society'] == g1][dependent_variable]
+                y_series = combined_df[combined_df['society'] == g2][dependent_variable]
+                
+                cohens_d_results.append({
+                    'group1': g1,
+                    'group2': g2,
+                    'cohens_d': self._cohens_d(x_series, y_series)
+                })
+        return pd.DataFrame(cohens_d_results)
+    
+    def _cohens_d(self, x_series, y_series):
+        """
+        Compute Cohen's d for two samples (works for unequal lengths).
+        """
+        nx, ny = len(x_series), len(y_series)
+        mean_diff = x_series.mean() - y_series.mean()
+        # pooled standard deviation
+        s_pooled = np.sqrt(((nx - 1) * x_series.std(ddof=1) ** 2 + (ny - 1) * y_series.std(ddof=1) ** 2) / (nx + ny - 2))
+        if s_pooled == 0:
+            return 0.0  # avoid division by zero
+        return mean_diff / s_pooled

@@ -1,0 +1,7 @@
+         group1        group2  meandiff  p-adj    lower    upper  reject  cohens_d
+0       average  majoritarian  -11.5258  0.000 -17.3625  -5.6890    True  0.137647
+1       average      optimist  -21.9320  0.000 -27.7688 -16.0952    True  0.270833
+2       average          veto    1.3625  0.881  -4.4743   7.1993   False -0.016596
+3  majoritarian      optimist  -10.4062  0.000 -16.2430  -4.5695    True  0.125942
+4  majoritarian          veto   12.8882  0.000   7.0515  18.7250    True -0.153941
+p = 0.008333333333333333

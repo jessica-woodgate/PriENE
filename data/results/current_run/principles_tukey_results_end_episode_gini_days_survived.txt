@@ -1,0 +1,5 @@
+     group1       group2  meandiff   p-adj   lower   upper  reject  cohens_d
+0  baseline  egalitarian    0.0234  0.0001  0.0053  0.0415    True -0.198771
+1  baseline      maximin   -0.0167  0.0127 -0.0348  0.0014   False  0.137462
+2  baseline  utilitarian   -0.0535  0.0000 -0.0716 -0.0354    True  0.406640
+p = 0.005

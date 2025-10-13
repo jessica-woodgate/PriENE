@@ -7,14 +7,33 @@ class NormProcessing():
         self.min_fitness = 0.1
         self.min_reward = 50
     
-    def proccess_norms(self, input_file, output_file, df_label):
+    def process_norms(self, df_labels, scenario, norms_filepath, write_filepath):
+        cooperative_dfs = []
+        cooperative_tendencies = []
+        emerged_norms_proportions = {"society": [],
+                                     "num_emerged_norms": [],
+                                     "num_cooperative_norms": [],
+                                     "proportion_cooperative": []}
+        for label in df_labels:
+            input_file = norms_filepath+label+"_emerged_norms.json"
+            output_file = write_filepath+scenario+"_"+label+"_norms"
+            df, n_norms, n_cooperative_norms = self._process_society_norms(input_file, output_file, label)
+            cooperative_dfs.append(df)
+            cooperative_tendencies.append(self._calculate_norms_tendency(df, label))
+            emerged_norms_proportions["society"].append(label)
+            emerged_norms_proportions["num_emerged_norms"].append(n_norms)
+            emerged_norms_proportions["num_cooperative_norms"].append(n_cooperative_norms)
+            emerged_norms_proportions["proportion_cooperative"].append((n_cooperative_norms/n_norms)*100 if n_norms > 0 else 0)
+        return cooperative_dfs, cooperative_tendencies, emerged_norms_proportions
+
+    def _process_society_norms(self, input_file, output_file, df_label):
         f = open(input_file)
         data = json.load(f)
-        cooperative_data = self._count_cooperative_norms(data, output_file)
+        cooperative_data, n_norms, n_cooperative_norms = self._count_cooperative_norms(data, output_file)
         data = self._merge_norms(data, output_file)
         self._generalise_norms(data.keys(), output_file)
         #self._generate_norms_tree(data, output_file)
-        return cooperative_data
+        return cooperative_data, n_norms, n_cooperative_norms
     
     def _count_cooperative_norms(self, data, output_file):
         cooperative_norms = []
@@ -28,12 +47,15 @@ class NormProcessing():
                 if consequent == "throw":
                     norm_data = {"reward": norm_value["reward"], "numerosity": norm_value["numerosity"], "fitness": norm_value["fitness"]}
                     cooperative_norms.append(norm_data)
-        print("Total emerged norms:", n_norms, "Total cooperative norms:", len(cooperative_norms))
-        if len(cooperative_norms) != 0 and n_norms != 0:
-            print("Proportion of cooperative norms for "+output_file+" is "+str((len(cooperative_norms)/n_norms)*100))
+        # print("Total emerged norms:", n_norms, "Total cooperative norms:", len(cooperative_norms))
+        # if len(cooperative_norms) != 0 and n_norms != 0:
+        #     print("Proportion of cooperative norms for "+output_file+" is "+str((len(cooperative_norms)/n_norms)*100))
+        # else:
+        #     print(f"Proportion of cooperative norms for {output_file} is 0. Number of norms is {n_norms}")
+        n_cooperative_norms = len(cooperative_norms)
         df = pd.DataFrame(cooperative_norms)
         df.to_csv(output_file+"_cooperative_data.csv",index=False)
-        return df
+        return df, n_norms, n_cooperative_norms
     
     def _generalise_norms(self, norms, output_file):
         rule_dict = {}
@@ -46,14 +68,14 @@ class NormProcessing():
             for conditions, action in rule_dict.items():
                 if conditions in merged_rules:
                     continue
-                generalized_conditions = []
+                generalised_conditions = []
                 for i in range(len(conditions)):
                     shorter_conditions = conditions[:i] + conditions[i+1:]
                     if tuple(shorter_conditions) in rule_dict and rule_dict[tuple(shorter_conditions)] == action:
-                        generalized_conditions = shorter_conditions
+                        generalised_conditions = shorter_conditions
                         break
-                if generalized_conditions:
-                    merged_rules[tuple(generalized_conditions)] = action
+                if generalised_conditions:
+                    merged_rules[tuple(generalised_conditions)] = action
                 else:
                     merged_rules[conditions] = action
             return merged_rules
@@ -154,3 +176,31 @@ class NormProcessing():
                 if "throw" in key:
                     keys_file.write(key+"\n")
         return emerged_norms
+    
+    def _calculate_norms_tendency(self, df, df_label):
+        if "reward" in df.columns:
+            central_tendency = {"df_label": df_label,
+                            "reward_mean": df["reward"].mean(),
+                            "reward_median": df["reward"].median(),
+                            "reward_stdev": df["reward"].std(),
+                            "numerosity_mean": df["numerosity"].mean(),
+                            "numerosity_median": df["numerosity"].median(),
+                            "numerosity_stdev": df["numerosity"].std(),
+                            "fitness_mean": df["fitness"].mean(),
+                            "fitness_median": df["fitness"].median(),
+                            "fitness_stdev": df["fitness"].std(),
+                            }
+        else:
+            #no cooperative norms found
+            central_tendency = {"df_label": df_label,
+                            "reward_mean": 0,
+                            "reward_median": 0,
+                            "reward_stdev": 0,
+                            "numerosity_mean": 0,
+                            "numerosity_median": 0,
+                            "numerosity_stdev": 0,
+                            "fitness_mean": 0,
+                            "fitness_median": 0,
+                            "fitness_stdev": 0,
+                            }
+        return central_tendency
