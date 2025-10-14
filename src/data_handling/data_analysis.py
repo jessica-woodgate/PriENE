@@ -404,35 +404,19 @@ class DataAnalysis():
     def _test_all_variables_significance(self, dfs, df_labels, df_type, agent_types):
         dfs, df_labels = self._extract_relevant_dfs(dfs, df_labels, agent_types)
         variables = dfs[0].columns
-        variables = variables[1:]
         exclude_list = ["agent_id", "episode", "action"]
         variables = [var for var in variables if var not in exclude_list]
         for dependent_variable in variables:
             if not np.issubdtype(dfs[0][dependent_variable].dtype, np.number):
                 #skip non-numeric variables
                 continue
-            anova_table, merged_results, anova, tukey, alpha_bonf = self._perform_anova(dfs, df_labels, dependent_variable)
+            anova_table, tukey_results, anova, tukey, cohens_results = self._perform_anova(dfs, df_labels, dependent_variable)
             if tukey and self.write:
                 with open(self.filepath+agent_types+"_tukey_results_"+df_type+"_"+dependent_variable+".txt", "w") as f:
-                    f.write(str(merged_results.to_string()))
-                    f.write(f"\np = {alpha_bonf}")
-        return anova_table, merged_results, anova, tukey
-    
-    def _extract_relevant_dfs(self, dfs, df_labels, agent_types):
-        if agent_types == "principles":
-            principle_dfs = dfs[:len(self.principles)]
-            print(f"df_labels {df_labels}")
-            print(f"best_aggregation {self.best_aggregation}")
-            print(f"index of best {df_labels.index(self.best_aggregation)}")
-            best_aggregation_df = dfs[df_labels.index(self.best_aggregation)]
-            relevant_dfs = principle_dfs + [best_aggregation_df]
-            relevant_df_labels = self.principles + [self.best_aggregation]
-            print(f"relevant df labels {relevant_df_labels}")
-        elif agent_types == "aggregations":
-            relevant_dfs = dfs[-len(self.aggregations):]
-            relevant_df_labels = self.aggregations
-        assert len(relevant_dfs) == len(relevant_df_labels)
-        return relevant_dfs, relevant_df_labels
+                    f.write(str(tukey_results.summary()))
+                    f.write("\n=========================================================\n  Effect Size - Cohen's D\n")
+                    f.write("\n"+str(cohens_results.to_string()))
+        return anova_table, tukey_results, anova, tukey
     
     def _perform_anova(self, dfs, df_labels, dependent_variable):
         """
@@ -445,7 +429,6 @@ class DataAnalysis():
             temp_df["society"] = df_labels[i]
             all_data.append(temp_df)
         combined_df = pd.concat(all_data, ignore_index=True)
-        value_counts = combined_df["society"].value_counts()
         try:
             #ordinary least squares: dependent variable is predicted by society (which is a category)
             #fit linear regression model to data
@@ -457,18 +440,9 @@ class DataAnalysis():
             return None, None, False, False
         try:
             #perform Tukey's HSD post-hoc test used after a significant anova to determine which specific groups are significantly different
-            #significance level = 0.05 / num_comparisons (Bonferonni correction)
-            #number of unique groups
-            k = combined_df["society"].nunique()
-            # number of pairwise comparisons
-            num_comparisons = k * (k - 1) // 2
-            #bonferonni correction
-            alpha_bonf = 0.05 / num_comparisons
-            tukey_results = pairwise_tukeyhsd(combined_df[dependent_variable], combined_df["society"], alpha=alpha_bonf)
+            tukey_results = pairwise_tukeyhsd(combined_df[dependent_variable], combined_df["society"], alpha=0.05)
             cohens_d_df = self._compute_pairwise_cohens_d(combined_df, dependent_variable)
-            tukey_df = pd.DataFrame(data=tukey_results._results_table.data[1:], columns=tukey_results._results_table.data[0])
-            merged_results = pd.merge(tukey_df, cohens_d_df, on=['group1','group2'])
-            return anova_table, merged_results, True, True, alpha_bonf
+            return anova_table, tukey_results, True, True, cohens_d_df
         except Exception as e:
             print(f"Exception during post hoc test for {dependent_variable}: {e}")
             return anova_table, None, True, False,0
@@ -476,13 +450,11 @@ class DataAnalysis():
     def _compute_pairwise_cohens_d(self, combined_df, dependent_variable):
         groups = combined_df["society"].unique()
         cohens_d_results = []
-
         for i in range(len(groups)):
             for j in range(i+1, len(groups)):
                 g1, g2 = groups[i], groups[j]
                 x_series = combined_df[combined_df['society'] == g1][dependent_variable]
                 y_series = combined_df[combined_df['society'] == g2][dependent_variable]
-                
                 cohens_d_results.append({
                     'group1': g1,
                     'group2': g2,
@@ -501,3 +473,22 @@ class DataAnalysis():
         if s_pooled == 0:
             return 0.0  # avoid division by zero
         return mean_diff / s_pooled
+    
+    def _extract_relevant_dfs(self, dfs, df_labels, agent_types):
+        if agent_types == "principles":
+            principle_dfs = dfs[:len(self.principles)]
+            best_aggregation_df = dfs[df_labels.index(self.best_aggregation)]
+            relevant_dfs = principle_dfs + [best_aggregation_df]
+            relevant_df_labels = self.principles + [self.best_aggregation]
+        elif agent_types == "aggregations":
+            relevant_dfs = dfs[-len(self.aggregations):]
+            relevant_df_labels = self.aggregations
+        assert len(relevant_dfs) == len(relevant_df_labels)
+        return relevant_dfs, relevant_df_labels
+    
+    def _sort_group_pairs(self, df):
+        df[['group1', 'group2']] = pd.DataFrame(
+            df[['group1', 'group2']].apply(lambda x: sorted(x), axis=1).tolist(),
+            index=df.index
+        )
+        return df
