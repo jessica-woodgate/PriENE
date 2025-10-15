@@ -414,7 +414,7 @@ class DataAnalysis():
             if tukey and self.write:
                 with open(self.filepath+agent_types+"_tukey_results_"+df_type+"_"+dependent_variable+".txt", "w") as f:
                     f.write(str(tukey_results.summary()))
-                    f.write("\n=========================================================\n  Effect Size - Cohen's D\n")
+                    f.write("\n      Effect Size - Cohen's D\n=========================================================\n")
                     f.write("\n"+str(cohens_results.to_string()))
         return anova_table, tukey_results, anova, tukey
     
