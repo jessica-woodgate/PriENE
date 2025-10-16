@@ -42,9 +42,9 @@ class DataAnalysis():
         if process_norms:
             norm_processing = NormProcessing()
             cooperative_norm_dfs, cooperative_tendencies, emerged_norms_proportions = norm_processing.process_norms(df_labels, scenario, norms_filepath, self.filepath)
-            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "numerosity", norms_filepath+"cooperative_numerosity")
-            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "fitness", norms_filepath+"cooperative_fitness")
-            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "reward", norms_filepath+"cooperative_reward")
+            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "numerosity", self.filepath+"cooperative_numerosity")
+            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "fitness", self.filepath+"cooperative_fitness")
+            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "reward", self.filepath+"cooperative_reward")
             self._write_dictionary_to_file(cooperative_tendencies,self.filepath+"cooperative_norms_tendencies.csv")
             self._write_dictionary_to_file(emerged_norms_proportions,self.filepath+"emerged_norms_proportions.csv")
 

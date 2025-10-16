@@ -8,7 +8,7 @@
 source ~/miniforge3/bin/activate
 conda activate PriENE
 
-python3 ~/PriENE/run.py train --log PriENE << EOF
+python3 ~/PriENE/run.py train << EOF
 200
 baseline
 20

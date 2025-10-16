@@ -362,27 +362,32 @@ class HarvestModel(Model):
     def _check_emerged_norms(self):
         if len(self.living_agents) < 2:
             return
-        emergence_count = len(self.living_agents) * self.societal_norm_emergence_threshold
+        emergence_threshold = len(self.living_agents) * self.societal_norm_emergence_threshold
         current_emerged_norms = {}
         for agent in self.schedule.agents:
             if agent.agent_type != "berry":
                 for norm_name, norm_value in agent.norms_module.behaviour_base.items():
-                    current_emerged_norms = self._update_norm(norm_name, norm_value, current_emerged_norms)
-        #current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_count and norm_value["fitness"] >= self.min_fitness}
-        current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_count}
+                    current_emerged_norms = self._update_norm(norm_name, norm_value, current_emerged_norms, tracking_emergence=True)
+        #current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_threshold and norm_value["fitness"] >= self.min_fitness}
+        current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_threshold}
         for norm_name, norm_value in current_emerged_norms.items():
             self.emerged_norms = self._update_norm(norm_name, norm_value, self.emerged_norms)
     
-    def _update_norm(self, norm_name, norm_value, norm_base):
+    def _update_norm(self, norm_name, norm_value, norm_base, tracking_emergence=False):
         if norm_name not in norm_base.keys():
             norm_base[norm_name] = {"reward": 0,
                                         "numerosity": 0,
                                         "fitness": 0,
                                         "adoption": 0}
         norm_base[norm_name]["reward"] += norm_value["reward"]
+        #number times it has been used by individual agents
         norm_base[norm_name]["numerosity"] += norm_value["numerosity"]
         norm_base[norm_name]["fitness"] += norm_value["fitness"]
-        norm_base[norm_name]["adoption"] += 1
+        #number of times it has been seen as an emerged norm in society
+        if tracking_emergence:
+            norm_base[norm_name]["adoption"] += 1
+        else:
+            norm_base[norm_name]["adoption"] += norm_value["adoption"]
         return norm_base
     
     def _update_schedule(self):

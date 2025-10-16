@@ -1,29 +1,29 @@
-   Multiple Comparison of Means - Tukey HSD, FWER=0.05   
+     Multiple Comparison of Means - Tukey HSD, FWER=0.05     
+=============================================================
+   group1      group2   meandiff p-adj  lower   upper  reject
+-------------------------------------------------------------
+   baseline egalitarian   0.7075 0.0161  0.087   1.328   True
+   baseline     maximin   2.1483    0.0 1.5277  2.7688   True
+   baseline utilitarian   3.0442    0.0 2.4237  3.6648   True
+   baseline        veto   9.4157    0.0 8.7952 10.0363   True
+egalitarian     maximin   1.4408    0.0 0.8202  2.0613   True
+egalitarian utilitarian   2.3367    0.0 1.7162  2.9573   True
+egalitarian        veto   8.7082    0.0 8.0877  9.3288   True
+    maximin utilitarian    0.896 0.0008 0.2755  1.5165   True
+    maximin        veto   7.2675    0.0  6.647   7.888   True
+utilitarian        veto   6.3715    0.0  5.751   6.992   True
+-------------------------------------------------------------
+      Effect Size - Cohen's D
 =========================================================
-   group1      group2   meandiff p-adj lower upper reject
----------------------------------------------------------
-    average    baseline      nan   nan   nan   nan  False
-    average egalitarian      nan   nan   nan   nan  False
-    average     maximin      nan   nan   nan   nan  False
-    average utilitarian      nan   nan   nan   nan  False
-   baseline egalitarian   0.7075   nan   nan   nan  False
-   baseline     maximin   2.1483   nan   nan   nan  False
-   baseline utilitarian   3.0442   nan   nan   nan  False
-egalitarian     maximin   1.4408   nan   nan   nan  False
-egalitarian utilitarian   2.3367   nan   nan   nan  False
-    maximin utilitarian    0.896   nan   nan   nan  False
----------------------------------------------------------
-=========================================================
-  Effect Size - Cohen's D
 
         group1       group2  cohens_d
 0     baseline  utilitarian -0.344140
 1     baseline      maximin -0.257273
 2     baseline  egalitarian -0.090845
-3     baseline      average       NaN
+3     baseline         veto -0.769953
 4  utilitarian      maximin  0.099148
 5  utilitarian  egalitarian  0.274254
-6  utilitarian      average       NaN
+6  utilitarian         veto -0.501378
 7      maximin  egalitarian  0.179996
-8      maximin      average       NaN
-9  egalitarian      average       NaN
+8      maximin         veto -0.587609
+9  egalitarian         veto -0.725953
