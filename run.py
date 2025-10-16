@@ -34,8 +34,8 @@ def generate_paper_graphs(scenario):
     data_analysis = DataAnalysis(num_agents, writing_filepath)
     agents_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_end_episode_df_"
     episodes_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/end_episode_totals_"
-    agent_end_episode_files = [agents_filepath+"baseline.csv",agents_filepath+"egalitarian.csv",agents_filepath+"maximin.csv",agents_filepath+"utilitarian.csv",agents_filepath+"average.csv",agents_filepath+"majoritarian.csv",agents_filepath+"optimist.csv",agents_filepath+"veto.csv"]
-    end_episode_totals_files = [episodes_filepath+"baseline.csv",episodes_filepath+"egalitarian.csv",episodes_filepath+"maximin.csv",episodes_filepath+"utilitarian.csv",episodes_filepath+"average.csv",episodes_filepath+"majoritarian.csv",episodes_filepath+"optimist.csv",episodes_filepath+"veto.csv"]
+    agent_end_episode_files = [agents_filepath+"baseline.csv",agents_filepath+"utilitarian.csv",agents_filepath+"maximin.csv",agents_filepath+"egalitarian.csv",agents_filepath+"average.csv",agents_filepath+"majoritarian.csv",agents_filepath+"optimist.csv",agents_filepath+"veto.csv"]
+    end_episode_totals_files = [episodes_filepath+"baseline.csv",episodes_filepath+"utilitarian.csv",episodes_filepath+"maximin.csv",episodes_filepath+"egalitarian.csv",episodes_filepath+"average.csv",episodes_filepath+"majoritarian.csv",episodes_filepath+"optimist.csv",episodes_filepath+"veto.csv"]
     agent_end_episode_dfs = []
     end_episode_totals_dfs = []
     for i, file in enumerate(agent_end_episode_files):
