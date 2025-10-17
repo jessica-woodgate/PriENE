@@ -1,21 +1,21 @@
-      Multiple Comparison of Means - Tukey HSD, FWER=0.05       
-================================================================
-   group1       group2    meandiff p-adj   lower   upper  reject
-----------------------------------------------------------------
-     average majoritarian    2.642    0.0  1.5484  3.7356   True
-     average     optimist    4.466    0.0  3.3724  5.5596   True
-     average         veto     2.75    0.0  1.6564  3.8436   True
-majoritarian     optimist    1.824 0.0001  0.7304  2.9176   True
-majoritarian         veto    0.108 0.9943 -0.9856  1.2016  False
-    optimist         veto   -1.716 0.0003 -2.8096 -0.6224   True
-----------------------------------------------------------------
+      Multiple Comparison of Means - Tukey HSD, FWER=0.05      
+===============================================================
+   group1       group2    meandiff p-adj   lower  upper  reject
+---------------------------------------------------------------
+     average majoritarian    2.642    0.0  1.5484 3.7356   True
+     average     optimist     2.75    0.0  1.6564 3.8436   True
+     average         veto    4.466    0.0  3.3724 5.5596   True
+majoritarian     optimist    0.108 0.9943 -0.9856 1.2016  False
+majoritarian         veto    1.824 0.0001  0.7304 2.9176   True
+    optimist         veto    1.716 0.0003  0.6224 2.8096   True
+---------------------------------------------------------------
+      Effect Size - Cohen's D
 =========================================================
-  Effect Size - Cohen's D
 
          group1        group2  cohens_d
 0       average  majoritarian -0.259324
-1       average          veto -0.274693
-2       average      optimist -0.428414
-3  majoritarian          veto -0.012694
-4  majoritarian      optimist -0.202881
-5          veto      optimist -0.195231
+1       average      optimist -0.274693
+2       average          veto -0.428414
+3  majoritarian      optimist -0.012694
+4  majoritarian          veto -0.202881
+5      optimist          veto -0.195231

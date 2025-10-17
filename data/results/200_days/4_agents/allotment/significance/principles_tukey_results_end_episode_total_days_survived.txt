@@ -1,29 +1,29 @@
-      Multiple Comparison of Means - Tukey HSD, FWER=0.05       
-================================================================
-   group1      group2   meandiff p-adj   lower    upper   reject
-----------------------------------------------------------------
-   baseline egalitarian   66.595    0.0  49.8948  83.2952   True
-   baseline     maximin   57.891    0.0  41.1908  74.5912   True
-   baseline    optimist   70.798    0.0  54.0978  87.4982   True
-   baseline utilitarian   40.146    0.0  23.4458  56.8462   True
-egalitarian     maximin   -8.704 0.6133 -25.4042   7.9962  False
-egalitarian    optimist    4.203 0.9594 -12.4972  20.9032  False
-egalitarian utilitarian  -26.449 0.0002 -43.1492  -9.7488   True
-    maximin    optimist   12.907 0.2163  -3.7932  29.6072  False
-    maximin utilitarian  -17.745 0.0308 -34.4452  -1.0448   True
-   optimist utilitarian  -30.652    0.0 -47.3522 -13.9518   True
-----------------------------------------------------------------
+      Multiple Comparison of Means - Tukey HSD, FWER=0.05      
+===============================================================
+   group1      group2   meandiff p-adj   lower    upper  reject
+---------------------------------------------------------------
+   baseline egalitarian   66.595    0.0  49.8948 83.2952   True
+   baseline     maximin   57.891    0.0  41.1908 74.5912   True
+   baseline utilitarian   40.146    0.0  23.4458 56.8462   True
+   baseline        veto   70.798    0.0  54.0978 87.4982   True
+egalitarian     maximin   -8.704 0.6133 -25.4042  7.9962  False
+egalitarian utilitarian  -26.449 0.0002 -43.1492 -9.7488   True
+egalitarian        veto    4.203 0.9594 -12.4972 20.9032  False
+    maximin utilitarian  -17.745 0.0308 -34.4452 -1.0448   True
+    maximin        veto   12.907 0.2163  -3.7932 29.6072  False
+utilitarian        veto   30.652    0.0  13.9518 47.3522   True
+---------------------------------------------------------------
+      Effect Size - Cohen's D
 =========================================================
-  Effect Size - Cohen's D
 
         group1       group2  cohens_d
 0     baseline  utilitarian -0.264389
 1     baseline      maximin -0.417697
 2     baseline  egalitarian -0.518449
-3     baseline     optimist -0.512558
+3     baseline         veto -0.512558
 4  utilitarian      maximin -0.120790
 5  utilitarian  egalitarian -0.192528
-6  utilitarian     optimist -0.209278
+6  utilitarian         veto -0.209278
 7      maximin  egalitarian -0.071010
-8      maximin     optimist -0.097279
-9  egalitarian     optimist -0.034438
+8      maximin         veto -0.097279
+9  egalitarian         veto -0.034438

@@ -3,19 +3,19 @@
    group1       group2    meandiff p-adj   lower   upper  reject
 ----------------------------------------------------------------
      average majoritarian   -0.154    0.0 -0.2398 -0.0682   True
-     average     optimist  -0.4705    0.0 -0.5563 -0.3847   True
-     average         veto  -0.2368    0.0 -0.3226 -0.1509   True
-majoritarian     optimist  -0.3165    0.0 -0.4023 -0.2307   True
-majoritarian         veto  -0.0827 0.0636 -0.1686  0.0031  False
-    optimist         veto   0.2338    0.0  0.1479  0.3196   True
+     average     optimist  -0.2368    0.0 -0.3226 -0.1509   True
+     average         veto  -0.4705    0.0 -0.5563 -0.3847   True
+majoritarian     optimist  -0.0827 0.0636 -0.1686  0.0031  False
+majoritarian         veto  -0.3165    0.0 -0.4023 -0.2307   True
+    optimist         veto  -0.2338    0.0 -0.3196 -0.1479   True
 ----------------------------------------------------------------
+      Effect Size - Cohen's D
 =========================================================
-  Effect Size - Cohen's D
 
          group1        group2  cohens_d
 0       average  majoritarian  0.082171
-1       average          veto  0.127702
-2       average      optimist  0.268214
-3  majoritarian          veto  0.070251
-4  majoritarian      optimist  0.312217
-5          veto      optimist  0.239539
+1       average      optimist  0.127702
+2       average          veto  0.268214
+3  majoritarian      optimist  0.070251
+4  majoritarian          veto  0.312217
+5      optimist          veto  0.239539

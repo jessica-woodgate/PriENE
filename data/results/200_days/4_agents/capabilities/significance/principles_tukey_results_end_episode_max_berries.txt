@@ -4,26 +4,26 @@
 --------------------------------------------------------------
    baseline egalitarian   -1.591    0.0 -2.4904 -0.6916   True
    baseline     maximin   -5.309    0.0 -6.2084 -4.4096   True
-   baseline    optimist    -5.13    0.0 -6.0294 -4.2306   True
    baseline utilitarian   -8.794    0.0 -9.6934 -7.8946   True
+   baseline        veto    -5.13    0.0 -6.0294 -4.2306   True
 egalitarian     maximin   -3.718    0.0 -4.6174 -2.8186   True
-egalitarian    optimist   -3.539    0.0 -4.4384 -2.6396   True
 egalitarian utilitarian   -7.203    0.0 -8.1024 -6.3036   True
-    maximin    optimist    0.179 0.9828 -0.7204  1.0784  False
+egalitarian        veto   -3.539    0.0 -4.4384 -2.6396   True
     maximin utilitarian   -3.485    0.0 -4.3844 -2.5856   True
-   optimist utilitarian   -3.664    0.0 -4.5634 -2.7646   True
+    maximin        veto    0.179 0.9828 -0.7204  1.0784  False
+utilitarian        veto    3.664    0.0  2.7646  4.5634   True
 --------------------------------------------------------------
+      Effect Size - Cohen's D
 =========================================================
-  Effect Size - Cohen's D
 
         group1       group2  cohens_d
 0     baseline  utilitarian  1.089424
 1     baseline      maximin  0.761267
 2     baseline  egalitarian  0.307081
-3     baseline     optimist  0.793919
+3     baseline         veto  0.793919
 4  utilitarian      maximin -0.383165
 5  utilitarian  egalitarian -0.922761
-6  utilitarian     optimist -0.420728
+6  utilitarian         veto -0.420728
 7      maximin  egalitarian -0.557929
-8      maximin     optimist -0.023241
-9  egalitarian     optimist  0.577722
+8      maximin         veto -0.023241
+9  egalitarian         veto  0.577722

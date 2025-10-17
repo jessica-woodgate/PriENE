@@ -32,7 +32,7 @@ class NormProcessing():
         cooperative_data, n_norms, n_cooperative_norms = self._count_cooperative_norms(data, output_file)
         data = self._merge_norms(data, output_file)
         self._generalise_norms(data.keys(), output_file)
-        #self._generate_norms_tree(data, output_file)
+        self._generalise_norms(data.keys(), output_file, cooperative_norms=True)
         return cooperative_data, n_norms, n_cooperative_norms
     
     def _count_cooperative_norms(self, data, output_file):
@@ -56,81 +56,10 @@ class NormProcessing():
         df = pd.DataFrame(cooperative_norms)
         df.to_csv(output_file+"_cooperative_data.csv",index=False)
         return df, n_norms, n_cooperative_norms
-    
-    def _generalise_norms(self, norms, output_file):
-        rule_dict = {}
-        for rule in norms:
-            conditions, action = rule.split("THEN")
-            conditions = conditions.split(",")[1:]
-            rule_dict[tuple(conditions)] = action.strip()
-        def merge_rules(rule_dict):
-            merged_rules = {}
-            for conditions, action in rule_dict.items():
-                if conditions in merged_rules:
-                    continue
-                generalised_conditions = []
-                for i in range(len(conditions)):
-                    shorter_conditions = conditions[:i] + conditions[i+1:]
-                    if tuple(shorter_conditions) in rule_dict and rule_dict[tuple(shorter_conditions)] == action:
-                        generalised_conditions = shorter_conditions
-                        break
-                if generalised_conditions:
-                    merged_rules[tuple(generalised_conditions)] = action
-                else:
-                    merged_rules[conditions] = action
-            return merged_rules
-        merged_rules = merge_rules(rule_dict)
-        merged_rules = self._convert_to_rule_list(merged_rules)
-        self._generate_norms_tree(merged_rules, output_file)
-    
-    def _convert_to_rule_list(self, data):
-        rule_list = []
-        for conditions, action in data.items():
-            rule = ["IF"]
-            rule.extend(conditions[:-1])
-            rule.append("THEN")
-            rule.append(action.strip(","))
-            rule_string = ", ".join(rule)
-            rule_list.append(rule_string)
-        return rule_list
-        
-    def _generate_norms_tree(self, data, output_file):
-        tree = {}
-        for norm in data:
-            conditions = norm.split("IF")[1].split(",")[:-2]
-            conditions = conditions[1:]
-            current_node = tree
-            for condition in conditions:
-                if condition not in current_node:
-                    current_node[condition] = {}
-                if isinstance(current_node[condition], list):
-                    new_node = {}
-                    for item in current_node[condition]:
-                        new_node[item] = {}
-                    current_node[condition] = new_node
-                current_node = current_node[condition]
-            consequent = norm.split("THEN")[1].strip(",")
-            if isinstance(current_node, list):
-                current_node.append(consequent)
-            else:
-                current_node[condition] = [consequent]
-        with open(output_file+"_tree.txt", 'w') as f:
-            f.write(self._print_tree(tree, indent="  "))
-
-    def _print_tree(self, node, indent=""):
-        output = ""
-        for key, value in node.items():
-            if isinstance(value, dict):
-                output += f"{indent}{key}\n"
-                output += self._print_tree(value, indent + "  ")
-            else:
-                output += f"{indent}{key}: {value}\n"
-        return output
 
     def _merge_norms(self,data,output_file):
         """
         Merges duplicates of norms into one dictionary
-
         Args:
             data: Norm base to remove duplicates from (dictionary).
             filename: The file to write the unique set of norms to.
@@ -176,6 +105,104 @@ class NormProcessing():
                 if "throw" in key:
                     keys_file.write(key+"\n")
         return emerged_norms
+    
+    def _generalise_norms(self, norms, output_file, cooperative_norms=False):
+        """
+        Generalises a set of norms (rules) by merging redundant or overly specific rules 
+        into more general ones, and outputs the resulting simplified rule set.
+        The function identifies cases where two rules have the same action, but one rule 
+        has a subset of the other's conditions (i.e. it is more general). The more 
+        specific rule is removed, keeping only the general rule.
+        Steps:
+            1. Parse each norm into a mapping from condition tuples to actions.
+            2. Identify rules that can be generalised by dropping redundant conditions 
+            when a simpler version exists with the same action.
+            3. Merge rules accordingly and remove duplicates.
+            4. Convert the merged rule set back into a list of textual rules.
+            5. Generate and save a norms tree representation to the specified output file.
+
+        Args:
+            norms (list[str]): 
+                A list of rule strings, where each rule follows the format 
+                "IF condition1,condition2,... THEN action".
+            output_file (str): 
+                Path to the output file where the generalised norms or tree representation 
+                will be written.
+        """
+        rule_dict = {}
+        for rule in norms:
+            conditions, action = rule.split("THEN")
+            if cooperative_norms:
+                action = action.strip().lower()
+                if "throw" not in action:
+                    continue
+            conditions = conditions.split(",")[1:]
+            rule_dict[tuple(conditions)] = action.strip()
+        def merge_rules(rule_dict):
+            merged_rules = {}
+            for conditions, action in rule_dict.items():
+                if conditions in merged_rules:
+                    continue
+                generalised_conditions = []
+                for i in range(len(conditions)):
+                    shorter_conditions = conditions[:i] + conditions[i+1:]
+                    if tuple(shorter_conditions) in rule_dict and rule_dict[tuple(shorter_conditions)] == action:
+                        generalised_conditions = shorter_conditions
+                        break
+                if generalised_conditions:
+                    merged_rules[tuple(generalised_conditions)] = action
+                else:
+                    merged_rules[conditions] = action
+            return merged_rules
+        merged_rules = merge_rules(rule_dict)
+        merged_rules = self._convert_to_rule_list(merged_rules)
+        if cooperative_norms:
+            output_file += "_cooperative"
+        self._generate_norms_tree(merged_rules, output_file)
+    
+    def _convert_to_rule_list(self, data):
+        rule_list = []
+        for conditions, action in data.items():
+            rule = ["IF"]
+            rule.extend(conditions[:-1])
+            rule.append("THEN")
+            rule.append(action.strip(","))
+            rule_string = ", ".join(rule)
+            rule_list.append(rule_string)
+        return rule_list
+        
+    def _generate_norms_tree(self, data, output_file):
+        tree = {}
+        for norm in data:
+            conditions = norm.split("IF")[1].split(",")[:-2]
+            conditions = conditions[1:]
+            current_node = tree
+            for condition in conditions:
+                if condition not in current_node:
+                    current_node[condition] = {}
+                if isinstance(current_node[condition], list):
+                    new_node = {}
+                    for item in current_node[condition]:
+                        new_node[item] = {}
+                    current_node[condition] = new_node
+                current_node = current_node[condition]
+            consequent = norm.split("THEN")[1].strip(",")
+            if isinstance(current_node, list):
+                current_node.append(consequent)
+            else:
+                current_node[condition] = [consequent]
+        with open(output_file+"_tree.txt", 'w') as f:
+            f.write(self._print_tree(tree, indent="  "))
+
+    def _print_tree(self, node, indent=""):
+        output = ""
+        for key, value in node.items():
+            if isinstance(value, dict):
+                output += f"{indent}{key}\n"
+                output += self._print_tree(value, indent + "  ")
+            else:
+                output += f"{indent}{key}: {value}\n"
+        return output
     
     def _calculate_norms_tendency(self, df, df_label):
         if "reward" in df.columns:

@@ -12,7 +12,7 @@ import time
 import re
 
 PRINCIPLES = ["baseline", "utilitarian", "maximin", "egalitarian"]
-AGGREGATIONS = ["average", "majoritarian", "veto", "optimist"]
+AGGREGATIONS = ["average", "majoritarian", "optimist", "veto"]
 AGENT_TYPES = PRINCIPLES + AGGREGATIONS
 SCENARIO_TYPES = ["colours", "capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6", "20", "50", "100"]

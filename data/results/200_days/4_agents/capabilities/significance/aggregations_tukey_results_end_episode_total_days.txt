@@ -1,21 +1,21 @@
-         Multiple Comparison of Means - Tukey HSD, FWER=0.05          
-======================================================================
-   group1       group2     meandiff p-adj    lower      upper   reject
-----------------------------------------------------------------------
-     average majoritarian  2098.201    0.0  1382.6994 2813.7026   True
-     average     optimist  4731.898    0.0  4016.3964 5447.3996   True
-     average         veto  3021.571    0.0  2306.0694 3737.0726   True
-majoritarian     optimist  2633.697    0.0  1918.1954 3349.1986   True
-majoritarian         veto    923.37 0.0051   207.8684 1638.8716   True
-    optimist         veto -1710.327    0.0 -2425.8286 -994.8254   True
-----------------------------------------------------------------------
+        Multiple Comparison of Means - Tukey HSD, FWER=0.05         
+====================================================================
+   group1       group2    meandiff p-adj    lower     upper   reject
+--------------------------------------------------------------------
+     average majoritarian 2098.201    0.0 1382.6994 2813.7026   True
+     average     optimist 3021.571    0.0 2306.0694 3737.0726   True
+     average         veto 4731.898    0.0 4016.3964 5447.3996   True
+majoritarian     optimist   923.37 0.0051  207.8684 1638.8716   True
+majoritarian         veto 2633.697    0.0 1918.1954 3349.1986   True
+    optimist         veto 1710.327    0.0  994.8254 2425.8286   True
+--------------------------------------------------------------------
+      Effect Size - Cohen's D
 =========================================================
-  Effect Size - Cohen's D
 
          group1        group2  cohens_d
 0       average  majoritarian -0.331778
-1       average          veto -0.506413
-2       average      optimist -0.792289
-3  majoritarian          veto -0.142764
-4  majoritarian      optimist -0.406862
-5          veto      optimist -0.279264
+1       average      optimist -0.506413
+2       average          veto -0.792289
+3  majoritarian      optimist -0.142764
+4  majoritarian          veto -0.406862
+5      optimist          veto -0.279264

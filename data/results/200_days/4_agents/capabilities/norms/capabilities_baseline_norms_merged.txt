@@ -1,1004 +1,2096 @@
 
 {
-    "IF,no berries,high health,high days,high days,THEN,move": {
-        "reward": 281423,
-        "numerosity": 1060117,
-        "fitness": 413482727.39999986,
-        "adoption": 11561,
-        "num_instances_across_episodes": 159
-    },
     "IF,no berries,high health,high days,THEN,move": {
-        "reward": 212797,
-        "numerosity": 729356,
-        "fitness": 324071657.3999999,
-        "adoption": 9752,
-        "num_instances_across_episodes": 95
-    },
-    "IF,medium berries,high health,high days,THEN,move": {
-        "reward": 248755,
-        "numerosity": 893134,
-        "fitness": 321745306.8,
-        "adoption": 13677,
-        "num_instances_across_episodes": 233
+        "reward": 608096,
+        "numerosity": 2063558,
+        "fitness": 1015515596.3999994,
+        "adoption": 50204,
+        "num_instances_across_episodes": 246
     },
     "IF,medium berries,high health,high days,THEN,eat": {
-        "reward": 577028,
-        "numerosity": 576916,
-        "fitness": 247657166.70000005,
-        "adoption": 26532,
-        "num_instances_across_episodes": 314
+        "reward": 869139,
+        "numerosity": 868987,
+        "fitness": 379945153.8000002,
+        "adoption": 81958,
+        "num_instances_across_episodes": 499
     },
-    "IF,medium berries,high health,high days,high days,THEN,eat": {
-        "reward": 501379,
-        "numerosity": 501276,
-        "fitness": 181404404.40000004,
-        "adoption": 15738,
-        "num_instances_across_episodes": 199
-    },
-    "IF,no berries,medium health,medium days,medium days,THEN,move": {
-        "reward": 273094,
-        "numerosity": 989712,
-        "fitness": 89145983.69999999,
-        "adoption": 25990,
-        "num_instances_across_episodes": 171
-    },
-    "IF,no berries,high health,medium days,medium days,THEN,move": {
-        "reward": 63364,
-        "numerosity": 322639,
-        "fitness": 48880221.899999976,
-        "adoption": 6541,
-        "num_instances_across_episodes": 55
-    },
-    "IF,no berries,high health,high days,medium days,THEN,move": {
-        "reward": 64509,
-        "numerosity": 244483,
-        "fitness": 43907590.20000001,
-        "adoption": 5543,
-        "num_instances_across_episodes": 61
+    "IF,medium berries,high health,high days,THEN,move": {
+        "reward": 210487,
+        "numerosity": 866814,
+        "fitness": 174707738.09999993,
+        "adoption": 61910,
+        "num_instances_across_episodes": 519
     },
     "IF,no berries,high health,medium days,THEN,move": {
-        "reward": 61682,
-        "numerosity": 222197,
-        "fitness": 31955600.39999998,
-        "adoption": 6185,
-        "num_instances_across_episodes": 47
-    },
-    "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
-        "reward": 274962,
-        "numerosity": 274962,
-        "fitness": 24845774.4,
-        "adoption": 21501,
-        "num_instances_across_episodes": 140
-    },
-    "IF,medium berries,high health,high days,high days,THEN,move": {
-        "reward": 7282,
-        "numerosity": 24857,
-        "fitness": 14102454.000000004,
-        "adoption": 436,
-        "num_instances_across_episodes": 15
-    },
-    "IF,no berries,medium health,medium days,THEN,move": {
-        "reward": 74988,
-        "numerosity": 238162,
-        "fitness": 13917070.500000004,
-        "adoption": 11950,
+        "reward": 141103,
+        "numerosity": 500203,
+        "fitness": 106716239.69999996,
+        "adoption": 27678,
         "num_instances_across_episodes": 95
     },
-    "IF,no berries,medium health,low days,low days,low days,THEN,move": {
-        "reward": 270797,
-        "numerosity": 1180603,
-        "fitness": 8942211.300000029,
-        "adoption": 111248,
-        "num_instances_across_episodes": 869
+    "IF,no berries,medium health,medium days,THEN,move": {
+        "reward": 208503,
+        "numerosity": 654768,
+        "fitness": 42759546.89999998,
+        "adoption": 52850,
+        "num_instances_across_episodes": 186
     },
     "IF,no berries,medium health,high days,medium days,THEN,move": {
-        "reward": 14459,
-        "numerosity": 62266,
-        "fitness": 6428754.0,
-        "adoption": 2630,
-        "num_instances_across_episodes": 30
+        "reward": 98114,
+        "numerosity": 370016,
+        "fitness": 27390984.299999997,
+        "adoption": 48094,
+        "num_instances_across_episodes": 268
     },
-    "IF,no berries,high health,medium days,high days,THEN,move": {
-        "reward": 11706,
-        "numerosity": 46985,
-        "fitness": 5858488.200000003,
-        "adoption": 1354,
-        "num_instances_across_episodes": 19
-    },
-    "IF,medium berries,high health,high days,medium days,THEN,eat": {
-        "reward": 38312,
-        "numerosity": 38311,
-        "fitness": 4610323.199999999,
-        "adoption": 3577,
-        "num_instances_across_episodes": 43
-    },
-    "IF,no berries,medium health,medium days,low days,THEN,move": {
-        "reward": 51087,
-        "numerosity": 183832,
-        "fitness": 4602213.899999996,
-        "adoption": 13070,
-        "num_instances_across_episodes": 113
-    },
-    "IF,no berries,high health,high days,low days,THEN,move": {
-        "reward": 20666,
-        "numerosity": 62679,
-        "fitness": 4539310.2,
-        "adoption": 3013,
-        "num_instances_across_episodes": 41
-    },
-    "IF,medium berries,medium health,medium days,THEN,eat": {
-        "reward": 101770,
-        "numerosity": 101770,
-        "fitness": 4221359.3999999985,
-        "adoption": 13591,
-        "num_instances_across_episodes": 94
-    },
-    "IF,no berries,medium health,low days,medium days,THEN,move": {
-        "reward": 27635,
-        "numerosity": 112948,
-        "fitness": 3287052.300000001,
-        "adoption": 7060,
-        "num_instances_across_episodes": 58
-    },
-    "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
-        "reward": 113823,
-        "numerosity": 529660,
-        "fitness": 3230772.9,
-        "adoption": 44691,
-        "num_instances_across_episodes": 411
-    },
-    "IF,medium berries,high health,medium days,THEN,eat": {
-        "reward": 28791,
-        "numerosity": 28791,
-        "fitness": 3165825.599999999,
-        "adoption": 3060,
-        "num_instances_across_episodes": 26
-    },
-    "IF,medium berries,high health,medium days,medium days,THEN,eat": {
-        "reward": 22788,
-        "numerosity": 22788,
-        "fitness": 3109905.9000000004,
-        "adoption": 1784,
-        "num_instances_across_episodes": 17
-    },
-    "IF,no berries,medium health,low days,THEN,move": {
-        "reward": 4760,
-        "numerosity": 18272,
-        "fitness": 2631997.5,
-        "adoption": 896,
-        "num_instances_across_episodes": 14
-    },
-    "IF,medium berries,high health,high days,low days,THEN,move": {
-        "reward": 6612,
-        "numerosity": 24887,
-        "fitness": 2496803.700000001,
-        "adoption": 1063,
-        "num_instances_across_episodes": 20
+    "IF,no berries,medium health,medium days,medium days,THEN,move": {
+        "reward": 198020,
+        "numerosity": 725891,
+        "fitness": 25161101.099999998,
+        "adoption": 104666,
+        "num_instances_across_episodes": 299
     },
     "IF,no berries,medium health,medium days,high days,THEN,move": {
-        "reward": 2785,
-        "numerosity": 12510,
-        "fitness": 2452959.9,
-        "adoption": 367,
-        "num_instances_across_episodes": 5
+        "reward": 83917,
+        "numerosity": 309791,
+        "fitness": 17822673.299999997,
+        "adoption": 45449,
+        "num_instances_across_episodes": 255
     },
-    "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
-        "reward": 89526,
-        "numerosity": 329158,
-        "fitness": 1879836.6000000006,
-        "adoption": 38242,
-        "num_instances_across_episodes": 311
+    "IF,no berries,high health,medium days,medium days,THEN,move": {
+        "reward": 26514,
+        "numerosity": 102322,
+        "fitness": 14126526.30000001,
+        "adoption": 10508,
+        "num_instances_across_episodes": 54
     },
-    "IF,no berries,medium health,medium days,high days,low days,THEN,move": {
-        "reward": 12843,
-        "numerosity": 76302,
-        "fitness": 1741755.9000000001,
-        "adoption": 4815,
-        "num_instances_across_episodes": 51
+    "IF,medium berries,medium health,medium days,THEN,eat": {
+        "reward": 249783,
+        "numerosity": 249783,
+        "fitness": 13078990.49999999,
+        "adoption": 58252,
+        "num_instances_across_episodes": 194
     },
-    "IF,no berries,low health,low days,medium days,low days,THEN,move": {
-        "reward": 64892,
-        "numerosity": 219105,
-        "fitness": 1676255.699999999,
-        "adoption": 23098,
-        "num_instances_across_episodes": 264
+    "IF,medium berries,high health,medium days,THEN,eat": {
+        "reward": 66072,
+        "numerosity": 66070,
+        "fitness": 7677249.900000002,
+        "adoption": 14460,
+        "num_instances_across_episodes": 53
     },
-    "IF,no berries,low health,medium days,high days,low days,THEN,move": {
-        "reward": 25243,
-        "numerosity": 87882,
-        "fitness": 1508367.6000000008,
-        "adoption": 7806,
-        "num_instances_across_episodes": 76
+    "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+        "reward": 309567,
+        "numerosity": 1414827,
+        "fitness": 7613656.200000023,
+        "adoption": 543942,
+        "num_instances_across_episodes": 947
     },
-    "IF,medium berries,low health,low days,medium days,low days,THEN,eat": {
-        "reward": 111287,
-        "numerosity": 111287,
-        "fitness": 1414442.9999999998,
-        "adoption": 23104,
-        "num_instances_across_episodes": 259
+    "IF,no berries,high health,high days,high days,THEN,move": {
+        "reward": 7599,
+        "numerosity": 23144,
+        "fitness": 5257074.000000002,
+        "adoption": 1499,
+        "num_instances_across_episodes": 6
     },
-    "IF,medium berries,high health,medium days,high days,THEN,eat": {
-        "reward": 11667,
-        "numerosity": 11667,
-        "fitness": 1278016.7999999993,
-        "adoption": 1011,
-        "num_instances_across_episodes": 14
+    "IF,no berries,high health,medium days,high days,THEN,move": {
+        "reward": 25494,
+        "numerosity": 85445,
+        "fitness": 4917548.1000000015,
+        "adoption": 17316,
+        "num_instances_across_episodes": 89
     },
-    "IF,no berries,high health,low days,medium days,THEN,move": {
-        "reward": 3472,
-        "numerosity": 22519,
-        "fitness": 1061949.899999999,
-        "adoption": 960,
-        "num_instances_across_episodes": 9
-    },
-    "IF,medium berries,high health,high days,low days,THEN,eat": {
-        "reward": 18043,
-        "numerosity": 18043,
-        "fitness": 997550.7000000004,
-        "adoption": 2662,
-        "num_instances_across_episodes": 39
-    },
-    "IF,medium berries,medium health,medium days,medium days,THEN,move": {
-        "reward": 4316,
-        "numerosity": 21498,
-        "fitness": 974196.8999999996,
-        "adoption": 1243,
-        "num_instances_across_episodes": 11
-    },
-    "IF,no berries,high health,medium days,low days,THEN,move": {
-        "reward": 7353,
-        "numerosity": 25811,
-        "fitness": 973904.1000000004,
-        "adoption": 1673,
-        "num_instances_across_episodes": 14
-    },
-    "IF,no berries,medium health,high days,low days,THEN,move": {
-        "reward": 4581,
-        "numerosity": 15633,
-        "fitness": 811247.0999999996,
-        "adoption": 1469,
-        "num_instances_across_episodes": 16
-    },
-    "IF,medium berries,low health,medium days,high days,low days,THEN,eat": {
-        "reward": 24369,
-        "numerosity": 24369,
-        "fitness": 780214.7999999996,
-        "adoption": 4278,
-        "num_instances_across_episodes": 47
-    },
-    "IF,no berries,low health,low days,high days,low days,THEN,move": {
-        "reward": 21813,
-        "numerosity": 76095,
-        "fitness": 715545.8999999997,
-        "adoption": 8482,
-        "num_instances_across_episodes": 82
-    },
-    "IF,medium berries,high health,medium days,high days,THEN,move": {
-        "reward": 1168,
-        "numerosity": 3869,
-        "fitness": 632231.1000000001,
-        "adoption": 117,
-        "num_instances_across_episodes": 3
-    },
-    "IF,medium berries,medium health,low days,medium days,THEN,eat": {
-        "reward": 18932,
-        "numerosity": 18932,
-        "fitness": 577752.6,
-        "adoption": 3354,
-        "num_instances_across_episodes": 27
+    "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+        "reward": 144247,
+        "numerosity": 144247,
+        "fitness": 4836334.800000002,
+        "adoption": 56935,
+        "num_instances_across_episodes": 161
     },
     "IF,medium berries,medium health,high days,medium days,THEN,eat": {
-        "reward": 12211,
-        "numerosity": 12211,
-        "fitness": 555516.3,
-        "adoption": 1877,
-        "num_instances_across_episodes": 24
+        "reward": 77516,
+        "numerosity": 77516,
+        "fitness": 4734346.200000002,
+        "adoption": 27058,
+        "num_instances_across_episodes": 169
     },
-    "IF,medium berries,high health,medium days,medium days,THEN,move": {
-        "reward": 1018,
-        "numerosity": 4027,
-        "fitness": 553454.3999999997,
-        "adoption": 160,
-        "num_instances_across_episodes": 4
+    "IF,no berries,high health,high days,medium days,THEN,move": {
+        "reward": 21223,
+        "numerosity": 80432,
+        "fitness": 3980139.5999999987,
+        "adoption": 14626,
+        "num_instances_across_episodes": 81
     },
-    "IF,no berries,medium health,low days,low days,THEN,move": {
-        "reward": 15755,
-        "numerosity": 72868,
-        "fitness": 528900.9,
-        "adoption": 7279,
-        "num_instances_across_episodes": 75
+    "IF,no berries,medium health,low days,medium days,THEN,move": {
+        "reward": 92441,
+        "numerosity": 345860,
+        "fitness": 3973593.3000000045,
+        "adoption": 106807,
+        "num_instances_across_episodes": 344
     },
-    "IF,medium berries,high health,high days,medium days,THEN,move": {
-        "reward": 1341,
-        "numerosity": 5511,
-        "fitness": 491558.10000000027,
-        "adoption": 244,
-        "num_instances_across_episodes": 7
+    "IF,no berries,medium health,medium days,low days,THEN,move": {
+        "reward": 101085,
+        "numerosity": 377584,
+        "fitness": 3857661.299999998,
+        "adoption": 116506,
+        "num_instances_across_episodes": 368
     },
-    "IF,medium berries,medium health,medium days,low days,THEN,eat": {
-        "reward": 33753,
-        "numerosity": 33753,
-        "fitness": 487241.09999999974,
-        "adoption": 6386,
-        "num_instances_across_episodes": 50
-    },
-    "IF,medium berries,low health,medium days,medium days,THEN,eat": {
-        "reward": 17429,
-        "numerosity": 17429,
-        "fitness": 480678.6000000001,
-        "adoption": 3538,
-        "num_instances_across_episodes": 29
-    },
-    "IF,no berries,low health,medium days,medium days,THEN,move": {
-        "reward": 8793,
-        "numerosity": 24961,
-        "fitness": 440299.4999999997,
-        "adoption": 3014,
-        "num_instances_across_episodes": 30
-    },
-    "IF,no berries,medium health,low days,high days,low days,THEN,move": {
-        "reward": 11954,
-        "numerosity": 71800,
-        "fitness": 411984.0000000002,
-        "adoption": 7340,
-        "num_instances_across_episodes": 67
-    },
-    "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
-        "reward": 35121,
-        "numerosity": 116370,
-        "fitness": 373182.8999999999,
-        "adoption": 16477,
-        "num_instances_across_episodes": 122
-    },
-    "IF,no berries,low health,medium days,medium days,low days,THEN,move": {
-        "reward": 30501,
-        "numerosity": 94703,
-        "fitness": 366352.79999999946,
-        "adoption": 14829,
-        "num_instances_across_episodes": 129
-    },
-    "IF,medium berries,low health,low days,high days,low days,THEN,eat": {
-        "reward": 26512,
-        "numerosity": 26512,
-        "fitness": 366105.90000000014,
-        "adoption": 6191,
-        "num_instances_across_episodes": 64
-    },
-    "IF,medium berries,low health,medium days,medium days,THEN,move": {
-        "reward": 1415,
-        "numerosity": 3499,
-        "fitness": 361448.99999999994,
-        "adoption": 304,
-        "num_instances_across_episodes": 5
-    },
-    "IF,medium berries,medium health,low days,medium days,THEN,move": {
-        "reward": 1463,
-        "numerosity": 7249,
-        "fitness": 336202.5000000007,
-        "adoption": 344,
-        "num_instances_across_episodes": 4
-    },
-    "IF,medium berries,low health,medium days,THEN,eat": {
-        "reward": 6021,
-        "numerosity": 6021,
-        "fitness": 311868.8999999996,
-        "adoption": 1247,
-        "num_instances_across_episodes": 13
-    },
-    "IF,medium berries,medium health,high days,medium days,THEN,move": {
-        "reward": 1920,
-        "numerosity": 9972,
-        "fitness": 285947.4,
-        "adoption": 714,
-        "num_instances_across_episodes": 11
-    },
-    "IF,no berries,high health,low days,THEN,move": {
-        "reward": 1698,
-        "numerosity": 7773,
-        "fitness": 225846.60000000003,
-        "adoption": 683,
-        "num_instances_across_episodes": 5
-    },
-    "IF,no berries,low health,medium days,THEN,move": {
-        "reward": 3164,
-        "numerosity": 6668,
-        "fitness": 207557.39999999985,
-        "adoption": 786,
-        "num_instances_across_episodes": 9
-    },
-    "IF,medium berries,high health,low days,high days,THEN,eat": {
-        "reward": 2123,
-        "numerosity": 2123,
-        "fitness": 185145.29999999987,
-        "adoption": 228,
-        "num_instances_across_episodes": 6
-    },
-    "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
-        "reward": 8499,
-        "numerosity": 31753,
-        "fitness": 176912.4,
-        "adoption": 4266,
-        "num_instances_across_episodes": 39
-    },
-    "IF,medium berries,medium health,low days,medium days,low days,THEN,eat": {
-        "reward": 16186,
-        "numerosity": 16186,
-        "fitness": 170005.49999999997,
-        "adoption": 3304,
-        "num_instances_across_episodes": 24
-    },
-    "IF,medium berries,high health,medium days,THEN,move": {
-        "reward": 230,
-        "numerosity": 1034,
-        "fitness": 163185.0,
-        "adoption": 23,
-        "num_instances_across_episodes": 1
-    },
-    "IF,no berries,high health,low days,high days,THEN,move": {
-        "reward": 1276,
-        "numerosity": 5471,
-        "fitness": 156070.5,
-        "adoption": 228,
-        "num_instances_across_episodes": 6
-    },
-    "IF,no berries,medium health,medium days,high days,medium days,THEN,move": {
-        "reward": 2698,
-        "numerosity": 10698,
-        "fitness": 155107.79999999987,
-        "adoption": 1212,
-        "num_instances_across_episodes": 13
-    },
-    "IF,medium berries,low health,high days,medium days,THEN,eat": {
-        "reward": 660,
-        "numerosity": 660,
-        "fitness": 142738.19999999995,
-        "adoption": 66,
-        "num_instances_across_episodes": 1
-    },
-    "IF,no berries,low health,medium days,high days,medium days,THEN,move": {
-        "reward": 2078,
-        "numerosity": 6642,
-        "fitness": 140554.79999999987,
-        "adoption": 907,
-        "num_instances_across_episodes": 11
-    },
-    "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
-        "reward": 11069,
-        "numerosity": 46776,
-        "fitness": 120434.39999999997,
-        "adoption": 7756,
-        "num_instances_across_episodes": 64
-    },
-    "IF,no berries,medium health,high days,low days,low days,THEN,move": {
-        "reward": 4344,
-        "numerosity": 19056,
-        "fitness": 117896.4,
-        "adoption": 1584,
-        "num_instances_across_episodes": 9
-    },
-    "IF,medium berries,medium health,low days,THEN,eat": {
-        "reward": 2872,
-        "numerosity": 2872,
-        "fitness": 113815.49999999999,
-        "adoption": 455,
-        "num_instances_across_episodes": 4
+    "IF,no berries,medium health,high days,low days,THEN,move": {
+        "reward": 25893,
+        "numerosity": 97278,
+        "fitness": 2493791.1000000006,
+        "adoption": 23424,
+        "num_instances_across_episodes": 138
     },
     "IF,medium berries,medium health,medium days,high days,THEN,eat": {
-        "reward": 829,
-        "numerosity": 829,
-        "fitness": 109465.79999999997,
-        "adoption": 61,
-        "num_instances_across_episodes": 1
+        "reward": 49418,
+        "numerosity": 49418,
+        "fitness": 2419011.0000000014,
+        "adoption": 19432,
+        "num_instances_across_episodes": 129
     },
-    "IF,medium berries,low health,low days,low days,THEN,eat": {
-        "reward": 14018,
-        "numerosity": 14018,
-        "fitness": 100293.0,
-        "adoption": 2807,
-        "num_instances_across_episodes": 28
+    "IF,no berries,high health,low days,medium days,THEN,move": {
+        "reward": 13088,
+        "numerosity": 57305,
+        "fitness": 1921012.2,
+        "adoption": 11640,
+        "num_instances_across_episodes": 53
     },
-    "IF,no berries,low health,low days,low days,THEN,move": {
-        "reward": 9326,
-        "numerosity": 25140,
-        "fitness": 85596.30000000005,
-        "adoption": 3049,
-        "num_instances_across_episodes": 41
+    "IF,medium berries,high health,high days,high days,THEN,move": {
+        "reward": 3910,
+        "numerosity": 15620,
+        "fitness": 1690706.4000000001,
+        "adoption": 1865,
+        "num_instances_across_episodes": 7
     },
-    "IF,no berries,low health,medium days,low days,THEN,move": {
-        "reward": 5647,
-        "numerosity": 21457,
-        "fitness": 83170.19999999991,
-        "adoption": 2710,
-        "num_instances_across_episodes": 39
-    },
-    "IF,no berries,high health,low days,medium days,low days,THEN,move": {
-        "reward": 1115,
-        "numerosity": 5067,
-        "fitness": 80269.79999999999,
-        "adoption": 392,
-        "num_instances_across_episodes": 3
-    },
-    "IF,no berries,low health,medium days,low days,low days,THEN,move": {
-        "reward": 18821,
-        "numerosity": 59982,
-        "fitness": 71428.20000000001,
-        "adoption": 7820,
-        "num_instances_across_episodes": 61
-    },
-    "IF,medium berries,high health,low days,THEN,eat": {
-        "reward": 759,
-        "numerosity": 759,
-        "fitness": 63603.89999999996,
-        "adoption": 93,
-        "num_instances_across_episodes": 1
-    },
-    "IF,medium berries,low health,medium days,low days,low days,THEN,eat": {
-        "reward": 10630,
-        "numerosity": 10630,
-        "fitness": 56056.20000000004,
-        "adoption": 2309,
-        "num_instances_across_episodes": 21
-    },
-    "IF,medium berries,medium health,medium days,low days,low days,THEN,eat": {
-        "reward": 11210,
-        "numerosity": 11210,
-        "fitness": 49046.10000000009,
-        "adoption": 2993,
-        "num_instances_across_episodes": 20
-    },
-    "IF,medium berries,low health,medium days,medium days,low days,THEN,eat": {
-        "reward": 8975,
-        "numerosity": 8975,
-        "fitness": 47111.699999999946,
-        "adoption": 2337,
-        "num_instances_across_episodes": 17
-    },
-    "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
-        "reward": 4784,
-        "numerosity": 12873,
-        "fitness": 42737.39999999998,
-        "adoption": 2588,
-        "num_instances_across_episodes": 27
-    },
-    "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
-        "reward": 1791,
-        "numerosity": 5348,
-        "fitness": 41088.00000000001,
-        "adoption": 661,
-        "num_instances_across_episodes": 4
-    },
-    "IF,no berries,medium health,high days,high days,THEN,move": {
-        "reward": 444,
-        "numerosity": 1430,
-        "fitness": 40935.6,
-        "adoption": 74,
-        "num_instances_across_episodes": 2
-    },
-    "IF,medium berries,high health,low days,medium days,THEN,eat": {
-        "reward": 584,
-        "numerosity": 584,
-        "fitness": 39770.40000000001,
-        "adoption": 73,
-        "num_instances_across_episodes": 1
-    },
-    "IF,no berries,low health,low days,low days,low days,THEN,move": {
-        "reward": 16260,
-        "numerosity": 39580,
-        "fitness": 38974.19999999998,
-        "adoption": 6748,
-        "num_instances_across_episodes": 86
-    },
-    "IF,medium berries,low health,low days,medium days,THEN,eat": {
-        "reward": 1972,
-        "numerosity": 1972,
-        "fitness": 38875.20000000006,
-        "adoption": 466,
-        "num_instances_across_episodes": 5
-    },
-    "IF,medium berries,high health,medium days,low days,THEN,eat": {
-        "reward": 984,
-        "numerosity": 984,
-        "fitness": 37080.0,
-        "adoption": 144,
-        "num_instances_across_episodes": 2
-    },
-    "IF,medium berries,low health,medium days,low days,THEN,eat": {
-        "reward": 8487,
-        "numerosity": 8487,
-        "fitness": 36665.39999999995,
-        "adoption": 2315,
-        "num_instances_across_episodes": 28
-    },
-    "IF,no berries,medium health,low days,high days,medium days,THEN,move": {
-        "reward": 601,
-        "numerosity": 2526,
-        "fitness": 34814.39999999994,
-        "adoption": 337,
-        "num_instances_across_episodes": 4
-    },
-    "IF,no berries,high health,medium days,medium days,low days,THEN,move": {
-        "reward": 510,
-        "numerosity": 714,
-        "fitness": 34516.80000000006,
-        "adoption": 102,
-        "num_instances_across_episodes": 1
-    },
-    "IF,no berries,high health,medium days,low days,low days,THEN,move": {
-        "reward": 306,
-        "numerosity": 1326,
-        "fitness": 34149.59999999996,
-        "adoption": 102,
-        "num_instances_across_episodes": 1
-    },
-    "IF,no berries,low health,low days,medium days,THEN,move": {
-        "reward": 2112,
-        "numerosity": 6375,
-        "fitness": 33185.39999999997,
-        "adoption": 849,
-        "num_instances_across_episodes": 8
-    },
-    "IF,no berries,high health,high days,low days,low days,THEN,move": {
-        "reward": 718,
-        "numerosity": 2142,
-        "fitness": 32913.89999999998,
-        "adoption": 426,
-        "num_instances_across_episodes": 5
-    },
-    "IF,no berries,low health,medium days,medium days,medium days,THEN,move": {
-        "reward": 4807,
-        "numerosity": 11003,
-        "fitness": 26055.59999999999,
-        "adoption": 2735,
-        "num_instances_across_episodes": 23
-    },
-    "IF,medium berries,high health,low days,high days,THEN,move": {
-        "reward": 438,
-        "numerosity": 1374,
-        "fitness": 22725.000000000007,
-        "adoption": 117,
-        "num_instances_across_episodes": 3
+    "IF,no berries,high health,high days,low days,THEN,move": {
+        "reward": 20114,
+        "numerosity": 63584,
+        "fitness": 1521428.4,
+        "adoption": 16377,
+        "num_instances_across_episodes": 101
     },
     "IF,no berries,medium health,low days,high days,THEN,move": {
-        "reward": 294,
-        "numerosity": 938,
-        "fitness": 19540.8,
-        "adoption": 58,
-        "num_instances_across_episodes": 1
+        "reward": 24251,
+        "numerosity": 81158,
+        "fitness": 1495402.1999999995,
+        "adoption": 22704,
+        "num_instances_across_episodes": 131
     },
-    "IF,no berries,low health,low days,medium days,medium days,THEN,move": {
-        "reward": 5658,
-        "numerosity": 11736,
-        "fitness": 18888.6,
-        "adoption": 2575,
-        "num_instances_across_episodes": 24
+    "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+        "reward": 155789,
+        "numerosity": 660418,
+        "fitness": 1379123.700000001,
+        "adoption": 335867,
+        "num_instances_across_episodes": 748
     },
-    "IF,no berries,low health,low days,low days,medium days,THEN,move": {
-        "reward": 4392,
-        "numerosity": 9679,
-        "fitness": 17993.399999999983,
-        "adoption": 1319,
-        "num_instances_across_episodes": 14
+    "IF,no berries,high health,medium days,low days,THEN,move": {
+        "reward": 11938,
+        "numerosity": 51307,
+        "fitness": 1358934.5999999999,
+        "adoption": 12279,
+        "num_instances_across_episodes": 56
     },
-    "IF,no berries,medium health,high days,high days,low days,THEN,move": {
-        "reward": 124,
-        "numerosity": 868,
-        "fitness": 17428.200000000008,
-        "adoption": 31,
-        "num_instances_across_episodes": 1
+    "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+        "reward": 135780,
+        "numerosity": 569890,
+        "fitness": 1253410.2,
+        "adoption": 291985,
+        "num_instances_across_episodes": 714
     },
-    "IF,medium berries,high health,high days,low days,low days,THEN,move": {
-        "reward": 155,
-        "numerosity": 558,
-        "fitness": 16572.600000000006,
-        "adoption": 31,
-        "num_instances_across_episodes": 1
+    "IF,no berries,high health,low days,high days,THEN,move": {
+        "reward": 17359,
+        "numerosity": 61437,
+        "fitness": 1217183.9999999998,
+        "adoption": 16100,
+        "num_instances_across_episodes": 105
     },
-    "IF,no berries,medium health,high days,medium days,low days,THEN,move": {
-        "reward": 1525,
-        "numerosity": 8621,
-        "fitness": 14394.599999999999,
-        "adoption": 1003,
-        "num_instances_across_episodes": 6
+    "IF,medium berries,medium health,medium days,medium days,THEN,move": {
+        "reward": 18557,
+        "numerosity": 107778,
+        "fitness": 1101458.4000000004,
+        "adoption": 33213,
+        "num_instances_across_episodes": 115
     },
-    "IF,medium berries,low health,low days,low days,low days,THEN,eat": {
-        "reward": 7589,
-        "numerosity": 7589,
-        "fitness": 13901.999999999996,
-        "adoption": 1882,
-        "num_instances_across_episodes": 16
+    "IF,medium berries,medium health,high days,medium days,THEN,move": {
+        "reward": 11906,
+        "numerosity": 58880,
+        "fitness": 1077886.1999999997,
+        "adoption": 17501,
+        "num_instances_across_episodes": 105
     },
-    "IF,medium berries,medium health,medium days,high days,low days,THEN,eat": {
-        "reward": 863,
-        "numerosity": 863,
-        "fitness": 13876.200000000015,
-        "adoption": 229,
-        "num_instances_across_episodes": 3
+    "IF,medium berries,high health,medium days,medium days,THEN,eat": {
+        "reward": 7819,
+        "numerosity": 7819,
+        "fitness": 1018105.7999999999,
+        "adoption": 1950,
+        "num_instances_across_episodes": 17
     },
-    "IF,medium berries,medium health,low days,low days,low days,THEN,eat": {
-        "reward": 2372,
-        "numerosity": 2372,
-        "fitness": 11851.2,
-        "adoption": 666,
-        "num_instances_across_episodes": 8
+    "IF,medium berries,high health,high days,medium days,THEN,eat": {
+        "reward": 17907,
+        "numerosity": 17907,
+        "fitness": 995058.5999999997,
+        "adoption": 6427,
+        "num_instances_across_episodes": 46
     },
-    "IF,medium berries,low health,low days,low days,medium days,THEN,eat": {
-        "reward": 3385,
-        "numerosity": 3385,
-        "fitness": 11365.800000000027,
-        "adoption": 817,
-        "num_instances_across_episodes": 6
+    "IF,medium berries,low health,medium days,medium days,THEN,eat": {
+        "reward": 48333,
+        "numerosity": 48333,
+        "fitness": 990311.4000000004,
+        "adoption": 26354,
+        "num_instances_across_episodes": 119
     },
-    "IF,medium berries,medium health,low days,low days,THEN,eat": {
-        "reward": 1864,
-        "numerosity": 1864,
-        "fitness": 10918.800000000003,
-        "adoption": 547,
-        "num_instances_across_episodes": 6
+    "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+        "reward": 125548,
+        "numerosity": 518678,
+        "fitness": 965037.9000000001,
+        "adoption": 271335,
+        "num_instances_across_episodes": 682
     },
-    "IF,medium berries,low health,medium days,THEN,move": {
-        "reward": 873,
-        "numerosity": 1575,
-        "fitness": 10673.999999999998,
-        "adoption": 356,
-        "num_instances_across_episodes": 2
+    "IF,no berries,medium health,low days,low days,THEN,move": {
+        "reward": 27533,
+        "numerosity": 127743,
+        "fitness": 927120.8999999993,
+        "adoption": 33488,
+        "num_instances_across_episodes": 107
     },
-    "IF,no berries,low health,medium days,low days,medium days,THEN,move": {
-        "reward": 1346,
-        "numerosity": 4082,
-        "fitness": 10095.600000000004,
-        "adoption": 959,
-        "num_instances_across_episodes": 13
+    "IF,medium berries,medium health,medium days,low days,THEN,eat": {
+        "reward": 73362,
+        "numerosity": 73362,
+        "fitness": 910936.5000000001,
+        "adoption": 39755,
+        "num_instances_across_episodes": 158
     },
-    "IF,no berries,low health,high days,low days,low days,THEN,move": {
-        "reward": 1284,
-        "numerosity": 4026,
-        "fitness": 8719.199999999975,
-        "adoption": 366,
-        "num_instances_across_episodes": 2
-    },
-    "IF,medium berries,low health,high days,low days,THEN,eat": {
-        "reward": 1531,
-        "numerosity": 1531,
-        "fitness": 8476.800000000016,
-        "adoption": 404,
+    "IF,medium berries,high health,high days,high days,THEN,eat": {
+        "reward": 6779,
+        "numerosity": 6777,
+        "fitness": 897302.1000000002,
+        "adoption": 1208,
         "num_instances_across_episodes": 5
     },
-    "IF,medium berries,low health,medium days,high days,medium days,THEN,eat": {
-        "reward": 819,
-        "numerosity": 819,
-        "fitness": 8373.599999999993,
-        "adoption": 217,
-        "num_instances_across_episodes": 3
+    "IF,no berries,low health,medium days,medium days,THEN,move": {
+        "reward": 20696,
+        "numerosity": 59976,
+        "fitness": 866789.6999999996,
+        "adoption": 19055,
+        "num_instances_across_episodes": 89
     },
-    "IF,no berries,low health,high days,high days,low days,THEN,move": {
-        "reward": 155,
-        "numerosity": 341,
-        "fitness": 8091.0,
-        "adoption": 31,
-        "num_instances_across_episodes": 1
+    "IF,medium berries,low health,high days,medium days,THEN,eat": {
+        "reward": 25505,
+        "numerosity": 25505,
+        "fitness": 788597.1,
+        "adoption": 13580,
+        "num_instances_across_episodes": 85
     },
-    "IF,medium berries,medium health,high days,THEN,eat": {
-        "reward": 295,
-        "numerosity": 295,
-        "fitness": 6249.600000000004,
-        "adoption": 39,
-        "num_instances_across_episodes": 1
+    "IF,medium berries,high health,medium days,high days,THEN,move": {
+        "reward": 4673,
+        "numerosity": 20401,
+        "fitness": 753915.3000000002,
+        "adoption": 4972,
+        "num_instances_across_episodes": 36
     },
-    "IF,no berries,low health,high days,low days,THEN,move": {
-        "reward": 380,
-        "numerosity": 805,
-        "fitness": 5518.200000000007,
-        "adoption": 81,
-        "num_instances_across_episodes": 5
+    "IF,no berries,medium health,low days,THEN,move": {
+        "reward": 14190,
+        "numerosity": 51716,
+        "fitness": 693614.1,
+        "adoption": 10856,
+        "num_instances_across_episodes": 45
+    },
+    "IF,medium berries,medium health,medium days,high days,THEN,move": {
+        "reward": 7785,
+        "numerosity": 43172,
+        "fitness": 544188.3000000003,
+        "adoption": 14942,
+        "num_instances_across_episodes": 97
+    },
+    "IF,medium berries,medium health,high days,low days,THEN,eat": {
+        "reward": 17807,
+        "numerosity": 17807,
+        "fitness": 535832.7000000002,
+        "adoption": 9620,
+        "num_instances_across_episodes": 63
+    },
+    "IF,no berries,low health,medium days,high days,THEN,move": {
+        "reward": 10511,
+        "numerosity": 26933,
+        "fitness": 501241.5000000003,
+        "adoption": 10198,
+        "num_instances_across_episodes": 63
+    },
+    "IF,medium berries,high health,medium days,high days,THEN,eat": {
+        "reward": 10892,
+        "numerosity": 10892,
+        "fitness": 457422.2999999999,
+        "adoption": 4788,
+        "num_instances_across_episodes": 34
+    },
+    "IF,medium berries,medium health,low days,medium days,THEN,eat": {
+        "reward": 41993,
+        "numerosity": 41993,
+        "fitness": 442802.40000000014,
+        "adoption": 26373,
+        "num_instances_across_episodes": 113
+    },
+    "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+        "reward": 56777,
+        "numerosity": 217389,
+        "fitness": 439946.9999999999,
+        "adoption": 131578,
+        "num_instances_across_episodes": 364
+    },
+    "IF,medium berries,low health,medium days,high days,THEN,eat": {
+        "reward": 16409,
+        "numerosity": 16409,
+        "fitness": 426359.39999999997,
+        "adoption": 9740,
+        "num_instances_across_episodes": 65
+    },
+    "IF,medium berries,low health,low days,medium days,low days,THEN,eat": {
+        "reward": 110923,
+        "numerosity": 110923,
+        "fitness": 422549.1000000001,
+        "adoption": 83894,
+        "num_instances_across_episodes": 297
+    },
+    "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+        "reward": 54181,
+        "numerosity": 234295,
+        "fitness": 417807.30000000016,
+        "adoption": 143530,
+        "num_instances_across_episodes": 410
     },
     "IF,no berries,low health,high days,medium days,THEN,move": {
-        "reward": 853,
-        "numerosity": 2121,
-        "fitness": 5148.6000000000095,
-        "adoption": 381,
-        "num_instances_across_episodes": 5
+        "reward": 10396,
+        "numerosity": 30413,
+        "fitness": 416657.39999999973,
+        "adoption": 11352,
+        "num_instances_across_episodes": 71
     },
-    "IF,medium berries,low health,medium days,medium days,medium days,THEN,eat": {
-        "reward": 1188,
-        "numerosity": 1188,
-        "fitness": 3830.4000000000033,
-        "adoption": 396,
+    "IF,medium berries,medium health,high days,THEN,eat": {
+        "reward": 3197,
+        "numerosity": 3197,
+        "fitness": 391394.69999999995,
+        "adoption": 698,
         "num_instances_across_episodes": 3
     },
-    "IF,no berries,low health,high days,medium days,low days,THEN,move": {
-        "reward": 672,
-        "numerosity": 2352,
-        "fitness": 2923.2000000000007,
-        "adoption": 336,
+    "IF,medium berries,high health,high days,low days,THEN,eat": {
+        "reward": 17973,
+        "numerosity": 17973,
+        "fitness": 387366.30000000005,
+        "adoption": 9206,
+        "num_instances_across_episodes": 59
+    },
+    "IF,medium berries,low health,medium days,low days,low days,THEN,eat": {
+        "reward": 91643,
+        "numerosity": 91643,
+        "fitness": 379264.50000000023,
+        "adoption": 69386,
+        "num_instances_across_episodes": 251
+    },
+    "IF,medium berries,high health,high days,medium days,THEN,move": {
+        "reward": 4199,
+        "numerosity": 20598,
+        "fitness": 373408.50000000023,
+        "adoption": 6727,
+        "num_instances_across_episodes": 42
+    },
+    "IF,no berries,low health,low days,low days,THEN,move": {
+        "reward": 19460,
+        "numerosity": 60282,
+        "fitness": 366013.49999999994,
+        "adoption": 19631,
+        "num_instances_across_episodes": 70
+    },
+    "IF,no berries,low health,low days,medium days,low days,THEN,move": {
+        "reward": 61204,
+        "numerosity": 182834,
+        "fitness": 355931.9999999999,
+        "adoption": 103169,
+        "num_instances_across_episodes": 338
+    },
+    "IF,no berries,low health,medium days,low days,low days,THEN,move": {
+        "reward": 59089,
+        "numerosity": 169987,
+        "fitness": 344727.6,
+        "adoption": 97501,
+        "num_instances_across_episodes": 330
+    },
+    "IF,medium berries,high health,high days,low days,THEN,move": {
+        "reward": 6809,
+        "numerosity": 26376,
+        "fitness": 306634.20000000007,
+        "adoption": 8028,
+        "num_instances_across_episodes": 56
+    },
+    "IF,medium berries,high health,low days,high days,THEN,move": {
+        "reward": 6058,
+        "numerosity": 23774,
+        "fitness": 303775.2000000001,
+        "adoption": 7515,
+        "num_instances_across_episodes": 49
+    },
+    "IF,no berries,low health,low days,low days,medium days,THEN,move": {
+        "reward": 65136,
+        "numerosity": 192944,
+        "fitness": 301553.0999999998,
+        "adoption": 113954,
+        "num_instances_across_episodes": 373
+    },
+    "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+        "reward": 44516,
+        "numerosity": 189279,
+        "fitness": 298608.9000000002,
+        "adoption": 118694,
+        "num_instances_across_episodes": 332
+    },
+    "IF,medium berries,high health,medium days,medium days,THEN,move": {
+        "reward": 2217,
+        "numerosity": 9975,
+        "fitness": 285691.5000000001,
+        "adoption": 2205,
+        "num_instances_across_episodes": 19
+    },
+    "IF,medium berries,medium health,low days,high days,THEN,move": {
+        "reward": 6385,
+        "numerosity": 25274,
+        "fitness": 273506.69999999995,
+        "adoption": 8374,
+        "num_instances_across_episodes": 42
+    },
+    "IF,no berries,low health,medium days,low days,THEN,move": {
+        "reward": 22955,
+        "numerosity": 68973,
+        "fitness": 266217.6000000001,
+        "adoption": 32762,
+        "num_instances_across_episodes": 155
+    },
+    "IF,medium berries,medium health,medium days,low days,THEN,move": {
+        "reward": 1654,
+        "numerosity": 6402,
+        "fitness": 256181.6999999996,
+        "adoption": 3098,
+        "num_instances_across_episodes": 17
+    },
+    "IF,medium berries,high health,low days,high days,THEN,eat": {
+        "reward": 10060,
+        "numerosity": 10060,
+        "fitness": 230934.00000000003,
+        "adoption": 5298,
+        "num_instances_across_episodes": 39
+    },
+    "IF,no berries,medium health,low days,low days,high days,THEN,move": {
+        "reward": 13412,
+        "numerosity": 61567,
+        "fitness": 222426.89999999985,
+        "adoption": 30242,
+        "num_instances_across_episodes": 102
+    },
+    "IF,no berries,medium health,high days,low days,low days,THEN,move": {
+        "reward": 15920,
+        "numerosity": 65385,
+        "fitness": 222108.60000000006,
+        "adoption": 32029,
+        "num_instances_across_episodes": 108
+    },
+    "IF,medium berries,low health,medium days,low days,THEN,eat": {
+        "reward": 35050,
+        "numerosity": 35050,
+        "fitness": 213063.59999999998,
+        "adoption": 25262,
+        "num_instances_across_episodes": 111
+    },
+    "IF,no berries,low health,low days,medium days,THEN,move": {
+        "reward": 29498,
+        "numerosity": 85343,
+        "fitness": 207766.20000000016,
+        "adoption": 39600,
+        "num_instances_across_episodes": 180
+    },
+    "IF,medium berries,low health,high days,low days,THEN,eat": {
+        "reward": 13108,
+        "numerosity": 13108,
+        "fitness": 207402.3,
+        "adoption": 8046,
+        "num_instances_across_episodes": 47
+    },
+    "IF,no berries,medium health,medium days,low days,high days,THEN,move": {
+        "reward": 10595,
+        "numerosity": 39734,
+        "fitness": 196200.59999999998,
+        "adoption": 21271,
+        "num_instances_across_episodes": 73
+    },
+    "IF,no berries,low health,low days,medium days,medium days,THEN,move": {
+        "reward": 39012,
+        "numerosity": 159455,
+        "fitness": 194622.89999999997,
+        "adoption": 97677,
+        "num_instances_across_episodes": 377
+    },
+    "IF,medium berries,low health,medium days,THEN,eat": {
+        "reward": 8040,
+        "numerosity": 8040,
+        "fitness": 194000.70000000033,
+        "adoption": 3782,
+        "num_instances_across_episodes": 16
+    },
+    "IF,no berries,low health,medium days,medium days,low days,THEN,move": {
+        "reward": 28882,
+        "numerosity": 119361,
+        "fitness": 192810.89999999997,
+        "adoption": 78634,
+        "num_instances_across_episodes": 301
+    },
+    "IF,no berries,medium health,low days,high days,low days,THEN,move": {
+        "reward": 8908,
+        "numerosity": 53995,
+        "fitness": 170502.89999999997,
+        "adoption": 26925,
+        "num_instances_across_episodes": 93
+    },
+    "IF,medium berries,low health,low days,medium days,THEN,eat": {
+        "reward": 22689,
+        "numerosity": 22689,
+        "fitness": 158600.09999999992,
+        "adoption": 16336,
+        "num_instances_across_episodes": 74
+    },
+    "IF,no berries,low health,high days,low days,THEN,move": {
+        "reward": 5666,
+        "numerosity": 13246,
+        "fitness": 148452.60000000024,
+        "adoption": 5170,
+        "num_instances_across_episodes": 37
+    },
+    "IF,no berries,low health,low days,low days,low days,THEN,move": {
+        "reward": 28701,
+        "numerosity": 75869,
+        "fitness": 143010.59999999992,
+        "adoption": 36675,
+        "num_instances_across_episodes": 132
+    },
+    "IF,no berries,medium health,low days,high days,medium days,THEN,move": {
+        "reward": 7268,
+        "numerosity": 32276,
+        "fitness": 142930.8,
+        "adoption": 15868,
+        "num_instances_across_episodes": 57
+    },
+    "IF,no berries,medium health,high days,low days,medium days,THEN,move": {
+        "reward": 7980,
+        "numerosity": 38617,
+        "fitness": 139553.69999999995,
+        "adoption": 19420,
+        "num_instances_across_episodes": 66
+    },
+    "IF,no berries,low health,medium days,low days,medium days,THEN,move": {
+        "reward": 31804,
+        "numerosity": 137718,
+        "fitness": 134876.99999999997,
+        "adoption": 89830,
+        "num_instances_across_episodes": 353
+    },
+    "IF,medium berries,high health,medium days,THEN,move": {
+        "reward": 1483,
+        "numerosity": 5169,
+        "fitness": 131362.5,
+        "adoption": 658,
+        "num_instances_across_episodes": 6
+    },
+    "IF,medium berries,medium health,high days,low days,THEN,move": {
+        "reward": 3226,
+        "numerosity": 17838,
+        "fitness": 130607.09999999992,
+        "adoption": 6466,
+        "num_instances_across_episodes": 34
+    },
+    "IF,high berries,high health,high days,THEN,eat": {
+        "reward": 1127,
+        "numerosity": 1126,
+        "fitness": 130063.20000000004,
+        "adoption": 316,
+        "num_instances_across_episodes": 6
+    },
+    "IF,no berries,medium health,low days,medium days,high days,THEN,move": {
+        "reward": 6553,
+        "numerosity": 26946,
+        "fitness": 125555.40000000005,
+        "adoption": 14192,
+        "num_instances_across_episodes": 57
+    },
+    "IF,medium berries,high health,high days,high days,THEN,throw": {
+        "reward": 1069.9,
+        "numerosity": 7259,
+        "fitness": 119356.23000000001,
+        "adoption": 1126,
+        "num_instances_across_episodes": 6
+    },
+    "IF,medium berries,low health,low days,low days,THEN,eat": {
+        "reward": 25191,
+        "numerosity": 25191,
+        "fitness": 114175.79999999983,
+        "adoption": 18188,
+        "num_instances_across_episodes": 65
+    },
+    "IF,no berries,medium health,high days,medium days,low days,THEN,move": {
+        "reward": 6381,
+        "numerosity": 35842,
+        "fitness": 105059.4000000001,
+        "adoption": 18823,
+        "num_instances_across_episodes": 66
+    },
+    "IF,medium berries,medium health,medium days,medium days,THEN,throw": {
+        "reward": 5010.200000000001,
+        "numerosity": 15990,
+        "fitness": 102393.21000000005,
+        "adoption": 7268,
+        "num_instances_across_episodes": 41
+    },
+    "IF,medium berries,low health,low days,low days,medium days,THEN,eat": {
+        "reward": 34366,
+        "numerosity": 34366,
+        "fitness": 94493.39999999994,
+        "adoption": 28202,
+        "num_instances_across_episodes": 127
+    },
+    "IF,no berries,medium health,medium days,high days,low days,THEN,move": {
+        "reward": 7427,
+        "numerosity": 35529,
+        "fitness": 87093.90000000001,
+        "adoption": 19212,
+        "num_instances_across_episodes": 67
+    },
+    "IF,medium berries,medium health,low days,high days,THEN,eat": {
+        "reward": 6538,
+        "numerosity": 6537,
+        "fitness": 85203.30000000002,
+        "adoption": 4268,
+        "num_instances_across_episodes": 31
+    },
+    "IF,medium berries,high health,medium days,low days,THEN,eat": {
+        "reward": 5728,
+        "numerosity": 5728,
+        "fitness": 84473.09999999993,
+        "adoption": 3174,
+        "num_instances_across_episodes": 17
+    },
+    "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+        "reward": 14808,
+        "numerosity": 57576,
+        "fitness": 82752.00000000006,
+        "adoption": 34288,
+        "num_instances_across_episodes": 100
+    },
+    "IF,medium berries,high health,low days,medium days,THEN,eat": {
+        "reward": 2154,
+        "numerosity": 2154,
+        "fitness": 82091.7,
+        "adoption": 1436,
+        "num_instances_across_episodes": 9
+    },
+    "IF,medium berries,low health,medium days,THEN,move": {
+        "reward": 940,
+        "numerosity": 2550,
+        "fitness": 78957.30000000015,
+        "adoption": 702,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,medium health,medium days,THEN,move": {
+        "reward": 526,
+        "numerosity": 2180,
+        "fitness": 73168.19999999984,
+        "adoption": 306,
+        "num_instances_across_episodes": 2
+    },
+    "IF,high berries,high health,high days,THEN,move": {
+        "reward": 95,
+        "numerosity": 296,
+        "fitness": 65145.0,
+        "adoption": 26,
+        "num_instances_across_episodes": 2
+    },
+    "IF,no berries,low health,low days,high days,THEN,move": {
+        "reward": 3558,
+        "numerosity": 9927,
+        "fitness": 63178.799999999974,
+        "adoption": 4620,
+        "num_instances_across_episodes": 28
+    },
+    "IF,no berries,low health,medium days,medium days,medium days,THEN,move": {
+        "reward": 13553,
+        "numerosity": 44829,
+        "fitness": 59780.99999999995,
+        "adoption": 28380,
+        "num_instances_across_episodes": 126
+    },
+    "IF,medium berries,low health,low days,high days,THEN,eat": {
+        "reward": 6919,
+        "numerosity": 6919,
+        "fitness": 56724.600000000006,
+        "adoption": 5132,
+        "num_instances_across_episodes": 30
+    },
+    "IF,medium berries,low health,high days,medium days,THEN,move": {
+        "reward": 1024,
+        "numerosity": 12365,
+        "fitness": 56261.40000000004,
+        "adoption": 4758,
+        "num_instances_across_episodes": 23
+    },
+    "IF,medium berries,medium health,low days,medium days,THEN,move": {
+        "reward": 1998,
+        "numerosity": 14849,
+        "fitness": 54041.40000000002,
+        "adoption": 6722,
+        "num_instances_across_episodes": 29
+    },
+    "IF,no berries,low health,high days,high days,THEN,move": {
+        "reward": 225,
+        "numerosity": 615,
+        "fitness": 53990.39999999998,
+        "adoption": 184,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,medium days,low days,THEN,move": {
+        "reward": 926,
+        "numerosity": 5414,
+        "fitness": 52638.59999999988,
+        "adoption": 3582,
+        "num_instances_across_episodes": 19
+    },
+    "IF,medium berries,high health,high days,medium days,THEN,throw": {
+        "reward": 662.4000000000002,
+        "numerosity": 2309,
+        "fitness": 50906.87999999997,
+        "adoption": 793,
+        "num_instances_across_episodes": 6
+    },
+    "IF,no berries,high health,medium days,low days,low days,THEN,move": {
+        "reward": 1672,
+        "numerosity": 5674,
+        "fitness": 48773.699999999975,
+        "adoption": 2168,
+        "num_instances_across_episodes": 10
+    },
+    "IF,medium berries,medium health,high days,medium days,THEN,throw": {
+        "reward": 3896.199999999999,
+        "numerosity": 11431,
+        "fitness": 47838.509999999995,
+        "adoption": 7082,
+        "num_instances_across_episodes": 44
+    },
+    "IF,no berries,medium health,high days,medium days,medium days,THEN,move": {
+        "reward": 5207,
+        "numerosity": 18060,
+        "fitness": 43523.4,
+        "adoption": 10642,
+        "num_instances_across_episodes": 34
+    },
+    "IF,medium berries,low health,low days,high days,medium days,THEN,eat": {
+        "reward": 3999,
+        "numerosity": 3999,
+        "fitness": 41049.300000000025,
+        "adoption": 2724,
+        "num_instances_across_episodes": 12
+    },
+    "IF,no berries,medium health,high days,high days,THEN,move": {
+        "reward": 926,
+        "numerosity": 3938,
+        "fitness": 40475.700000000004,
+        "adoption": 738,
+        "num_instances_across_episodes": 9
+    },
+    "IF,medium berries,low health,medium days,high days,THEN,move": {
+        "reward": 1779,
+        "numerosity": 7624,
+        "fitness": 39844.200000000026,
+        "adoption": 4332,
+        "num_instances_across_episodes": 20
+    },
+    "IF,medium berries,medium health,low days,medium days,low days,THEN,eat": {
+        "reward": 20337,
+        "numerosity": 20337,
+        "fitness": 39099.00000000001,
+        "adoption": 16836,
+        "num_instances_across_episodes": 69
+    },
+    "IF,no berries,medium health,high days,low days,high days,THEN,move": {
+        "reward": 540,
+        "numerosity": 1314,
+        "fitness": 38192.4,
+        "adoption": 372,
         "num_instances_across_episodes": 2
     },
     "IF,medium berries,high health,high days,low days,low days,THEN,eat": {
-        "reward": 124,
-        "numerosity": 124,
-        "fitness": 2511.0,
-        "adoption": 31,
+        "reward": 1014,
+        "numerosity": 1014,
+        "fitness": 36912.60000000005,
+        "adoption": 372,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,low days,THEN,eat": {
+        "reward": 7775,
+        "numerosity": 7775,
+        "fitness": 35331.59999999999,
+        "adoption": 5020,
+        "num_instances_across_episodes": 21
+    },
+    "IF,no berries,low health,low days,THEN,move": {
+        "reward": 4832,
+        "numerosity": 10319,
+        "fitness": 34299.299999999945,
+        "adoption": 3834,
+        "num_instances_across_episodes": 20
+    },
+    "IF,medium berries,low health,medium days,medium days,low days,THEN,eat": {
+        "reward": 19587,
+        "numerosity": 19587,
+        "fitness": 33901.2,
+        "adoption": 17035,
+        "num_instances_across_episodes": 69
+    },
+    "IF,medium berries,low health,medium days,medium days,THEN,move": {
+        "reward": 1347,
+        "numerosity": 11698,
+        "fitness": 33535.19999999999,
+        "adoption": 6014,
+        "num_instances_across_episodes": 29
+    },
+    "IF,no berries,high health,low days,low days,THEN,move": {
+        "reward": 134,
+        "numerosity": 737,
+        "fitness": 30391.199999999964,
+        "adoption": 134,
         "num_instances_across_episodes": 1
     },
-    "IF,medium berries,medium health,medium days,THEN,move": {
-        "reward": 194,
-        "numerosity": 777,
-        "fitness": 2389.2000000000003,
-        "adoption": 100,
-        "num_instances_across_episodes": 1
+    "IF,no berries,medium health,medium days,medium days,high days,THEN,move": {
+        "reward": 2596,
+        "numerosity": 10108,
+        "fitness": 29489.40000000003,
+        "adoption": 5174,
+        "num_instances_across_episodes": 22
+    },
+    "IF,no berries,high health,low days,high days,low days,THEN,move": {
+        "reward": 367,
+        "numerosity": 1784,
+        "fitness": 29131.19999999996,
+        "adoption": 602,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,low health,high days,low days,low days,THEN,move": {
+        "reward": 8167,
+        "numerosity": 20721,
+        "fitness": 28684.49999999996,
+        "adoption": 13046,
+        "num_instances_across_episodes": 52
+    },
+    "IF,no berries,medium health,high days,high days,low days,THEN,move": {
+        "reward": 438,
+        "numerosity": 1890,
+        "fitness": 28058.4,
+        "adoption": 372,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,low days,low days,low days,THEN,eat": {
+        "reward": 35173,
+        "numerosity": 35173,
+        "fitness": 27767.999999999996,
+        "adoption": 32242,
+        "num_instances_across_episodes": 117
+    },
+    "IF,medium berries,low health,high days,medium days,medium days,THEN,eat": {
+        "reward": 1376,
+        "numerosity": 1376,
+        "fitness": 25555.200000000055,
+        "adoption": 1013,
+        "num_instances_across_episodes": 4
+    },
+    "IF,medium berries,medium health,low days,low days,medium days,THEN,throw": {
+        "reward": 13282.5,
+        "numerosity": 26565,
+        "fitness": 25099.2,
+        "adoption": 23649,
+        "num_instances_across_episodes": 85
+    },
+    "IF,medium berries,high health,low days,high days,low days,THEN,eat": {
+        "reward": 624,
+        "numerosity": 624,
+        "fitness": 24595.199999999964,
+        "adoption": 372,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,medium health,low days,low days,THEN,eat": {
+        "reward": 3848,
+        "numerosity": 3848,
+        "fitness": 24217.199999999964,
+        "adoption": 2160,
+        "num_instances_across_episodes": 13
+    },
+    "IF,medium berries,medium health,low days,medium days,medium days,THEN,throw": {
+        "reward": 10652.0,
+        "numerosity": 21304,
+        "fitness": 23715.599999999995,
+        "adoption": 18140,
+        "num_instances_across_episodes": 68
+    },
+    "IF,medium berries,medium health,medium days,low days,low days,THEN,eat": {
+        "reward": 16093,
+        "numerosity": 16093,
+        "fitness": 23420.700000000008,
+        "adoption": 13766,
+        "num_instances_across_episodes": 63
+    },
+    "IF,no berries,low health,medium days,high days,low days,THEN,move": {
+        "reward": 3687,
+        "numerosity": 13121,
+        "fitness": 22600.499999999996,
+        "adoption": 9016,
+        "num_instances_across_episodes": 39
+    },
+    "IF,no berries,medium health,medium days,high days,medium days,THEN,move": {
+        "reward": 2246,
+        "numerosity": 12180,
+        "fitness": 22277.999999999975,
+        "adoption": 6871,
+        "num_instances_across_episodes": 26
+    },
+    "IF,no berries,low health,medium days,high days,medium days,THEN,move": {
+        "reward": 1085,
+        "numerosity": 3849,
+        "fitness": 21778.199999999957,
+        "adoption": 2592,
+        "num_instances_across_episodes": 14
     },
     "IF,medium berries,low health,high days,low days,low days,THEN,eat": {
-        "reward": 1806,
-        "numerosity": 1806,
-        "fitness": 2383.2,
-        "adoption": 426,
+        "reward": 6012,
+        "numerosity": 6012,
+        "fitness": 21319.799999999952,
+        "adoption": 4680,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,low health,high days,low days,medium days,THEN,move": {
+        "reward": 3390,
+        "numerosity": 17481,
+        "fitness": 20466.60000000001,
+        "adoption": 11143,
+        "num_instances_across_episodes": 46
+    },
+    "IF,no berries,low health,low days,medium days,high days,THEN,move": {
+        "reward": 3369,
+        "numerosity": 11045,
+        "fitness": 20398.800000000007,
+        "adoption": 7663,
+        "num_instances_across_episodes": 34
+    },
+    "IF,no berries,high health,low days,low days,medium days,THEN,move": {
+        "reward": 1297,
+        "numerosity": 4886,
+        "fitness": 20095.800000000007,
+        "adoption": 2184,
+        "num_instances_across_episodes": 10
+    },
+    "IF,no berries,high health,low days,low days,high days,THEN,move": {
+        "reward": 408,
+        "numerosity": 1719,
+        "fitness": 19584.0,
+        "adoption": 614,
         "num_instances_across_episodes": 3
     },
-    "IF,no berries,medium health,high days,low days,medium days,THEN,move": {
-        "reward": 516,
-        "numerosity": 3618,
-        "fitness": 2240.9999999999964,
-        "adoption": 516,
-        "num_instances_across_episodes": 3
+    "IF,medium berries,medium health,low days,low days,low days,THEN,eat": {
+        "reward": 7519,
+        "numerosity": 7519,
+        "fitness": 19175.1,
+        "adoption": 5750,
+        "num_instances_across_episodes": 31
     },
-    "IF,medium berries,medium health,low days,medium days,medium days,THEN,eat": {
-        "reward": 412,
-        "numerosity": 412,
-        "fitness": 1977.6000000000033,
-        "adoption": 103,
+    "IF,no berries,high health,low days,high days,medium days,THEN,move": {
+        "reward": 336,
+        "numerosity": 756,
+        "fitness": 17942.40000000001,
+        "adoption": 168,
         "num_instances_across_episodes": 1
     },
-    "IF,medium berries,low health,high days,medium days,THEN,move": {
-        "reward": 91,
-        "numerosity": 819,
-        "fitness": 1965.5999999999967,
-        "adoption": 91,
+    "IF,no berries,high health,low days,medium days,high days,THEN,move": {
+        "reward": 420,
+        "numerosity": 588,
+        "fitness": 17892.0,
+        "adoption": 168,
         "num_instances_across_episodes": 1
     },
-    "IF,high berries,high health,high days,THEN,eat": {
-        "reward": 61,
-        "numerosity": 60,
-        "fitness": 1683.2999999999997,
-        "adoption": 11,
-        "num_instances_across_episodes": 2
+    "IF,no berries,low health,high days,medium days,low days,THEN,move": {
+        "reward": 3957,
+        "numerosity": 14959,
+        "fitness": 17707.799999999977,
+        "adoption": 10306,
+        "num_instances_across_episodes": 43
     },
-    "IF,medium berries,medium health,medium days,medium days,low days,THEN,eat": {
-        "reward": 777,
-        "numerosity": 777,
-        "fitness": 1635.5999999999972,
-        "adoption": 259,
-        "num_instances_across_episodes": 2
+    "IF,medium berries,medium health,low days,THEN,eat": {
+        "reward": 2545,
+        "numerosity": 2545,
+        "fitness": 17222.999999999964,
+        "adoption": 1382,
+        "num_instances_across_episodes": 7
     },
-    "IF,medium berries,high health,high days,low days,medium days,THEN,move": {
-        "reward": 62,
-        "numerosity": 403,
-        "fitness": 1627.5,
-        "adoption": 31,
-        "num_instances_across_episodes": 1
+    "IF,no berries,high health,low days,medium days,low days,THEN,move": {
+        "reward": 789,
+        "numerosity": 5115,
+        "fitness": 15835.799999999983,
+        "adoption": 1724,
+        "num_instances_across_episodes": 9
     },
-    "IF,medium berries,low health,low days,low days,low days,THEN,move": {
-        "reward": 0,
-        "numerosity": 1044,
-        "fitness": 1305.0,
-        "adoption": 174,
-        "num_instances_across_episodes": 1
+    "IF,medium berries,low health,low days,medium days,medium days,THEN,eat": {
+        "reward": 11031,
+        "numerosity": 11031,
+        "fitness": 14181.000000000011,
+        "adoption": 10197,
+        "num_instances_across_episodes": 47
     },
     "IF,medium berries,low health,low days,medium days,THEN,move": {
-        "reward": 33,
-        "numerosity": 99,
-        "fitness": 900.8999999999999,
-        "adoption": 11,
+        "reward": 1417,
+        "numerosity": 10336,
+        "fitness": 12859.199999999975,
+        "adoption": 6168,
+        "num_instances_across_episodes": 28
+    },
+    "IF,medium berries,high health,medium days,high days,low days,THEN,eat": {
+        "reward": 420,
+        "numerosity": 420,
+        "fitness": 12448.800000000014,
+        "adoption": 168,
         "num_instances_across_episodes": 1
+    },
+    "IF,no berries,high health,high days,medium days,low days,THEN,move": {
+        "reward": 168,
+        "numerosity": 1146,
+        "fitness": 12348.0,
+        "adoption": 372,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,low days,high days,low days,THEN,eat": {
+        "reward": 8013,
+        "numerosity": 8013,
+        "fitness": 11937.600000000013,
+        "adoption": 6890,
+        "num_instances_across_episodes": 26
+    },
+    "IF,medium berries,medium health,medium days,low days,medium days,THEN,throw": {
+        "reward": 6089.5,
+        "numerosity": 12179,
+        "fitness": 11693.099999999999,
+        "adoption": 10691,
+        "num_instances_across_episodes": 41
     },
     "IF,no berries,low health,low days,high days,medium days,THEN,move": {
-        "reward": 574,
-        "numerosity": 2203,
-        "fitness": 813.0000000000011,
-        "adoption": 443,
-        "num_instances_across_episodes": 5
+        "reward": 3887,
+        "numerosity": 13028,
+        "fitness": 11384.399999999996,
+        "adoption": 9499,
+        "num_instances_across_episodes": 41
     },
-    "IF,no berries,medium health,high days,high days,medium days,THEN,move": {
-        "reward": 62,
-        "numerosity": 155,
-        "fitness": 744.0,
-        "adoption": 31,
-        "num_instances_across_episodes": 1
-    },
-    "IF,medium berries,low health,high days,high days,THEN,move": {
-        "reward": 31,
-        "numerosity": 248,
-        "fitness": 669.6000000000004,
-        "adoption": 31,
-        "num_instances_across_episodes": 1
-    },
-    "IF,no berries,low health,low days,high days,THEN,move": {
-        "reward": 24,
-        "numerosity": 90,
-        "fitness": 608.4,
-        "adoption": 6,
+    "IF,no berries,high health,medium days,high days,low days,THEN,move": {
+        "reward": 168,
+        "numerosity": 840,
+        "fitness": 11289.599999999982,
+        "adoption": 168,
         "num_instances_across_episodes": 1
     },
     "IF,medium berries,low health,low days,low days,THEN,move": {
-        "reward": 132,
-        "numerosity": 528,
-        "fitness": 594.0,
-        "adoption": 132,
-        "num_instances_across_episodes": 1
-    },
-    "IF,medium berries,low health,high days,high days,medium days,THEN,eat": {
-        "reward": 93,
-        "numerosity": 93,
-        "fitness": 372.0,
-        "adoption": 31,
-        "num_instances_across_episodes": 1
-    },
-    "IF,medium berries,low health,high days,THEN,eat": {
-        "reward": 102,
-        "numerosity": 102,
-        "fitness": 285.6,
-        "adoption": 34,
-        "num_instances_across_episodes": 1
-    },
-    "IF,no berries,low health,low days,THEN,move": {
-        "reward": 93,
-        "numerosity": 278,
-        "fitness": 248.4,
-        "adoption": 53,
-        "num_instances_across_episodes": 9
-    },
-    "IF,no berries,high health,high days,medium days,low days,THEN,move": {
-        "reward": 62,
-        "numerosity": 155,
-        "fitness": 241.80000000000013,
-        "adoption": 31,
-        "num_instances_across_episodes": 1
-    },
-    "IF,medium berries,low health,low days,high days,THEN,eat": {
-        "reward": 30,
-        "numerosity": 30,
-        "fitness": 223.19999999999996,
-        "adoption": 6,
-        "num_instances_across_episodes": 1
-    },
-    "IF,medium berries,low health,high days,high days,medium days,THEN,move": {
-        "reward": 31,
-        "numerosity": 124,
-        "fitness": 111.59999999999994,
-        "adoption": 31,
-        "num_instances_across_episodes": 1
-    },
-    "IF,medium berries,high health,low days,medium days,THEN,move": {
-        "reward": 122,
-        "numerosity": 183,
-        "fitness": 73.20000000000009,
-        "adoption": 61,
-        "num_instances_across_episodes": 1
-    },
-    "IF,medium berries,low health,low days,THEN,eat": {
-        "reward": 33,
-        "numerosity": 33,
-        "fitness": 66.0,
-        "adoption": 11,
+        "reward": 162,
+        "numerosity": 1614,
+        "fitness": 10886.400000000014,
+        "adoption": 480,
         "num_instances_across_episodes": 2
     },
+    "IF,medium berries,medium health,high days,high days,THEN,eat": {
+        "reward": 677,
+        "numerosity": 677,
+        "fitness": 9586.2,
+        "adoption": 410,
+        "num_instances_across_episodes": 5
+    },
+    "IF,medium berries,low health,medium days,low days,medium days,THEN,eat": {
+        "reward": 7737,
+        "numerosity": 7737,
+        "fitness": 9224.400000000023,
+        "adoption": 6978,
+        "num_instances_across_episodes": 34
+    },
+    "IF,no berries,low health,medium days,THEN,move": {
+        "reward": 954,
+        "numerosity": 1613,
+        "fitness": 9157.200000000026,
+        "adoption": 790,
+        "num_instances_across_episodes": 7
+    },
+    "IF,no berries,low health,low days,high days,low days,THEN,move": {
+        "reward": 4503,
+        "numerosity": 16526,
+        "fitness": 9152.700000000003,
+        "adoption": 9722,
+        "num_instances_across_episodes": 39
+    },
+    "IF,no berries,high health,medium days,low days,high days,THEN,move": {
+        "reward": 84,
+        "numerosity": 588,
+        "fitness": 8920.799999999996,
+        "adoption": 168,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,low days,high days,THEN,move": {
+        "reward": 4041,
+        "numerosity": 13104,
+        "fitness": 8853.599999999991,
+        "adoption": 9505,
+        "num_instances_across_episodes": 40
+    },
+    "IF,medium berries,medium health,low days,medium days,THEN,throw": {
+        "reward": 1132.9999999999995,
+        "numerosity": 2833,
+        "fitness": 8804.699999999992,
+        "adoption": 1982,
+        "num_instances_across_episodes": 10
+    },
+    "IF,no berries,high health,high days,low days,low days,THEN,move": {
+        "reward": 306,
+        "numerosity": 1572,
+        "fitness": 8659.799999999985,
+        "adoption": 372,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,medium health,low days,low days,high days,THEN,throw": {
+        "reward": 1134.0,
+        "numerosity": 2268,
+        "fitness": 8128.199999999996,
+        "adoption": 1708,
+        "num_instances_across_episodes": 8
+    },
+    "IF,medium berries,high health,medium days,high days,THEN,throw": {
+        "reward": 186.3000000000001,
+        "numerosity": 2243,
+        "fitness": 7579.499999999995,
+        "adoption": 1343,
+        "num_instances_across_episodes": 10
+    },
+    "IF,medium berries,medium health,medium days,medium days,low days,THEN,eat": {
+        "reward": 8011,
+        "numerosity": 8011,
+        "fitness": 7480.799999999997,
+        "adoption": 7364,
+        "num_instances_across_episodes": 27
+    },
+    "IF,medium berries,medium health,medium days,low days,THEN,throw": {
+        "reward": 937.3000000000001,
+        "numerosity": 1939,
+        "fitness": 7422.899999999986,
+        "adoption": 1456,
+        "num_instances_across_episodes": 7
+    },
+    "IF,medium berries,medium health,high days,low days,low days,THEN,throw": {
+        "reward": 942.5,
+        "numerosity": 1885,
+        "fitness": 6496.800000000012,
+        "adoption": 1278,
+        "num_instances_across_episodes": 6
+    },
+    "IF,no berries,high health,medium days,medium days,high days,THEN,move": {
+        "reward": 252,
+        "numerosity": 420,
+        "fitness": 6451.20000000001,
+        "adoption": 168,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,medium days,high days,high days,THEN,move": {
+        "reward": 168,
+        "numerosity": 756,
+        "fitness": 6274.799999999991,
+        "adoption": 168,
+        "num_instances_across_episodes": 1
+    },
     "IF,no berries,high health,high days,low days,medium days,THEN,move": {
-        "reward": 36,
-        "numerosity": 108,
-        "fitness": 21.60000000000001,
-        "adoption": 36,
+        "reward": 84,
+        "numerosity": 504,
+        "fitness": 5796.0,
+        "adoption": 168,
         "num_instances_across_episodes": 1
     },
-    "IF,medium berries,low health,medium days,low days,THEN,move": {
-        "reward": 31,
-        "numerosity": 248,
-        "fitness": 18.6,
-        "adoption": 31,
+    "IF,medium berries,medium health,high days,medium days,low days,THEN,eat": {
+        "reward": 1927,
+        "numerosity": 1927,
+        "fitness": 5294.399999999996,
+        "adoption": 1630,
+        "num_instances_across_episodes": 8
+    },
+    "IF,no berries,low health,high days,medium days,medium days,THEN,move": {
+        "reward": 1019,
+        "numerosity": 5560,
+        "fitness": 5168.100000000006,
+        "adoption": 3706,
+        "num_instances_across_episodes": 16
+    },
+    "IF,medium berries,medium health,medium days,low days,low days,THEN,throw": {
+        "reward": 6538.0,
+        "numerosity": 13076,
+        "fitness": 5132.400000000007,
+        "adoption": 12350,
+        "num_instances_across_episodes": 53
+    },
+    "IF,medium berries,medium health,low days,low days,medium days,THEN,eat": {
+        "reward": 3136,
+        "numerosity": 3136,
+        "fitness": 5088.0000000000055,
+        "adoption": 2798,
+        "num_instances_across_episodes": 15
+    },
+    "IF,medium berries,medium health,medium days,medium days,medium days,THEN,throw": {
+        "reward": 2852.0,
+        "numerosity": 5704,
+        "fitness": 4822.200000000009,
+        "adoption": 5077,
+        "num_instances_across_episodes": 17
+    },
+    "IF,no berries,medium health,high days,medium days,high days,THEN,move": {
+        "reward": 252,
+        "numerosity": 588,
+        "fitness": 4788.0,
+        "adoption": 168,
         "num_instances_across_episodes": 1
     },
-    "IF,medium berries,medium health,high days,low days,THEN,move": {
-        "reward": 2,
-        "numerosity": 5,
-        "fitness": 14.4,
-        "adoption": 1,
+    "IF,no berries,high health,low days,low days,low days,THEN,move": {
+        "reward": 258,
+        "numerosity": 1179,
+        "fitness": 4780.800000000011,
+        "adoption": 362,
+        "num_instances_across_episodes": 3
+    },
+    "IF,medium berries,low health,high days,low days,THEN,move": {
+        "reward": 708,
+        "numerosity": 5881,
+        "fitness": 4506.000000000008,
+        "adoption": 2706,
+        "num_instances_across_episodes": 13
+    },
+    "IF,medium berries,low health,high days,medium days,low days,THEN,eat": {
+        "reward": 1940,
+        "numerosity": 1940,
+        "fitness": 4457.999999999998,
+        "adoption": 1705,
+        "num_instances_across_episodes": 6
+    },
+    "IF,high berries,high health,high days,THEN,throw": {
+        "reward": 31.200000000000003,
+        "numerosity": 80,
+        "fitness": 3754.2,
+        "adoption": 28,
+        "num_instances_across_episodes": 3
+    },
+    "IF,medium berries,medium health,high days,low days,THEN,throw": {
+        "reward": 1161.0,
+        "numerosity": 2322,
+        "fitness": 3479.4000000000033,
+        "adoption": 1754,
+        "num_instances_across_episodes": 8
+    },
+    "IF,medium berries,medium health,low days,high days,medium days,THEN,throw": {
+        "reward": 1194.0,
+        "numerosity": 2388,
+        "fitness": 3442.049999999997,
+        "adoption": 1941,
+        "num_instances_across_episodes": 9
+    },
+    "IF,medium berries,low health,high days,high days,THEN,eat": {
+        "reward": 560,
+        "numerosity": 560,
+        "fitness": 3380.999999999998,
+        "adoption": 320,
+        "num_instances_across_episodes": 4
+    },
+    "IF,medium berries,high health,medium days,medium days,THEN,throw": {
+        "reward": 265.2999999999997,
+        "numerosity": 819,
+        "fitness": 3162.150000000002,
+        "adoption": 364,
+        "num_instances_across_episodes": 3
+    },
+    "IF,no berries,low health,medium days,medium days,high days,THEN,move": {
+        "reward": 1065,
+        "numerosity": 2836,
+        "fitness": 3060.6000000000013,
+        "adoption": 1602,
+        "num_instances_across_episodes": 10
+    },
+    "IF,medium berries,medium health,low days,high days,THEN,throw": {
+        "reward": 330.49999999999955,
+        "numerosity": 2194,
+        "fitness": 2906.940000000001,
+        "adoption": 1270,
+        "num_instances_across_episodes": 8
+    },
+    "IF,medium berries,medium health,medium days,low days,high days,THEN,throw": {
+        "reward": 1443.0,
+        "numerosity": 2886,
+        "fitness": 2723.3999999999996,
+        "adoption": 2650,
+        "num_instances_across_episodes": 11
+    },
+    "IF,medium berries,low health,high days,high days,medium days,THEN,eat": {
+        "reward": 252,
+        "numerosity": 252,
+        "fitness": 2620.799999999999,
+        "adoption": 168,
         "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,high health,high days,medium days,low days,THEN,eat": {
+        "reward": 252,
+        "numerosity": 252,
+        "fitness": 2520.0,
+        "adoption": 168,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,high health,high days,THEN,throw": {
+        "reward": 78.70000000000002,
+        "numerosity": 538,
+        "fitness": 2408.8500000000004,
+        "adoption": 298,
+        "num_instances_across_episodes": 14
+    },
+    "IF,medium berries,low health,medium days,medium days,high days,THEN,eat": {
+        "reward": 306,
+        "numerosity": 306,
+        "fitness": 2325.5999999999995,
+        "adoption": 204,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,low days,low days,THEN,move": {
+        "reward": 168,
+        "numerosity": 1759,
+        "fitness": 2217.6000000000026,
+        "adoption": 700,
+        "num_instances_across_episodes": 3
+    },
+    "IF,medium berries,low health,high days,low days,high days,THEN,eat": {
+        "reward": 306,
+        "numerosity": 306,
+        "fitness": 2080.800000000004,
+        "adoption": 204,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,medium days,high days,low days,THEN,throw": {
+        "reward": 979.0,
+        "numerosity": 1958,
+        "fitness": 1979.4000000000003,
+        "adoption": 1794,
+        "num_instances_across_episodes": 8
+    },
+    "IF,medium berries,medium health,low days,medium days,low days,THEN,throw": {
+        "reward": 6826.5,
+        "numerosity": 13653,
+        "fitness": 1917.599999999997,
+        "adoption": 13003,
+        "num_instances_across_episodes": 54
+    },
+    "IF,medium berries,low health,low days,low days,high days,THEN,move": {
+        "reward": 606,
+        "numerosity": 1872,
+        "fitness": 1864.7999999999997,
+        "adoption": 1212,
+        "num_instances_across_episodes": 5
+    },
+    "IF,medium berries,medium health,low days,high days,high days,THEN,throw": {
+        "reward": 228.0,
+        "numerosity": 456,
+        "fitness": 1612.8000000000025,
+        "adoption": 372,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,medium days,high days,low days,THEN,eat": {
+        "reward": 2239,
+        "numerosity": 2239,
+        "fitness": 1561.2000000000003,
+        "adoption": 1938,
+        "num_instances_across_episodes": 9
+    },
+    "IF,medium berries,medium health,low days,medium days,high days,THEN,throw": {
+        "reward": 1173.5,
+        "numerosity": 2347,
+        "fitness": 1444.1999999999998,
+        "adoption": 2184,
+        "num_instances_across_episodes": 11
+    },
+    "IF,no berries,low health,medium days,low days,high days,THEN,move": {
+        "reward": 2158,
+        "numerosity": 6418,
+        "fitness": 1431.000000000002,
+        "adoption": 5043,
+        "num_instances_across_episodes": 24
+    },
+    "IF,no berries,high health,low days,medium days,medium days,THEN,move": {
+        "reward": 380,
+        "numerosity": 1678,
+        "fitness": 1294.2,
+        "adoption": 1082,
+        "num_instances_across_episodes": 6
+    },
+    "IF,medium berries,medium health,medium days,medium days,low days,THEN,throw": {
+        "reward": 3347.0,
+        "numerosity": 6694,
+        "fitness": 1198.800000000001,
+        "adoption": 6483,
+        "num_instances_across_episodes": 29
+    },
+    "IF,medium berries,low health,high days,low days,medium days,THEN,eat": {
+        "reward": 1244,
+        "numerosity": 1244,
+        "fitness": 1166.4000000000015,
+        "adoption": 1022,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,high health,high days,medium days,medium days,THEN,move": {
+        "reward": 84,
+        "numerosity": 336,
+        "fitness": 1134.0,
+        "adoption": 168,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,high days,low days,high days,THEN,move": {
+        "reward": 252,
+        "numerosity": 336,
+        "fitness": 1058.400000000001,
+        "adoption": 168,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,low days,high days,low days,THEN,eat": {
+        "reward": 504,
+        "numerosity": 504,
+        "fitness": 1036.7999999999988,
+        "adoption": 432,
+        "num_instances_across_episodes": 3
+    },
+    "IF,medium berries,medium health,medium days,low days,medium days,THEN,eat": {
+        "reward": 3300,
+        "numerosity": 3300,
+        "fitness": 1018.7999999999998,
+        "adoption": 3168,
+        "num_instances_across_episodes": 16
+    },
+    "IF,medium berries,low health,low days,low days,medium days,THEN,move": {
+        "reward": 454,
+        "numerosity": 23854,
+        "fitness": 1018.7999999999978,
+        "adoption": 16790,
+        "num_instances_across_episodes": 76
+    },
+    "IF,medium berries,low health,medium days,medium days,medium days,THEN,eat": {
+        "reward": 2281,
+        "numerosity": 2281,
+        "fitness": 986.4000000000005,
+        "adoption": 2144,
+        "num_instances_across_episodes": 11
+    },
+    "IF,medium berries,high health,high days,low days,THEN,throw": {
+        "reward": 279.5,
+        "numerosity": 559,
+        "fitness": 871.2000000000016,
+        "adoption": 438,
+        "num_instances_across_episodes": 3
+    },
+    "IF,medium berries,low health,low days,medium days,high days,THEN,eat": {
+        "reward": 1542,
+        "numerosity": 1542,
+        "fitness": 863.9999999999991,
+        "adoption": 1482,
+        "num_instances_across_episodes": 8
+    },
+    "IF,medium berries,low health,low days,low days,high days,THEN,eat": {
+        "reward": 2786,
+        "numerosity": 2786,
+        "fitness": 756.0,
+        "adoption": 2660,
+        "num_instances_across_episodes": 11
+    },
+    "IF,high berries,high health,high days,medium days,THEN,eat": {
+        "reward": 75,
+        "numerosity": 75,
+        "fitness": 570.0000000000001,
+        "adoption": 50,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,high health,medium days,medium days,low days,THEN,move": {
+        "reward": 144,
+        "numerosity": 2120,
+        "fitness": 540.9000000000012,
+        "adoption": 1127,
+        "num_instances_across_episodes": 5
+    },
+    "IF,medium berries,high health,low days,medium days,THEN,move": {
+        "reward": 165,
+        "numerosity": 896,
+        "fitness": 501.5999999999998,
+        "adoption": 608,
+        "num_instances_across_episodes": 5
+    },
+    "IF,medium berries,medium health,high days,medium days,low days,THEN,throw": {
+        "reward": 483.5,
+        "numerosity": 967,
+        "fitness": 475.2000000000006,
+        "adoption": 895,
+        "num_instances_across_episodes": 4
+    },
+    "IF,medium berries,medium health,low days,medium days,medium days,THEN,move": {
+        "reward": 348,
+        "numerosity": 852,
+        "fitness": 302.40000000000094,
+        "adoption": 516,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,medium health,high days,low days,low days,THEN,move": {
+        "reward": 242,
+        "numerosity": 1080,
+        "fitness": 294.2999999999994,
+        "adoption": 736,
+        "num_instances_across_episodes": 3
+    },
+    "IF,medium berries,low health,medium days,high days,medium days,THEN,eat": {
+        "reward": 216,
+        "numerosity": 216,
+        "fitness": 259.1999999999997,
+        "adoption": 144,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,medium days,low days,low days,THEN,move": {
+        "reward": 351,
+        "numerosity": 2317,
+        "fitness": 160.2,
+        "adoption": 1664,
+        "num_instances_across_episodes": 7
+    },
+    "IF,medium berries,medium health,low days,low days,medium days,THEN,move": {
+        "reward": 276,
+        "numerosity": 2946,
+        "fitness": 104.39999999999972,
+        "adoption": 2416,
+        "num_instances_across_episodes": 9
+    },
+    "IF,medium berries,low health,low days,medium days,low days,THEN,move": {
+        "reward": 173,
+        "numerosity": 3212,
+        "fitness": 103.79999999999973,
+        "adoption": 2667,
+        "num_instances_across_episodes": 9
+    },
+    "IF,high berries,medium health,low days,high days,THEN,eat": {
+        "reward": 219,
+        "numerosity": 219,
+        "fitness": 87.60000000000012,
+        "adoption": 146,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,medium days,low days,medium days,THEN,move": {
+        "reward": 163,
+        "numerosity": 1434,
+        "fitness": 83.70000000000005,
+        "adoption": 1372,
+        "num_instances_across_episodes": 6
+    },
+    "IF,medium berries,medium health,low days,high days,medium days,THEN,move": {
+        "reward": 109,
+        "numerosity": 327,
+        "fitness": 65.40000000000009,
+        "adoption": 218,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,high health,low days,low days,high days,THEN,move": {
+        "reward": 102,
+        "numerosity": 762,
+        "fitness": 61.2000000000001,
+        "adoption": 372,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,low days,medium days,medium days,THEN,move": {
+        "reward": 109,
+        "numerosity": 1425,
+        "fitness": 54.60000000000009,
+        "adoption": 1178,
+        "num_instances_across_episodes": 4
+    },
+    "IF,medium berries,medium health,medium days,low days,medium days,THEN,move": {
+        "reward": 230,
+        "numerosity": 1463,
+        "fitness": 43.80000000000006,
+        "adoption": 1390,
+        "num_instances_across_episodes": 4
+    },
+    "IF,high berries,medium health,low days,high days,THEN,move": {
+        "reward": 73,
+        "numerosity": 219,
+        "fitness": 43.80000000000006,
+        "adoption": 146,
+        "num_instances_across_episodes": 1
+    },
+    "IF,high berries,high health,high days,high days,THEN,move": {
+        "reward": 25,
+        "numerosity": 100,
+        "fitness": 14.999999999999995,
+        "adoption": 50,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,low days,low days,low days,THEN,throw": {
+        "reward": 3147.0,
+        "numerosity": 6294,
+        "fitness": 0,
+        "adoption": 6294,
+        "num_instances_across_episodes": 28
+    },
+    "IF,medium berries,medium health,low days,low days,low days,THEN,move": {
+        "reward": 0,
+        "numerosity": 2058,
+        "fitness": 0.0,
+        "adoption": 1416,
+        "num_instances_across_episodes": 5
+    },
+    "IF,medium berries,low health,high days,low days,low days,THEN,move": {
+        "reward": 156,
+        "numerosity": 1290,
+        "fitness": 0.0,
+        "adoption": 912,
+        "num_instances_across_episodes": 4
+    },
+    "IF,medium berries,medium health,high days,low days,low days,THEN,eat": {
+        "reward": 897,
+        "numerosity": 897,
+        "fitness": 0,
+        "adoption": 897,
+        "num_instances_across_episodes": 4
+    },
+    "IF,medium berries,medium health,medium days,medium days,low days,THEN,move": {
+        "reward": 121,
+        "numerosity": 363,
+        "fitness": 0.0,
+        "adoption": 242,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,high days,high days,THEN,move": {
+        "reward": 0,
+        "numerosity": 86,
+        "fitness": 0,
+        "adoption": 86,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,high days,low days,medium days,THEN,move": {
+        "reward": 182,
+        "numerosity": 905,
+        "fitness": 0.0,
+        "adoption": 856,
+        "num_instances_across_episodes": 4
+    },
+    "IF,no berries,high health,medium days,low days,medium days,THEN,move": {
+        "reward": 258,
+        "numerosity": 1302,
+        "fitness": 0.0,
+        "adoption": 1163,
+        "num_instances_across_episodes": 4
+    },
+    "IF,medium berries,medium health,low days,low days,THEN,throw": {
+        "reward": 308.0,
+        "numerosity": 616,
+        "fitness": 0,
+        "adoption": 616,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,low days,medium days,high days,THEN,throw": {
+        "reward": -67.19999999999987,
+        "numerosity": 336,
+        "fitness": 0,
+        "adoption": 336,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,medium days,high days,low days,THEN,throw": {
+        "reward": -47.99999999999989,
+        "numerosity": 240,
+        "fitness": 0,
+        "adoption": 240,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,medium days,low days,low days,THEN,move": {
+        "reward": -186,
+        "numerosity": 762,
+        "fitness": 0.0,
+        "adoption": 756,
+        "num_instances_across_episodes": 5
+    },
+    "IF,medium berries,low health,low days,THEN,move": {
+        "reward": 177,
+        "numerosity": 2650,
+        "fitness": 0.0,
+        "adoption": 1180,
+        "num_instances_across_episodes": 5
+    },
+    "IF,medium berries,medium health,medium days,high days,medium days,THEN,throw": {
+        "reward": 522.0,
+        "numerosity": 1044,
+        "fitness": 0,
+        "adoption": 1044,
+        "num_instances_across_episodes": 4
+    },
+    "IF,medium berries,medium health,low days,high days,low days,THEN,throw": {
+        "reward": 260.0,
+        "numerosity": 520,
+        "fitness": 0,
+        "adoption": 520,
+        "num_instances_across_episodes": 3
+    },
+    "IF,medium berries,medium health,low days,medium days,low days,THEN,move": {
+        "reward": 295,
+        "numerosity": 1949,
+        "fitness": 0.0,
+        "adoption": 1708,
+        "num_instances_across_episodes": 7
+    },
+    "IF,medium berries,medium health,high days,low days,medium days,THEN,eat": {
+        "reward": 120,
+        "numerosity": 120,
+        "fitness": 0,
+        "adoption": 120,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,medium days,low days,high days,THEN,eat": {
+        "reward": 388,
+        "numerosity": 388,
+        "fitness": 0,
+        "adoption": 388,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,medium health,medium days,medium days,high days,THEN,throw": {
+        "reward": 287.5,
+        "numerosity": 575,
+        "fitness": 0,
+        "adoption": 575,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,medium health,high days,low days,medium days,THEN,move": {
+        "reward": 109,
+        "numerosity": 327,
+        "fitness": 0.0,
+        "adoption": 218,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,high days,low days,medium days,THEN,throw": {
+        "reward": 102.0,
+        "numerosity": 204,
+        "fitness": 0,
+        "adoption": 204,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,high days,medium days,medium days,THEN,throw": {
+        "reward": 120.0,
+        "numerosity": 240,
+        "fitness": 0,
+        "adoption": 240,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,low days,high days,medium days,THEN,eat": {
+        "reward": 158,
+        "numerosity": 158,
+        "fitness": 0,
+        "adoption": 158,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,high health,low days,low days,low days,THEN,eat": {
+        "reward": 290,
+        "numerosity": 290,
+        "fitness": 0,
+        "adoption": 290,
+        "num_instances_across_episodes": 1
+    },
+    "IF,high berries,high health,medium days,high days,THEN,move": {
+        "reward": 0,
+        "numerosity": 75,
+        "fitness": 0.0,
+        "adoption": 50,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,low days,high days,low days,THEN,move": {
+        "reward": 162,
+        "numerosity": 834,
+        "fitness": 0.0,
+        "adoption": 672,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,medium health,low days,medium days,medium days,THEN,eat": {
+        "reward": 450,
+        "numerosity": 450,
+        "fitness": 0,
+        "adoption": 450,
+        "num_instances_across_episodes": 4
+    },
+    "IF,medium berries,high health,low days,medium days,low days,THEN,eat": {
+        "reward": 180,
+        "numerosity": 180,
+        "fitness": 0,
+        "adoption": 180,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,high health,low days,low days,medium days,THEN,move": {
+        "reward": 0,
+        "numerosity": 252,
+        "fitness": 0.0,
+        "adoption": 168,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,high health,medium days,high days,medium days,THEN,throw": {
+        "reward": 84.0,
+        "numerosity": 168,
+        "fitness": 0,
+        "adoption": 168,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,high days,high days,medium days,THEN,throw": {
+        "reward": 84.0,
+        "numerosity": 168,
+        "fitness": 0,
+        "adoption": 168,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,high days,high days,low days,THEN,move": {
+        "reward": 150,
+        "numerosity": 636,
+        "fitness": 0.0,
+        "adoption": 468,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,low days,high days,high days,THEN,eat": {
+        "reward": 168,
+        "numerosity": 168,
+        "fitness": 0,
+        "adoption": 168,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,medium health,low days,high days,high days,THEN,move": {
+        "reward": 0,
+        "numerosity": 1200,
+        "fitness": 0.0,
+        "adoption": 372,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,high days,medium days,high days,THEN,throw": {
+        "reward": -33.599999999999945,
+        "numerosity": 168,
+        "fitness": 0,
+        "adoption": 168,
+        "num_instances_across_episodes": 1
+    },
+    "IF,no berries,low health,low days,high days,high days,THEN,move": {
+        "reward": 84,
+        "numerosity": 252,
+        "fitness": 0.0,
+        "adoption": 168,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,medium days,high days,low days,THEN,eat": {
+        "reward": 182,
+        "numerosity": 182,
+        "fitness": 0,
+        "adoption": 182,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,low days,low days,high days,THEN,move": {
+        "reward": 133,
+        "numerosity": 532,
+        "fitness": 0.0,
+        "adoption": 266,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,high health,medium days,low days,medium days,THEN,eat": {
+        "reward": 204,
+        "numerosity": 204,
+        "fitness": 0,
+        "adoption": 204,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,high health,medium days,medium days,low days,THEN,eat": {
+        "reward": 204,
+        "numerosity": 204,
+        "fitness": 0,
+        "adoption": 204,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,high days,high days,low days,THEN,eat": {
+        "reward": 204,
+        "numerosity": 204,
+        "fitness": 0,
+        "adoption": 204,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,high days,medium days,medium days,THEN,eat": {
+        "reward": 314,
+        "numerosity": 314,
+        "fitness": 0,
+        "adoption": 314,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,low days,medium days,high days,THEN,eat": {
+        "reward": 170,
+        "numerosity": 170,
+        "fitness": 0,
+        "adoption": 170,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,high health,low days,medium days,low days,THEN,move": {
+        "reward": 139,
+        "numerosity": 834,
+        "fitness": 0.0,
+        "adoption": 417,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,medium health,high days,high days,THEN,throw": {
+        "reward": 14.699999999999996,
+        "numerosity": 105,
+        "fitness": -24.0,
+        "adoption": 102,
+        "num_instances_across_episodes": 3
+    },
+    "IF,medium berries,low health,low days,low days,low days,THEN,move": {
+        "reward": -1992,
+        "numerosity": 11975,
+        "fitness": -115.19999999999959,
+        "adoption": 9110,
+        "num_instances_across_episodes": 39
+    },
+    "IF,medium berries,low health,medium days,low days,THEN,throw": {
+        "reward": -97.19999999999979,
+        "numerosity": 486,
+        "fitness": -116.63999999999986,
+        "adoption": 324,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,high days,medium days,THEN,throw": {
+        "reward": -142.80000000000004,
+        "numerosity": 714,
+        "fitness": -135.59999999999985,
+        "adoption": 556,
+        "num_instances_across_episodes": 3
+    },
+    "IF,medium berries,low health,low days,high days,THEN,move": {
+        "reward": 164,
+        "numerosity": 5176,
+        "fitness": -347.4000000000009,
+        "adoption": 3298,
+        "num_instances_across_episodes": 15
+    },
+    "IF,medium berries,low health,medium days,low days,high days,THEN,throw": {
+        "reward": -79.19999999999996,
+        "numerosity": 396,
+        "fitness": -348.4799999999989,
+        "adoption": 264,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,medium days,high days,medium days,THEN,throw": {
+        "reward": -107.2,
+        "numerosity": 536,
+        "fitness": -440.6399999999994,
+        "adoption": 434,
+        "num_instances_across_episodes": 2
+    },
+    "IF,medium berries,low health,medium days,low days,medium days,THEN,throw": {
+        "reward": -1870.399999999998,
+        "numerosity": 9292,
+        "fitness": -545.9999999999993,
+        "adoption": 8798,
+        "num_instances_across_episodes": 41
+    },
+    "IF,medium berries,low health,low days,low days,THEN,throw": {
+        "reward": -129.59999999999968,
+        "numerosity": 648,
+        "fitness": -1088.6400000000033,
+        "adoption": 324,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,medium days,medium days,low days,THEN,throw": {
+        "reward": -3482.9999999999936,
+        "numerosity": 17415,
+        "fitness": -1670.16,
+        "adoption": 16351,
+        "num_instances_across_episodes": 64
+    },
+    "IF,medium berries,low health,low days,medium days,THEN,throw": {
+        "reward": -465.00000000000006,
+        "numerosity": 1540,
+        "fitness": -2423.5199999999977,
+        "adoption": 1276,
+        "num_instances_across_episodes": 7
+    },
+    "IF,medium berries,low health,low days,medium days,medium days,THEN,throw": {
+        "reward": -3220.7999999999975,
+        "numerosity": 14449,
+        "fitness": -2619.900000000003,
+        "adoption": 13039,
+        "num_instances_across_episodes": 56
+    },
+    "IF,medium berries,low health,medium days,medium days,medium days,THEN,throw": {
+        "reward": -3681.3999999999965,
+        "numerosity": 17087,
+        "fitness": -2705.279999999996,
+        "adoption": 15032,
+        "num_instances_across_episodes": 49
+    },
+    "IF,medium berries,low health,high days,high days,THEN,throw": {
+        "reward": -131.39999999999986,
+        "numerosity": 657,
+        "fitness": -4765.440000000003,
+        "adoption": 146,
+        "num_instances_across_episodes": 1
+    },
+    "IF,medium berries,low health,low days,medium days,low days,THEN,throw": {
+        "reward": -3787.3999999999965,
+        "numerosity": 18877,
+        "fitness": -6103.680000000003,
+        "adoption": 14893,
+        "num_instances_across_episodes": 63
+    },
+    "IF,medium berries,low health,medium days,medium days,THEN,throw": {
+        "reward": -734.2000000000002,
+        "numerosity": 2741,
+        "fitness": -11464.559999999974,
+        "adoption": 2034,
+        "num_instances_across_episodes": 11
+    },
+    "IF,medium berries,low health,low days,low days,medium days,THEN,throw": {
+        "reward": -5726.799999999993,
+        "numerosity": 27794,
+        "fitness": -14984.040000000003,
+        "adoption": 20699,
+        "num_instances_across_episodes": 92
+    },
+    "IF,medium berries,low health,medium days,low days,low days,THEN,throw": {
+        "reward": -5150.999999999996,
+        "numerosity": 23925,
+        "fitness": -18692.75999999998,
+        "adoption": 17740,
+        "num_instances_across_episodes": 80
+    },
+    "IF,medium berries,low health,medium days,high days,THEN,throw": {
+        "reward": -2516.1999999999994,
+        "numerosity": 10821,
+        "fitness": -60652.259999999995,
+        "adoption": 5160,
+        "num_instances_across_episodes": 33
+    },
+    "IF,medium berries,medium health,medium days,high days,THEN,throw": {
+        "reward": 3749.0999999999976,
+        "numerosity": 43229,
+        "fitness": -122536.37999999998,
+        "adoption": 18022,
+        "num_instances_across_episodes": 118
+    },
+    "IF,medium berries,medium health,medium days,THEN,throw": {
+        "reward": -2809.9999999999964,
+        "numerosity": 21162,
+        "fitness": -189579.42000000013,
+        "adoption": 7426,
+        "num_instances_across_episodes": 26
+    },
+    "IF,medium berries,low health,low days,low days,low days,THEN,throw": {
+        "reward": -34576.200000000004,
+        "numerosity": 171976,
+        "fitness": -193032.54000000007,
+        "adoption": 74864,
+        "num_instances_across_episodes": 231
     }
 }

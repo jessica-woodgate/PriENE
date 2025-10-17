@@ -1,21 +1,21 @@
-      Multiple Comparison of Means - Tukey HSD, FWER=0.05       
-================================================================
-   group1       group2    meandiff p-adj   lower   upper  reject
-----------------------------------------------------------------
-     average majoritarian   0.5683 0.3457 -0.3121  1.4486  False
-     average     optimist   4.6453    0.0  3.7649  5.5256   True
-     average         veto   3.2355    0.0  2.3552  4.1158   True
-majoritarian     optimist    4.077    0.0  3.1967  4.9573   True
-majoritarian         veto   2.6672    0.0  1.7869  3.5476   True
-    optimist         veto  -1.4097 0.0002 -2.2901 -0.5294   True
-----------------------------------------------------------------
+      Multiple Comparison of Means - Tukey HSD, FWER=0.05      
+===============================================================
+   group1       group2    meandiff p-adj   lower  upper  reject
+---------------------------------------------------------------
+     average majoritarian   0.5683 0.3457 -0.3121 1.4486  False
+     average     optimist   3.2355    0.0  2.3552 4.1158   True
+     average         veto   4.6453    0.0  3.7649 5.5256   True
+majoritarian     optimist   2.6672    0.0  1.7869 3.5476   True
+majoritarian         veto    4.077    0.0  3.1967 4.9573   True
+    optimist         veto   1.4097 0.0002  0.5294 2.2901   True
+---------------------------------------------------------------
+      Effect Size - Cohen's D
 =========================================================
-  Effect Size - Cohen's D
 
          group1        group2  cohens_d
 0       average  majoritarian -0.068597
-1       average          veto -0.441474
-2       average      optimist -0.631244
-3  majoritarian          veto -0.335600
-4  majoritarian      optimist -0.511198
-5          veto      optimist -0.202021
+1       average      optimist -0.441474
+2       average          veto -0.631244
+3  majoritarian      optimist -0.335600
+4  majoritarian          veto -0.511198
+5      optimist          veto -0.202021

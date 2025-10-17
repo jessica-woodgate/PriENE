@@ -1,34 +1,145 @@
-   medium berries
-     high health
-       high days
-         high days: [' eat']
-       medium days
-         high days
-           high days: [' throw']
-         medium days: [' eat']
-       low days
-         high days
-           high days: [' move']
-     medium health
-       high days
-         high days: [' move']
-       medium days
-         medium days: [' eat']
-   high berries
-     high health
-       high days
-         high days: [' eat']
    no berries
      high health
        high days
          high days: [' move']
+         medium days
+           medium days: [' move']
+         low days
+           low days: [' move']
        medium days
-         medium days: [' move']
+         medium days
+           move
+           medium days: [' move']
+         low days
+           low days: [' move']
+       low days
+         low days
+           move
+           low days: [' move']
+         medium days
+           medium days: [' move']
+         high days
+           high days: [' move']
      medium health
        medium days
-         medium days: [' move']
+         medium days
+           move
+           medium days: [' move']
+         low days
+           low days: [' move']
+         high days
+           high days: [' move']
        low days
          low days: [' move']
+         medium days
+           medium days: [' move']
+         high days
+           high days: [' move']
+       high days
+         high days: [' move']
+         low days
+           low days: [' move']
+         medium days
+           medium days: [' move']
+     low health
+       medium days
+         medium days
+           move
+           medium days: [' move']
+         low days
+           low days: [' move']
+         high days
+           high days: [' move']
+       low days
+         medium days
+           medium days: [' move']
+         low days: [' move']
+         high days
+           high days: [' move']
+       high days
+         low days
+           low days: [' move']
+         medium days
+           medium days: [' move']
+   medium berries
+     high health
+       high days
+         high days: [' throw']
+         low days
+           low days: [' eat']
+       medium days
+         medium days
+           throw
+           medium days: [' move']
+         low days
+           low days: [' move']
+       low days
+         medium days
+           medium days: [' move']
+         low days
+           low days: [' eat']
+     medium health
+       medium days
+         medium days
+           throw
+           low days
+             low days: [' move']
+           medium days: [' throw']
+         high days
+           high days: [' move']
+         low days
+           medium days
+             medium days: [' move']
+           low days: [' throw']
+       high days
+         high days: [' throw']
+         medium days
+           medium days: [' move']
+         low days
+           low days
+             move
+             low days: [' throw']
+       low days
+         low days
+           throw
+           low days: [' move']
+           high days
+             high days: [' eat']
+         medium days
+           medium days: [' throw']
+         high days
+           high days: [' throw']
      low health
        medium days
          medium days: [' move']
+         low days
+           low days: [' throw']
+           high days
+             high days: [' eat']
+         high days
+           high days: [' throw']
+           low days
+             low days: [' eat']
+       low days
+         low days: [' eat']
+         high days
+           high days: [' move']
+         medium days
+           high days
+             high days: [' eat']
+       high days
+         low days
+           low days: [' throw']
+         medium days
+           medium days
+             throw
+             medium days: [' eat']
+           low days
+             low days: [' eat']
+   high berries
+     high health
+       high days
+         high days: [' throw']
+     medium health
+       medium days
+         medium days: [' throw']
