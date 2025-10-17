@@ -17,7 +17,7 @@ class NormProcessing():
         for label in df_labels:
             input_file = norms_filepath+label+"_emerged_norms.json"
             output_file = write_filepath+scenario+"_"+label+"_norms"
-            df, n_norms, n_cooperative_norms = self._process_society_norms(input_file, output_file, label)
+            df, n_norms, n_cooperative_norms = self._process_society_norms(input_file, output_file, filter_fitness=True)
             cooperative_dfs.append(df)
             cooperative_tendencies.append(self._calculate_norms_tendency(df, label))
             emerged_norms_proportions["society"].append(label)
@@ -26,9 +26,21 @@ class NormProcessing():
             emerged_norms_proportions["proportion_cooperative"].append((n_cooperative_norms/n_norms)*100 if n_norms > 0 else 0)
         return cooperative_dfs, cooperative_tendencies, emerged_norms_proportions
 
-    def _process_society_norms(self, input_file, output_file, df_label):
+    def _process_society_norms(self, input_file, output_file, filter_fitness=False):
         f = open(input_file)
         data = json.load(f)
+        if filter_fitness:
+            filtered_data = {}
+            for society_id, rules in data.items():
+                filtered_rules = []
+                for rule_entry in rules:
+                    # rule_entry is a dict with one key (the rule string)
+                    rule_str, rule_info = next(iter(rule_entry.items()))
+                    if rule_info.get("fitness", 0.0) > 0.0:
+                        filtered_rules.append(rule_entry)
+                if filtered_rules:
+                    filtered_data[society_id] = filtered_rules
+            data = filtered_data
         cooperative_data, n_norms, n_cooperative_norms = self._count_cooperative_norms(data, output_file)
         data = self._merge_norms(data, output_file)
         self._generalise_norms(data.keys(), output_file)

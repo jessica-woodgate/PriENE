@@ -9,16 +9,16 @@
          low days
            low days: [' throw']
        low days
-         low days: [' throw']
-         medium days
-           medium days: [' throw']
-         high days
-           high days: [' throw']
-       high days
          medium days
            medium days: [' throw']
          low days
+           high days
+             high days: [' throw']
+       high days
+         low days
            low days: [' throw']
+         medium days
+           medium days: [' throw']
          high days
            high days: [' throw']
      high health
@@ -27,29 +27,6 @@
        medium days
          medium days
            medium days: [' throw']
-     low health
-       medium days
-         medium days
-           throw
-           medium days: [' throw']
-         high days
-           high days: [' throw']
-         low days
-           low days: [' throw']
-       low days
-         low days
-           low days: [' throw']
-         high days
-           high days: [' throw']
-         medium days
-           medium days: [' throw']
-       high days
-         medium days
-           medium days: [' throw']
-         low days
-           low days: [' throw']
-         high days
-           high days: [' throw']
    high berries
      high health
        high days

@@ -28,17 +28,17 @@ class DataAnalysis():
         self.principles = principles
         self.aggregations = aggregations
         #if need to analyse data
-        if end_episode_totals_dfs == None:
-            end_episode_totals_dfs, agent_final_rows_dfs, normalised_df_list, self.best_aggregation = self._process_agent_dfs(agent_df_list, df_labels, write, get_normalised)
-        else:
-            #if data has already been analysed
-            agent_final_rows_dfs = agent_df_list
-        if write:
-            self._display_graphs(agent_final_rows_dfs, end_episode_totals_dfs, df_labels, normalised_df_list)
-        self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "principles")
-        self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "principles")
-        self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "aggregations")
-        self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "aggregations")
+        # if end_episode_totals_dfs == None:
+        #     end_episode_totals_dfs, agent_final_rows_dfs, normalised_df_list, self.best_aggregation = self._process_agent_dfs(agent_df_list, df_labels, write, get_normalised)
+        # else:
+        #     #if data has already been analysed
+        #     agent_final_rows_dfs = agent_df_list
+        # if write:
+        #     self._display_graphs(agent_final_rows_dfs, end_episode_totals_dfs, df_labels, normalised_df_list)
+        # self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "principles")
+        # self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "principles")
+        # self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "aggregations")
+        # self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "aggregations")
         if process_norms:
             norm_processing = NormProcessing()
             cooperative_norm_dfs, cooperative_tendencies, emerged_norms_proportions = norm_processing.process_norms(df_labels, scenario, norms_filepath, self.filepath)
