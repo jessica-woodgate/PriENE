@@ -42,9 +42,10 @@ class DataAnalysis():
         if process_norms:
             norm_processing = NormProcessing()
             cooperative_norm_dfs, cooperative_tendencies, emerged_norms_proportions = norm_processing.process_norms(df_labels, scenario, norms_filepath, self.filepath)
-            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "numerosity", self.filepath+"cooperative_numerosity")
-            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "fitness", self.filepath+"cooperative_fitness")
-            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "reward", self.filepath+"cooperative_reward")
+            # self._display_swarm_plot(cooperative_norm_dfs,df_labels, "numerosity", self.filepath+"cooperative_numerosity")
+            # self._display_swarm_plot(cooperative_norm_dfs,df_labels, "fitness", self.filepath+"cooperative_fitness")
+            # self._display_swarm_plot(cooperative_norm_dfs,df_labels, "reward", self.filepath+"cooperative_reward")
+            self._display_norm_data(cooperative_norm_dfs, df_labels, self.filepath+"cooperative_norms")
             self._write_dictionary_to_file(cooperative_tendencies,self.filepath+"cooperative_norms_tendencies.csv")
             self._write_dictionary_to_file(emerged_norms_proportions,self.filepath+"emerged_norms_proportions.csv")
 
@@ -206,6 +207,19 @@ class DataAnalysis():
         plt.tight_layout()
         plt.savefig(str(filename).split()[0])
         plt.close(fig)
+
+    def _display_norm_data(self, df_list, df_labels, filename):
+        agg = pd.DataFrame({
+            'society': df_labels,
+            'fitness': [df['fitness'].mean() for df in df_list],
+            'num_instances': [df['num_instances_across_episodes'].mean() for df in df_list]
+        })
+
+        sns.scatterplot(data=agg, x='fitness', y='num_instances', hue='society', s=100)
+        plt.title("Societies positioned by mean Fitness and Num Instances")
+        plt.tight_layout()
+        plt.savefig(str(filename+"_scatter").split()[0])
+        plt.close()
     
     def _display_end_episode(self, df_list, df_labels):
         self._display_violin_plot_df_list(df_list, df_labels, "gini_days_survived", self.filepath+"gini_days_survived", "Violin Plot of Gini Days Survived", "Days Survived")

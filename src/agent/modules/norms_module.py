@@ -67,7 +67,7 @@ class NormsModule():
         else:
             return consequent + action
     
-    def update_behaviour_base(self, antecedent, action, reward, day):
+    def update_behaviour_base(self, antecedent, action, reward, day, episode):
         """
         Update current behaviour and then update the age of all behaviours in behaviour base
         If day == clipping frequency, clip behaviour base if it exceeds maximum capacity
@@ -75,7 +75,7 @@ class NormsModule():
         self._update_behaviour(antecedent,action,reward)
         self._update_behaviours_age()
         if day % self.norm_clipping_frequency == 0:
-            self._clip_behaviour_base()
+            self._clip_behaviour_base(day, episode)
 
     def _update_behaviour(self, antecedent, action, reward):
         consequent = self.get_consequent(action)
@@ -102,8 +102,9 @@ class NormsModule():
             fitness = norm["numerosity"] * norm["reward"] * discounted_age
             norm["fitness"] = round(fitness, 4)
 
-    def _clip_behaviour_base(self):
+    def _clip_behaviour_base(self, day, episode):
         if len(self.behaviour_base.keys()) > self.max_norms:
+            print(f"agent {self.agent_id} clipping behaviour base, length is {len(self.behaviour_base.keys())} in episode {episode} day {day}")
             for metadata in self.behaviour_base.values():
                 self._update_norm_fitness(metadata)
             assessed_base = self._assess(self.behaviour_base)

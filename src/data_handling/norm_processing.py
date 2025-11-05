@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+import networkx as nx
 
 class NormProcessing():
     def __init__(self):
@@ -17,9 +18,9 @@ class NormProcessing():
         for label in df_labels:
             input_file = norms_filepath+label+"_emerged_norms.json"
             output_file = write_filepath+scenario+"_"+label+"_norms"
-            df, n_norms, n_cooperative_norms = self._process_society_norms(input_file, output_file, filter_fitness=True)
-            cooperative_dfs.append(df)
-            cooperative_tendencies.append(self._calculate_norms_tendency(df, label))
+            cooperative_data, n_norms, n_cooperative_norms = self._process_society_norms(input_file, output_file, filter_fitness=True)
+            cooperative_dfs.append(cooperative_data)
+            cooperative_tendencies.append(self._calculate_norms_tendency(cooperative_data, label))
             emerged_norms_proportions["society"].append(label)
             emerged_norms_proportions["num_emerged_norms"].append(n_norms)
             emerged_norms_proportions["num_cooperative_norms"].append(n_cooperative_norms)
@@ -28,10 +29,10 @@ class NormProcessing():
 
     def _process_society_norms(self, input_file, output_file, filter_fitness=False):
         f = open(input_file)
-        data = json.load(f)
+        norm_data = json.load(f)
         if filter_fitness:
             filtered_data = {}
-            for society_id, rules in data.items():
+            for society_id, rules in norm_data.items():
                 filtered_rules = []
                 for rule_entry in rules:
                     # rule_entry is a dict with one key (the rule string)
@@ -40,30 +41,23 @@ class NormProcessing():
                         filtered_rules.append(rule_entry)
                 if filtered_rules:
                     filtered_data[society_id] = filtered_rules
-            data = filtered_data
-        cooperative_data, n_norms, n_cooperative_norms = self._count_cooperative_norms(data, output_file)
-        data = self._merge_norms(data, output_file)
-        self._generalise_norms(data.keys(), output_file)
-        self._generalise_norms(data.keys(), output_file, cooperative_norms=True)
+            norm_data = filtered_data
+        #merges norms repeated across episodes and writes unique norms to file
+        merged_norms = self._merge_norms(norm_data, output_file)
+        #looks at all the merged norms and collects data for the cooperative norms
+        cooperative_data, n_norms, n_cooperative_norms = self._count_cooperative_norms(merged_norms, output_file)
+        #self._generalise_norms(merged_norms.keys(), output_file)
+        #self._generalise_norms(merged_norms.keys(), output_file, cooperative_norms=True)
         return cooperative_data, n_norms, n_cooperative_norms
     
     def _count_cooperative_norms(self, data, output_file):
         cooperative_norms = []
         n_norms = 0
-        for episode_number, episode_norms in data.items():
-            for norm in episode_norms:
-                n_norms += 1
-                norm_name = list(norm.keys())[0]
-                norm_value = list(norm.values())[0]
-                consequent = norm_name.split("THEN")[1].strip(",")
-                if consequent == "throw":
-                    norm_data = {"reward": norm_value["reward"], "numerosity": norm_value["numerosity"], "fitness": norm_value["fitness"]}
-                    cooperative_norms.append(norm_data)
-        # print("Total emerged norms:", n_norms, "Total cooperative norms:", len(cooperative_norms))
-        # if len(cooperative_norms) != 0 and n_norms != 0:
-        #     print("Proportion of cooperative norms for "+output_file+" is "+str((len(cooperative_norms)/n_norms)*100))
-        # else:
-        #     print(f"Proportion of cooperative norms for {output_file} is 0. Number of norms is {n_norms}")
+        for norm_name, norm_value in data.items():
+            n_norms += 1
+            if "throw" in norm_name:
+                norm_data = {"norm": norm_name, "reward": norm_value["reward"], "numerosity": norm_value["numerosity"], "fitness": norm_value["fitness"], "num_instances_across_episodes": norm_value["num_instances_across_episodes"]}
+                cooperative_norms.append(norm_data)
         n_cooperative_norms = len(cooperative_norms)
         df = pd.DataFrame(cooperative_norms)
         df.to_csv(output_file+"_cooperative_data.csv",index=False)
@@ -82,7 +76,6 @@ class NormProcessing():
         Returns:
             A dictionary containing the unique set of norms.
         """
-        filename = output_file+"_merged.txt"
         emerged_norms = {}
         for episode_number, episode_norms in data.items():
             #key is the episode number; value is the emerged norms from that episode
@@ -103,6 +96,8 @@ class NormProcessing():
                         emerged_norms[norm_name]["adoption"] += norm_data["adoption"]
                         emerged_norms[norm_name]["num_instances_across_episodes"] += 1
         emerged_norms = dict(sorted(emerged_norms.items(), key=lambda item: item[1]["fitness"], reverse=True))
+
+        filename = output_file+"_merged.json"
         with open(filename, "a+") as file:
             file.seek(0)
             if not file.read(1):

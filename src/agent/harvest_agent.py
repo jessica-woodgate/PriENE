@@ -83,7 +83,7 @@ class HarvestAgent(Agent):
         done, reward_vector = self._update_attributes(reward_vector)
         if self.write_norms:
             reward = np.sum(reward_vector).item()
-            self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day())
+            self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day(), self.model.episode)
             if ("no berries" in antecedent and action == "throw") or ("eat" in antecedent and self.actions[action] == "throw"):
                 raise ImpossibleNormException(self.unique_id, antecedent, self.actions[action], reward)
                 #print(self.model.episode, self.model.day, "agent", self.agent_id, antecedent, "reward", reward_vector, "berries", self.berries, "health", self.health)

@@ -360,6 +360,13 @@ class HarvestModel(Model):
                 file.write("}")
 
     def _check_emerged_norms(self):
+        """
+        function to check the current emerged norms at this step and update the norms that have emerged across the whole episode
+        for each agent, look at the norms in its behaviour base and store in current_emerged_norms
+        pass to update_norm to store a norm if it hasn't been seen before else to update it
+        filter emerged norms by emergence threshold
+        update norms emerged across the whole episode with the norms emerged at this step
+        """
         if len(self.living_agents) < 2:
             return
         emergence_threshold = len(self.living_agents) * self.societal_norm_emergence_threshold
@@ -367,13 +374,13 @@ class HarvestModel(Model):
         for agent in self.schedule.agents:
             if agent.agent_type != "berry":
                 for norm_name, norm_value in agent.norms_module.behaviour_base.items():
-                    current_emerged_norms = self._update_norm(norm_name, norm_value, current_emerged_norms, tracking_emergence=True)
+                    current_emerged_norms = self._update_norm(norm_name, norm_value, current_emerged_norms, tracking_adoption=True)
         #current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_threshold and norm_value["fitness"] >= self.min_fitness}
         current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_threshold}
         for norm_name, norm_value in current_emerged_norms.items():
             self.emerged_norms = self._update_norm(norm_name, norm_value, self.emerged_norms)
     
-    def _update_norm(self, norm_name, norm_value, norm_base, tracking_emergence=False):
+    def _update_norm(self, norm_name, norm_value, norm_base, tracking_adoption=False):
         if norm_name not in norm_base.keys():
             norm_base[norm_name] = {"reward": 0,
                                         "numerosity": 0,
@@ -383,8 +390,8 @@ class HarvestModel(Model):
         #number times it has been used by individual agents
         norm_base[norm_name]["numerosity"] += norm_value["numerosity"]
         norm_base[norm_name]["fitness"] += norm_value["fitness"]
-        #number of times it has been seen as an emerged norm in society
-        if tracking_emergence:
+        #number of times it has been adopted in the behaviour bases of individual agents in a society
+        if tracking_adoption:
             norm_base[norm_name]["adoption"] += 1
         else:
             norm_base[norm_name]["adoption"] += norm_value["adoption"]
