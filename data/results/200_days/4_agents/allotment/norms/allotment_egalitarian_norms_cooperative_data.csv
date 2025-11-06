@@ -1,42 +1,64 @@
 norm,reward,numerosity,fitness,num_instances_across_episodes
-"IF,medium berries,medium health,medium days,medium days,THEN,throw",23687.4,84900,869933.6100000001,153
-"IF,medium berries,high health,medium days,medium days,THEN,throw",10793.8,22804,620958.24,48
-"IF,medium berries,high health,medium days,high days,THEN,throw",3870.7000000000003,14349,233206.53000000003,39
-"IF,medium berries,medium health,high days,medium days,THEN,throw",3567.8000000000015,13666,126634.70999999996,46
-"IF,medium berries,medium health,medium days,medium days,low days,THEN,throw",10688.900000000005,21365,117836.4,59
-"IF,medium berries,medium health,low days,medium days,THEN,throw",6085.899999999997,12583,105644.55,43
-"IF,medium berries,high health,high days,medium days,THEN,throw",2120.2999999999997,5775,102408.50999999998,28
-"IF,medium berries,medium health,medium days,medium days,medium days,THEN,throw",5221.299999999998,20445,95211.36,56
-"IF,medium berries,medium health,low days,medium days,low days,THEN,throw",7867.200000000002,12372,72468.83999999995,41
-"IF,medium berries,medium health,low days,low days,low days,THEN,throw",10976.600000000006,15082,53001.030000000035,38
-"IF,medium berries,high health,high days,high days,THEN,throw",1101.7999999999997,4320,36211.77,12
-"IF,medium berries,medium health,low days,medium days,medium days,THEN,throw",3148.2999999999993,7283,31201.07999999998,25
-"IF,medium berries,medium health,medium days,THEN,throw",285.4,7234,21451.20000000002,18
-"IF,medium berries,medium health,medium days,low days,medium days,THEN,throw",1273.4999999999986,3187,20654.789999999994,12
-"IF,medium berries,high health,high days,THEN,throw",200.20000000000002,2742,11169.3,6
-"IF,medium berries,high health,high days,low days,THEN,throw",448.89999999999986,1079,10893.960000000008,4
-"IF,medium berries,medium health,medium days,high days,THEN,throw",409.2000000000002,3848,10233.69,18
-"IF,medium berries,high health,low days,medium days,THEN,throw",605.0999999999999,1311,9743.52,5
-"IF,medium berries,high health,low days,high days,THEN,throw",548.5999999999997,1550,9655.710000000006,11
-"IF,medium berries,medium health,high days,low days,THEN,throw",644.1999999999995,1576,6881.400000000005,7
-"IF,medium berries,medium health,medium days,low days,low days,THEN,throw",1393.3999999999987,1986,5175.960000000005,8
-"IF,medium berries,medium health,medium days,low days,THEN,throw",310.40000000000003,1050,5151.929999999997,5
-"IF,medium berries,medium health,low days,low days,medium days,THEN,throw",644.7,1295,5107.590000000004,5
-"IF,medium berries,high health,medium days,medium days,low days,THEN,throw",405.19999999999965,496,4111.44,3
+"IF,medium berries,medium health,medium days,medium days,THEN,throw",23504.300000000003,113059,833420.4899999999,222
+"IF,medium berries,high health,medium days,medium days,THEN,throw",11005.0,24378,617493.78,58
+"IF,medium berries,high health,medium days,high days,THEN,throw",4441.8,22306,194365.02000000008,64
+"IF,medium berries,medium health,medium days,medium days,low days,THEN,throw",17221.100000000002,34907,117836.4,121
+"IF,medium berries,high health,high days,medium days,THEN,throw",2524.0000000000005,8102,99442.07999999997,38
+"IF,medium berries,medium health,low days,medium days,THEN,throw",9218.299999999997,23467,99217.59,93
+"IF,medium berries,medium health,high days,medium days,THEN,throw",4405.700000000002,23349,95237.39999999994,88
+"IF,medium berries,medium health,medium days,medium days,medium days,THEN,throw",7504.799999999994,26848,95211.36,86
+"IF,medium berries,medium health,low days,medium days,low days,THEN,throw",16039.300000000007,24661,72468.83999999995,112
+"IF,medium berries,medium health,low days,low days,low days,THEN,throw",18770.600000000013,26694,53001.030000000035,108
+"IF,medium berries,high health,high days,high days,THEN,throw",1065.9999999999995,5722,33917.67,14
+"IF,medium berries,medium health,low days,medium days,medium days,THEN,throw",6438.000000000004,15128,31201.07999999998,63
+"IF,medium berries,medium health,medium days,low days,medium days,THEN,throw",3178.199999999998,8306,20654.789999999994,41
+"IF,medium berries,high health,high days,low days,THEN,throw",619.8,1638,10773.09000000001,12
+"IF,medium berries,high health,low days,medium days,THEN,throw",618.0999999999999,1591,9729.12,8
+"IF,medium berries,high health,low days,high days,THEN,throw",833.3999999999995,2862,9084.960000000006,24
+"IF,medium berries,medium health,high days,low days,THEN,throw",1060.6999999999994,2721,6531.720000000005,17
+"IF,medium berries,medium health,medium days,low days,low days,THEN,throw",4108.400000000001,6212,5175.960000000005,29
+"IF,medium berries,medium health,low days,low days,medium days,THEN,throw",3371.500000000001,5163,5107.590000000004,33
+"IF,medium berries,medium health,medium days,low days,THEN,throw",1094.7999999999995,5152,4309.739999999997,30
+"IF,medium berries,high health,medium days,medium days,low days,THEN,throw",786.1999999999997,998,4111.44,8
 "IF,medium berries,high health,medium days,low days,THEN,throw",417.0999999999995,679,3567.6600000000008,2
-"IF,medium berries,medium health,high days,high days,THEN,throw",136.69999999999993,1281,3514.8599999999997,7
-"IF,medium berries,medium health,high days,medium days,medium days,THEN,throw",271.70000000000005,917,2873.1299999999956,4
-"IF,medium berries,medium health,low days,low days,THEN,throw",602.9999999999995,1500,2862.54,6
-"IF,medium berries,high health,medium days,low days,medium days,THEN,throw",67.19999999999997,96,1924.5600000000009,1
-"IF,medium berries,medium health,medium days,high days,low days,THEN,throw",145.59999999999974,364,1834.560000000003,1
-"IF,medium berries,high health,low days,medium days,low days,THEN,throw",264.50000000000057,345,1738.799999999995,1
-"IF,medium berries,medium health,medium days,high days,medium days,THEN,throw",23.400000000000006,78,1726.9199999999992,1
-"IF,medium berries,medium health,low days,high days,THEN,throw",46.20000000000001,718,733.05,4
-"IF,medium berries,medium health,high days,medium days,low days,THEN,throw",58.800000000000054,196,533.6099999999996,1
-"IF,medium berries,medium health,high days,low days,medium days,THEN,throw",29.900000000000006,39,505.44,1
-"IF,medium berries,medium health,medium days,medium days,high days,THEN,throw",28.70000000000001,183,312.24,2
+"IF,medium berries,medium health,high days,high days,THEN,throw",131.89999999999992,1425,3320.4599999999996,8
+"IF,medium berries,medium health,high days,medium days,medium days,THEN,throw",532.5000000000002,2141,2873.1299999999956,12
+"IF,medium berries,high health,medium days,low days,medium days,THEN,throw",160.79999999999995,216,1924.5600000000009,3
+"IF,medium berries,medium health,medium days,high days,low days,THEN,throw",373.79999999999984,762,1834.560000000003,4
+"IF,medium berries,high health,low days,medium days,low days,THEN,throw",376.9000000000005,481,1738.799999999995,3
+"IF,medium berries,medium health,medium days,high days,medium days,THEN,throw",345.8000000000001,870,1726.9199999999992,7
+"IF,medium berries,medium health,low days,low days,THEN,throw",1687.0999999999983,5347,1401.2399999999989,26
+"IF,medium berries,medium health,high days,medium days,low days,THEN,throw",77.00000000000003,378,533.6099999999996,2
+"IF,medium berries,medium health,high days,low days,medium days,THEN,throw",119.50000000000001,239,505.44,5
+"IF,medium berries,medium health,medium days,medium days,high days,THEN,throw",216.49999999999994,921,312.24,7
 "IF,medium berries,medium health,low days,high days,low days,THEN,throw",133.0999999999997,363,261.35999999999973,1
 "IF,medium berries,high health,low days,high days,medium days,THEN,throw",82.79999999999994,108,233.2799999999999,1
-"IF,medium berries,medium health,low days,high days,medium days,THEN,throw",70.59999999999998,114,133.7999999999999,2
-"IF,medium berries,high health,low days,medium days,medium days,THEN,throw",45.59999999999998,72,129.60000000000005,1
-"IF,medium berries,high health,medium days,THEN,throw",10.0,90,75.39000000000001,1
+"IF,medium berries,medium health,low days,high days,medium days,THEN,throw",190.59999999999997,354,133.7999999999999,4
+"IF,medium berries,high health,low days,medium days,medium days,THEN,throw",88.99999999999996,134,129.60000000000005,2
+"IF,high berries,medium health,medium days,THEN,throw",-13.999999999999982,140,0.0,1
+"IF,medium berries,medium health,low days,medium days,high days,THEN,throw",43.80000000000001,126,0.0,2
+"IF,medium berries,high health,low days,low days,high days,THEN,throw",196.20000000000027,218,0.0,1
+"IF,medium berries,high health,medium days,high days,low days,THEN,throw",13.0,26,0.0,1
+"IF,medium berries,high health,medium days,medium days,medium days,THEN,throw",95.19999999999992,112,0.0,2
+"IF,medium berries,low health,medium days,low days,low days,THEN,throw",-23.199999999999992,232,-0.72,4
+"IF,medium berries,low health,high days,low days,THEN,throw",-1.8000000000000003,18,-0.72,1
+"IF,medium berries,medium health,low days,THEN,throw",38.29999999999997,167,-9.48,2
+"IF,medium berries,low health,high days,medium days,medium days,THEN,throw",-2.8,28,-10.920000000000002,1
+"IF,medium berries,low health,high days,high days,low days,THEN,throw",-19.199999999999996,192,-25.919999999999973,1
+"IF,medium berries,low health,medium days,high days,medium days,THEN,throw",-43.200000000000045,362,-39.53999999999998,2
+"IF,medium berries,low health,low days,medium days,medium days,THEN,throw",-287.6999999999998,2877,-143.8799999999996,17
+"IF,medium berries,low health,medium days,medium days,THEN,throw",-66.69999999999996,377,-159.12000000000006,3
+"IF,medium berries,low health,high days,high days,THEN,throw",-14.399999999999995,144,-162.0,1
+"IF,medium berries,medium health,low days,high days,THEN,throw",125.60000000000007,2806,-176.51999999999964,18
+"IF,medium berries,low health,medium days,medium days,low days,THEN,throw",-259.0,1460,-211.32000000000008,8
+"IF,medium berries,low health,medium days,low days,medium days,THEN,throw",-155.89999999999984,1559,-278.75999999999965,4
+"IF,medium berries,low health,low days,low days,medium days,THEN,throw",-274.59999999999957,2746,-294.5999999999996,15
+"IF,medium berries,low health,low days,medium days,low days,THEN,throw",-238.5999999999998,2386,-459.4499999999997,17
+"IF,medium berries,low health,medium days,medium days,medium days,THEN,throw",-2316.999999999998,22260,-7027.019999999997,68
+"IF,medium berries,medium health,medium days,high days,THEN,throw",231.90000000000012,11305,-7660.290000000004,52
+"IF,medium berries,low health,high days,medium days,THEN,throw",-645.5000000000001,2755,-13176.69,13
+"IF,medium berries,medium health,high days,THEN,throw",-78.20000000000006,952,-20787.180000000004,1
+"IF,medium berries,low health,low days,low days,low days,THEN,throw",-8499.599999999997,83436,-129415.2600000001,162
+"IF,medium berries,high health,medium days,THEN,throw",-261.5000000000001,8903,-161745.45,11
+"IF,medium berries,high health,high days,THEN,throw",-1024.7,18271,-252453.62999999992,39
+"IF,medium berries,medium health,medium days,THEN,throw",-1513.9000000000008,30875,-323163.05999999994,47

@@ -28,26 +28,32 @@ class DataAnalysis():
         self.principles = principles
         self.aggregations = aggregations
         #if need to analyse data
-        # if end_episode_totals_dfs == None:
-        #     end_episode_totals_dfs, agent_final_rows_dfs, normalised_df_list, self.best_aggregation = self._process_agent_dfs(agent_df_list, df_labels, write, get_normalised)
+        if end_episode_totals_dfs == None:
+            end_episode_totals_dfs, agent_final_rows_dfs, normalised_df_list, self.best_aggregation = self._process_agent_dfs(agent_df_list, df_labels, write, get_normalised)
         # else:
         #     #if data has already been analysed
         #     agent_final_rows_dfs = agent_df_list
         # if write:
         #     self._display_graphs(agent_final_rows_dfs, end_episode_totals_dfs, df_labels, normalised_df_list)
-        # self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "principles")
-        # self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "principles")
-        # self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "aggregations")
-        # self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "aggregations")
+        #exclude_list = ["agent_id", "episode", "action"]
+        # self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "principles", exclude_list)
+        # self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "principles", exclude_list)
+        # self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "aggregations", exclude_list)
+        # self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "aggregations",exclude_list)
         if process_norms:
             norm_processing = NormProcessing()
-            cooperative_norm_dfs, cooperative_tendencies, emerged_norms_proportions = norm_processing.process_norms(df_labels, scenario, norms_filepath, self.filepath)
+            episode_norm_dfs, cooperative_norm_dfs, norms_tendencies, emerged_norms_proportions = norm_processing.process_norms(df_labels, scenario, norms_filepath, self.filepath)
+            exclude_list = ["episode"]
+            self._test_all_variables_significance(episode_norm_dfs, df_labels, "episode_norm", "principles", exclude_list)
             # self._display_swarm_plot(cooperative_norm_dfs,df_labels, "numerosity", self.filepath+"cooperative_numerosity")
             # self._display_swarm_plot(cooperative_norm_dfs,df_labels, "fitness", self.filepath+"cooperative_fitness")
             # self._display_swarm_plot(cooperative_norm_dfs,df_labels, "reward", self.filepath+"cooperative_reward")
-            self._display_norm_data(cooperative_norm_dfs, df_labels, self.filepath+"cooperative_norms")
-            self._write_dictionary_to_file(cooperative_tendencies,self.filepath+"cooperative_norms_tendencies.csv")
-            self._write_dictionary_to_file(emerged_norms_proportions,self.filepath+"emerged_norms_proportions.csv")
+            # self._display_swarmplot(episode_norm_dfs,df_labels, "proportion", self.filepath+"swarm_norms_cooperative_proportion")
+            # self._display_swarmplot(episode_norm_dfs,df_labels, "total_norms", self.filepath+"swarm_norms_total")
+            # self._display_swarmplot(episode_norm_dfs,df_labels, "cooperative_norms", self.filepath+"swarm_norms_cooperative")
+            #self._display_norm_data(episode_norm_dfs, df_labels, self.filepath+"cooperative_norms")
+            self._write_dictionary_to_file(norms_tendencies,self.filepath+"norms_tendencies.csv")
+            # self._write_dictionary_to_file(emerged_norms_proportions,self.filepath+"emerged_norms_proportions.csv")
 
     def _process_agent_dfs(self, agent_df_list, df_labels, write, get_normalised):
         end_episode_totals_df_list = []
@@ -195,7 +201,7 @@ class DataAnalysis():
         # with open(self.filepath+"tendency_berries_consumed.json", "w") as f:
         #     json.dump(berries_consumed_tendency, f, indent=4)
 
-    def _display_swarm_plot(self, df_list, df_labels, column, filename):
+    def _display_stripplot(self, df_list, df_labels, column, filename):
         fig, ax = plt.subplots()
         #combine the DataFrames and add labels
         combined_df = pd.concat([df.assign(label=label) for df, label in zip(df_list, df_labels)])
@@ -203,7 +209,33 @@ class DataAnalysis():
         sns.stripplot(data=combined_df, x=column, y='label', ax=ax, size=2, hue='label', dodge=True, alpha=0.6)
         plt.xlabel(column)
         plt.ylabel('Society')
+        plt.title('Strip Plot of ' + column + ' by Society')
+        plt.tight_layout()
+        plt.savefig(str(filename).split()[0])
+        plt.close(fig)
+    
+    def _display_swarmplot(self, df_list, df_labels, column, filename):
+        fig, ax = plt.subplots()
+        #combine the DataFrames and add labels
+        combined_df = pd.concat([df.assign(label=label) for df, label in zip(df_list, df_labels)])
+        #plot the swarm plot with reduced marker size
+        sns.swarmplot(data=combined_df, x=column, y='label', ax=ax, size=2, hue='label', dodge=True, alpha=0.6)
+        plt.xlabel(column)
+        plt.ylabel('Society')
         plt.title('Swarm Plot of ' + column + ' by Society')
+        plt.tight_layout()
+        plt.savefig(str(filename).split()[0])
+        plt.close(fig)
+    
+    def _display_scatterplot(self, df_list, df_labels, column, filename):
+        fig, ax = plt.subplots()
+        #combine the DataFrames and add labels
+        combined_df = pd.concat([df.assign(label=label) for df, label in zip(df_list, df_labels)])
+        #plot the swarm plot with reduced marker size
+        sns.scatterplot(data=combined_df, x=column, y='label', ax=ax, size=2, hue='label')
+        plt.xlabel(column)
+        plt.ylabel('Society')
+        plt.title('Scatter Plot of ' + column + ' by Society')
         plt.tight_layout()
         plt.savefig(str(filename).split()[0])
         plt.close(fig)
@@ -220,6 +252,20 @@ class DataAnalysis():
         plt.tight_layout()
         plt.savefig(str(filename+"_scatter").split()[0])
         plt.close()
+        # agg = pd.concat(
+        #     [df.assign(society=label) for df, label in zip(df_list, df_labels)],
+        #     ignore_index=True
+        # )[['society', 'fitness', 'num_instances_across_episodes']]
+        # sns.jointplot(data=agg, x='fitness', y='num_instances_across_episodes', hue='society')
+        # plt.title("Societies positioned by mean Fitness and Num Instances")
+        # plt.tight_layout()
+        # plt.savefig(str(filename+"jointplot").split()[0])
+        # plt.close()
+        # sns.kdeplot(data=agg, x='fitness', y='num_instances_across_episodes', hue='society', fill=True)
+        # plt.title("Societies positioned by mean Fitness and Num Instances")
+        # plt.tight_layout()
+        # plt.savefig(str(filename+"kdeplot").split()[0])
+        # plt.close()
     
     def _display_end_episode(self, df_list, df_labels):
         self._display_violin_plot_df_list(df_list, df_labels, "gini_days_survived", self.filepath+"gini_days_survived", "Violin Plot of Gini Days Survived", "Days Survived")
@@ -415,10 +461,9 @@ class DataAnalysis():
             self._write_dictionary_to_file(best_results,self.filepath+"best_results_"+run_type+".csv")
         return most_common_best_summary
 
-    def _test_all_variables_significance(self, dfs, df_labels, df_type, agent_types):
+    def _test_all_variables_significance(self, dfs, df_labels, df_type, agent_types, exclude_list):
         dfs, df_labels = self._extract_relevant_dfs(dfs, df_labels, agent_types)
         variables = dfs[0].columns
-        exclude_list = ["agent_id", "episode", "action"]
         variables = [var for var in variables if var not in exclude_list]
         for dependent_variable in variables:
             if not np.issubdtype(dfs[0][dependent_variable].dtype, np.number):

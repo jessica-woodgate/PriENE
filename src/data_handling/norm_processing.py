@@ -9,8 +9,9 @@ class NormProcessing():
         self.min_reward = 50
     
     def process_norms(self, df_labels, scenario, norms_filepath, write_filepath):
+        episode_norm_dfs = []
         cooperative_dfs = []
-        cooperative_tendencies = []
+        norms_tendencies = []
         emerged_norms_proportions = {"society": [],
                                      "num_emerged_norms": [],
                                      "num_cooperative_norms": [],
@@ -18,14 +19,15 @@ class NormProcessing():
         for label in df_labels:
             input_file = norms_filepath+label+"_emerged_norms.json"
             output_file = write_filepath+scenario+"_"+label+"_norms"
-            cooperative_data, n_norms, n_cooperative_norms = self._process_society_norms(input_file, output_file, filter_fitness=True)
-            cooperative_dfs.append(cooperative_data)
-            cooperative_tendencies.append(self._calculate_norms_tendency(cooperative_data, label))
+            episode_norm_data, cooperative_norms, n_norms, n_cooperative_norms = self._process_society_norms(input_file, output_file, filter_fitness=False)
+            episode_norm_dfs.append(episode_norm_data)
+            cooperative_dfs.append(cooperative_norms)
+            norms_tendencies.append(self._calculate_norms_central_tendency(episode_norm_data, label))
             emerged_norms_proportions["society"].append(label)
             emerged_norms_proportions["num_emerged_norms"].append(n_norms)
             emerged_norms_proportions["num_cooperative_norms"].append(n_cooperative_norms)
             emerged_norms_proportions["proportion_cooperative"].append((n_cooperative_norms/n_norms)*100 if n_norms > 0 else 0)
-        return cooperative_dfs, cooperative_tendencies, emerged_norms_proportions
+        return episode_norm_dfs, cooperative_dfs, norms_tendencies, emerged_norms_proportions
 
     def _process_society_norms(self, input_file, output_file, filter_fitness=False):
         f = open(input_file)
@@ -42,15 +44,52 @@ class NormProcessing():
                 if filtered_rules:
                     filtered_data[society_id] = filtered_rules
             norm_data = filtered_data
+        #counts total norms, cooperative norms, and proportion of cooperative norms for each episode
+        episode_norm_data = self._count_norms(norm_data, output_file)
         #merges norms repeated across episodes and writes unique norms to file
         merged_norms = self._merge_norms(norm_data, output_file)
         #looks at all the merged norms and collects data for the cooperative norms
-        cooperative_data, n_norms, n_cooperative_norms = self._count_cooperative_norms(merged_norms, output_file)
+        cooperative_norms, n_norms, n_cooperative_norms = self._get_cooperative_norms(merged_norms, output_file)
         #self._generalise_norms(merged_norms.keys(), output_file)
         #self._generalise_norms(merged_norms.keys(), output_file, cooperative_norms=True)
-        return cooperative_data, n_norms, n_cooperative_norms
+        return episode_norm_data, cooperative_norms, n_norms, n_cooperative_norms
     
-    def _count_cooperative_norms(self, data, output_file):
+    def _count_norms(self, data, output_file):
+        df = {"episode": [],
+                        "total_norms": [],
+                        "cooperative_norms": [],
+                        "proportion": [],
+                        "reward": [],
+                        "numerosity": [],
+                        "fitness": []}
+        for episode, rules in data.items():
+            n_episode = str(episode)
+            total_norms = len(rules)
+            cooperative_norms = 0
+            reward = 0
+            numerosity = 0
+            fitness = 0
+            if total_norms != 0:
+                cooperative_norms = 0
+                for rule in rules:
+                    for norm_name, norm_value in rule.items():
+                        reward += norm_value["reward"]
+                        numerosity += norm_value["numerosity"]
+                        fitness += norm_value["fitness"]
+                        if "throw" in norm_name:
+                            cooperative_norms += 1
+            df["episode"].append(n_episode)
+            df["total_norms"].append(total_norms)
+            df["cooperative_norms"].append(cooperative_norms)
+            df["proportion"].append((cooperative_norms/total_norms)*100 if cooperative_norms > 0 and total_norms > 0 else 0)
+            df["reward"].append(reward)
+            df["numerosity"].append(numerosity)
+            df["fitness"].append(fitness)
+        df = pd.DataFrame(df)
+        df.to_csv(output_file+"_emerged_norms_data.csv", index=False)
+        return df
+    
+    def _get_cooperative_norms(self, data, output_file):
         cooperative_norms = []
         n_norms = 0
         for norm_name, norm_value in data.items():
@@ -211,30 +250,59 @@ class NormProcessing():
                 output += f"{indent}{key}: {value}\n"
         return output
     
-    def _calculate_norms_tendency(self, df, df_label):
-        if "reward" in df.columns:
-            central_tendency = {"df_label": df_label,
+    def _calculate_norms_central_tendency(self, df, df_label):
+        central_tendency = {"df_label": df_label,
+                            "total_norms_mean": df["total_norms"].mean(),
+                            "total_norms_median": df["total_norms"].median(),
+                            "total_norms_stdev": df["total_norms"].std(),
+                            "total_norms_summary": (df["total_norms"].mean() + df["total_norms"].median()) - df["total_norms"].std(),
+                            "cooperative_norms_mean": df["cooperative_norms"].mean(),
+                            "cooperative_norms_median": df["cooperative_norms"].median(),
+                            "cooperative_norms_stdev": df["cooperative_norms"].std(),
+                            "cooperative_norms_summary": (df["cooperative_norms"].mean() + df["cooperative_norms"].median()) - df["cooperative_norms"].std(),
+                            "proportion_mean": df["proportion"].mean(),
+                            "proportion_median": df["proportion"].median(),
+                            "proportion_stdev": df["proportion"].std(),
+                            "proportion_summary": (df["proportion"].mean() + df["proportion"].median()) - df["proportion"].std(),
                             "reward_mean": df["reward"].mean(),
                             "reward_median": df["reward"].median(),
                             "reward_stdev": df["reward"].std(),
+                            "reward_summary": (df["reward"].mean() + df["reward"].median()) - df["reward"].std(),
                             "numerosity_mean": df["numerosity"].mean(),
                             "numerosity_median": df["numerosity"].median(),
                             "numerosity_stdev": df["numerosity"].std(),
+                            "numerosity_summary": (df["numerosity"].mean() + df["numerosity"].median()) - df["numerosity"].std(),
                             "fitness_mean": df["fitness"].mean(),
                             "fitness_median": df["fitness"].median(),
                             "fitness_stdev": df["fitness"].std(),
-                            }
-        else:
-            #no cooperative norms found
-            central_tendency = {"df_label": df_label,
-                            "reward_mean": 0,
-                            "reward_median": 0,
-                            "reward_stdev": 0,
-                            "numerosity_mean": 0,
-                            "numerosity_median": 0,
-                            "numerosity_stdev": 0,
-                            "fitness_mean": 0,
-                            "fitness_median": 0,
-                            "fitness_stdev": 0,
+                            "fitness_summary": (df["fitness"].mean() + df["fitness"].median()) - df["fitness"].std()
                             }
         return central_tendency
+    
+    # def _calculate_norms_tendency(self, df, df_label):
+    #     if "reward" in df.columns:
+    #         central_tendency = {"df_label": df_label,
+    #                         "reward_mean": df["reward"].mean(),
+    #                         "reward_median": df["reward"].median(),
+    #                         "reward_stdev": df["reward"].std(),
+    #                         "numerosity_mean": df["numerosity"].mean(),
+    #                         "numerosity_median": df["numerosity"].median(),
+    #                         "numerosity_stdev": df["numerosity"].std(),
+    #                         "fitness_mean": df["fitness"].mean(),
+    #                         "fitness_median": df["fitness"].median(),
+    #                         "fitness_stdev": df["fitness"].std(),
+    #                         }
+    #     else:
+    #         #no cooperative norms found
+    #         central_tendency = {"df_label": df_label,
+    #                         "reward_mean": 0,
+    #                         "reward_median": 0,
+    #                         "reward_stdev": 0,
+    #                         "numerosity_mean": 0,
+    #                         "numerosity_median": 0,
+    #                         "numerosity_stdev": 0,
+    #                         "fitness_mean": 0,
+    #                         "fitness_median": 0,
+    #                         "fitness_stdev": 0,
+    #                         }
+    #     return central_tendency
