@@ -15,7 +15,7 @@ class NormProcessing():
         for label in df_labels:
             input_file = norms_filepath+label+"_emerged_norms.json"
             output_file = write_filepath+scenario+"_"+label+"_norms"
-            episode_norm_data, cooperative_norms, n_norms, n_cooperative_norms = self._process_society_norms(input_file, output_file, filter_fitness=False)
+            episode_norm_data, cooperative_norms = self._process_society_norms(input_file, output_file, filter_fitness=False)
             episode_norm_dfs.append(episode_norm_data)
             cooperative_dfs.append(cooperative_norms)
             norms_tendencies.append(self._calculate_norms_central_tendency(episode_norm_data, label))
@@ -41,10 +41,10 @@ class NormProcessing():
         #merges norms repeated across episodes and writes unique norms to file
         merged_norms = self._merge_norms(norm_data, output_file)
         #looks at all the merged norms and collects data for the cooperative norms
-        cooperative_norms, n_norms, n_cooperative_norms = self._get_cooperative_norms(merged_norms, output_file)
+        cooperative_norms = self._get_cooperative_norms(merged_norms, output_file)
         #self._generalise_norms(merged_norms.keys(), output_file)
         #self._generalise_norms(merged_norms.keys(), output_file, cooperative_norms=True)
-        return episode_norm_data, cooperative_norms, n_norms, n_cooperative_norms
+        return episode_norm_data, cooperative_norms
     
     def _count_norms(self, data, output_file):
         df = {"episode": [],
@@ -83,16 +83,13 @@ class NormProcessing():
     
     def _get_cooperative_norms(self, data, output_file):
         cooperative_norms = []
-        n_norms = 0
         for norm_name, norm_value in data.items():
-            n_norms += 1
             if "throw" in norm_name:
                 norm_data = {"norm": norm_name, "reward": norm_value["reward"], "numerosity": norm_value["numerosity"], "fitness": norm_value["fitness"], "num_instances_across_episodes": norm_value["num_instances_across_episodes"]}
                 cooperative_norms.append(norm_data)
-        n_cooperative_norms = len(cooperative_norms)
         df = pd.DataFrame(cooperative_norms)
         df.to_csv(output_file+"_cooperative_data.csv",index=False)
-        return df, n_norms, n_cooperative_norms
+        return df
 
     def _merge_norms(self,data,output_file):
         """
