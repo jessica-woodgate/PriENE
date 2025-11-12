@@ -40,20 +40,19 @@ class DataAnalysis():
         self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "principles", exclude_list)
         self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "aggregations", exclude_list)
         self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "aggregations",exclude_list)
-        if process_norms:
+        if process_norms and write:
             norm_processing = NormProcessing()
             episode_norm_dfs, cooperative_norm_dfs, norms_tendencies, emerged_norms_proportions = norm_processing.process_norms(df_labels, scenario, norms_filepath, self.filepath)
             exclude_list = ["episode"]
             self._test_all_variables_significance(episode_norm_dfs, df_labels, "episode_norm", "principles", exclude_list)
-            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "numerosity", self.filepath+"cooperative_numerosity")
-            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "fitness", self.filepath+"cooperative_fitness")
-            self._display_swarm_plot(cooperative_norm_dfs,df_labels, "reward", self.filepath+"cooperative_reward")
+            self._display_swarmplot(cooperative_norm_dfs,df_labels, "numerosity", self.filepath+"cooperative_numerosity")
+            self._display_swarmplot(cooperative_norm_dfs,df_labels, "fitness", self.filepath+"cooperative_fitness")
+            self._display_swarmplot(cooperative_norm_dfs,df_labels, "reward", self.filepath+"cooperative_reward")
             self._display_swarmplot(episode_norm_dfs,df_labels, "proportion", self.filepath+"swarm_norms_cooperative_proportion")
             self._display_swarmplot(episode_norm_dfs,df_labels, "total_norms", self.filepath+"swarm_norms_total")
             self._display_swarmplot(episode_norm_dfs,df_labels, "cooperative_norms", self.filepath+"swarm_norms_cooperative")
             self._display_norm_data(episode_norm_dfs, df_labels, self.filepath+"cooperative_norms")
             self._write_dictionary_to_file(norms_tendencies,self.filepath+"norms_tendencies.csv")
-            self._write_dictionary_to_file(emerged_norms_proportions,self.filepath+"emerged_norms_proportions.csv")
 
     def _process_agent_dfs(self, agent_df_list, df_labels, write, get_normalised):
         end_episode_totals_df_list = []
