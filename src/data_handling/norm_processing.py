@@ -12,10 +12,6 @@ class NormProcessing():
         episode_norm_dfs = []
         cooperative_dfs = []
         norms_tendencies = []
-        emerged_norms_proportions = {"society": [],
-                                     "num_emerged_norms": [],
-                                     "num_cooperative_norms": [],
-                                     "proportion_cooperative": []}
         for label in df_labels:
             input_file = norms_filepath+label+"_emerged_norms.json"
             output_file = write_filepath+scenario+"_"+label+"_norms"
@@ -23,11 +19,7 @@ class NormProcessing():
             episode_norm_dfs.append(episode_norm_data)
             cooperative_dfs.append(cooperative_norms)
             norms_tendencies.append(self._calculate_norms_central_tendency(episode_norm_data, label))
-            emerged_norms_proportions["society"].append(label)
-            emerged_norms_proportions["num_emerged_norms"].append(n_norms)
-            emerged_norms_proportions["num_cooperative_norms"].append(n_cooperative_norms)
-            emerged_norms_proportions["proportion_cooperative"].append((n_cooperative_norms/n_norms)*100 if n_norms > 0 else 0)
-        return episode_norm_dfs, cooperative_dfs, norms_tendencies, emerged_norms_proportions
+        return episode_norm_dfs, cooperative_dfs, norms_tendencies
 
     def _process_society_norms(self, input_file, output_file, filter_fitness=False):
         f = open(input_file)
