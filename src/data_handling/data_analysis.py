@@ -394,9 +394,6 @@ class DataAnalysis():
                             }
         return central_tendency
     
-    def _calculate_normalised_central_tendency(self, df, df_labels):
-        pass
-    
     def _get_best_results(self, df, run_type, best_aggregation=None):
         best_results = []
         test_names = []
