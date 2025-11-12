@@ -251,20 +251,6 @@ class DataAnalysis():
         plt.tight_layout()
         plt.savefig(str(filename+"_scatter").split()[0])
         plt.close()
-        # agg = pd.concat(
-        #     [df.assign(society=label) for df, label in zip(df_list, df_labels)],
-        #     ignore_index=True
-        # )[['society', 'fitness', 'num_instances_across_episodes']]
-        # sns.jointplot(data=agg, x='fitness', y='num_instances_across_episodes', hue='society')
-        # plt.title("Societies positioned by mean Fitness and Num Instances")
-        # plt.tight_layout()
-        # plt.savefig(str(filename+"jointplot").split()[0])
-        # plt.close()
-        # sns.kdeplot(data=agg, x='fitness', y='num_instances_across_episodes', hue='society', fill=True)
-        # plt.title("Societies positioned by mean Fitness and Num Instances")
-        # plt.tight_layout()
-        # plt.savefig(str(filename+"kdeplot").split()[0])
-        # plt.close()
     
     def _display_end_episode(self, df_list, df_labels):
         self._display_violin_plot_df_list(df_list, df_labels, "gini_days_survived", self.filepath+"gini_days_survived", "Violin Plot of Gini Days Survived", "Days Survived")
@@ -407,9 +393,6 @@ class DataAnalysis():
                             "total_berries_summary": (df["total_berries"].mean() + df["total_berries"].median()) - df["total_berries"].std(),
                             }
         return central_tendency
-    
-    def _calculate_normalised_central_tendency(self, df, df_labels):
-        pass
     
     def _get_best_results(self, df, run_type, best_aggregation=None):
         best_results = []

@@ -267,31 +267,3 @@ class NormProcessing():
                             "fitness_summary": (df["fitness"].mean() + df["fitness"].median()) - df["fitness"].std()
                             }
         return central_tendency
-    
-    # def _calculate_norms_tendency(self, df, df_label):
-    #     if "reward" in df.columns:
-    #         central_tendency = {"df_label": df_label,
-    #                         "reward_mean": df["reward"].mean(),
-    #                         "reward_median": df["reward"].median(),
-    #                         "reward_stdev": df["reward"].std(),
-    #                         "numerosity_mean": df["numerosity"].mean(),
-    #                         "numerosity_median": df["numerosity"].median(),
-    #                         "numerosity_stdev": df["numerosity"].std(),
-    #                         "fitness_mean": df["fitness"].mean(),
-    #                         "fitness_median": df["fitness"].median(),
-    #                         "fitness_stdev": df["fitness"].std(),
-    #                         }
-    #     else:
-    #         #no cooperative norms found
-    #         central_tendency = {"df_label": df_label,
-    #                         "reward_mean": 0,
-    #                         "reward_median": 0,
-    #                         "reward_stdev": 0,
-    #                         "numerosity_mean": 0,
-    #                         "numerosity_median": 0,
-    #                         "numerosity_stdev": 0,
-    #                         "fitness_mean": 0,
-    #                         "fitness_median": 0,
-    #                         "fitness_stdev": 0,
-    #                         }
-    #     return central_tendency
