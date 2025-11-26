@@ -37,3 +37,22 @@ The following arguments can be used with the `run.py` script:
 - `train`: Train the norm-learning agent.
 - `test`: Evaluate the performance of the trained agent.
 - `graphs`: Generate relevant plots for analysis.
+
+## Citation
+
+If you use this code in your research, please cite our paper:
+
+```bibtex
+@inproceedings{Woodgate+Ajmeri2025Combining
+doi = {10.5555/3709347.3744013},
+author = {Woodgate, Jessica and Ajmeri, Nirav},
+title = {Combining Normative Ethics Principles to Learn Prosocial Behaviour},
+year = {2025},
+isbn = {9798400714269},
+publisher = {International Foundation for Autonomous Agents and Multiagent Systems},
+booktitle = {Proceedings of the 24th International Conference on Autonomous Agents and Multiagent Systems ({AAMAS})},
+pages = {2789--2791},
+numpages = {3},
+address = {Detroit},
+series = {AAMAS '25}
+}
