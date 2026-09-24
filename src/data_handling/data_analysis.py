@@ -448,7 +448,7 @@ class DataAnalysis():
         variables = dfs[0].columns
         variables = [var for var in variables if var not in exclude_list]
         for dependent_variable in variables:
-            if not np.issubdtype(dfs[0][dependent_variable].dtype, np.number):
+            if not pd.api.types.is_numeric_dtype(dfs[0][dependent_variable]):
                 #skip non-numeric variables
                 continue
             anova_table, tukey_results, anova, tukey, cohens_results = self._perform_anova(dfs, df_labels, dependent_variable)
@@ -478,7 +478,7 @@ class DataAnalysis():
             anova_table = sm.stats.anova_lm(model, typ=2)
         except Exception as e:
             print(f"Exception during ANOVA test for {dependent_variable}: {e}")
-            return None, None, False, False
+            return None, None, False, False, None
         try:
             #perform Tukey's HSD post-hoc test used after a significant anova to determine which specific groups are significantly different
             tukey_results = pairwise_tukeyhsd(combined_df[dependent_variable], combined_df["society"], alpha=0.05)
@@ -486,7 +486,7 @@ class DataAnalysis():
             return anova_table, tukey_results, True, True, cohens_d_df
         except Exception as e:
             print(f"Exception during post hoc test for {dependent_variable}: {e}")
-            return anova_table, None, True, False,0
+            return anova_table, None, True, False, 0, None
     
     def _compute_pairwise_cohens_d(self, combined_df, dependent_variable):
         groups = combined_df["society"].unique()

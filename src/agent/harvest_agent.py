@@ -251,7 +251,7 @@ class HarvestAgent(Agent):
                    "insufficient_health": -0.2,
                    "neutral_reward": 0,
                    "throw": 0.5,
-                   "forage": 1,
+                   "forage": 0.5,
                    "eat": 1,
                    "survive": 1
                    }
@@ -265,7 +265,7 @@ class HarvestAgent(Agent):
                    "neutral_reward": 0,
                    "sanction": 0.4,
                    "throw": 0.5,
-                   "forage": 0.8,
+                   "forage": 0.5,
                    "eat": 0.8,
                    "survive": 1
                    }

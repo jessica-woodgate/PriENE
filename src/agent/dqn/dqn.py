@@ -25,7 +25,7 @@ class DQN:
         optimiser -- learning optimiser
         delta -- parameter for Huber loss
     """
-    def __init__(self,actions,n_features,training,n_rewards=1,checkpoint_path=None,shared_replay_buffer=None,new_train=False):
+    def __init__(self,actions,n_features,training,n_rewards=1,checkpoint_path=None,shared_replay_buffer=None,new_train=True):
         self.gamma = 0.95
         self.lr = 0.0001
         self.total_episode_reward = 0
@@ -45,7 +45,6 @@ class DQN:
         self.max_experiences = 100000
         self.optimiser = keras.optimizers.Adam(learning_rate=self.lr)
         self.delta = 1.0
-        
         if self.training:
             if new_train:
                 self.dqn = NNetwork(self.n_actions,self.n_features,self.hidden_units,self.n_rewards)

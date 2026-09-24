@@ -12,7 +12,8 @@ import time
 import re
 
 PRINCIPLES = ["baseline", "utilitarian", "maximin", "egalitarian"]
-AGGREGATIONS = ["average", "majoritarian", "optimist", "veto"]
+#AGGREGATIONS = ["average", "majoritarian", "optimist", "veto"]
+AGGREGATIONS = ["average"]
 AGENT_TYPES = PRINCIPLES + AGGREGATIONS
 SCENARIO_TYPES = ["colours", "capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6", "20", "50", "100"]
@@ -57,7 +58,8 @@ def generate_graphs(scenario, run_name, num_agents):
         reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
     else:
         reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+scenario+"_"
-    files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
+    #files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
+    files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv"]
     dfs = []
     for file in files:
         df = pd.read_csv(file)
@@ -90,11 +92,11 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
         wandb.init(project=wandb_project)
     if render:
         render_inst = RenderPygame(model_inst.max_width, model_inst.max_height)
-    while (
-    (model_inst.training and model_inst.episode <= MAX_TRAINING_EPISODES and elapsed_time < TIME_LIMIT)
-    or (not model_inst.training and model_inst.episode <= model_inst.max_episodes)
-    ):
-    #while (model_inst.training and round(model_inst.epsilon, 5) > model_inst.min_epsilon) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
+    #while (
+    #(model_inst.training and model_inst.episode <= MAX_TRAINING_EPISODES and elapsed_time < TIME_LIMIT)
+    #or (not model_inst.training and model_inst.episode <= model_inst.max_episodes)
+    #):
+    while (model_inst.training and round(model_inst.epsilon, 5) > model_inst.min_epsilon) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
         model_inst.step()
         if log_wandb:
             #reward_tracker = [a.total_episode_reward for a in model_inst.schedule.agents if a.agent_type != "berry"]
@@ -106,7 +108,7 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
         elapsed_time = time.time() - start_time
     model_inst.finish_episode(collect_data=False)
     num_episodes = model_inst.episode
-    print(f"simulation finished {time.time()}")
+    print(f"simulation finished time: {time.time()}")
     return num_episodes
 
 def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,render,log_wandb,wandb_project=None):   

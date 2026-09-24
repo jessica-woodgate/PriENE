@@ -8,4 +8,7 @@ dependencies:
   - matplotlib
   - tensorflow=2.16.2
   - numpy
-  - mesa
+  - mesa=2.3.0
+  - scipy
+  - statsmodels
+  - pygame
