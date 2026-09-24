@@ -52,7 +52,10 @@ def generate_graphs(scenario, run_name, num_agents):
     processed dfs contain data for each agent at the end of each episode
     """
     writing_filepath = "data/results/current_run/"
-    norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/norms/"+scenario+"_"
+    if run_name == "current_run":
+        norms_filepath = "data/results/"+run_name+"/"+scenario+"_"
+    else:
+        norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/norms/"+scenario+"_"
     data_analysis = DataAnalysis(num_agents, writing_filepath)
     if run_name == "current_run":
         reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"

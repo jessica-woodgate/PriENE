@@ -51,7 +51,7 @@ class DataAnalysis():
             self._display_swarmplot(episode_norm_dfs,df_labels, "proportion", self.filepath+"swarm_norms_cooperative_proportion")
             self._display_swarmplot(episode_norm_dfs,df_labels, "total_norms", self.filepath+"swarm_norms_total")
             self._display_swarmplot(episode_norm_dfs,df_labels, "cooperative_norms", self.filepath+"swarm_norms_cooperative")
-            self._display_norm_data(episode_norm_dfs, df_labels, self.filepath+"cooperative_norms")
+            self._display_norm_data(cooperative_norm_dfs, df_labels, self.filepath+"cooperative_norms")
             self._write_dictionary_to_file(norms_tendencies,self.filepath+"norms_tendencies.csv")
 
     def _process_agent_dfs(self, agent_df_list, df_labels, write, get_normalised):
