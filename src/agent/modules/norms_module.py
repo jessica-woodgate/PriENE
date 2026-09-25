@@ -1,71 +1,73 @@
 class NormsModule():
     """
     Norms Module (Algorithm 2) handles tracking of behaviours and norms
+    NormsModule has no built-in knowledge of what the observed features or actions mean: the
+    owning agent registers that at construction time (antecedent_features, consequent_rules), so
+    this module can be reused by any agent/scenario wanting norm tracking over a different set of
+    state features or actions without needing any changes here.
     Instance variables:
         agent_id -- identification of agent
+        antecedent_features -- ordered list of feature specs used by get_antecedent to bucket
+            state values into a natural language precondition string. Each spec is a dict:
+                boundaries -- ascending thresholds; a value is bucketed into labels[i] for the
+                    first i where value < boundaries[i], else labels[-1]
+                labels -- one more label than boundaries, e.g. ["low health","medium health","high health"]
+                zero_label -- optional, checked before boundaries: label used when value == 0
+                repeated -- if True, the call-time value for this spec is a list, and every
+                    element is bucketed and appended individually (e.g. one well-being reading
+                    per other observed agent, rather than a single scalar reading)
+        consequent_rules -- ordered list of rules used by get_consequent to turn a raw action
+            string into a natural language postcondition. Each rule is a dict:
+                prefix -- if the action string starts with this, substitute `label` for it
+                label -- the natural language label to substitute
+            an action matching no rule is used as-is (e.g. "move", "eat")
         max_norms -- max size of norms and behaviour bases
         norm_clipping_frequency -- time interval to clip norms and behaviour bases
-        low_health_threshold -- antecedent threshold for "low health"
-        high_health_threshold -- antecedent threshold for "high health"
-        low_berries_threshold -- antecedent threshold for "low berries"
-        high_berries_threshold -- antecedent threshold for "high berries"
-        low_days_left_threshold -- antecedent threshold for "low days"
-        high_days_left_threshold -- antecedent threshold for "high days"
         norm_decay_rate -- decay of norm over time
     """
-    def __init__(self,agent_id):
+    def __init__(self, agent_id, antecedent_features, consequent_rules):
         self.agent_id = agent_id
+        self.antecedent_features = antecedent_features
+        self.consequent_rules = consequent_rules
         self.max_norms = 100
         self.norm_clipping_frequency = 10
         self.behaviour_base = {}
-        self.low_health_threshold = 0.6
-        self.high_health_threshold = 2.0
-        self.low_berries_threshold = 1
-        self.high_berries_threshold = 3
-        self.low_days_left_threshold = 10
-        self.high_days_left_threshold = 30
         self.norm_decay_rate = 0.3
 
-    def get_antecedent(self, berries, health, well_being):
+    def get_antecedent(self, feature_values):
         """
-        Get antecedent string from view of agent's berries and health and society well-being
+        Get antecedent string by bucketing an ordered list of state values, one per registered
+        antecedent_features spec (a "repeated" spec's corresponding value is itself a list)
         """
-        if berries == 0:
-            b = "no berries"
-        elif berries > 0 and berries < self.low_berries_threshold:
-            b = "low berries"
-        elif berries >= self.low_berries_threshold and berries < self.high_berries_threshold:
-            b = "medium berries"
-        else:
-            b = "high berries"
-        if health < self.low_health_threshold:
-            h = "low health"
-        elif health >= self.low_health_threshold and health < self.high_health_threshold:
-            h = "medium health"
-        else:
-            h = "high health"
-        view = ["IF", b, h]
-        for w in well_being:
-            if w < self.low_days_left_threshold:
-                view.append("low days")
-            elif w >= self.low_days_left_threshold and w < self.high_days_left_threshold:
-                view.append("medium days")
+        view = ["IF"]
+        for spec, value in zip(self.antecedent_features, feature_values):
+            if spec.get("repeated"):
+                for v in value:
+                    view.append(self._bucket(v, spec))
             else:
-                view.append("high days")
-        antecedent = ",".join(view)
-        return antecedent
+                view.append(self._bucket(value, spec))
+        return ",".join(view)
 
     def get_consequent(self, action):
         """
-        Get consequent string from action
+        Get consequent string from action, generalised via registered consequent_rules
         """
-        consequent = "THEN,"
-        if action == "north" or action == "east" or action == "south" or action == "west":
-            return consequent + "move"
-        elif "throw" in action:
-            return consequent + "throw"
-        else:
-            return consequent + action
+        for rule in self.consequent_rules:
+            if action.startswith(rule["prefix"]):
+                return "THEN," + rule["label"]
+        return "THEN," + action
+
+    def _bucket(self, value, spec):
+        """
+        Buckets a single numeric value into its natural language label per a feature spec
+        """
+        zero_label = spec.get("zero_label")
+        if zero_label is not None and value == 0:
+            return zero_label
+        for boundary, label in zip(spec["boundaries"], spec["labels"]):
+            if value < boundary:
+                return label
+        return spec["labels"][-1]
     
     def update_behaviour_base(self, antecedent, action, reward, day, episode):
         """

@@ -2,35 +2,47 @@ import pytest
 
 from src.agent.modules.norms_module import NormsModule
 
+# matches exactly what HarvestAgent._antecedent_features()/_consequent_rules() register in practice
+BERRIES_HEALTH_DAYS_FEATURES = [
+    {"boundaries": [1, 3], "labels": ["low berries", "medium berries", "high berries"], "zero_label": "no berries"},
+    {"boundaries": [0.6, 2.0], "labels": ["low health", "medium health", "high health"]},
+    {"boundaries": [10, 30], "labels": ["low days", "medium days", "high days"], "repeated": True},
+]
+THROW_CONSEQUENT_RULES = [{"prefix": "throw", "label": "throw"}]
 
-# --- get_antecedent: berries/health/well-being thresholds ---
+
+def make_norms_module(antecedent_features=BERRIES_HEALTH_DAYS_FEATURES, consequent_rules=THROW_CONSEQUENT_RULES):
+    return NormsModule(agent_id=1, antecedent_features=antecedent_features, consequent_rules=consequent_rules)
+
+
+# --- get_antecedent: berries/health/well-being thresholds (the feature set HarvestAgent registers) ---
 
 def test_antecedent_no_berries_low_health_low_days():
-    nm = NormsModule(agent_id=1)
-    assert nm.get_antecedent(berries=0, health=0.5, well_being=[5]) == "IF,no berries,low health,low days"
+    nm = make_norms_module()
+    assert nm.get_antecedent([0, 0.5, [5]]) == "IF,no berries,low health,low days"
 
 
 def test_antecedent_medium_berries_medium_health_mixed_days():
-    nm = NormsModule(agent_id=1)
+    nm = make_norms_module()
     # berries=2 -> medium (1 <= 2 < 3); health=1.0 -> medium (0.6 <= 1.0 < 2.0)
-    assert nm.get_antecedent(berries=2, health=1.0, well_being=[15, 35]) == (
+    assert nm.get_antecedent([2, 1.0, [15, 35]]) == (
         "IF,medium berries,medium health,medium days,high days"
     )
 
 
 def test_antecedent_high_berries_high_health_no_other_agents():
-    nm = NormsModule(agent_id=1)
-    assert nm.get_antecedent(berries=5, health=3.0, well_being=[]) == "IF,high berries,high health"
+    nm = make_norms_module()
+    assert nm.get_antecedent([5, 3.0, []]) == "IF,high berries,high health"
 
 
 def test_antecedent_low_berries_branch_is_only_reachable_for_non_integer_counts():
     """
-    low_berries_threshold=1, so `berries > 0 and berries < 1` can never be true for an integer
+    The berries spec's first boundary is 1, so `0 < berries < 1` can never be true for an integer
     berry count (0 or >=1) -- this branch is effectively dead code in the running system, since
     HarvestAgent.berries is always a non-negative integer. Documented here rather than changed.
     """
-    nm = NormsModule(agent_id=1)
-    assert nm.get_antecedent(berries=0.5, health=1.0, well_being=[]) == "IF,low berries,medium health"
+    nm = make_norms_module()
+    assert nm.get_antecedent([0.5, 1.0, []]) == "IF,low berries,medium health"
 
 
 @pytest.mark.parametrize(
@@ -43,8 +55,8 @@ def test_antecedent_low_berries_branch_is_only_reachable_for_non_integer_counts(
     ],
 )
 def test_antecedent_health_thresholds(health, expected):
-    nm = NormsModule(agent_id=1)
-    antecedent = nm.get_antecedent(berries=5, health=health, well_being=[])
+    nm = make_norms_module()
+    antecedent = nm.get_antecedent([5, health, []])
     assert antecedent.split(",")[2] == expected
 
 
@@ -58,8 +70,8 @@ def test_antecedent_health_thresholds(health, expected):
     ],
 )
 def test_antecedent_berries_thresholds(berries, expected):
-    nm = NormsModule(agent_id=1)
-    antecedent = nm.get_antecedent(berries=berries, health=3.0, well_being=[])
+    nm = make_norms_module()
+    antecedent = nm.get_antecedent([berries, 3.0, []])
     assert antecedent.split(",")[1] == expected
 
 
@@ -73,43 +85,64 @@ def test_antecedent_berries_thresholds(berries, expected):
     ],
 )
 def test_antecedent_well_being_thresholds(well_being_value, expected):
-    nm = NormsModule(agent_id=1)
-    antecedent = nm.get_antecedent(berries=5, health=3.0, well_being=[well_being_value])
+    nm = make_norms_module()
+    antecedent = nm.get_antecedent([5, 3.0, [well_being_value]])
     assert antecedent.split(",")[3] == expected
+
+
+def test_antecedent_is_driven_entirely_by_registered_features_not_hardcoded_names():
+    """
+    NormsModule has no built-in knowledge of "berries"/"health"/"days" -- it just buckets whatever
+    feature specs it was constructed with. Prove that with a completely unrelated feature set.
+    """
+    features = [
+        {"boundaries": [50], "labels": ["cold", "hot"]},
+        {"boundaries": [1, 5], "labels": ["quiet", "busy", "crowded"], "repeated": True},
+    ]
+    nm = NormsModule(agent_id=1, antecedent_features=features, consequent_rules=[])
+    assert nm.get_antecedent([70, [0, 3, 8]]) == "IF,hot,quiet,busy,crowded"
 
 
 # --- get_consequent ---
 
 def test_consequent_move_action():
-    nm = NormsModule(agent_id=1)
+    nm = make_norms_module()
     assert nm.get_consequent("move") == "THEN,move"
 
 
 def test_consequent_eat_action():
-    nm = NormsModule(agent_id=1)
+    nm = make_norms_module()
     assert nm.get_consequent("eat") == "THEN,eat"
 
 
 def test_consequent_throw_action():
-    nm = NormsModule(agent_id=1)
+    nm = make_norms_module()
     assert nm.get_consequent("throw_2") == "THEN,throw"
 
 
-def test_consequent_cardinal_directions_also_map_to_move():
-    """
-    In practice HarvestAgent only ever passes "move"/"eat"/"throw_X" (its DQN action names) into
-    get_consequent -- "north"/"south"/"east"/"west" are internal to MovingModule and never reach
-    here -- but the function itself still handles them if called directly, so pin that down too.
-    """
-    nm = NormsModule(agent_id=1)
-    for direction in ["north", "south", "east", "west"]:
-        assert nm.get_consequent(direction) == "THEN,move"
+def test_consequent_falls_back_to_the_raw_action_when_no_rule_matches():
+    nm = make_norms_module()
+    assert nm.get_consequent("jump") == "THEN,jump"
 
 
-# --- behaviour base updates ---
+def test_consequent_rules_are_driven_entirely_by_registration_not_hardcoded_actions():
+    """
+    NormsModule has no built-in knowledge of "throw" specifically -- it just applies whatever
+    prefix rules it was constructed with, in order, falling back to the raw action string.
+    """
+    nm = NormsModule(
+        agent_id=1,
+        antecedent_features=[],
+        consequent_rules=[{"prefix": "attack_", "label": "attack"}],
+    )
+    assert nm.get_consequent("attack_goblin") == "THEN,attack"
+    assert nm.get_consequent("flee") == "THEN,flee"
+
+
+# --- behaviour base updates (independent of antecedent_features/consequent_rules) ---
 
 def test_update_behaviour_base_creates_new_norm():
-    nm = NormsModule(agent_id=1)
+    nm = make_norms_module()
     nm.update_behaviour_base("IF,no berries,low health", "move", 0.5, day=1, episode=1)
     key = "IF,no berries,low health,THEN,move"
     assert key in nm.behaviour_base
@@ -121,7 +154,7 @@ def test_update_behaviour_base_creates_new_norm():
 
 
 def test_update_behaviour_base_accumulates_on_repeat():
-    nm = NormsModule(agent_id=1)
+    nm = make_norms_module()
     nm.update_behaviour_base("IF,no berries,low health", "move", 0.5, day=1, episode=1)
     nm.update_behaviour_base("IF,no berries,low health", "move", 0.5, day=2, episode=1)
     key = "IF,no berries,low health,THEN,move"
@@ -135,14 +168,14 @@ def test_update_behaviour_base_accumulates_on_repeat():
 
 
 def test_update_norm_fitness_zero_age_leaves_fitness_unchanged():
-    nm = NormsModule(agent_id=1)
+    nm = make_norms_module()
     norm = {"reward": 5, "numerosity": 2, "age": 0, "fitness": 0}
     nm._update_norm_fitness(norm)
     assert norm["fitness"] == 0
 
 
 def test_update_norm_fitness_formula():
-    nm = NormsModule(agent_id=1)
+    nm = make_norms_module()
     norm = {"reward": 2, "numerosity": 3, "age": 4, "fitness": 0}
     nm._update_norm_fitness(norm)
     # fitness = numerosity * reward * (decay_rate * age) = 3 * 2 * (0.3 * 4) = 7.2
@@ -150,7 +183,7 @@ def test_update_norm_fitness_formula():
 
 
 def test_clip_behaviour_base_noop_when_under_limit():
-    nm = NormsModule(agent_id=1)
+    nm = make_norms_module()
     nm.max_norms = 10
     nm.behaviour_base = {"a": {"reward": 1, "numerosity": 1, "age": 1, "fitness": 0}}
     nm._clip_behaviour_base(day=10, episode=1)
@@ -158,7 +191,7 @@ def test_clip_behaviour_base_noop_when_under_limit():
 
 
 def test_clip_behaviour_base_keeps_highest_fitness_entries():
-    nm = NormsModule(agent_id=1)
+    nm = make_norms_module()
     nm.max_norms = 3
     # same numerosity/age for every entry so fitness ranking is driven purely by reward
     nm.behaviour_base = {
@@ -174,7 +207,7 @@ def test_clip_behaviour_base_keeps_highest_fitness_entries():
 
 
 def test_update_behaviour_base_triggers_clipping_on_clipping_frequency_day():
-    nm = NormsModule(agent_id=1)
+    nm = make_norms_module()
     nm.max_norms = 1
     nm.norm_clipping_frequency = 10
     nm.update_behaviour_base("IF,a", "move", 1.0, day=1, episode=1)

@@ -21,6 +21,11 @@ class HarvestAgent(Agent):
         self.health = self.start_health
         self.health_decay = 0.1
         self.low_health_threshold = 0.6
+        self.high_health_threshold = 2.0
+        self.low_berries_threshold = 1
+        self.high_berries_threshold = 3
+        self.low_days_left_threshold = 10
+        self.high_days_left_threshold = 30
         self.berry_health_payoff = 0.6
         self.berries = 0
         self.berries_consumed = 0
@@ -43,7 +48,7 @@ class HarvestAgent(Agent):
         self.moving_module = MovingModule(self.unique_id, model, training, allotment, self.allocation_id)
         self.write_norms = write_norms
         if self.write_norms:
-            self.norms_module = NormsModule(self.unique_id)
+            self.norms_module = NormsModule(self.unique_id, self._antecedent_features(), self._consequent_rules())
         if agent_type != "baseline":
             self.rewards = self._ethics_rewards()
             self.ethics_module = EthicsModule(self.rewards["sanction"],agent_type)
@@ -72,7 +77,7 @@ class HarvestAgent(Agent):
         done = False
         self.current_action = action
         if self.write_norms:
-            antecedent = self.norms_module.get_antecedent(self.berries, self.health, self.model.get_society_well_being(self, True, False))
+            antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)])
         if self.agent_type != "baseline":
             self.ethics_module.day = self.model.get_day()
             self._update_ethics()
@@ -156,6 +161,29 @@ class HarvestAgent(Agent):
             if agent_id != unique_id:
                 actions.append(f"throw_{agent_id}")
         return actions
+
+    def _antecedent_features(self):
+        """
+        Registers with NormsModule how to bucket this agent's state into a natural language
+        precondition string: berries and health as single scalar readings, and well-being (one
+        reading per other currently-observed agent) as a repeated feature.
+        """
+        return [
+            {"boundaries": [self.low_berries_threshold, self.high_berries_threshold],
+             "labels": ["low berries", "medium berries", "high berries"], "zero_label": "no berries"},
+            {"boundaries": [self.low_health_threshold, self.high_health_threshold],
+             "labels": ["low health", "medium health", "high health"]},
+            {"boundaries": [self.low_days_left_threshold, self.high_days_left_threshold],
+             "labels": ["low days", "medium days", "high days"], "repeated": True},
+        ]
+
+    def _consequent_rules(self):
+        """
+        Registers with NormsModule how to generalise this agent's raw action names (move/eat/
+        throw_X) into a natural language postcondition string: all throw_X variants collapse to
+        "throw"; everything else (move, eat) is used as-is.
+        """
+        return [{"prefix": "throw", "label": "throw"}]
     
     def _perform_action(self, action_index):
         reward = 0
