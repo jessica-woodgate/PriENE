@@ -18,6 +18,11 @@ class NNetwork(keras.Model):
         model -- the sequential model
     """
     def __init__(self, n_actions, n_features, hidden_units, trainable=True, dtype="float32", **kwargs):
+        """
+        n_features must be a shape tuple (e.g. (5,)), not a bare int, since it is passed straight
+        through to layers.InputLayer(shape=n_features); callers always construct it this way
+        (DQN.__init__ receives n_features as a tuple and forwards it unchanged).
+        """
         super().__init__()
         self.n_features = n_features
         self.n_actions = n_actions

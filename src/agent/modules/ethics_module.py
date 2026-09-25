@@ -85,7 +85,7 @@ class EthicsModule():
         return combined_sanction
     
     def _average_aggregation(self, sanction_list):
-        return np.mean(sanction_list)
+        return [np.mean(sanction_list)]
 
     def _majoritarian_aggregation(self, sanction_list):
         return [min(max(np.sum(sanction_list), -self.sanction), self.sanction)]
