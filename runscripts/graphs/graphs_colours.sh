@@ -5,7 +5,7 @@
 #SBATCH --time=24:00:00 
 
 source ~/miniforge3/bin/activate
-conda activate PriENE
+conda activate prenv
 
 python3 ~/PriENE/run.py graphs << EOF
 200_days
