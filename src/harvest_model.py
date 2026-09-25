@@ -331,20 +331,24 @@ class HarvestModel(Model):
         return new_entry
 
     def _append_norm_dict_to_file(self, norm_dictionary, filename):
-        with open(filename, "a+") as file:
-            file.seek(0)
-            if not file.read(1):
-                file.write("{")
-            file.seek(0, 2)
-            norm_list = []
-            for key, value in norm_dictionary.items():
-                dict = {key: value}
-                norm_list.append(dict)
-            file.write(f"\"{self.episode}\": {json.dumps(norm_list, indent=4)}\n")
-            if self.episode != self.max_episodes:
-                file.write(",")
-            else:
-                file.write("}")
+        """
+        Persists the current episode's emerged norms into filename, keyed by episode number
+        Rewrites the whole file from a full in-memory dict each call so the file on disk is always valid,
+        complete JSON, rather than relying on the run reaching its final episode to write a closing brace
+        """
+        if exists(filename):
+            with open(filename, "r") as file:
+                try:
+                    all_episodes = json.load(file)
+                except json.JSONDecodeError:
+                    print(f"Warning: {filename} was not valid JSON (likely left over from an interrupted run); starting a new norms file")
+                    all_episodes = {}
+        else:
+            all_episodes = {}
+        norm_list = [{key: value} for key, value in norm_dictionary.items()]
+        all_episodes[str(self.episode)] = norm_list
+        with open(filename, "w") as file:
+            json.dump(all_episodes, file, indent=4)
 
     def _check_emerged_norms(self):
         """
@@ -395,27 +399,13 @@ class HarvestModel(Model):
                     if a.done == True:
                         self._remove_agent(a)
     
-    def _check_bounds(self, cell):
-        if cell[0] >= 0 and cell[0] < self.max_width:
-            if cell[1] >= 0 and cell[1] < self.max_height:
-                return True
-        return False
-
-    def _place_agent_in_allotment(self, agent):    
+    def _place_agent_in_allotment(self, agent):
         #for new agents who aren't yet on the grid
         if not self.grid.exists_empty_cells:
             raise NoEmptyCells
         cell = self._random_allotment_cell(agent)
         self.grid.place_agent(agent, cell)
 
-    def _move_agent_in_allotment(self, agent, cell=None):
-        #for agents who are on the grid
-        if not self.grid.exists_empty_cells:
-            raise NoEmptyCells
-        if cell == None:
-            cell = self._random_allotment_cell(agent)
-        self.grid.move_agent(agent, cell)
-    
     def _clear_grid(self):
         for a in self.schedule.agents:
             if a.agent_type != "berry" and a.off_grid:

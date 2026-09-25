@@ -1,15 +1,23 @@
+# Single source of truth for reproducing the environment (supersedes requirements.txt / clean_requirements.txt).
+# Split between conda (packages verified available on the defaults channel for linux-64/osx-64/osx-arm64/win-64)
+# and pip (packages that are pip-only in practice, e.g. mesa, tensorflow, keras, networkx).
 name: prenv
 channels:
   - defaults
 dependencies:
   - python=3.11
-  - pandas
-  - seaborn
-  - matplotlib
-  - tensorflow=2.16.2
-  - protobuf=4.25.3
-  - numpy
-  - mesa=2.3.0
-  - scipy
-  - statsmodels
-  - pygame
+  - pandas=3.0.5
+  - seaborn=0.13.2
+  - matplotlib=3.11.1
+  - scipy=1.17.1
+  - statsmodels=0.15.0
+  - wandb=0.27.2
+  - pip
+  - pip:
+      - numpy==1.26.4
+      - mesa==2.3.0
+      - networkx==3.6.1
+      - keras==3.15.1
+      - protobuf==4.25.3
+      - pygame==2.6.1
+      - tensorflow==2.16.2
