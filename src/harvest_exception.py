@@ -1,10 +1,10 @@
 class HarvestException(Exception):
     def __init__(self):
-        super().__init__
+        super().__init__()
 
 class FileExistsException(HarvestException):
     def __init__(self, file_name):
-        super().__init__
+        super().__init__()
         self.file_name= file_name
     
     def __str__(self):
@@ -12,7 +12,7 @@ class FileExistsException(HarvestException):
 
 class NoBerriesException(HarvestException):
     def __init__(self, agent_id=None, coordinates=None):
-        super().__init__
+        super().__init__()
         self.agent_id = agent_id
         self.coordinates = coordinates
     
@@ -26,7 +26,7 @@ class NoBerriesException(HarvestException):
         
 class NumAgentsException(HarvestException):
     def __init__(self, num_expected_agents, num_agents):
-        super().__init__
+        super().__init__()
         self.num_expected_agents = num_expected_agents
         self.num_agents = num_agents
     
@@ -35,7 +35,7 @@ class NumAgentsException(HarvestException):
 
 class NumAllotmentsException(HarvestException):
     def __init__(self, num_agents, num_allotments):
-        super().__init__
+        super().__init__()
         self.num_agents = num_agents
         self.num_allotments = num_allotments
     
@@ -44,7 +44,7 @@ class NumAllotmentsException(HarvestException):
 
 class AgentTypeException(HarvestException):
     def __init__(self, expected_type, agent_type):
-        super().__init__
+        super().__init__()
         self.expected_type = expected_type
         self.agent_type = agent_type
     
@@ -53,7 +53,7 @@ class AgentTypeException(HarvestException):
 
 class OutOfBounds(HarvestException):
     def __init__(self, agent_id, coordinates):
-        super().__init__
+        super().__init__()
         self.agent_id = agent_id
         self.coordinates = coordinates
     
@@ -76,7 +76,7 @@ class NoAllocationException(HarvestException):
     
 class UnrecognisedPrinciple(HarvestException):
     def __init__(self, principle):
-        super().__init__
+        super().__init__()
         self.principle = principle
     
     def __str__(self):
@@ -101,7 +101,7 @@ class IllegalBerry(HarvestException):
     
 class NumBerriesException(HarvestException):
     def __init__(self, num_expected_berries, num_berries):
-        super().__init__
+        super().__init__()
         self.num_expected_berries = num_expected_berries
         self.num_berries = num_berries
     
@@ -110,16 +110,16 @@ class NumBerriesException(HarvestException):
     
 class NumFeaturesException(HarvestException):
     def __init__(self, num_expected_features, num_features):
-        super().__init__
+        super().__init__()
         self.num_expected_features = num_expected_features
         self.num_features = num_features
-    
+
     def __str__(self):
-        return (f"Expected {self.num_expected_features} berries and got {self.num_features}")
+        return (f"Expected {self.num_expected_features} features and got {self.num_features}")
 
 class ImpossibleNormException(HarvestException):
     def __init__(self, day, agent_id, antecedent, action, reward):
-        super().__init__
+        super().__init__()
         self.day = day
         self.agent_id = agent_id
         self.antecedent = antecedent

@@ -19,7 +19,7 @@ conda env create -f environment.yml
 Activate the environment:
 
 ```bash
-conda activate renv
+conda activate prenv
 ```
 
 ## Usage

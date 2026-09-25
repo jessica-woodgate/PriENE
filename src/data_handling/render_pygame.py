@@ -15,20 +15,19 @@ class RenderPygame():
             "purple": (255, 0, 255),
         }
 
-        self.obj_colours = {
-            "None": "red",
-            "0": "purple",
-            "1": "blue"
-        }
-
         self.agent_colours = {
             "baseline": "red",
             "egalitarian": "yellow",
             "maximin": "blue",
             "utilitarian": "green",
+            "average": "white",
+            "majoritarian": "purple",
+            "optimist": "yellow",
+            "veto": "green",
             "berry": "purple",
             "all_principles": "white"
         }
+        self.running = True
         self.screen = self.init_pygame()
 
     def init_pygame(self):
@@ -40,9 +39,14 @@ class RenderPygame():
         return screen
 
     def render_pygame(self, modelInst):
+        """
+        Renders one frame; returns False if the window was closed (caller should stop rendering/simulating)
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                break
+                self.running = False
+                pygame.quit()
+                return False
         self.screen.fill(self.colour_map["black"])
         for a in modelInst.schedule.agents:
             if hasattr(a, "off_grid") and a.off_grid:
@@ -56,7 +60,7 @@ class RenderPygame():
                 colour = self.colour_map[self.agent_colours[str(a.agent_type)]]
                 self.draw_agent(self.screen, colour, x, y)
         pygame.display.flip()
-        return self.screen
+        return True
 
     def draw_agent(self, screen, colour, x, y):
         pygame.draw.rect(screen, colour, (x+self.block_size/4, y, self.block_size/2, self.block_size/4))

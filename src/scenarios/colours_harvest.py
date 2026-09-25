@@ -12,16 +12,12 @@ class ColoursHarvest(HarvestModel):
     def __init__(self,society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
         super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath)
         self.num_start_berries = num_start_berries
-        print(num_start_berries)
         self.allocations = self._assign_allocations()
-        print(self.allocations.values())
-        print(self.allocations.keys())
         self._init_agents(society_mix, agent_type, checkpoint_path)
         self.berries = self._init_berries()
     
     def _assign_allocations(self):
         resources = self._generate_resource_allocations(self.num_agents)
-        print(resources)
         allocations = {}
         for i in range(self.num_agents):
             key = "allocation_"+str(i)

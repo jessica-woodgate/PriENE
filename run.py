@@ -77,10 +77,7 @@ def log_wandb_agents(model_inst, last_episode, reward_tracker):
                 reward = reward_tracker[i]
                 wandb.log({string: reward})
             string = base_string+"_reward"
-            if "multiobjective" in agent.agent_type:
-                wandb.log({string: sum(agent.current_reward)})
-            else:
-                wandb.log({string: agent.current_reward})
+            wandb.log({string: agent.current_reward})
             mean_loss = (agent.get_mean_loss() if model_inst.training else 0)
             string = base_string+"_mean_loss"
             wandb.log({string: mean_loss})
@@ -106,7 +103,8 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
             mean_reward = model_inst._mean_reward()
             wandb.log({'mean_episode_reward': mean_reward})
         if render:
-            render_inst.render_pygame(model_inst)
+            if not render_inst.render_pygame(model_inst):
+                break
         elapsed_time = time.time() - start_time
     model_inst.finish_episode(collect_data=False)
     num_episodes = model_inst.episode

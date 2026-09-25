@@ -1,0 +1,32 @@
+{"1": [
+    {
+        "IF,no berries,medium health,low days,THEN,eat": {
+            "reward": -0.8,
+            "numerosity": 8,
+            "fitness": 0,
+            "adoption": 8
+        }
+    }
+]
+,"2": [
+    {
+        "IF,no berries,medium health,low days,THEN,move": {
+            "reward": 2.0,
+            "numerosity": 10,
+            "fitness": 0.0,
+            "adoption": 8
+        }
+    }
+]
+}"1": [
+    {
+        "IF,no berries,medium health,low days,THEN,throw": {
+            "reward": -0.9000000000000001,
+            "numerosity": 9,
+            "fitness": -0.36,
+            "adoption": 6
+        }
+    }
+]
+,"2": []
+}

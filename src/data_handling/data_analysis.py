@@ -486,7 +486,7 @@ class DataAnalysis():
             return anova_table, tukey_results, True, True, cohens_d_df
         except Exception as e:
             print(f"Exception during post hoc test for {dependent_variable}: {e}")
-            return anova_table, None, True, False, 0, None
+            return anova_table, None, True, False, 0
     
     def _compute_pairwise_cohens_d(self, combined_df, dependent_variable):
         groups = combined_df["society"].unique()

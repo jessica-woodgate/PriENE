@@ -51,7 +51,7 @@ class HarvestModel(Model):
             raise NumAgentsException(">0", 0)
         self.num_berries = 0
         self.end_day = 0
-        self.day = 1
+        self.day = 0
         self.max_days = max_days
         self.max_episodes = max_episodes
         self.min_epsilon = 0.01

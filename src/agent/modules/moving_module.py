@@ -86,27 +86,30 @@ class MovingModule():
         return len(self.path) - self.path_step
     
     def _move(self, current_pos, action):
+        """
+        Standard convention: north/south change y (+1/-1), east/west change x (+1/-1)
+        """
         x, y = current_pos
         if action == "north":
             if (y + 1) < self.max_height:
                 y += 1
             else:
                 raise OutOfBounds(self.agent_id, (x,y+1))
-        elif action == "east":
-            if (x - 1) >= self.min_width:
-                x -= 1
-            else:
-                raise OutOfBounds(self.agent_id, (x-1,y))
         elif action == "south":
             if (y - 1) >= self.min_height:
                 y -= 1
             else:
                 raise OutOfBounds(self.agent_id, (x,y-1))
-        elif action == "west":
+        elif action == "east":
             if (x + 1) < self.max_width:
                 x += 1
             else:
                 raise OutOfBounds(self.agent_id, (x+1,y))
+        elif action == "west":
+            if (x - 1) >= self.min_width:
+                x -= 1
+            else:
+                raise OutOfBounds(self.agent_id, (x-1,y))
         return (x, y)
     
     def _forage(self, cell):
@@ -188,8 +191,11 @@ class MovingModule():
         return path[::-1]  # Reverse the path to start from the agent
 
     def _direction_to_string(self, start, end):
-        dx, dy = end[0] - start[0], end[1] - start[1]
+        """
+        start is later along the path than end (its parent in came_from); returns the direction of travel from end to start
+        """
+        dx, dy = start[0] - end[0], start[1] - end[1]
         if dx == 0:
-            return "south" if dy > 0 else "north"
+            return "north" if dy > 0 else "south"
         elif dy == 0:
             return "east" if dx > 0 else "west"

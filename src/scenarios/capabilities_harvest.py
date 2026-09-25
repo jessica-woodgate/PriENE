@@ -17,8 +17,6 @@ class CapabilitiesHarvest(HarvestModel):
         self.num_start_berries = num_start_berries
         self.num_capabilities = num_capabilities
         self.allocations = self._assign_allocations()
-        print(self.allocations.values())
-        print(self.allocations.keys())
         self._init_agents(society_mix,agent_type, checkpoint_path)
         self.berries = self._init_berries()
     

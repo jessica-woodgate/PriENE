@@ -48,14 +48,6 @@ class DQNDecisionModule():
             return np.mean(self.losses)
         return 0
     
-    def _calculate_n_features(self, model):
-        """
-        Get number of features in observation (agent's health, days left to live, distance to berry, well-being of other agents in society)
-        """
-        n_features = 4
-        n_features += model.get_num_agents() - 1
-        return n_features
-
     def _init_networks(self, checkpoint_path):
         self.q_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(self.unique_id)+"/q_model_variables.keras"
         self.target_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(self.unique_id)+"/target_model_variables.keras"
