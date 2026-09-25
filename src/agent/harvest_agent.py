@@ -40,12 +40,13 @@ class HarvestAgent(Agent):
         self.max_width = allotment[1]
         self.min_height = allotment[2]
         self.max_height = allotment[3]
+        restrict_to_allocation = allocation_id is not None
         if allocation_id == None:
             self.allocation_id = self.unique_id
         else:
             self.allocation_id = allocation_id
         self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer)
-        self.moving_module = MovingModule(self.unique_id, model, training, allotment, self.allocation_id)
+        self.moving_module = MovingModule(self.unique_id, model, training, allotment, self.allocation_id, restrict_to_allocation)
         self.write_norms = write_norms
         if self.write_norms:
             self.norms_module = NormsModule(self.unique_id, self._antecedent_features(), self._consequent_rules())

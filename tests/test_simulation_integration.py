@@ -1,6 +1,7 @@
 import pytest
 
 from tests.conftest import AGENT_TYPES, SCENARIOS, make_scenario_model, make_training_model
+from tests.conftest import _build, _make_pretrained_checkpoint
 
 
 # --- A: state-consistency invariants (deterministic, not dependent on agent behaviour) ---
@@ -56,6 +57,24 @@ def test_agent_and_berry_counts_are_conserved_across_steps_and_episodes(tmp_path
 @pytest.mark.parametrize("agent_type", AGENT_TYPES)
 def test_scenario_runs_for_every_agent_type_without_raising(tmp_path, scenario, agent_type):
     model = make_scenario_model(tmp_path, scenario, agent_type, max_days=10, max_episodes=2)
+    for _ in range(20):
+        model.step()
+
+
+def test_basic_harvest_runs_with_training_false(tmp_path):
+    """
+    Regression test for the mirror-image bug of the allotment/training=True one: MovingModule used
+    to gate berry-allocation restriction on `training` instead of an explicit restrict_to_allocation
+    flag, so evaluating basic_harvest with training=False (not exposed via run.py's CLI today, but
+    not prevented by the model code either) would raise IllegalBerry on every forage attempt, since
+    basic_harvest agents' allocation_id (defaulting to their own unique_id) never matches a berry's
+    allocation_id (None). Confirms basic_harvest is now safe to evaluate without further learning.
+    """
+    checkpoint_path = _make_pretrained_checkpoint(tmp_path, "baseline", max_days=5)
+    model = _build(
+        "basic", "homogeneous", 12, "baseline", False, checkpoint_path,
+        False, False, "eval_baseline", 2, 10,
+    )
     for _ in range(20):
         model.step()
 

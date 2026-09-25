@@ -10,7 +10,8 @@ class MovingModule():
     Moving module searches for berries, finds paths to nearest berries, returns coordinates for agent to move to, and handles foraging
     Instance variables:
         agent_id -- unique id of agent
-        training -- boolean to indicate if training or testing (if testing, need to check which berries the agent is allocated)
+        training -- boolean to indicate if training or testing (only affects DQN learning; kept for interface consistency but not used to gate berry access -- see restrict_to_allocation)
+        restrict_to_allocation -- whether berry search/foraging is restricted to this agent's own allocation_id (true for scenarios that partition berries, e.g. colours/allotment/capabilities; false for basic_harvest); independent of training so evaluating a policy without further learning doesn't silently change berry access
         max_width -- width of grid agent has access to
         max_height -- height of grid agent has access to
         path -- current path to nearest berry
@@ -18,11 +19,12 @@ class MovingModule():
         nearest_berry -- the nearest berry agent
         nearest_berry_coordinates -- coordinates of the nearest berry
     """
-    def __init__(self, agent_id, model, training, allotment, allocation_id):
+    def __init__(self, agent_id, model, training, allotment, allocation_id, restrict_to_allocation):
         self.agent_id = agent_id
         self.allocation_id = allocation_id
         self.model = model
         self.training = training
+        self.restrict_to_allocation = restrict_to_allocation
         self.min_width = allotment[0]
         self.max_width = allotment[1]
         self.min_height = allotment[2]
@@ -42,10 +44,10 @@ class MovingModule():
             self.nearest_berry_coordinates = self._find_nearest_berry_coordinates(current_pos)
             if self.nearest_berry_coordinates == None:
                 return False
-            if self.training:
-                self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates)
-            else:
+            if self.restrict_to_allocation:
                 self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates, self.allocation_id)
+            else:
+                self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates)
             self.path = self._find_path_to_berry(current_pos,self.nearest_berry.pos)
             self.path_step = 0
         return True
@@ -118,7 +120,7 @@ class MovingModule():
         for b in location:
             #there can be multiple berries at one location: check we are foraging the one we were going for
             if b.agent_type == "berry" and b.unique_id == self.nearest_berry.unique_id:
-                if not self.training and b.allocation_id != self.allocation_id:
+                if self.restrict_to_allocation and b.allocation_id != self.allocation_id:
                     raise IllegalBerry(self.agent_id, f"allocated to {b.allocation_id}")
                 else:
                     b.foraged = True
@@ -130,10 +132,10 @@ class MovingModule():
         return math.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
 
     def _find_nearest_berry_coordinates(self, agent_coordinates):
-        if self.training:
-            uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates()
-        else:
+        if self.restrict_to_allocation:
             uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.allocation_id)
+        else:
+            uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates()
         if not uneaten_berries_coordinates:
             return None
         #Use the key parameter of min to find the index of the minimum distance
