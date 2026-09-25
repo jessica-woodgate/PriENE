@@ -110,7 +110,8 @@ class HarvestAgent(Agent):
             antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)])
         if self.agent_type != "baseline":
             self.ethics_module.day = self.model.get_day()
-            self._update_ethics()
+            society_well_being = self.model.get_society_well_being(self, False, True)
+            self.ethics_module.update_ethics_state(society_well_being)
         reward_vector = [self._perform_action(action)]
         next_state = self.observe()
         if self.agent_type != "baseline":
@@ -275,22 +276,6 @@ class HarvestAgent(Agent):
         society_well_being = self.model.get_society_well_being(self, False, True)
         sanction = self.ethics_module.get_sanction(society_well_being)
         return sanction
-    
-    def _update_ethics(self):
-        #can_help is meant to represent whether this agent could actually afford to help others
-        #(the condition below checks for spare berries and sufficient health), but both branches
-        #currently set can_help = True regardless, so the condition has no effect on the ethics
-        #sanction (self.can_help gates the "negative sanction for making things worse" branches in
-        #EthicsModule's _egalitarian_sanction/_maximin_sanction/_utilitarian_sanction). Left as-is
-        #rather than changed here, since fixing it would change reward/sanction behaviour, not just
-        #documentation.
-        society_well_being = self.model.get_society_well_being(self, False, True)
-        if self.berries > 0 and self.health >= self.low_health_threshold:
-            can_help = True
-            self.ethics_module.update_ethics_state(can_help, society_well_being)
-        else:
-            can_help = True
-            self.ethics_module.update_ethics_state(can_help, society_well_being)
     
     def _update_attributes(self, reward_vector):
         done = False

@@ -40,61 +40,55 @@ def test_calculate_utilitarian_welfare():
 
 def test_egalitarian_sanction_improved_welfare():
     em = EthicsModule(sanction=0.4, principle="egalitarian")
-    em.update_ethics_state(can_help=True, society_well_being=np.array([0.0, 10.0, 20.0]))  # loss=20
+    em.update_ethics_state(society_well_being=np.array([0.0, 10.0, 20.0]))  # loss=20
     assert em.get_sanction(np.array([10.0, 10.0, 10.0])) == [0.4]  # loss=0, improved
 
 
-def test_egalitarian_sanction_worsened_welfare_when_could_help():
+def test_egalitarian_sanction_worsened_welfare():
     em = EthicsModule(sanction=0.4, principle="egalitarian")
-    em.update_ethics_state(can_help=True, society_well_being=np.array([10.0, 10.0, 10.0]))  # loss=0
+    em.update_ethics_state(society_well_being=np.array([10.0, 10.0, 10.0]))  # loss=0
     assert em.get_sanction(np.array([0.0, 10.0, 20.0])) == [-0.4]  # loss=20, worsened
-
-
-def test_egalitarian_sanction_worsened_welfare_when_could_not_help():
-    em = EthicsModule(sanction=0.4, principle="egalitarian")
-    em.update_ethics_state(can_help=False, society_well_being=np.array([10.0, 10.0, 10.0]))
-    assert em.get_sanction(np.array([0.0, 10.0, 20.0])) == [0]
 
 
 def test_egalitarian_sanction_unchanged_welfare():
     em = EthicsModule(sanction=0.4, principle="egalitarian")
-    em.update_ethics_state(can_help=True, society_well_being=np.array([10.0, 10.0, 10.0]))
+    em.update_ethics_state(society_well_being=np.array([10.0, 10.0, 10.0]))
     assert em.get_sanction(np.array([10.0, 10.0, 10.0])) == [0]
 
 
 def test_maximin_sanction_min_increased():
     em = EthicsModule(sanction=0.4, principle="maximin")
-    em.update_ethics_state(can_help=True, society_well_being=np.array([2.0, 5.0, 8.0]))  # min=2
+    em.update_ethics_state(society_well_being=np.array([2.0, 5.0, 8.0]))  # min=2
     assert em.get_sanction(np.array([3.0, 5.0, 8.0])) == [0.4]  # min=3, improved
 
 
-def test_maximin_sanction_min_decreased_when_could_help():
+def test_maximin_sanction_min_decreased():
     em = EthicsModule(sanction=0.4, principle="maximin")
-    em.update_ethics_state(can_help=True, society_well_being=np.array([2.0, 5.0, 8.0]))  # min=2
+    em.update_ethics_state(society_well_being=np.array([2.0, 5.0, 8.0]))  # min=2
     assert em.get_sanction(np.array([1.0, 5.0, 8.0])) == [-0.4]  # min=1, worsened
 
 
 def test_maximin_sanction_fewer_instances_of_min_is_positive():
     em = EthicsModule(sanction=0.4, principle="maximin")
-    em.update_ethics_state(can_help=True, society_well_being=np.array([2.0, 2.0, 8.0]))  # min=2, 2 instances
+    em.update_ethics_state(society_well_being=np.array([2.0, 2.0, 8.0]))  # min=2, 2 instances
     assert em.get_sanction(np.array([2.0, 5.0, 8.0])) == [0.4]  # min still 2, now only 1 instance
 
 
-def test_maximin_sanction_more_instances_of_min_is_negative_when_could_help():
+def test_maximin_sanction_more_instances_of_min_is_negative():
     em = EthicsModule(sanction=0.4, principle="maximin")
-    em.update_ethics_state(can_help=True, society_well_being=np.array([2.0, 5.0, 8.0]))  # min=2, 1 instance
+    em.update_ethics_state(society_well_being=np.array([2.0, 5.0, 8.0]))  # min=2, 1 instance
     assert em.get_sanction(np.array([2.0, 2.0, 8.0])) == [-0.4]  # min still 2, now 2 instances
 
 
 def test_utilitarian_sanction_total_increased():
     em = EthicsModule(sanction=0.4, principle="utilitarian")
-    em.update_ethics_state(can_help=True, society_well_being=np.array([1.0, 2.0, 3.0]))  # total=6
+    em.update_ethics_state(society_well_being=np.array([1.0, 2.0, 3.0]))  # total=6
     assert em.get_sanction(np.array([2.0, 2.0, 3.0])) == [0.4]  # total=7, improved
 
 
-def test_utilitarian_sanction_total_decreased_when_could_help():
+def test_utilitarian_sanction_total_decreased():
     em = EthicsModule(sanction=0.4, principle="utilitarian")
-    em.update_ethics_state(can_help=True, society_well_being=np.array([1.0, 2.0, 3.0]))
+    em.update_ethics_state(society_well_being=np.array([1.0, 2.0, 3.0]))
     assert em.get_sanction(np.array([0.0, 2.0, 3.0])) == [-0.4]  # total=5, worsened
 
 
@@ -147,7 +141,7 @@ def test_average_aggregation_returns_a_single_element_list():
 @pytest.mark.parametrize("principle", ["veto", "optimist", "majoritarian", "average"])
 def test_combined_sanction_returns_single_element_list(principle):
     em = EthicsModule(sanction=0.4, principle=principle)
-    em.update_ethics_state(can_help=True, society_well_being=np.array([1.0, 2.0, 3.0]))
+    em.update_ethics_state(society_well_being=np.array([1.0, 2.0, 3.0]))
     sanction = em.get_sanction(np.array([2.0, 2.0, 3.0]))
     assert isinstance(sanction, list)
     assert len(sanction) == 1
