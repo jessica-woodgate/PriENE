@@ -3,10 +3,14 @@ import pandas as pd
 import networkx as nx
 
 class NormProcessing():
+    """
+    NormProcessing reads the emerged-norms JSON files each HarvestModel run writes (one per
+    society/agent_type), and turns them into per-episode counts, merged/deduplicated norms across
+    episodes, and central-tendency summaries used by DataAnalysis for graphing and significance
+    testing. See process_norms for the overall pipeline.
+    """
     def __init__(self):
-        self.min_instances = 1
-        self.min_fitness = 0.1
-        self.min_reward = 50
+        pass
     
     def process_norms(self, df_labels, scenario, norms_filepath, write_filepath):
         episode_norm_dfs = []
@@ -15,33 +19,23 @@ class NormProcessing():
         for label in df_labels:
             input_file = norms_filepath+label+"_emerged_norms.json"
             output_file = write_filepath+scenario+"_"+label+"_norms"
-            episode_norm_data, cooperative_norms = self._process_society_norms(input_file, output_file, filter_fitness=False)
+            episode_norm_data, cooperative_norms = self._process_society_norms(input_file, output_file)
             episode_norm_dfs.append(episode_norm_data)
             cooperative_dfs.append(cooperative_norms)
             norms_tendencies.append(self._calculate_norms_central_tendency(episode_norm_data, label))
         return episode_norm_dfs, cooperative_dfs, norms_tendencies
 
-    def _process_society_norms(self, input_file, output_file, filter_fitness=False):
+    def _process_society_norms(self, input_file, output_file):
         f = open(input_file)
         norm_data = json.load(f)
-        if filter_fitness:
-            filtered_data = {}
-            for society_id, rules in norm_data.items():
-                filtered_rules = []
-                for rule_entry in rules:
-                    # rule_entry is a dict with one key (the rule string)
-                    rule_str, rule_info = next(iter(rule_entry.items()))
-                    if rule_info.get("fitness", 0.0) > 0.0:
-                        filtered_rules.append(rule_entry)
-                if filtered_rules:
-                    filtered_data[society_id] = filtered_rules
-            norm_data = filtered_data
         #counts total norms, cooperative norms, and proportion of cooperative norms for each episode
         episode_norm_data = self._count_norms(norm_data, output_file)
         #merges norms repeated across episodes and writes unique norms to file
         merged_norms = self._merge_norms(norm_data, output_file)
         #looks at all the merged norms and collects data for the cooperative norms
         cooperative_norms = self._get_cooperative_norms(merged_norms, output_file)
+        #_generalise_norms (norms tree + rule generalisation) is a parked feature, not dead code --
+        #disabled here pending a decision on whether to keep or remove it (see _generalise_norms)
         #self._generalise_norms(merged_norms.keys(), output_file)
         #self._generalise_norms(merged_norms.keys(), output_file, cooperative_norms=True)
         return episode_norm_data, cooperative_norms
@@ -98,8 +92,6 @@ class NormProcessing():
             data: Norm base to remove duplicates from (dictionary).
             filename: The file to write the unique set of norms to.
             filter: Whether to filter the norms by fitness and number of instances.
-            min_instances: Minimum number of instances of a norm to include in unique set.
-            min_fitness: Minimum fitness of norm to include in unique set.
 
         Returns:
             A dictionary containing the unique set of norms.
@@ -240,6 +232,7 @@ class NormProcessing():
         return output
     
     def _calculate_norms_central_tendency(self, df, df_label):
+        #each "_summary" field is (mean + median) - stdev, see DataAnalysis._calculate_central_tendency
         central_tendency = {"df_label": df_label,
                             "total_norms_mean": df["total_norms"].mean(),
                             "total_norms_median": df["total_norms"].median(),

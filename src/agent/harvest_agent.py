@@ -9,6 +9,35 @@ from src.harvest_exception import ImpossibleNormException
 import numpy as np
 
 class HarvestAgent(Agent):
+    """
+    HarvestAgent is the agent that observes, chooses an action via its DQNDecisionModule, performs
+    the action (move/eat/throw) and updates its own attributes (health, berries, days left to
+    live), receives an ethics sanction from its EthicsModule (unless agent_type is "baseline"),
+    and optionally tracks its own behaviour/norms via a NormsModule (see perform_transition,
+    which is the Interaction Module described as Algorithm 3 in the paper).
+    Instance variables:
+        agent_type -- normative ethics principle (or aggregation, or "baseline") this agent follows
+        training -- boolean training or testing (also gates whether DQNDecisionModule learns)
+        n_features -- length of the observation vector (see _calculate_n_features)
+        actions -- this agent's action vocabulary: ["move", "eat"] plus one "throw_X" per other agent
+        health / start_health / health_decay / berry_health_payoff -- agent's vitality; health
+            decays every step and is restored by eating/receiving a thrown berry
+        low/high_health_threshold, low/high_berries_threshold, low/high_days_left_threshold --
+            bucket boundaries registered with NormsModule (see _antecedent_features) for turning
+            this agent's state into a natural language precondition string
+        berries / berries_consumed / berries_thrown -- this agent's current berry count and
+            lifetime totals of berries eaten/given away
+        days_left_to_live / total_days_left_to_live -- this agent's own well-being measure
+            (Equation 4), and its running total across the episode
+        min/max_width, min/max_height -- the grid bounds this agent may move within
+        allocation_id -- which allocation of berries this agent may forage from (colours/allotment/
+            capabilities scenarios only; defaults to this agent's own unique_id when unrestricted)
+        decision_module -- DQNDecisionModule choosing actions and (if training) learning from them
+        moving_module -- MovingModule handling pathfinding/movement towards berries
+        ethics_module -- EthicsModule computing a self-directed sanction (absent for "baseline")
+        norms_module -- NormsModule tracking this agent's behaviour base (present only if write_norms)
+        rewards -- this agent's reward table (see _baseline_rewards/_ethics_rewards)
+    """
     def __init__(self,unique_id,model,agent_type,allotment,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None,allocation_id=None):
         super().__init__(unique_id,model)
         self.done = False
@@ -248,6 +277,13 @@ class HarvestAgent(Agent):
         return sanction
     
     def _update_ethics(self):
+        #can_help is meant to represent whether this agent could actually afford to help others
+        #(the condition below checks for spare berries and sufficient health), but both branches
+        #currently set can_help = True regardless, so the condition has no effect on the ethics
+        #sanction (self.can_help gates the "negative sanction for making things worse" branches in
+        #EthicsModule's _egalitarian_sanction/_maximin_sanction/_utilitarian_sanction). Left as-is
+        #rather than changed here, since fixing it would change reward/sanction behaviour, not just
+        #documentation.
         society_well_being = self.model.get_society_well_being(self, False, True)
         if self.berries > 0 and self.health >= self.low_health_threshold:
             can_help = True

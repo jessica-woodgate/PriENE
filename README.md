@@ -6,6 +6,7 @@ This repository includes the codebase for the paper "Combining Normative Ethics 
 - [Introduction](#introduction)
 - [Initialisation](#initialisation)
 - [Usage](#usage)
+- [Testing](#testing)
 
 ## Introduction
 PriENE is a framework for implementing multiple normative ethics principles in decision-making capacities of norm-learning agents. This codebase facilitates the creation of agents that aggregate multiple principles to evaluate the effects of their actions on the well-being of other agents. By operationalising principles, PriENE agents learn behaviours that promote prosocial norms which balance individual interests with collective well-being. Evaluations in simulated harvesting scenarios demonstrate that PriENE agents enhance fairness and sustainability compared to agents that implement individual principles.
@@ -37,6 +38,16 @@ The following arguments can be used with the `run.py` script:
 - `train`: Train the norm-learning agent.
 - `test`: Evaluate the performance of the trained agent.
 - `graphs`: Generate relevant plots for analysis.
+
+## Testing
+
+The test suite covers pure logic (exceptions, ethics/norms/movement modules), the DQN/network layer, and full-simulation integration/regression tests. Run it from the repository root with:
+
+```bash
+pytest
+```
+
+`pytest.ini` points it at the `tests/` directory and adds the repository root to `PYTHONPATH`, so no extra setup is needed once the environment is activated.
 
 ## Citation
 

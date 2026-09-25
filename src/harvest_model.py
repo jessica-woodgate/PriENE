@@ -41,7 +41,6 @@ class HarvestModel(Model):
         write_norms -- boolean to track norms and write to file
         societal_norm_emergence_threshold -- percentage of society required to have adopted a behaviour for it to become a norm
         emerged_norms -- all norms which emerge in current episode
-        min_fitness -- minimum fitness required for a behaviour to become a norm
         epsilon -- probability of exploration for agents (tracks when to end training)
     """
     def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath=""):
@@ -69,7 +68,6 @@ class HarvestModel(Model):
         self.write_norms = write_norms
         self.societal_norm_emergence_threshold = 0.9
         self.emerged_norms = {}
-        #self.min_fitness = 0.0
         if self.training:
             self.epsilon = 0.9
         else:
@@ -366,7 +364,6 @@ class HarvestModel(Model):
             if agent.agent_type != "berry":
                 for norm_name, norm_value in agent.norms_module.behaviour_base.items():
                     current_emerged_norms = self._update_norm(norm_name, norm_value, current_emerged_norms, tracking_adoption=True)
-        #current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_threshold and norm_value["fitness"] >= self.min_fitness}
         current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_threshold}
         for norm_name, norm_value in current_emerged_norms.items():
             self.emerged_norms = self._update_norm(norm_name, norm_value, self.emerged_norms)
@@ -432,6 +429,19 @@ class HarvestModel(Model):
         return (width, height)
     
     def _generate_resource_allocations(self, num_agents):
+        """
+        Returns a list of starting berry counts, one per agent, modelling an unequal distribution
+        of resources across the society (used by colours/allotment/capabilities scenarios; never
+        called by basic_harvest). For num_agents in {2,4,6,20}, returns a hand-picked, hardcoded
+        inequality pattern -- these are the exact, reproducible configurations behind the paper's
+        published results (matching run.py's "select N to replicate results in the paper" prompts),
+        not arbitrary sample data. For any other agent count, falls back to _generate_zipf_distribution
+        to generate an equivalently-shaped inequality programmatically.
+        Side effect: overwrites self.num_start_berries with sum(resources) -- the num_start_berries
+        passed into the model's constructor does NOT directly control the final berry count for
+        these scenarios; it's silently discarded here for the four hardcoded agent counts, and only
+        used as a target total for the Zipf fallback (see _generate_zipf_distribution).
+        """
         if num_agents == 2:
             resources = [5, 1]
         elif num_agents == 4:
@@ -446,20 +456,31 @@ class HarvestModel(Model):
         return resources
     
     def _generate_zipf_distribution(self, num_agents):
+        """
+        Distributes self.num_start_berries (the target total, read here before
+        _generate_resource_allocations overwrites it) across num_agents agents in a Zipf's-law
+        ("few haves, many have-nots") shape, matching the character of the hardcoded distributions
+        this is a fallback for.
+        """
         total_resources = self.num_start_berries
 
         # Generate Zipf-like distribution
-        weights = 1 / np.arange(1, num_agents + 1)  # [1, 1/2, 1/3, ...]
+        weights = 1 / np.arange(1, num_agents + 1)  # [1, 1/2, 1/3, ...] -- rank 0 gets the largest share
         weights /= weights.sum()
         allocations = (weights * total_resources).astype(int)
 
-        # Adjust rounding error
+        #.astype(int) truncates each share toward zero, which can only ever lose berries to
+        #rounding (never gain), so diff is always >= 0; redistribute that shortfall one berry at a
+        #time to a random agent so the total exactly matches total_resources
         diff = total_resources - allocations.sum()
         for _ in range(abs(diff)):
             i = np.random.randint(num_agents)
             allocations[i] += np.sign(diff)
-            
-        np.random.shuffle(allocations)  # Shuffle to avoid order bias
+
+        #without this, agent index/unique_id 0 would always be the richest agent, since the Zipf
+        #weighting always puts the largest share at rank 0 -- shuffle to decouple "who is agent 0"
+        #from "who is rich" while keeping the overall few-rich-many-poor distribution shape
+        np.random.shuffle(allocations)
         self.num_start_berries = int(allocations.sum())
         return allocations.tolist()
 

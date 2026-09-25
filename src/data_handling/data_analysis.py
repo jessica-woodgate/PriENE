@@ -200,19 +200,6 @@ class DataAnalysis():
         # with open(self.filepath+"tendency_berries_consumed.json", "w") as f:
         #     json.dump(berries_consumed_tendency, f, indent=4)
 
-    def _display_stripplot(self, df_list, df_labels, column, filename):
-        fig, ax = plt.subplots()
-        #combine the DataFrames and add labels
-        combined_df = pd.concat([df.assign(label=label) for df, label in zip(df_list, df_labels)])
-        #plot the swarm plot with reduced marker size
-        sns.stripplot(data=combined_df, x=column, y='label', ax=ax, size=2, hue='label', dodge=True, alpha=0.6)
-        plt.xlabel(column)
-        plt.ylabel('Society')
-        plt.title('Strip Plot of ' + column + ' by Society')
-        plt.tight_layout()
-        plt.savefig(str(filename).split()[0])
-        plt.close(fig)
-    
     def _display_swarmplot(self, df_list, df_labels, column, filename):
         fig, ax = plt.subplots()
         #combine the DataFrames and add labels
@@ -226,19 +213,6 @@ class DataAnalysis():
         plt.savefig(str(filename).split()[0])
         plt.close(fig)
     
-    def _display_scatterplot(self, df_list, df_labels, column, filename):
-        fig, ax = plt.subplots()
-        #combine the DataFrames and add labels
-        combined_df = pd.concat([df.assign(label=label) for df, label in zip(df_list, df_labels)])
-        #plot the swarm plot with reduced marker size
-        sns.scatterplot(data=combined_df, x=column, y='label', ax=ax, size=2, hue='label')
-        plt.xlabel(column)
-        plt.ylabel('Society')
-        plt.title('Scatter Plot of ' + column + ' by Society')
-        plt.tight_layout()
-        plt.savefig(str(filename).split()[0])
-        plt.close(fig)
-
     def _display_norm_data(self, df_list, df_labels, filename):
         agg = pd.DataFrame({
             'society': df_labels,
@@ -292,47 +266,16 @@ class DataAnalysis():
         plt.savefig(str(filename).split()[0])
         plt.close()
 
-    def _display_dataframe_shaded(self, df, title, y_label, filename):
-        sns.set_palette("colorblind")
-        ax = sns.lineplot(data=df)
-        ax.set_xlabel("day")
-        ax.set_ylabel(y_label)
-        ax.legend(title="Societies", loc="upper left")
-        plt.title(title)
-        for col in df.columns:
-            mean = df[col].mean()
-            sem = df[col].sem()
-            x = df["day"]
-            ax.fill_between(x, mean + sem, mean - sem, alpha=0.2)
-        plt.savefig(str(filename).split()[0])
-        plt.close()
-        
     def _write_dictionary_to_file(self, dictionary, filepath):
         df = pd.DataFrame(dictionary)
         df.to_csv(filepath, index=False)
         return df
-    
-    def _write_df_list_to_file(self, df_list, df_labels, filepath):
-        i = 0
-        for df in df_list:
-            df.to_csv(filepath+df_labels[i]+".csv")
-            i += 1
-
-    def _apply_function_to_list(self, list, function):
-            results_list = []
-            for item in list:
-                result = function(item)
-                results_list.append(result)
-            return results_list
 
     def _calculate_max(self, series):
         return series.max()
 
     def _calculate_min(self, series):
         return series.min()
-
-    def _calculate_variance(self, series):
-        return series.var()
 
     def _calculate_gini(self, series):
         #sort series in ascending order
@@ -358,6 +301,10 @@ class DataAnalysis():
             return df
 
     def _calculate_central_tendency(self, df, df_label):
+        #each "_summary" field below is (mean + median) - stdev: a single composite score that
+        #rewards a metric being centrally high while penalising it being spread out/inconsistent
+        #across episodes, used by _get_best_results to rank societies on metrics where "more
+        #consistently high" should beat "occasionally very high but volatile"
         central_tendency = {"df_label": df_label,
                             "gini_days_mean": df["gini_days_survived"].mean(),
                             "gini_days_median": df["gini_days_survived"].median(),
@@ -526,10 +473,3 @@ class DataAnalysis():
             relevant_df_labels = self.aggregations
         assert len(relevant_dfs) == len(relevant_df_labels)
         return relevant_dfs, relevant_df_labels
-    
-    def _sort_group_pairs(self, df):
-        df[['group1', 'group2']] = pd.DataFrame(
-            df[['group1', 'group2']].apply(lambda x: sorted(x), axis=1).tolist(),
-            index=df.index
-        )
-        return df

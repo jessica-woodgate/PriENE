@@ -8,6 +8,7 @@ from src.harvest_exception import NoAllocationException
 class AllotmentHarvest(HarvestModel):
     """
     Allotment harvest scenario agents have only access to specific parts of the grid within which different amounts of berries grow
+    Instance variables:
         num_start_berries -- the number of berries initiated at the beginning of an episode
         allocations -- dictionary of agent ids, the part of the grid they have access to, and the berries assigned to that agent
         berries -- list of active berry objects

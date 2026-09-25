@@ -3,6 +3,25 @@ import numpy as np
 import os
 
 class DQNDecisionModule():
+    """
+    DQNDecisionModule is the agent-facing wrapper around a q_network/target_network DQN pair:
+    chooses actions, drives learning (experience replay + periodic target-network sync), and
+    saves/loads checkpoints. Fully generic -- takes actions/n_features as opaque parameters from
+    its caller and has no knowledge of what they represent.
+    Instance variables:
+        agent_type, unique_id -- used only to build this agent's checkpoint file paths
+        training -- boolean training or testing; gates whether learn() has any effect and whether
+            a fresh network is created vs one loaded from checkpoint_path (see _init_networks)
+        epsilon -- current exploration probability, decayed each learn() call
+        min_exploration_prob, expl_decay -- floor and decay rate for epsilon's exponential decay
+        actions, n_actions -- this agent's action vocabulary and its size
+        shared_replay_buffer -- experience buffer shared across agents (see DQN), or None for a
+            per-agent buffer
+        learn_step, replace_target_iter -- counts learn() calls; target_network's weights are
+            copied from q_network every replace_target_iter calls
+        q_network, target_network -- the two DQN instances (see DQN for why two networks are used)
+        losses -- training losses recorded this episode (training mode only), used by get_mean_loss
+    """
     def __init__(self,agent_type,unique_id,training,actions,n_features,checkpoint_path,epsilon,shared_replay_buffer=None):
         self.n_features = n_features
         self.agent_type = agent_type
