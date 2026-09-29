@@ -2,6 +2,7 @@ from mesa import Agent
 from .modules.dqn_decision_module import DQNDecisionModule
 from .modules.moving_module import MovingModule
 from .modules.norms_module import NormsModule
+from .modules.bayesian_norms_module import BayesianNormsModule
 from .modules.ethics_module import EthicsModule
 from src.harvest_exception import NumFeaturesException
 from src.harvest_exception import AgentTypeException
@@ -10,8 +11,8 @@ import numpy as np
 
 class HarvestAgent(Agent):
     """
-    HarvestAgent is the agent that observes, chooses an action via its DQNDecisionModule, performs
-    the action (move/eat/throw) and updates its own attributes (health, berries, days left to
+    HarvestAgent observes, chooses an action via its DQNDecisionModule, performs
+    the action (move/eat/throw), updates its own attributes (health, berries, days left to
     live), receives an ethics sanction from its EthicsModule (unless agent_type is "baseline"),
     and optionally tracks its own behaviour/norms via a NormsModule (see perform_transition,
     which is the Interaction Module described as Algorithm 3 in the paper).
@@ -78,7 +79,8 @@ class HarvestAgent(Agent):
         self.moving_module = MovingModule(self.unique_id, model, training, allotment, self.allocation_id, restrict_to_allocation)
         self.write_norms = write_norms
         if self.write_norms:
-            self.norms_module = NormsModule(self.unique_id, self._antecedent_features(), self._consequent_rules())
+            #self.norms_module = NormsModule(self.unique_id, self._antecedent_features(), self._consequent_rules())
+            self.norms_module = self._build_norm_base(self.model.get_n_agents())
         if agent_type != "baseline":
             self.rewards = self._ethics_rewards()
             self.ethics_module = EthicsModule(self.rewards["sanction"],agent_type)
@@ -89,13 +91,13 @@ class HarvestAgent(Agent):
         if self.done == False:
             observation = self.observe()
             action = self.decision_module.choose_action(observation)
-            self.current_reward, next_state, self.done = self.perform_transition(action)
+            self.current_reward, next_state, self.done = self.perform_transition(action, observation)
             self.current_reward = np.sum(self.current_reward)
             if self.training:
                 self.decision_module.learn(observation, action, self.current_reward, next_state, self.done, self.model.episode)
             self.total_episode_reward += self.current_reward
 
-    def perform_transition(self, action):
+    def perform_transition(self, action, observation):
         """
         Interaction Module (Algorithm 3) receives action from DQN and performs transition
         Observes state before acting and passes view to Norms Module for behaviour and norms handling (Algorithm 2)
@@ -106,8 +108,8 @@ class HarvestAgent(Agent):
         """
         done = False
         self.current_action = action
-        if self.write_norms:
-            antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)])
+        # if self.write_norms:
+        #     antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)])
         if self.agent_type != "baseline":
             self.ethics_module.day = self.model.get_day()
             society_well_being = self.model.get_society_well_being(self, False, True)
@@ -117,12 +119,13 @@ class HarvestAgent(Agent):
         if self.agent_type != "baseline":
             reward_vector = reward_vector + self._ethics_sanction()
         done, reward_vector = self._update_attributes(reward_vector)
+        #if self.write_norms:
+            # reward = np.sum(reward_vector).item()
+            # self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day(), self.model.episode)
+            # if ("no berries" in antecedent and action == "throw") or ("eat" in antecedent and self.actions[action] == "throw"):
+            #     raise ImpossibleNormException(self.unique_id, antecedent, self.actions[action], reward)
         if self.write_norms:
-            reward = np.sum(reward_vector).item()
-            self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day(), self.model.episode)
-            if ("no berries" in antecedent and action == "throw") or ("eat" in antecedent and self.actions[action] == "throw"):
-                raise ImpossibleNormException(self.unique_id, antecedent, self.actions[action], reward)
-                #print(self.model.episode, self.model.day, "agent", self.agent_id, antecedent, "reward", reward_vector, "berries", self.berries, "health", self.health)
+            self.norms_module.update(action, observation)
         return reward_vector, next_state, done
     
     def observe(self):
@@ -176,7 +179,8 @@ class HarvestAgent(Agent):
         self.current_reward = 0
         self.moving_module.reset()
         if self.write_norms:
-            self.norms_module.behaviour_base  = {}
+            #self.norms_module.behaviour_base  = {}
+            self.bayesian_norms_module.initialise()
     
     def _calculate_n_features(self):
         """
@@ -192,29 +196,6 @@ class HarvestAgent(Agent):
             if agent_id != unique_id:
                 actions.append(f"throw_{agent_id}")
         return actions
-
-    def _antecedent_features(self):
-        """
-        Registers with NormsModule how to bucket this agent's state into a natural language
-        precondition string: berries and health as single scalar readings, and well-being (one
-        reading per other currently-observed agent) as a repeated feature.
-        """
-        return [
-            {"boundaries": [self.low_berries_threshold, self.high_berries_threshold],
-             "labels": ["low berries", "medium berries", "high berries"], "zero_label": "no berries"},
-            {"boundaries": [self.low_health_threshold, self.high_health_threshold],
-             "labels": ["low health", "medium health", "high health"]},
-            {"boundaries": [self.low_days_left_threshold, self.high_days_left_threshold],
-             "labels": ["low days", "medium days", "high days"], "repeated": True},
-        ]
-
-    def _consequent_rules(self):
-        """
-        Registers with NormsModule how to generalise this agent's raw action names (move/eat/
-        throw_X) into a natural language postcondition string: all throw_X variants collapse to
-        "throw"; everything else (move, eat) is used as-is.
-        """
-        return [{"prefix": "throw", "label": "throw"}]
     
     def _perform_action(self, action_index):
         reward = 0
@@ -320,3 +301,88 @@ class HarvestAgent(Agent):
                    "survive": 1
                    }
         return rewards
+
+    # ── Norms ───────────────────────────────────────────────────
+
+    # def _antecedent_features(self):
+    #     """
+    #     Registers with NormsModule how to bucket this agent's state into a natural language
+    #     precondition string: berries and health as single scalar readings, and well-being (one
+    #     reading per other currently-observed agent) as a repeated feature.
+    #     """
+    #     return [
+    #         {"boundaries": [self.low_berries_threshold, self.high_berries_threshold],
+    #          "labels": ["low berries", "medium berries", "high berries"], "zero_label": "no berries"},
+    #         {"boundaries": [self.low_health_threshold, self.high_health_threshold],
+    #          "labels": ["low health", "medium health", "high health"]},
+    #         {"boundaries": [self.low_days_left_threshold, self.high_days_left_threshold],
+    #          "labels": ["low days", "medium days", "high days"], "repeated": True},
+    #     ]
+
+    # def _consequent_rules(self):
+    #     """
+    #     Registers with NormsModule how to generalise this agent's raw action names (move/eat/
+    #     throw_X) into a natural language postcondition string: all throw_X variants collapse to
+    #     "throw"; everything else (move, eat) is used as-is.
+    #     """
+    #     return [{"prefix": "throw", "label": "throw"}]
+
+    def _build_norm_base(self, n_agents):
+        """
+        Construct a NormBase from this agent's existing bucket thresholds.
+        Domain knowledge lives here; NormBase itself stays domain-agnostic.
+        """
+        n_others = n_agents - 1
+        other_wellbeing_indices = list(range(4, 4 + n_others))
+
+        feature_specs = [
+            {
+                "name":       "health",
+                "index":      0,
+                "thresholds": [1, 5, 10],
+                "direction":  "<",
+                "repeated":   False,
+            },
+            {
+                "name":       "berries",
+                "index":      1,
+                "thresholds": [1, 5, 10],
+                "direction":  "<",
+                "repeated":   False,
+            },
+            {
+                "name":       "self_wellbeing",
+                "index":      2,
+                "thresholds": [10, 50, 100],
+                "direction":  "<",
+                "repeated":   False,
+            },
+            {
+                "name":       "distance",
+                "index":      3,
+                "thresholds": [1, 5, 10],
+                "direction":  ">",
+                "repeated":   False,
+            },
+            {
+                "name":       "other_wellbeing",
+                "index":      other_wellbeing_indices,
+                "thresholds": [10, 50, 100],
+                "direction":  "<",
+                "repeated":   True,
+            },
+        ]
+
+        #max_predicates = len(self.actions) * 21 * 2 #predicates = num actions, num thresholds per feature, num behaviour types (prohibition/obligation)
+        max_predicates = 2
+
+        action_name_to_index = {
+            name: idx for idx, name in enumerate(self.actions)
+        }
+
+        return BayesianNormsModule(
+            feature_specs=feature_specs,
+            actions=self.actions,
+            max_predicates=max_predicates,
+            action_name_to_index=action_name_to_index,
+        )

@@ -78,9 +78,17 @@ class UnrecognisedPrinciple(HarvestException):
     def __init__(self, principle):
         super().__init__()
         self.principle = principle
-    
+
     def __str__(self):
         return(f"Do not recognise principle {self.principle}")
+
+class UnmappedActionException(HarvestException):
+    def __init__(self, missing_actions):
+        super().__init__()
+        self.missing_actions = missing_actions
+
+    def __str__(self):
+        return (f"action_name_to_index is missing entries for: {sorted(self.missing_actions)}")
     
 class NoPathFound(HarvestException):
     def __init__(self, agent_id, agent_coordinates, berry_coordinates):
