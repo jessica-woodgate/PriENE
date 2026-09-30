@@ -82,7 +82,7 @@ def _make_pretrained_checkpoint(tmp_path, agent_type, max_days=5):
     return checkpoint_path
 
 
-def make_scenario_model(tmp_path, scenario, agent_type, max_days=10, max_episodes=2, society_mix="homogeneous"):
+def make_scenario_model(tmp_path, scenario, agent_type, max_days=10, max_episodes=2, society_mix="homogeneous", track_norms=False):
     """
     Builds a model for the given scenario/agent_type the way it is actually used in practice:
     basic_harvest trains (training=True); colours/allotment/capabilities are test-only
@@ -100,5 +100,5 @@ def make_scenario_model(tmp_path, scenario, agent_type, max_days=10, max_episode
         training = False
     return _build(
         scenario, society_mix, num_start_berries, agent_type, training, checkpoint_path,
-        False, False, f"test_{scenario}_{agent_type}", max_episodes, max_days,
+        False, track_norms, f"test_{scenario}_{agent_type}", max_episodes, max_days,
     )

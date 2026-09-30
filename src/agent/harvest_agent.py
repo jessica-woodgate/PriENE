@@ -36,10 +36,10 @@ class HarvestAgent(Agent):
         decision_module -- DQNDecisionModule choosing actions and (if training) learning from them
         moving_module -- MovingModule handling pathfinding/movement towards berries
         ethics_module -- EthicsModule computing a self-directed sanction (absent for "baseline")
-        norms_module -- NormsModule tracking this agent's behaviour base (present only if write_norms)
+        norms_module -- NormsModule tracking this agent's behaviour base (present only if track_norms)
         rewards -- this agent's reward table (see _baseline_rewards/_ethics_rewards)
     """
-    def __init__(self,unique_id,model,agent_type,allotment,training,checkpoint_path,epsilon,write_norms,shared_replay_buffer=None,allocation_id=None):
+    def __init__(self,unique_id,model,agent_type,allotment,training,checkpoint_path,epsilon,track_norms,shared_replay_buffer=None,allocation_id=None):
         super().__init__(unique_id,model)
         self.done = False
         self.current_reward = 0
@@ -77,10 +77,10 @@ class HarvestAgent(Agent):
             self.allocation_id = allocation_id
         self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer)
         self.moving_module = MovingModule(self.unique_id, model, training, allotment, self.allocation_id, restrict_to_allocation)
-        self.write_norms = write_norms
-        if self.write_norms:
+        self.track_norms = track_norms
+        if self.track_norms:
             #self.norms_module = NormsModule(self.unique_id, self._antecedent_features(), self._consequent_rules())
-            self.norms_module = self._build_norm_base(self.model.get_n_agents())
+            self.norms_module = self._build_norm_base(self.model.get_num_agents())
         if agent_type != "baseline":
             self.rewards = self._ethics_rewards()
             self.ethics_module = EthicsModule(self.rewards["sanction"],agent_type)
@@ -108,7 +108,7 @@ class HarvestAgent(Agent):
         """
         done = False
         self.current_action = action
-        # if self.write_norms:
+        # if self.track_norms:
         #     antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)])
         if self.agent_type != "baseline":
             self.ethics_module.day = self.model.get_day()
@@ -119,13 +119,13 @@ class HarvestAgent(Agent):
         if self.agent_type != "baseline":
             reward_vector = reward_vector + self._ethics_sanction()
         done, reward_vector = self._update_attributes(reward_vector)
-        #if self.write_norms:
+        #if self.track_norms:
             # reward = np.sum(reward_vector).item()
             # self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day(), self.model.episode)
             # if ("no berries" in antecedent and action == "throw") or ("eat" in antecedent and self.actions[action] == "throw"):
             #     raise ImpossibleNormException(self.unique_id, antecedent, self.actions[action], reward)
-        if self.write_norms:
-            self.norms_module.update(action, observation)
+        if self.track_norms:
+            self.norms_module.update(observation, action)
         return reward_vector, next_state, done
     
     def observe(self):
@@ -161,6 +161,8 @@ class HarvestAgent(Agent):
             self.days_survived = end_day
         if self.training:
             self.decision_module.save_models()
+        # if self.track_norms:
+        #     self.norms_module.initialise()
 
     def reset(self):
         """
@@ -178,9 +180,6 @@ class HarvestAgent(Agent):
         self.total_episode_reward = 0
         self.current_reward = 0
         self.moving_module.reset()
-        if self.write_norms:
-            #self.norms_module.behaviour_base  = {}
-            self.bayesian_norms_module.initialise()
     
     def _calculate_n_features(self):
         """
@@ -340,14 +339,14 @@ class HarvestAgent(Agent):
                 "name":       "health",
                 "index":      0,
                 "thresholds": [1, 5, 10],
-                "direction":  "<",
+                "direction":  "<=",
                 "repeated":   False,
             },
             {
                 "name":       "berries",
                 "index":      1,
-                "thresholds": [1, 5, 10],
-                "direction":  "<",
+                "thresholds": [0, 2, 3],
+                "direction":  ">=",
                 "repeated":   False,
             },
             {
@@ -360,20 +359,20 @@ class HarvestAgent(Agent):
             {
                 "name":       "distance",
                 "index":      3,
-                "thresholds": [1, 5, 10],
-                "direction":  ">",
+                "thresholds": [1, 3, 8],
+                "direction":  "<=",
                 "repeated":   False,
             },
             {
                 "name":       "other_wellbeing",
                 "index":      other_wellbeing_indices,
                 "thresholds": [10, 50, 100],
-                "direction":  "<",
+                "direction":  "<=",
                 "repeated":   True,
             },
         ]
 
-        #max_predicates = len(self.actions) * 21 * 2 #predicates = num actions, num thresholds per feature, num behaviour types (prohibition/obligation)
+        #max_predicates = len(self.actions) * 21 #predicates = num actions, num thresholds per feature
         max_predicates = 2
 
         action_name_to_index = {
@@ -384,5 +383,5 @@ class HarvestAgent(Agent):
             feature_specs=feature_specs,
             actions=self.actions,
             max_predicates=max_predicates,
-            action_name_to_index=action_name_to_index,
+            action_name_to_index=action_name_to_index
         )

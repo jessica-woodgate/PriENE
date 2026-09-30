@@ -27,6 +27,10 @@ class BayesianNormsModule():
         prior                -- initial P(behaviour learned), low by default
         learned_threshold    -- posterior above which a behaviour is returned
                                 as learned (default 0.95)
+        min_observations     -- minimum number of times a behaviour's
+                                precondition must be met before it can be
+                                considered learned (default 5)
+        epsilon              -- exploration probability for agent's action selection
         behaviour_base            -- dict mapping behaviour_id -> behaviour dict,
                                 populated by initialise()
     """
@@ -38,7 +42,9 @@ class BayesianNormsModule():
         max_predicates=2,
         prior=0.05,
         learned_threshold=0.95,
-        action_name_to_index=None
+        min_observations=5,
+        action_name_to_index=None,
+        epsilon=0.1
     ):
         self.feature_specs = feature_specs
         self.actions = actions
@@ -46,7 +52,11 @@ class BayesianNormsModule():
         self.max_predicates = max_predicates
         self.prior = prior
         self.learned_threshold = learned_threshold
+        self.min_observations = min_observations
+        self.epsilon = epsilon
         self.behaviour_base = {}
+
+        self.initialise()
 
     def initialise(self):
         """
@@ -67,6 +77,13 @@ class BayesianNormsModule():
             for b in candidates
         }
         return self
+
+    def end_episode(self):
+        """
+        Decay posteriors at the end of each episode, to allow for forgetting.
+        """
+        for behaviour in self.behaviour_base.values():
+            behaviour["posterior"] *= (1.0 - self.norm_decay_rate)
 
     def update(self, observation, action_taken):
         """
@@ -116,11 +133,11 @@ class BayesianNormsModule():
             #                              because it learned the behaviour)
             # P(consistent | not learned) = base_rate (agent acts this way
             #                              by chance or for other reasons)
-            n   = behaviour["times_precondition_met"]
-            k   = behaviour["times_action_matched"]
+            # n   = behaviour["times_precondition_met"]
+            # k   = behaviour["times_action_matched"]
 
-            # Running match rate: how often the agent acted consistently
-            match_rate = k / n
+            # # Running match rate: how often the agent acted consistently
+            # match_rate = k / n
 
             # Base rate: for a prohibition, the agent avoids the action
             # some fraction of the time regardless of norms (1 - 1/n_actions
@@ -134,10 +151,10 @@ class BayesianNormsModule():
 
             # Likelihood of this step's evidence under each hypothesis
             if consistent:
-                p_evidence_given_learned     = match_rate
+                p_evidence_given_learned     = 1.0 - self.epsilon
                 p_evidence_given_not_learned = base_rate
             else:
-                p_evidence_given_learned     = 1.0 - match_rate
+                p_evidence_given_learned     = self.epsilon
                 p_evidence_given_not_learned = 1.0 - base_rate
 
             # Avoid degenerate likelihoods on first observations
@@ -157,7 +174,7 @@ class BayesianNormsModule():
             )
             behaviour["posterior"] = numerator / denominator
 
-    def learned_behaviours(self):
+    def get_learned_behaviours(self):
         """
         Return behaviours whose posterior exceeds the learned threshold,
         sorted by posterior descending — most certain first.
@@ -168,19 +185,17 @@ class BayesianNormsModule():
         learned = [
             b for b in self.behaviour_base.values()
             if b["posterior"] >= self.learned_threshold
-            and b["times_precondition_met"] > 0
+            and b["times_precondition_met"] >= self.min_observations
         ]
         return sorted(learned, key=lambda b: b["posterior"], reverse=True)
 
-    def all_behaviours_by_certainty(self, min_observations=5):
+    def get_all_behaviours_by_certainty(self):
         """
-        Return all behaviours that have been observed at least
-        min_observations times, sorted by posterior descending.
+        Return all behaviours that have been observed, sorted by posterior descending.
         Useful for inspecting the full learned/not-learned spectrum.
         """
         observed = [
             b for b in self.behaviour_base.values()
-            if b["times_precondition_met"] >= min_observations
         ]
         return sorted(observed, key=lambda b: b["posterior"], reverse=True)
 
@@ -188,10 +203,10 @@ class BayesianNormsModule():
         predicates = []
         for spec in self.feature_specs:
             if spec.get("repeated"):
-                for idx in spec["index"]:
+                for position, idx in enumerate(spec["index"]):
                     for threshold in spec["thresholds"]:
                         predicates.append(
-                            self._make_predicate(spec, idx, threshold)
+                            self._make_predicate(spec, idx, threshold, position)
                         )
             else:
                 for threshold in spec["thresholds"]:
@@ -200,9 +215,12 @@ class BayesianNormsModule():
                     )
         return predicates
 
-    def _make_predicate(self, spec, index, threshold):
+    def _make_predicate(self, spec, index, threshold, position=None):
         direction = spec["direction"]
-        name = f"{spec['name']}{direction}{threshold}"
+        # repeated features need their position in the name, else e.g. each other agent's
+        # well-being predicate would share one label (and collide as a key in the norms JSON)
+        feature = spec["name"] if position is None else f"{spec['name']}[{position}]"
+        name = f"{feature}{direction}{threshold}"
         return {
             "name":      name,
             "index":     index,
