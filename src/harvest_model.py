@@ -96,7 +96,7 @@ class HarvestModel(Model):
             #self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.filepath+"_emerged_norms.json")
             # record norms before agents' finish_episode(), so any end-of-episode norm update (e.g. decay) is excluded
             self._analyse_agent_norms()
-            self._write_agent_norms_to_file()
+            #self._write_agent_norms_to_file()
         for a in self.schedule.agents:
             if a.agent_type != "berry":
                 a.finish_episode(self.day)

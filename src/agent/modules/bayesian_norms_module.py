@@ -78,13 +78,13 @@ class BayesianNormsModule():
         }
         return self
 
-    def end_episode(self):
-        """
-        Decay posteriors at the end of each episode, to allow for forgetting.
-        """
+    def reset(self):
+        """Reset posteriors and counts for a new episode."""
         for behaviour in self.behaviour_base.values():
-            behaviour["posterior"] *= (1.0 - self.norm_decay_rate)
-
+            behaviour["posterior"] = self.prior
+            behaviour["times_precondition_met"] = 0
+            behaviour["times_action_matched"] = 0
+            
     def update(self, observation, action_taken):
         """
         Bayesian update on one (observation, action) pair from the

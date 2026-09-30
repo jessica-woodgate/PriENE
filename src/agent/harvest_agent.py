@@ -161,8 +161,6 @@ class HarvestAgent(Agent):
             self.days_survived = end_day
         if self.training:
             self.decision_module.save_models()
-        # if self.track_norms:
-        #     self.norms_module.initialise()
 
     def reset(self):
         """
@@ -180,6 +178,8 @@ class HarvestAgent(Agent):
         self.total_episode_reward = 0
         self.current_reward = 0
         self.moving_module.reset()
+        if self.track_norms:
+            self.norms_module.reset()
     
     def _calculate_n_features(self):
         """
