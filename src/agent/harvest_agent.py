@@ -353,7 +353,7 @@ class HarvestAgent(Agent):
                 "name":       "self_wellbeing",
                 "index":      2,
                 "thresholds": [10, 50, 100],
-                "direction":  "<",
+                "direction":  "<=",
                 "repeated":   False,
             },
             {

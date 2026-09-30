@@ -84,7 +84,7 @@ class BayesianNormsModule():
             behaviour["posterior"] = self.prior
             behaviour["times_precondition_met"] = 0
             behaviour["times_action_matched"] = 0
-            
+
     def update(self, observation, action_taken):
         """
         Bayesian update on one (observation, action) pair from the
@@ -289,7 +289,7 @@ class BayesianNormsModule():
     def _precondition_satisfied(self, behaviour, observation):
         for pred in behaviour["predicates"]:
             value = observation[pred["index"]]
-            if pred["direction"] == "<":
+            if pred["direction"] == "<=":
                 if not (value < pred["threshold"]):
                     return False
             else:
