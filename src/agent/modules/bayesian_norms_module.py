@@ -1,7 +1,13 @@
 from itertools import combinations
+import operator
 import numpy as np
 
 from src.harvest_exception import UnmappedActionException
+
+
+# predicate direction -> comparison of (observed value, threshold); the direction string is also
+# used in the predicate's label, so each must test exactly what it says
+DIRECTIONS = {"<": operator.lt, "<=": operator.le, ">": operator.gt, ">=": operator.ge}
 
 
 class BayesianNormsModule():
@@ -217,6 +223,8 @@ class BayesianNormsModule():
 
     def _make_predicate(self, spec, index, threshold, position=None):
         direction = spec["direction"]
+        if direction not in DIRECTIONS:
+            raise ValueError(f"unknown predicate direction {direction!r} for {spec['name']}; expected one of {list(DIRECTIONS)}")
         # repeated features need their position in the name, else e.g. each other agent's
         # well-being predicate would share one label (and collide as a key in the norms JSON)
         feature = spec["name"] if position is None else f"{spec['name']}[{position}]"
@@ -288,11 +296,6 @@ class BayesianNormsModule():
 
     def _precondition_satisfied(self, behaviour, observation):
         for pred in behaviour["predicates"]:
-            value = observation[pred["index"]]
-            if pred["direction"] == "<=":
-                if not (value < pred["threshold"]):
-                    return False
-            else:
-                if not (value > pred["threshold"]):
-                    return False
+            if not DIRECTIONS[pred["direction"]](observation[pred["index"]], pred["threshold"]):
+                return False
         return True

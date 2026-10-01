@@ -29,29 +29,29 @@ GRID = {
 
 
 def _build(scenario, society_mix, num_start_berries, agent_type, training, checkpoint_path,
-           write_data, write_norms, filepath, max_episodes, max_days):
+           write_data, write_norms, filepath, max_episodes, max_days, seed=None):
     max_width, max_height = GRID[scenario]
     if scenario == "basic":
         return BasicHarvest(
             society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
-            max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath,
+            max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed,
         )
     elif scenario == "colours":
         return ColoursHarvest(
             society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
-            max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath,
+            max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed,
         )
     elif scenario == "allotment":
         return AllotmentHarvest(
             society_mix, NUM_AGENTS, num_start_berries, NUM_ALLOCATIONS, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
-            write_norms, filepath,
+            write_norms, filepath, seed,
         )
     elif scenario == "capabilities":
         return CapabilitiesHarvest(
             society_mix, NUM_AGENTS, num_start_berries, NUM_ALLOCATIONS, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
-            write_norms, filepath,
+            write_norms, filepath, seed,
         )
     raise ValueError(f"unknown scenario {scenario}")
 

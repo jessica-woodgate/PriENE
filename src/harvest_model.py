@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import json
 import os
+import tensorflow
+from tensorflow import keras
 from .agent.harvest_agent import HarvestAgent
 from .berry import Berry
 from .harvest_exception import FileExistsException
@@ -43,9 +45,11 @@ class HarvestModel(Model):
         societal_norm_emergence_threshold -- percentage of society required to have adopted a behaviour for it to become a norm
         emerged_norms -- all norms which emerge in current episode
         epsilon -- probability of exploration for agents (tracks when to end training)
+        seed -- random seed for the run (None = unseeded)
     """
-    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath=""):
+    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None):
         super().__init__()
+        self._set_seed(seed)
         self.num_agents = num_agents
         if self.num_agents <= 0:
             raise NumAgentsException(">0", 0)
@@ -158,6 +162,21 @@ class HarvestModel(Model):
                 society_well_being = np.append(society_well_being, 0)
         return society_well_being
     
+    def _set_seed(self, seed):
+        """
+        Seeds every source of randomness so a run can be reproduced: python's random module, numpy's
+        global RNG (grid placement, resource allocations, DQN replay sampling and exploration),
+        tensorflow (network weight initialisation), and mesa's own model RNG (RandomActivation's
+        agent ordering). Must run before any agents are created. Op determinism is process-wide and
+        stays on for any later models in the same process. seed=None leaves the run unseeded.
+        """
+        self.seed = seed
+        if seed is None:
+            return
+        keras.utils.set_random_seed(seed)
+        tensorflow.config.experimental.enable_op_determinism()
+        self.reset_randomizer(seed)
+
     def get_num_agents(self):
         return self.num_agents
     
@@ -286,7 +305,8 @@ class HarvestModel(Model):
                                "median_health": [],
                                "variance_health": [],
                                "deceased": [],
-                               "num_emerged_norms": []})
+                               "num_emerged_norms": [],
+                               "seed": []})
         if self.write_data:
             if exists("data/results/current_run/model_episode_reports_"+self.filepath+".csv"):
                 raise FileExistsException("data/results/current_run/model_episode_reports_"+self.filepath+".csv")
@@ -333,7 +353,8 @@ class HarvestModel(Model):
                                "median_health": [self.agent_reporter["health"].loc[row_index_list].median()],
                                "variance_health": [self.agent_reporter["health"].loc[row_index_list].var(axis=0)],
                                "deceased": [self.num_agents - len(self.living_agents)],
-                               "num_emerged_norms": [len(self.emerged_norms) if self.track_norms else None]})
+                               "num_emerged_norms": [len(self.emerged_norms) if self.track_norms else None],
+                               "seed": [self.seed]})
         if self.write_data:
             new_entry.to_csv("data/results/current_run/model_episode_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
         return new_entry

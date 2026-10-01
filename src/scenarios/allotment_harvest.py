@@ -13,8 +13,8 @@ class AllotmentHarvest(HarvestModel):
         allocations -- dictionary of agent ids, the part of the grid they have access to, and the berries assigned to that agent
         berries -- list of active berry objects
     """
-    def __init__(self,society_mix,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath=""):
-        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath)
+    def __init__(self,society_mix,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None):
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed)
         self.num_start_berries = num_start_berries
         if num_allotments > num_agents or num_allotments < 1:
             raise NumAllotmentsException(num_agents, num_allotments)

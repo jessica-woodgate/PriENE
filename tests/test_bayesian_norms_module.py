@@ -151,6 +151,18 @@ def test_initialise_resets_posteriors_and_counts():
         assert b["times_action_matched"] == 0
 
 
+def test_reset_restores_prior_and_counts_but_keeps_candidates():
+    module = make_module()
+    run_policy(module, always_eat, 20)
+    ids_before = list(module.behaviour_base)
+    module.reset()
+    assert list(module.behaviour_base) == ids_before
+    for b in module.behaviour_base.values():
+        assert b["posterior"] == module.prior
+        assert b["times_precondition_met"] == 0
+        assert b["times_action_matched"] == 0
+
+
 # --- _precondition_satisfied ---
 
 @pytest.mark.parametrize(
@@ -162,12 +174,22 @@ def test_initialise_resets_posteriors_and_counts():
         (">", 5.01, True),
         (">", 5.0, False),   # strict: equal to threshold is not above it
         (">", 4.99, False),
+        ("<=", 5.0, True),   # inclusive: the label "x<=5" must hold at exactly 5
+        ("<=", 5.01, False),
+        (">=", 5.0, True),   # inclusive: the label "x>=5" must hold at exactly 5
+        (">=", 4.99, False),
     ],
 )
 def test_precondition_threshold_boundaries(direction, value, expected):
     spec = [{"name": "x", "index": 0, "thresholds": [5], "direction": direction}]
     module = make_module(spec)
     assert module._precondition_satisfied(module.behaviour_base[0], np.array([value])) == expected
+
+
+def test_unknown_direction_raises():
+    """Regression test: an unrecognised direction used to fall through silently to a ">" check."""
+    with pytest.raises(ValueError):
+        make_module([{"name": "x", "index": 0, "thresholds": [5], "direction": "=<"}])
 
 
 def test_two_predicate_precondition_requires_both():

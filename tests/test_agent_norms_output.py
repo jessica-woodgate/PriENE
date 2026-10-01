@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.agent.modules.bayesian_norms_module import BayesianNormsModule
+from src.agent.modules.bayesian_norms_module import DIRECTIONS, BayesianNormsModule
 from src.harvest_exception import FileExistsException
 from tests.conftest import SCENARIOS, _build, make_scenario_model
 
@@ -109,13 +109,16 @@ def test_rerun_with_same_filepath_raises(in_tmp_dir):
 # --- _write_agent_norms_to_file (JSON, one per agent) ---
 
 def test_one_json_per_agent_keyed_by_episode(in_tmp_dir):
+    # called directly: the finish_episode() call to _write_agent_norms_to_file is currently disabled
     model = make_norms_model(in_tmp_dir)
     agents = harvest_agents(model)
     model.step()
     force_learned(agents[0], {0, 1, 3})
+    model._write_agent_norms_to_file()
     model.finish_episode()
     model.step()
     force_learned(agents[0], {1})
+    model._write_agent_norms_to_file()
     model.finish_episode()
     for agent in agents:
         assert list(read_agent_json(agent.unique_id).keys()) == ["1", "2"]
@@ -130,7 +133,7 @@ def test_json_norm_entry_contents(in_tmp_dir):
     agent = harvest_agents(model)[0]
     model.step()
     force_learned(agent, {1})
-    model.finish_episode()
+    model._write_agent_norms_to_file()
     [entry] = read_agent_json(0)["1"]
     label, data = next(iter(entry.items()))
     expected = agent.norms_module.behaviour_base[1]
@@ -152,9 +155,10 @@ def test_scenario_runs_with_norm_tracking(in_tmp_dir, scenario):
     model = make_scenario_model(in_tmp_dir, scenario, "utilitarian", max_days=5, max_episodes=2, track_norms=True)
     while model.episode <= 2:
         model.step()
-    agents = harvest_agents(model)
-    assert all(any(b["times_precondition_met"] > 0 for b in a.norms_module.behaviour_base.values()) for a in agents)
-    assert len(pd.read_csv(f"data/results/current_run/agent_norms_test_{scenario}_utilitarian.csv")) == 2 * len(agents)
+    df = pd.read_csv(f"data/results/current_run/agent_norms_test_{scenario}_utilitarian.csv")
+    assert len(df) == 2 * model.num_agents
+    # agents' norm bases are reset each episode, so check observations via what was recorded
+    assert (df["num_observed_behaviours"] > 0).all()
 
 
 TRAINED_CHECKPOINTS = "data/model_variables/200_days/4_agents/"
@@ -164,9 +168,10 @@ TRAINED_CHECKPOINTS_ABS = os.path.abspath(TRAINED_CHECKPOINTS) + "/"
 
 @pytest.mark.skipif(not os.path.isdir(TRAINED_CHECKPOINTS), reason="needs the trained 200_days checkpoints")
 @pytest.mark.xfail(strict=True, reason=(
-    "HarvestAgent._build_norm_base thresholds partly don't match trained-policy observation ranges: "
-    "berries<5/<10 are ~always true (agents rarely hold more than 3 berries) and distance>5/>10 are "
-    "~never true on an 8x8 grid. Remove this marker once the thresholds are recalibrated."
+    "HarvestAgent._build_norm_base has thresholds that are (almost) always or never true under trained policies: "
+    "distance<8 (distance never exceeds 7 on an 8x8 grid); berries>3 is also ~never true (<1%) for some "
+    "agent types. "
+    "Remove this marker once they are changed."
 ))
 @pytest.mark.parametrize("agent_type", ["baseline", "utilitarian"])
 def test_every_predicate_is_informative_under_trained_policy(in_tmp_dir, monkeypatch, agent_type):
@@ -191,10 +196,7 @@ def test_every_predicate_is_informative_under_trained_policy(in_tmp_dir, monkeyp
     uninformative = []
     for predicate in harvest_agents(model)[0].norms_module._build_predicates():
         values = observations[:, predicate["index"]]
-        if predicate["direction"] == "<":
-            rate = np.mean(values < predicate["threshold"])
-        else:
-            rate = np.mean(values > predicate["threshold"])
+        rate = np.mean(DIRECTIONS[predicate["direction"]](values, predicate["threshold"]))
         if not 0.01 <= rate <= 0.99:
             uninformative.append(f"{predicate['name']}: {rate:.1%}")
     assert uninformative == []
