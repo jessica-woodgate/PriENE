@@ -125,7 +125,7 @@ class HarvestAgent(Agent):
             # if ("no berries" in antecedent and action == "throw") or ("eat" in antecedent and self.actions[action] == "throw"):
             #     raise ImpossibleNormException(self.unique_id, antecedent, self.actions[action], reward)
         if self.track_norms:
-            self.norms_module.update(observation, action)
+            self.norms_module.update(observation, self.norm_action_index[action])
         return reward_vector, next_state, done
     
     def observe(self):
@@ -339,49 +339,50 @@ class HarvestAgent(Agent):
                 "name":       "health",
                 "index":      0,
                 "thresholds": [1, 5, 10],
-                "direction":  "<",
                 "repeated":   False,
             },
             {
                 "name":       "berries",
                 "index":      1,
-                "thresholds": [0, 2, 3],
-                "direction":  ">",
+                "thresholds": [1, 2, 3],
                 "repeated":   False,
             },
             {
                 "name":       "self_wellbeing",
                 "index":      2,
                 "thresholds": [10, 50, 100],
-                "direction":  "<",
                 "repeated":   False,
             },
             {
                 "name":       "distance",
                 "index":      3,
                 "thresholds": [1, 3, 7],
-                "direction":  "<",
                 "repeated":   False,
             },
             {
                 "name":       "other_wellbeing",
                 "index":      other_wellbeing_indices,
-                "thresholds": [10, 50, 100],
-                "direction":  "<",
+                "thresholds": [0.1, 10, 50, 100],
                 "repeated":   True,
             },
         ]
 
-        #max_predicates = len(self.actions) * 21 #predicates = num actions, num thresholds per feature
+        #max_predicates = len(self.actions) * 28 #predicates = num actions, num thresholds per feature
         max_predicates = 2
 
-        action_name_to_index = {
-            name: idx for idx, name in enumerate(self.actions)
-        }
+        # norms are about whether an agent shares at all, not who it shares with: every throw_X
+        # collapses to a single "throw" norm action. norm_action_index maps each raw action index
+        # (into self.actions) to its norm action index, for converting actions before update()
+        norm_actions = ["move", "eat", "throw"]
+        action_name_to_index = {name: idx for idx, name in enumerate(norm_actions)}
+        self.norm_action_index = [
+            action_name_to_index["throw" if name.startswith("throw_") else name]
+            for name in self.actions
+        ]
 
         return BayesianNormsModule(
             feature_specs=feature_specs,
-            actions=self.actions,
+            actions=norm_actions,
             max_predicates=max_predicates,
             action_name_to_index=action_name_to_index
         )

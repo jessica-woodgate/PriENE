@@ -384,7 +384,9 @@ class HarvestModel(Model):
         Collects one row per agent summarising the norms it has learned by the end of this episode and
         appends them to agent_norms_<filepath>.csv. Gained/lost compare against the behaviours the same
         agent had learned at the end of the previous episode (posteriors decay between episodes, so
-        behaviours can be lost as well as gained).
+        behaviours can be lost as well as gained). Cooperative norms are learned obligations to throw a
+        berry to another agent ("IF ... THEN throw"); uncooperative norms are learned prohibitions on
+        throwing ("IF ... THEN NOT throw"). Agents' throw_X actions are collapsed to "throw" for norms.
         """
         rows = []
         for agent in self.schedule.agents:
@@ -403,7 +405,9 @@ class HarvestModel(Model):
                          "num_gained_norms": len(learned_ids - previous_ids),
                          "num_lost_norms": len(previous_ids - learned_ids),
                          "mean_learned_posterior": float(np.mean([b["posterior"] for b in learned])) if learned else None,
-                         "num_observed_behaviours": sum(b["times_precondition_met"] > 0 for b in agent.norms_module.behaviour_base.values())})
+                         "num_observed_behaviours": sum(b["times_precondition_met"] > 0 for b in agent.norms_module.behaviour_base.values()),
+                         "num_learned_cooperative_norms": sum(b["type"] == "obligation" and b["action"] == "throw" for b in learned),
+                         "num_learned_uncooperative_norms": sum(b["type"] == "prohibition" and b["action"] == "throw" for b in learned)})
             self.previous_learned_norms[agent.unique_id] = learned_ids
         pd.DataFrame(rows, columns=self._agent_norms_columns()).to_csv(self._agent_norms_csv_filename(), header=None, mode='a', index=False)
 
@@ -430,7 +434,8 @@ class HarvestModel(Model):
     def _agent_norms_columns(self):
         return ["episode", "agent_id", "agent_type", "end_day", "num_learned_norms", "num_learned_prohibitions",
                 "num_learned_obligations", "num_gained_norms", "num_lost_norms", "mean_learned_posterior",
-                "num_observed_behaviours"]
+                "num_observed_behaviours", "num_learned_cooperative_norms",
+                "num_learned_uncooperative_norms"]
 
     def _check_emerged_norms(self):
         """
