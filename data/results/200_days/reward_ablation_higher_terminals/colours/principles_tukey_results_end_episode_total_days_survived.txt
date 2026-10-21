@@ -1,0 +1,29 @@
+      Multiple Comparison of Means - Tukey HSD, FWER=0.05      
+===============================================================
+   group1      group2   meandiff p-adj   lower    upper  reject
+---------------------------------------------------------------
+    average    baseline   103.23    0.0   84.552 121.908   True
+    average egalitarian   89.809    0.0   71.131 108.487   True
+    average     maximin    7.214   0.83  -11.464  25.892  False
+    average utilitarian    24.28 0.0036    5.602  42.958   True
+   baseline egalitarian  -13.421 0.2856  -32.099   5.257  False
+   baseline     maximin  -96.016    0.0 -114.694 -77.338   True
+   baseline utilitarian   -78.95    0.0  -97.628 -60.272   True
+egalitarian     maximin  -82.595    0.0 -101.273 -63.917   True
+egalitarian utilitarian  -65.529    0.0  -84.207 -46.851   True
+    maximin utilitarian   17.066 0.0923   -1.612  35.744  False
+---------------------------------------------------------------
+      Effect Size - Cohen's D
+=========================================================
+
+        group1       group2  cohens_d
+0     baseline  utilitarian  0.518936
+1     baseline      maximin  0.558713
+2     baseline  egalitarian  0.087815
+3     baseline      average  0.600151
+4  utilitarian      maximin  0.116916
+5  utilitarian  egalitarian -0.532717
+6  utilitarian      average  0.166130
+7      maximin  egalitarian -0.563053
+8      maximin      average  0.043308
+9  egalitarian      average  0.611476

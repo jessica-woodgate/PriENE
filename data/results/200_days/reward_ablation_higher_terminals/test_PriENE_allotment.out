@@ -1,0 +1,34 @@
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+pygame 2.6.1 (SDL 2.32.56, Python 3.11.16)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+What type of scenario do you want to run ['colours', 'capabilities', 'allotment']: What run do you want to test (select 200_days to replicate results in the paper) ['current_run', '50_days', '200_days']: What mix of society do you want to test ['homogeneous', 'heterogeneous']: What type of agent do you want to implement ['baseline', 'utilitarian', 'maximin', 'egalitarian', 'average', 'majoritarian', 'optimist', 'veto', 'all']: How many agents do you want to implement (select 4 to replicate results in the paper) ['2', '4', '6', '20', '50', '100']: How many allotments do you want? (select 2 to replicate results in the paper) (must be more than 0 and less than 5): Do you want to write data to file? (y, n): data will be written into data/results/current_run.
+Do you want to write norms to file? (y, n): norms will be written into data/results/current_run.
+Do you want to render the simulation? (y, n): dict_values([{'id': 0, 'berry_allocation': 8, 'allotment': [0, 8, 0, 8], 'agent_ids': [0, 1]}, {'id': 1, 'berry_allocation': 4, 'allotment': [8, 16, 0, 8], 'agent_ids': [2, 3]}])
+dict_keys(['allocation_0', 'allocation_1'])
+simulation finished time: 1790851208.5829139
+dict_values([{'id': 0, 'berry_allocation': 8, 'allotment': [0, 8, 0, 8], 'agent_ids': [0, 1]}, {'id': 1, 'berry_allocation': 4, 'allotment': [8, 16, 0, 8], 'agent_ids': [2, 3]}])
+dict_keys(['allocation_0', 'allocation_1'])
+simulation finished time: 1790855329.468206
+dict_values([{'id': 0, 'berry_allocation': 8, 'allotment': [0, 8, 0, 8], 'agent_ids': [0, 1]}, {'id': 1, 'berry_allocation': 4, 'allotment': [8, 16, 0, 8], 'agent_ids': [2, 3]}])
+dict_keys(['allocation_0', 'allocation_1'])
+simulation finished time: 1790859262.2643151
+dict_values([{'id': 0, 'berry_allocation': 8, 'allotment': [0, 8, 0, 8], 'agent_ids': [0, 1]}, {'id': 1, 'berry_allocation': 4, 'allotment': [8, 16, 0, 8], 'agent_ids': [2, 3]}])
+dict_keys(['allocation_0', 'allocation_1'])
+simulation finished time: 1790862724.935032
+dict_values([{'id': 0, 'berry_allocation': 8, 'allotment': [0, 8, 0, 8], 'agent_ids': [0, 1]}, {'id': 1, 'berry_allocation': 4, 'allotment': [8, 16, 0, 8], 'agent_ids': [2, 3]}])
+dict_keys(['allocation_0', 'allocation_1'])
+simulation finished time: 1790866127.5177183
+dict_values([{'id': 0, 'berry_allocation': 8, 'allotment': [0, 8, 0, 8], 'agent_ids': [0, 1]}, {'id': 1, 'berry_allocation': 4, 'allotment': [8, 16, 0, 8], 'agent_ids': [2, 3]}])
+dict_keys(['allocation_0', 'allocation_1'])
+simulation finished time: 1790870940.9754865
+dict_values([{'id': 0, 'berry_allocation': 8, 'allotment': [0, 8, 0, 8], 'agent_ids': [0, 1]}, {'id': 1, 'berry_allocation': 4, 'allotment': [8, 16, 0, 8], 'agent_ids': [2, 3]}])
+dict_keys(['allocation_0', 'allocation_1'])
+simulation finished time: 1790874517.1176424
+dict_values([{'id': 0, 'berry_allocation': 8, 'allotment': [0, 8, 0, 8], 'agent_ids': [0, 1]}, {'id': 1, 'berry_allocation': 4, 'allotment': [8, 16, 0, 8], 'agent_ids': [2, 3]}])
+dict_keys(['allocation_0', 'allocation_1'])
+simulation finished time: 1790877857.8978786

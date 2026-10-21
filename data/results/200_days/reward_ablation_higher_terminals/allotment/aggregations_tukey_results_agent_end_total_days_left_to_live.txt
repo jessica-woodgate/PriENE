@@ -1,0 +1,21 @@
+         Multiple Comparison of Means - Tukey HSD, FWER=0.05         
+=====================================================================
+   group1       group2     meandiff p-adj    lower     upper   reject
+---------------------------------------------------------------------
+     average majoritarian -156.6107 0.3434 -398.5438   85.3223  False
+     average     optimist  454.2142    0.0  212.2812  696.1473   True
+     average         veto  -254.342 0.0349 -496.2751  -12.4089   True
+majoritarian     optimist   610.825    0.0  368.8919  852.7581   True
+majoritarian         veto  -97.7312 0.7271 -339.6643  144.2018  False
+    optimist         veto -708.5562    0.0 -950.4893 -466.6232   True
+---------------------------------------------------------------------
+      Effect Size - Cohen's D
+=========================================================
+
+         group1        group2  cohens_d
+0       average  majoritarian  0.037114
+1       average      optimist -0.106857
+2       average          veto  0.059552
+3  majoritarian      optimist -0.147173
+4  majoritarian          veto  0.023430
+5      optimist          veto  0.168608

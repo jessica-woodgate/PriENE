@@ -8,6 +8,7 @@ import os
 import tensorflow
 from tensorflow import keras
 from .agent.harvest_agent import HarvestAgent
+from .agent.harvest_agent import NORMS_MODULE_TYPES
 from .berry import Berry
 from .harvest_exception import FileExistsException
 from .harvest_exception import NoEmptyCells
@@ -15,6 +16,7 @@ from .harvest_exception import NumAgentsException
 from .harvest_exception import AgentTypeException
 from .harvest_exception import NoBerriesException
 from .harvest_exception import NumBerriesException
+from .harvest_exception import UnrecognisedNormsModule
 from os.path import exists
 from abc import abstractmethod
 
@@ -41,13 +43,15 @@ class HarvestModel(Model):
         filepath -- file path for current run
         write_data -- boolean to write data to file
         track_norms -- boolean to track norms and write to file
+        norms_module_type -- norm base agents track norms with: "rule_based" (default; tracks societally
+            emerged norms, writes <filepath>_emerged_norms.json) or "bayesian" (writes agent_norms_<filepath>.csv)
         previous_learned_norms -- dict mapping agent unique_id -> set of behaviour ids learned at the end of the previous episode
         societal_norm_emergence_threshold -- percentage of society required to have adopted a behaviour for it to become a norm
         emerged_norms -- all norms which emerge in current episode
         epsilon -- probability of exploration for agents (tracks when to end training)
         seed -- random seed for the run (None = unseeded)
     """
-    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None):
+    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based"):
         super().__init__()
         self._set_seed(seed)
         self.num_agents = num_agents
@@ -71,6 +75,9 @@ class HarvestModel(Model):
         self.filepath = filepath
         self.write_data = write_data
         self.track_norms = track_norms
+        if norms_module_type not in NORMS_MODULE_TYPES:
+            raise UnrecognisedNormsModule(norms_module_type, NORMS_MODULE_TYPES)
+        self.norms_module_type = norms_module_type
         self.societal_norm_emergence_threshold = 0.9
         self.emerged_norms = {}
         self.previous_learned_norms = {}
@@ -88,8 +95,8 @@ class HarvestModel(Model):
         self.day += 1
         self._update_schedule()
         self.epsilon = self._mean_epsilon()
-        #if self.track_norms:
-            #self._check_emerged_norms()
+        if self.track_norms and self.norms_module_type == "rule_based":
+            self._check_emerged_norms()
         #if exceeded max days or all agents died, reset for new episode
         if self.day >= self.max_days or len(self.living_agents) <= 0:
             self.finish_episode()
@@ -97,10 +104,12 @@ class HarvestModel(Model):
     def finish_episode(self, collect_data=True):
         self.end_day = self.day
         if self.track_norms and collect_data:
-            #self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.filepath+"_emerged_norms.json")
             # record norms before agents' finish_episode(), so any end-of-episode norm update (e.g. decay) is excluded
-            self._analyse_agent_norms()
-            #self._write_agent_norms_to_file()
+            if self.norms_module_type == "rule_based":
+                self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.filepath+"_emerged_norms.json")
+            else:
+                self._analyse_agent_norms()
+                #self._write_agent_norms_to_file()
         for a in self.schedule.agents:
             if a.agent_type != "berry":
                 a.finish_episode(self.day)
@@ -213,7 +222,7 @@ class HarvestModel(Model):
         self.berry_id = len(self.living_agents) + 1
 
     def _add_agent(self, i, agent_type, allotment, checkpoint_path, allocation_id=None):
-        a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.track_norms,shared_replay_buffer=self.shared_replay_buffer,allocation_id=allocation_id)
+        a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.track_norms,shared_replay_buffer=self.shared_replay_buffer,allocation_id=allocation_id,norms_module_type=self.norms_module_type)
         self.schedule.add(a)
         self._place_agent_in_allotment(a)
         if a.agent_type != "berry":
@@ -311,7 +320,7 @@ class HarvestModel(Model):
             if exists("data/results/current_run/model_episode_reports_"+self.filepath+".csv"):
                 raise FileExistsException("data/results/current_run/model_episode_reports_"+self.filepath+".csv")
             self.model_episode_reporter.to_csv("data/results/current_run/model_episode_reports_"+self.filepath+".csv", mode='a',index=False)
-        if self.track_norms:
+        if self.track_norms and self.norms_module_type == "bayesian":
             if exists(self._agent_norms_csv_filename()):
                 raise FileExistsException(self._agent_norms_csv_filename())
             pd.DataFrame(columns=self._agent_norms_columns()).to_csv(self._agent_norms_csv_filename(), mode='a', index=False)
@@ -329,12 +338,22 @@ class HarvestModel(Model):
                                "total_days_left_to_live": [agent.total_days_left_to_live],
                                "action": [agent.current_action],
                                "reward": [agent.current_reward],
-                               #"num_norms": [len(agent.norms_module.behaviour_base) if self.track_norms else None]})
-                               "num_norms": [len(agent.norms_module.get_learned_behaviours()) if self.track_norms else None]})
+                               "num_norms": [self._num_agent_norms(agent)]})
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry])
         if self.write_data and not self.training:
            new_entry.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
     
+    def _num_agent_norms(self, agent):
+        """
+        Size of an agent's norm base: behaviours in its behaviour base (rule-based), or behaviours
+        it has learned (Bayesian, whose candidate set is fixed). None if norms aren't tracked.
+        """
+        if not self.track_norms:
+            return None
+        if self.norms_module_type == "rule_based":
+            return len(agent.norms_module.behaviour_base)
+        return len(agent.norms_module.get_learned_behaviours())
+
     def _collect_model_episode_data(self):
         row_index_list = self.agent_reporter.index[self.agent_reporter["episode"] == self.episode].tolist()
         new_entry = pd.DataFrame({"episode": [self.episode], 
@@ -405,7 +424,7 @@ class HarvestModel(Model):
                          "num_gained_norms": len(learned_ids - previous_ids),
                          "num_lost_norms": len(previous_ids - learned_ids),
                          "mean_learned_posterior": float(np.mean([b["posterior"] for b in learned])) if learned else None,
-                         "num_observed_behaviours": sum(b["times_precondition_met"] > 0 for b in agent.norms_module.behaviour_base.values()),
+                         "num_observed_behaviours": sum(agent.norms_module.behaviour_counts(*view)[0] > 0 for view in agent.norms_module.iter_behaviours()),
                          "num_learned_cooperative_norms": sum(b["type"] == "obligation" and b["action"] == "throw" for b in learned),
                          "num_learned_uncooperative_norms": sum(b["type"] == "prohibition" and b["action"] == "throw" for b in learned)})
             self.previous_learned_norms[agent.unique_id] = learned_ids
@@ -419,13 +438,15 @@ class HarvestModel(Model):
         for agent in self.schedule.agents:
             if agent.agent_type == "berry":
                 continue
-            learned_norms = {b["label"]: {"type": b["type"],
-                                          "precondition": b["precondition"],
-                                          "action": b["action"],
-                                          "posterior": float(b["posterior"]),
-                                          "times_precondition_met": b["times_precondition_met"],
-                                          "times_action_matched": b["times_action_matched"]}
-                             for b in agent.norms_module.get_learned_behaviours()}
+            learned_norms = {}
+            for b in agent.norms_module.get_learned_behaviours():
+                times_precondition_met, times_action_matched = agent.norms_module.behaviour_counts(b["precondition_key"], b["action_idx"], b["type"])
+                learned_norms[b["label"]] = {"type": b["type"],
+                                             "precondition": b["precondition"],
+                                             "action": b["action"],
+                                             "posterior": float(b["posterior"]),
+                                             "times_precondition_met": times_precondition_met,
+                                             "times_action_matched": times_action_matched}
             self._append_norm_dict_to_file(learned_norms, "data/results/current_run/"+self.filepath+"_agent_"+str(agent.unique_id)+"_norms.json")
 
     def _agent_norms_csv_filename(self):

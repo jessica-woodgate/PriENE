@@ -1,7 +1,18 @@
+from collections import namedtuple
 from itertools import combinations
 import numpy as np
 
 from src.harvest_exception import UnmappedActionException
+
+# columns of each behaviour_base entry's posteriors array
+PROHIBITION = 0
+OBLIGATION = 1
+TYPE_COLUMNS = {"prohibition": PROHIBITION, "obligation": OBLIGATION}
+# order behaviours of one (precondition, action) are listed in
+TYPES = ("prohibition", "obligation")
+
+# one behaviour, "IF precondition THEN (NOT) action": a view onto a behaviour_base entry
+BehaviourView = namedtuple("BehaviourView", ["precondition_key", "action_idx", "type"])
 
 class BayesianNormsModule():
     """
@@ -35,11 +46,24 @@ class BayesianNormsModule():
                                 precondition must be met before it can be
                                 considered learned (default 5)
         epsilon              -- exploration probability for agent's action selection
+        cooperative_actions  -- set of action names whose obligations count as
+                                cooperative in episode_report() (e.g. {"throw"})
         action_counts        -- number of times the agent has taken each action, over
                                 every update (not reset per episode: the policy, and so
                                 its action frequencies, don't change between episodes)
-        behaviour_base       -- dict mapping behaviour_id -> behaviour dict,
-                                populated by _initialise()
+        behaviour_base       -- dict mapping precondition (frozenset of predicate names)
+                                -> entry, populated by _initialise(). One entry per
+                                precondition holds every behaviour with it:
+                                    predicates    -- tuple of predicate dicts
+                                    precondition  -- list of predicate names
+                                    action_counts -- int array (len(actions)): how often
+                                                     the agent took each action while the
+                                                     precondition held this episode
+                                    posteriors    -- float array (len(actions), 2):
+                                                     P(learned) per action, column
+                                                     PROHIBITION / OBLIGATION
+                                Individual behaviours are BehaviourViews (see
+                                iter_behaviours()), identified by behaviour_id()
     """
 
     def __init__(
@@ -51,7 +75,8 @@ class BayesianNormsModule():
         learned_threshold=0.95,
         min_observations=5,
         action_name_to_index=None,
-        epsilon=0.1
+        epsilon=0.1,
+        cooperative_actions=None
     ):
         self.feature_specs = feature_specs
         self.actions = actions
@@ -61,6 +86,7 @@ class BayesianNormsModule():
         self.learned_threshold = learned_threshold
         self.min_observations = min_observations
         self.epsilon = epsilon
+        self.cooperative_actions = set(cooperative_actions or [])
         self.action_counts = np.zeros(len(actions))
         self.behaviour_base = {}
 
@@ -71,10 +97,9 @@ class BayesianNormsModule():
         Reset posteriors and counts for a new episode. action_counts is kept, so
         the agent's action frequencies keep being estimated across episodes.
         """
-        for behaviour in self.behaviour_base.values():
-            behaviour["posterior"] = self.prior
-            behaviour["times_precondition_met"] = 0
-            behaviour["times_action_matched"] = 0
+        for entry in self.behaviour_base.values():
+            entry["action_counts"][:] = 0
+            entry["posteriors"][:] = self.prior
 
     def update(self, observation, action_taken):
         """
@@ -91,40 +116,89 @@ class BayesianNormsModule():
         observation  -- flat numpy array
         action_taken -- int, index into actions of the action the agent chose
         """
+        n_actions = len(self.actions)
         # frequencies from steps before this one
-        action_frequencies = (self.action_counts + 1) / (self.action_counts.sum() + len(self.actions))
+        action_frequencies = (self.action_counts + 1) / (self.action_counts.sum() + n_actions)
 
-        for behaviour in self._matching_behaviours(observation):
-            action_idx = behaviour["action_idx"]
-            behaviour["times_precondition_met"] += 1
+        # likelihoods for every (action, type) cell -- they depend only on the action taken and the
+        # agent's overall action frequencies, so they are shared by every matching precondition
+        p_consistent_given_not_learned = np.empty((n_actions, 2))
+        # prohibition learned <=> agent avoids the action; obligation learned <=> agent takes it
+        p_consistent_given_not_learned[:, PROHIBITION] = 1.0 - action_frequencies
+        p_consistent_given_not_learned[:, OBLIGATION]  = action_frequencies
+        p_consistent_given_learned = np.maximum(1.0 - self.epsilon, p_consistent_given_not_learned)
 
-            if behaviour["type"] == "prohibition":
-                # learned <=> agent avoids the prohibited action
-                consistent = (action_taken != action_idx)
-                p_consistent_given_not_learned = 1.0 - action_frequencies[action_idx]
-            else:
-                # learned <=> agent takes the obligated action
-                consistent = (action_taken == action_idx)
-                p_consistent_given_not_learned = action_frequencies[action_idx]
-            p_consistent_given_learned = max(1.0 - self.epsilon, p_consistent_given_not_learned)
+        took_action = np.arange(n_actions) == action_taken
+        consistent = np.empty((n_actions, 2), dtype=bool)
+        consistent[:, PROHIBITION] = ~took_action
+        consistent[:, OBLIGATION]  = took_action
 
-            if consistent:
-                behaviour["times_action_matched"] += 1
-                p_evidence_given_learned     = p_consistent_given_learned
-                p_evidence_given_not_learned = p_consistent_given_not_learned
-            else:
-                p_evidence_given_learned     = 1.0 - p_consistent_given_learned
-                p_evidence_given_not_learned = 1.0 - p_consistent_given_not_learned
+        p_evidence_given_learned     = np.where(consistent, p_consistent_given_learned,
+                                                1.0 - p_consistent_given_learned)
+        p_evidence_given_not_learned = np.where(consistent, p_consistent_given_not_learned,
+                                                1.0 - p_consistent_given_not_learned)
+        p_evidence_given_learned     = np.clip(p_evidence_given_learned,     0.01, 0.99)
+        p_evidence_given_not_learned = np.clip(p_evidence_given_not_learned, 0.01, 0.99)
 
-            p_evidence_given_learned     = np.clip(p_evidence_given_learned,     0.01, 0.99)
-            p_evidence_given_not_learned = np.clip(p_evidence_given_not_learned, 0.01, 0.99)
+        for key in self._matching_preconditions(observation):
+            entry = self.behaviour_base[key]
+            entry["action_counts"][action_taken] += 1
 
-            prior = behaviour["posterior"]
+            prior = entry["posteriors"]
             numerator = p_evidence_given_learned * prior
             denominator = numerator + p_evidence_given_not_learned * (1.0 - prior)
-            behaviour["posterior"] = numerator / denominator
+            entry["posteriors"] = numerator / denominator
 
         self.action_counts[action_taken] += 1
+
+    def behaviour_counts(self, precondition_key, action_idx, behaviour_type):
+        """
+        (n_precon_met, n_action_matched) for a behaviour this episode, derived from
+        its precondition's action counts: n_action_matched is how often the agent
+        took the obligated action, or avoided the prohibited one.
+        """
+        counts = self.behaviour_base[precondition_key]["action_counts"]
+        n_precon_met = int(counts.sum())
+        n_action_taken = int(counts[action_idx])
+        if behaviour_type == "prohibition":
+            return n_precon_met, n_precon_met - n_action_taken
+        return n_precon_met, n_action_taken
+
+    def iter_behaviours(self):
+        """
+        Yield a BehaviourView for every behaviour: each precondition, each action, then
+        prohibition before obligation (the order behaviours were originally generated in).
+        """
+        for key in self.behaviour_base:
+            yield from self._entry_behaviours(key)
+
+    def behaviour_id(self, view):
+        """Stable id, identical across agents and runs: "type|action|sorted precondition"."""
+        precondition = sorted(self.behaviour_base[view.precondition_key]["precondition"])
+        return f"{view.type}|{self._action_names[view.action_idx]}|{' AND '.join(precondition)}"
+
+    def posterior(self, view):
+        return self.behaviour_base[view.precondition_key]["posteriors"][view.action_idx, TYPE_COLUMNS[view.type]]
+
+    def label(self, view):
+        precondition = self.behaviour_base[view.precondition_key]["precondition"]
+        negation = "NOT " if view.type == "prohibition" else ""
+        return f"IF {' AND '.join(precondition)} THEN {negation}{self._action_names[view.action_idx]}"
+
+    def behaviour_dict(self, view):
+        """A behaviour as a dict, in the shape callers (e.g. HarvestModel's norm writers) read."""
+        entry = self.behaviour_base[view.precondition_key]
+        return {
+            "id":               self.behaviour_id(view),
+            "type":             view.type,
+            "action":           self._action_names[view.action_idx],
+            "predicates":       entry["predicates"],
+            "precondition":     entry["precondition"],
+            "label":            self.label(view),
+            "posterior":        float(self.posterior(view)),
+            "precondition_key": view.precondition_key,
+            "action_idx":       view.action_idx,
+        }
 
     def get_learned_behaviours(self):
         """
@@ -134,11 +208,15 @@ class BayesianNormsModule():
         These are the behaviours the agent has most consistently exhibited
         whenever their precondition was met.
         """
-        learned = [
-            b for b in self.behaviour_base.values()
-            if b["posterior"] >= self.learned_threshold
-            and b["times_precondition_met"] >= self.min_observations
-        ]
+        learned = []
+        for key, entry in self.behaviour_base.items():
+            # n_precon_met is shared by every behaviour of a precondition
+            if entry["action_counts"].sum() < self.min_observations:
+                continue
+            learned.extend(
+                self.behaviour_dict(view) for view in self._entry_behaviours(key)
+                if self.posterior(view) >= self.learned_threshold
+            )
         return sorted(learned, key=lambda b: b["posterior"], reverse=True)
 
     def get_all_behaviours_by_certainty(self):
@@ -146,41 +224,81 @@ class BayesianNormsModule():
         Return all behaviours that have been observed, sorted by posterior descending.
         Useful for inspecting the full learned/not-learned spectrum.
         """
-        observed = [
-            b for b in self.behaviour_base.values()
-        ]
+        observed = [self.behaviour_dict(view) for view in self.iter_behaviours()]
         return sorted(observed, key=lambda b: b["posterior"], reverse=True)
+
+    def episode_report(self):
+        """
+        One row per behaviour whose precondition was met at least once this
+        episode. Call at the end of each episode, before reset() clears the counts.
+
+        Columns:
+            behaviour_id     -- behaviour_id(), "type|action|sorted precondition"
+            precondition     -- predicate names joined with " AND "
+            action           -- the action, prefixed "NOT " for prohibitions
+            type             -- "obligation" or "prohibition"
+            is_cooperative   -- obligation to take one of cooperative_actions
+                                (prohibitions, e.g. NOT throw, are never cooperative)
+            n_precon_met     -- steps this episode where the precondition held
+            n_action_matched -- of those, steps where the agent acted consistently
+                                (took the obligated / avoided the prohibited action)
+            rate             -- n_action_matched / n_precon_met
+            exhibited        -- rate > 0 and n_precon_met > min_observations, i.e.
+                                seen often enough for the rate to mean something
+            posterior        -- P(behaviour learned) at the end of the episode
+        """
+        rows = []
+        for key, entry in self.behaviour_base.items():
+            if entry["action_counts"].sum() == 0:
+                continue
+            for view in self._entry_behaviours(key):
+                n_precon_met, n_action_matched = self.behaviour_counts(*view)
+                action = self._action_names[view.action_idx]
+                rate = n_action_matched / n_precon_met
+                rows.append({
+                    "behaviour_id":     self.behaviour_id(view),
+                    "precondition":     " AND ".join(entry["precondition"]),
+                    "action":           action if view.type == "obligation" else f"NOT {action}",
+                    "type":             view.type,
+                    "is_cooperative":   view.type == "obligation" and action in self.cooperative_actions,
+                    "n_precon_met":     n_precon_met,
+                    "n_action_matched": n_action_matched,
+                    "rate":             rate,
+                    "exhibited":        rate > 0 and n_precon_met > self.min_observations,
+                    "posterior":        float(self.posterior(view)),
+                })
+        return rows
 
     def _initialise(self):
         """
-        Generate candidate behaviours, assign priors, and build a lookup table
-        from each precondition to the behaviours that share it, so update()
-        only visits behaviours whose precondition can match the observation.
+        Build one behaviour_base entry per candidate precondition, with zeroed action
+        counts and every posterior at the prior. Keyed by precondition, behaviour_base is
+        also the lookup table update() uses to visit only matching preconditions.
         """
+        self._validate_action_mapping()
+        # action index -> name; rows of action_counts / posteriors are action indices
+        self._action_names = {self.action_name_to_index[action]: action for action in self.actions}
         self._predicates = self._build_predicates()
-        candidates = self._generate_candidates(self._predicates)
-        self._validate_action_mapping(candidates)
 
+        n_actions = len(self.actions)
         self.behaviour_base = {}
-        # frozenset of predicate names -> list of behaviour dicts
-        self._rules_by_precondition = {}
-
-        for b in candidates:
-            behaviour = {
-                **b,
-                # resolved once here rather than looked up on every step
-                "action_idx": self.action_name_to_index[b["action"]],
-                # posterior: P(this behaviour has been learned)
-                "posterior": self.prior,
-                # counts used to compute the likelihood at each step
-                "times_precondition_met": 0,
-                "times_action_matched":   0,
+        for pred_combo in self._generate_preconditions(self._predicates):
+            precondition_names = [p["name"] for p in pred_combo]
+            self.behaviour_base[frozenset(precondition_names)] = {
+                "predicates":    pred_combo,
+                "precondition":  precondition_names,
+                "action_counts": np.zeros(n_actions, dtype=int),
+                "posteriors":    np.full((n_actions, 2), self.prior, dtype=float),
             }
-            self.behaviour_base[b["id"]] = behaviour
-            key = frozenset(b["precondition"])
-            self._rules_by_precondition.setdefault(key, []).append(behaviour)
 
         return self
+
+    def _entry_behaviours(self, precondition_key):
+        """BehaviourViews of one precondition: each action, prohibition before obligation."""
+        for action in self.actions:
+            action_idx = self.action_name_to_index[action]
+            for behaviour_type in TYPES:
+                yield BehaviourView(precondition_key, action_idx, behaviour_type)
 
     def _build_predicates(self):
         """
@@ -223,75 +341,36 @@ class BayesianNormsModule():
             "upper": upper,
         }
 
-    def _generate_candidates(self, predicates):
+    def _generate_preconditions(self, predicates):
         """
-        Generate both a prohibition and an obligation candidate for every
-        combination of predicates and every action. Both types are always
-        generated — the Bayesian update determines which are learned,
-        not the generation step. Combinations containing two bins of the same
-        feature are skipped: bins don't overlap, so they could never be met.
+        Yield every combination of up to max_predicates predicates as a candidate
+        precondition; each gets a prohibition and an obligation for every action (the
+        Bayesian update determines which are learned, not the generation step).
+        Combinations containing two bins of the same feature are skipped: bins don't
+        overlap, so they could never be met.
         """
-        candidates = []
-        behaviour_id = 0
-
         for length in range(1, self.max_predicates + 1):
             for pred_combo in combinations(predicates, length):
                 if len({p["index"] for p in pred_combo}) < length:
                     continue
-                precondition_names = [p["name"] for p in pred_combo]
+                yield pred_combo
 
-                for action in self.actions:
-                    # Prohibition: IF precondition THEN NOT action
-                    candidates.append({
-                        "id":           behaviour_id,
-                        "type":         "prohibition",
-                        "predicates":   pred_combo,
-                        "precondition": precondition_names,
-                        "action":       action,
-                        "label": (
-                            f"IF {' AND '.join(precondition_names)} "
-                            f"THEN NOT {action}"
-                        ),
-                    })
-                    behaviour_id += 1
-
-                    # Obligation: IF precondition THEN action
-                    candidates.append({
-                        "id":           behaviour_id,
-                        "type":         "obligation",
-                        "predicates":   pred_combo,
-                        "precondition": precondition_names,
-                        "action":       action,
-                        "label": (
-                            f"IF {' AND '.join(precondition_names)} "
-                            f"THEN {action}"
-                        ),
-                    })
-                    behaviour_id += 1
-
-        return candidates
-
-    def _validate_action_mapping(self, candidates):
+    def _validate_action_mapping(self):
         """
-        Raise immediately if any generated candidate's action isn't covered by
-        action_name_to_index. Without this check, update() would silently skip every behaviour
-        using an unmapped action forever (action_idx would always resolve to None), with no error
-        or warning -- times_precondition_met would stay at 0 and learned_behaviours()/
-        all_behaviours_by_certainty() would silently never return anything for it.
+        Raise immediately if any action isn't covered by action_name_to_index, rather than
+        failing later with a KeyError when its behaviours are first indexed.
         """
-        referenced_actions = {c["action"] for c in candidates}
-        missing = referenced_actions - set(self.action_name_to_index.keys())
+        missing = set(self.actions) - set(self.action_name_to_index.keys())
         if missing:
             raise UnmappedActionException(missing)
 
-    def _matching_behaviours(self, observation):
+    def _matching_preconditions(self, observation):
         """
-        Yield every behaviour whose precondition is satisfied by this observation.
+        Yield the key of every precondition satisfied by this observation.
 
         Finds the predicates the observation satisfies (one bin per feature),
-        then looks up each combination of them up to max_predicates.
-        Same-feature combinations can't occur here because each feature has
-        only one active bin.
+        then each combination of them up to max_predicates. Same-feature
+        combinations can't occur here because each feature has only one active bin.
         """
         active = [
             p for p in self._predicates
@@ -300,10 +379,12 @@ class BayesianNormsModule():
         for length in range(1, self.max_predicates + 1):
             for combo in combinations(active, length):
                 key = frozenset(p["name"] for p in combo)
-                yield from self._rules_by_precondition.get(key, [])
+                if key in self.behaviour_base:
+                    yield key
 
-    def _precondition_satisfied(self, behaviour, observation):
-        for pred in behaviour["predicates"]:
+    def _precondition_satisfied(self, entry, observation):
+        """Whether observation satisfies a behaviour_base entry's precondition (full check, no lookup)."""
+        for pred in entry["predicates"]:
             value = observation[pred["index"]]
             if not (pred["lower"] <= value < pred["upper"]):
                 return False

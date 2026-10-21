@@ -29,29 +29,30 @@ GRID = {
 
 
 def _build(scenario, society_mix, num_start_berries, agent_type, training, checkpoint_path,
-           write_data, write_norms, filepath, max_episodes, max_days, seed=None):
+           write_data, write_norms, filepath, max_episodes, max_days, seed=None,
+           norms_module_type="rule_based"):
     max_width, max_height = GRID[scenario]
     if scenario == "basic":
         return BasicHarvest(
             society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
-            max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed,
+            max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed, norms_module_type,
         )
     elif scenario == "colours":
         return ColoursHarvest(
             society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
-            max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed,
+            max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed, norms_module_type,
         )
     elif scenario == "allotment":
         return AllotmentHarvest(
             society_mix, NUM_AGENTS, num_start_berries, NUM_ALLOCATIONS, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
-            write_norms, filepath, seed,
+            write_norms, filepath, seed, norms_module_type,
         )
     elif scenario == "capabilities":
         return CapabilitiesHarvest(
             society_mix, NUM_AGENTS, num_start_berries, NUM_ALLOCATIONS, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
-            write_norms, filepath, seed,
+            write_norms, filepath, seed, norms_module_type,
         )
     raise ValueError(f"unknown scenario {scenario}")
 
@@ -82,7 +83,8 @@ def _make_pretrained_checkpoint(tmp_path, agent_type, max_days=5):
     return checkpoint_path
 
 
-def make_scenario_model(tmp_path, scenario, agent_type, max_days=10, max_episodes=2, society_mix="homogeneous", track_norms=False):
+def make_scenario_model(tmp_path, scenario, agent_type, max_days=10, max_episodes=2, society_mix="homogeneous", track_norms=False,
+                        norms_module_type="rule_based"):
     """
     Builds a model for the given scenario/agent_type the way it is actually used in practice:
     basic_harvest trains (training=True); colours/allotment/capabilities are test-only
@@ -101,4 +103,5 @@ def make_scenario_model(tmp_path, scenario, agent_type, max_days=10, max_episode
     return _build(
         scenario, society_mix, num_start_berries, agent_type, training, checkpoint_path,
         False, track_norms, f"test_{scenario}_{agent_type}", max_episodes, max_days,
+        norms_module_type=norms_module_type,
     )

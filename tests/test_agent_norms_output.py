@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.agent.modules.bayesian_norms_module import BayesianNormsModule
+from src.agent.modules.bayesian_norms_module import TYPE_COLUMNS, BayesianNormsModule
 from src.harvest_exception import FileExistsException
 from tests.conftest import SCENARIOS, _build, make_scenario_model
 
@@ -26,7 +26,7 @@ def in_tmp_dir(tmp_path, monkeypatch):
 def make_norms_model(tmp_path, filepath="norms", max_days=5):
     return _build(
         "basic", "homogeneous", 12, "baseline", True, str(tmp_path / "checkpoints") + "/",
-        False, True, filepath, 3, max_days,
+        False, True, filepath, 3, max_days, norms_module_type="bayesian",
     )
 
 
@@ -34,11 +34,27 @@ def harvest_agents(model):
     return sorted((a for a in model.schedule.agents if a.agent_type != "berry"), key=lambda a: a.unique_id)
 
 
-def force_learned(agent, learned_ids, times_precondition_met=10):
-    """Set an agent's posteriors directly so exactly learned_ids are learned."""
-    for b in agent.norms_module.behaviour_base.values():
-        b["posterior"] = 0.99 if b["id"] in learned_ids else 0.05
-        b["times_precondition_met"] = times_precondition_met
+def nth_behaviour(agent, position):
+    """The behaviour (as a dict) at this position in iter_behaviours() order -- the order of the old
+    integer ids, so position 0 is the first precondition's prohibition of the first action."""
+    module = agent.norms_module
+    return module.behaviour_dict(list(module.iter_behaviours())[position])
+
+
+def force_learned(agent, learned_positions, times_precondition_met=10):
+    """
+    Set an agent's posteriors directly so exactly the behaviours at learned_positions (in
+    iter_behaviours() order) are learned, with every precondition met times_precondition_met times
+    this episode (all recorded as the first action).
+    """
+    module = agent.norms_module
+    for entry in module.behaviour_base.values():
+        entry["posteriors"][:] = 0.05
+        entry["action_counts"][:] = 0
+        entry["action_counts"][0] = times_precondition_met
+    for position, view in enumerate(module.iter_behaviours()):
+        if position in learned_positions:
+            module.behaviour_base[view.precondition_key]["posteriors"][view.action_idx, TYPE_COLUMNS[view.type]] = 0.99
 
 
 def read_csv(filepath="norms"):
@@ -70,7 +86,7 @@ def test_csv_has_one_row_per_agent_per_episode(in_tmp_dir):
 
 
 def test_csv_counts_gained_and_lost_norms_against_previous_episode(in_tmp_dir):
-    """Ids are generated prohibition/obligation alternately, so even ids are prohibitions."""
+    """Behaviours alternate prohibition/obligation in iter_behaviours(), so even positions are prohibitions."""
     model = make_norms_model(in_tmp_dir)
     agent = harvest_agents(model)[0]
     model.step()
@@ -92,10 +108,10 @@ def test_csv_counts_gained_and_lost_norms_against_previous_episode(in_tmp_dir):
 def test_csv_counts_throw_obligations_as_cooperative_and_throw_prohibitions_as_uncooperative(in_tmp_dir):
     model = make_norms_model(in_tmp_dir)
     agent = harvest_agents(model)[0]
-    base = agent.norms_module.behaviour_base.values()
-    throw_obligations = [b["id"] for b in base if b["type"] == "obligation" and b["action"] == "throw"][:3]
-    throw_prohibitions = [b["id"] for b in base if b["type"] == "prohibition" and b["action"] == "throw"][:2]
-    eat_obligations = [b["id"] for b in base if b["type"] == "obligation" and b["action"] == "eat"][:2]
+    base = list(enumerate(agent.norms_module.behaviour_dict(v) for v in agent.norms_module.iter_behaviours()))
+    throw_obligations = [i for i, b in base if b["type"] == "obligation" and b["action"] == "throw"][:3]
+    throw_prohibitions = [i for i, b in base if b["type"] == "prohibition" and b["action"] == "throw"][:2]
+    eat_obligations = [i for i, b in base if b["type"] == "obligation" and b["action"] == "eat"][:2]
     model.step()
     force_learned(agent, set(throw_obligations + throw_prohibitions + eat_obligations))
     model.finish_episode()
@@ -165,9 +181,8 @@ def test_one_json_per_agent_keyed_by_episode(in_tmp_dir):
     for agent in agents:
         assert list(read_agent_json(agent.unique_id).keys()) == ["1", "2"]
     episodes = read_agent_json(0)
-    base = agents[0].norms_module.behaviour_base
-    assert [list(norm)[0] for norm in episodes["1"]] == [base[i]["label"] for i in (0, 1, 3)]
-    assert [list(norm)[0] for norm in episodes["2"]] == [base[1]["label"]]
+    assert [list(norm)[0] for norm in episodes["1"]] == [nth_behaviour(agents[0], i)["label"] for i in (0, 1, 3)]
+    assert [list(norm)[0] for norm in episodes["2"]] == [nth_behaviour(agents[0], 1)["label"]]
 
 
 def test_json_norm_entry_contents(in_tmp_dir):
@@ -178,7 +193,7 @@ def test_json_norm_entry_contents(in_tmp_dir):
     model._write_agent_norms_to_file()
     [entry] = read_agent_json(0)["1"]
     label, data = next(iter(entry.items()))
-    expected = agent.norms_module.behaviour_base[1]
+    expected = nth_behaviour(agent, 1)
     assert label == expected["label"]
     assert data == {
         "type": expected["type"],
@@ -186,7 +201,8 @@ def test_json_norm_entry_contents(in_tmp_dir):
         "action": expected["action"],
         "posterior": 0.99,
         "times_precondition_met": 10,
-        "times_action_matched": expected["times_action_matched"],
+        "times_action_matched": agent.norms_module.behaviour_counts(
+            expected["precondition_key"], expected["action_idx"], expected["type"])[1],
     }
 
 
@@ -194,7 +210,8 @@ def test_json_norm_entry_contents(in_tmp_dir):
 
 @pytest.mark.parametrize("scenario", SCENARIOS)
 def test_scenario_runs_with_norm_tracking(in_tmp_dir, scenario):
-    model = make_scenario_model(in_tmp_dir, scenario, "utilitarian", max_days=5, max_episodes=2, track_norms=True)
+    model = make_scenario_model(in_tmp_dir, scenario, "utilitarian", max_days=5, max_episodes=2, track_norms=True,
+                                norms_module_type="bayesian")
     while model.episode <= 2:
         model.step()
     df = pd.read_csv(f"data/results/current_run/agent_norms_test_{scenario}_utilitarian.csv")
@@ -231,7 +248,8 @@ def test_every_predicate_is_informative_under_trained_policy(in_tmp_dir, monkeyp
         return original_update(self, observation, action_taken)
 
     monkeypatch.setattr(BayesianNormsModule, "update", logging_update)
-    model = _build("basic", "homogeneous", 12, agent_type, False, TRAINED_CHECKPOINTS_ABS, False, True, "informative", 3, 200)
+    model = _build("basic", "homogeneous", 12, agent_type, False, TRAINED_CHECKPOINTS_ABS, False, True, "informative", 3, 200,
+                   norms_module_type="bayesian")
     while model.episode <= 3:
         model.step()
     observations = np.array(observations)

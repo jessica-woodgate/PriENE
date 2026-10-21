@@ -34,6 +34,12 @@ class NormsModule():
         self.behaviour_base = {}
         self.norm_decay_rate = 0.3
 
+    def reset(self):
+        """
+        Clear the behaviour base for a new episode (same interface as BayesianNormsModule.reset)
+        """
+        self.behaviour_base = {}
+
     def get_antecedent(self, feature_values):
         """
         Get antecedent string by bucketing an ordered list of state values, one per registered

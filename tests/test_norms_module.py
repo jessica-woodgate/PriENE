@@ -15,6 +15,14 @@ def make_norms_module(antecedent_features=BERRIES_HEALTH_DAYS_FEATURES, conseque
     return NormsModule(agent_id=1, antecedent_features=antecedent_features, consequent_rules=consequent_rules)
 
 
+def test_reset_clears_behaviour_base():
+    nm = make_norms_module()
+    nm.update_behaviour_base("IF,no berries,low health", "move", 0.5, day=1, episode=1)
+    assert nm.behaviour_base
+    nm.reset()
+    assert nm.behaviour_base == {}
+
+
 # --- get_antecedent: berries/health/well-being thresholds (the feature set HarvestAgent registers) ---
 
 def test_antecedent_no_berries_low_health_low_days():

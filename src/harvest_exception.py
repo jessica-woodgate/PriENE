@@ -82,6 +82,15 @@ class UnrecognisedPrinciple(HarvestException):
     def __str__(self):
         return(f"Do not recognise principle {self.principle}")
 
+class UnrecognisedNormsModule(HarvestException):
+    def __init__(self, norms_module_type, valid_types):
+        super().__init__()
+        self.norms_module_type = norms_module_type
+        self.valid_types = valid_types
+
+    def __str__(self):
+        return(f"Do not recognise norms module type {self.norms_module_type}; choose from {self.valid_types}")
+
 class UnmappedActionException(HarvestException):
     def __init__(self, missing_actions):
         super().__init__()

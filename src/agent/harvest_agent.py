@@ -7,7 +7,11 @@ from .modules.ethics_module import EthicsModule
 from src.harvest_exception import NumFeaturesException
 from src.harvest_exception import AgentTypeException
 from src.harvest_exception import ImpossibleNormException
+from src.harvest_exception import UnrecognisedNormsModule
 import numpy as np
+
+# norm bases an agent can track its behaviour with (see _build_norms_module); the first is the default
+NORMS_MODULE_TYPES = ["rule_based", "bayesian"]
 
 class HarvestAgent(Agent):
     """
@@ -36,10 +40,12 @@ class HarvestAgent(Agent):
         decision_module -- DQNDecisionModule choosing actions and (if training) learning from them
         moving_module -- MovingModule handling pathfinding/movement towards berries
         ethics_module -- EthicsModule computing a self-directed sanction (absent for "baseline")
-        norms_module -- NormsModule tracking this agent's behaviour base (present only if track_norms)
+        norms_module_type -- which norm base tracks this agent's behaviour: "rule_based"
+            (NormsModule, the default) or "bayesian" (BayesianNormsModule); only used if track_norms
+        norms_module -- norm base tracking this agent's behaviour (present only if track_norms)
         rewards -- this agent's reward table (see _baseline_rewards/_ethics_rewards)
     """
-    def __init__(self,unique_id,model,agent_type,allotment,training,checkpoint_path,epsilon,track_norms,shared_replay_buffer=None,allocation_id=None):
+    def __init__(self,unique_id,model,agent_type,allotment,training,checkpoint_path,epsilon,track_norms,shared_replay_buffer=None,allocation_id=None,norms_module_type="rule_based"):
         super().__init__(unique_id,model)
         self.done = False
         self.current_reward = 0
@@ -78,9 +84,9 @@ class HarvestAgent(Agent):
         self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer)
         self.moving_module = MovingModule(self.unique_id, model, training, allotment, self.allocation_id, restrict_to_allocation)
         self.track_norms = track_norms
+        self.norms_module_type = norms_module_type
         if self.track_norms:
-            #self.norms_module = NormsModule(self.unique_id, self._antecedent_features(), self._consequent_rules())
-            self.norms_module = self._build_norm_base(self.model.get_num_agents())
+            self.norms_module = self._build_norms_module()
         if agent_type != "baseline":
             self.rewards = self._ethics_rewards()
             self.ethics_module = EthicsModule(self.rewards["sanction"],agent_type)
@@ -108,8 +114,9 @@ class HarvestAgent(Agent):
         """
         done = False
         self.current_action = action
-        # if self.track_norms:
-        #     antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)])
+        if self.track_norms and self.norms_module_type == "rule_based":
+            # rule-based norms are keyed on the state before acting
+            antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)])
         if self.agent_type != "baseline":
             self.ethics_module.day = self.model.get_day()
             society_well_being = self.model.get_society_well_being(self, False, True)
@@ -119,13 +126,12 @@ class HarvestAgent(Agent):
         if self.agent_type != "baseline":
             reward_vector = reward_vector + self._ethics_sanction()
         done, reward_vector = self._update_attributes(reward_vector)
-        #if self.track_norms:
-            # reward = np.sum(reward_vector).item()
-            # self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day(), self.model.episode)
-            # if ("no berries" in antecedent and action == "throw") or ("eat" in antecedent and self.actions[action] == "throw"):
-            #     raise ImpossibleNormException(self.unique_id, antecedent, self.actions[action], reward)
         if self.track_norms:
-            self.norms_module.update(observation, self.norm_action_index[action])
+            if self.norms_module_type == "rule_based":
+                reward = np.sum(reward_vector).item()
+                self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day(), self.model.episode)
+            else:
+                self.norms_module.update(observation, self.norm_action_index[action])
         return reward_vector, next_state, done
     
     def observe(self):
@@ -303,33 +309,43 @@ class HarvestAgent(Agent):
 
     # ── Norms ───────────────────────────────────────────────────
 
-    # def _antecedent_features(self):
-    #     """
-    #     Registers with NormsModule how to bucket this agent's state into a natural language
-    #     precondition string: berries and health as single scalar readings, and well-being (one
-    #     reading per other currently-observed agent) as a repeated feature.
-    #     """
-    #     return [
-    #         {"boundaries": [self.low_berries_threshold, self.high_berries_threshold],
-    #          "labels": ["low berries", "medium berries", "high berries"], "zero_label": "no berries"},
-    #         {"boundaries": [self.low_health_threshold, self.high_health_threshold],
-    #          "labels": ["low health", "medium health", "high health"]},
-    #         {"boundaries": [self.low_days_left_threshold, self.high_days_left_threshold],
-    #          "labels": ["low days", "medium days", "high days"], "repeated": True},
-    #     ]
-
-    # def _consequent_rules(self):
-    #     """
-    #     Registers with NormsModule how to generalise this agent's raw action names (move/eat/
-    #     throw_X) into a natural language postcondition string: all throw_X variants collapse to
-    #     "throw"; everything else (move, eat) is used as-is.
-    #     """
-    #     return [{"prefix": "throw", "label": "throw"}]
-
-    def _build_norm_base(self, n_agents):
+    def _build_norms_module(self):
         """
-        Construct a NormBase from this agent's existing bucket thresholds.
-        Domain knowledge lives here; NormBase itself stays domain-agnostic.
+        Construct the norm base selected by norms_module_type. Domain knowledge (features, thresholds,
+        action groupings) lives here; both norms modules stay domain-agnostic.
+        """
+        if self.norms_module_type == "bayesian":
+            return self._build_bayesian_norms_module(self.model.get_num_agents())
+        if self.norms_module_type == "rule_based":
+            return NormsModule(self.unique_id, self._antecedent_features(), self._consequent_rules())
+        raise UnrecognisedNormsModule(self.norms_module_type, NORMS_MODULE_TYPES)
+
+    def _antecedent_features(self):
+        """
+        Registers with NormsModule how to bucket this agent's state into a natural language
+        precondition string: berries and health as single scalar readings, and well-being (one
+        reading per other currently-observed agent) as a repeated feature.
+        """
+        return [
+            {"boundaries": [self.low_berries_threshold, self.high_berries_threshold],
+             "labels": ["low berries", "medium berries", "high berries"], "zero_label": "no berries"},
+            {"boundaries": [self.low_health_threshold, self.high_health_threshold],
+             "labels": ["low health", "medium health", "high health"]},
+            {"boundaries": [self.low_days_left_threshold, self.high_days_left_threshold],
+             "labels": ["low days", "medium days", "high days"], "repeated": True},
+        ]
+
+    def _consequent_rules(self):
+        """
+        Registers with NormsModule how to generalise this agent's raw action names (move/eat/
+        throw_X) into a natural language postcondition string: all throw_X variants collapse to
+        "throw"; everything else (move, eat) is used as-is.
+        """
+        return [{"prefix": "throw", "label": "throw"}]
+
+    def _build_bayesian_norms_module(self, n_agents):
+        """
+        Construct a BayesianNormsModule from this agent's observation layout and bucket thresholds.
         """
         n_others = n_agents - 1
         other_wellbeing_indices = list(range(4, 4 + n_others))
@@ -384,5 +400,6 @@ class HarvestAgent(Agent):
             feature_specs=feature_specs,
             actions=norm_actions,
             max_predicates=max_predicates,
-            action_name_to_index=action_name_to_index
+            action_name_to_index=action_name_to_index,
+            cooperative_actions=["throw"]
         )
