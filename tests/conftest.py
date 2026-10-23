@@ -2,6 +2,7 @@ from src.scenarios.basic_harvest import BasicHarvest
 from src.scenarios.colours_harvest import ColoursHarvest
 from src.scenarios.allotment_harvest import AllotmentHarvest
 from src.scenarios.capabilities_harvest import CapabilitiesHarvest
+from src.scenarios.health_harvest import HealthHarvest
 
 # the 8 agent types actually reachable through run.py's CLI (PRINCIPLES + AGGREGATIONS);
 # "multiobjective" is deliberately excluded -- it isn't reachable through any documented entry point
@@ -16,15 +17,17 @@ AGENT_TYPES = [
     "veto",
 ]
 
-SCENARIOS = ["basic", "colours", "allotment", "capabilities"]
+SCENARIOS = ["basic", "colours", "allotment", "capabilities", "health"]
 
 NUM_AGENTS = 4
 NUM_ALLOCATIONS = 2
+INITIAL_HEALTHS = [1.0, 1.0, 1.0, 0.5]
 GRID = {
     "basic": (8, 8),
     "colours": (8, 8),
     "allotment": (16, 8),
     "capabilities": (8, 8),
+    "health": (8, 8),
 }
 
 
@@ -53,6 +56,12 @@ def _build(scenario, society_mix, num_start_berries, agent_type, training, check
             society_mix, NUM_AGENTS, num_start_berries, NUM_ALLOCATIONS, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
             write_norms, filepath, seed, norms_module_type,
+        )
+    elif scenario == "health":
+        return HealthHarvest(
+            society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
+            max_episodes, max_days, training, checkpoint_path, write_data, write_norms, INITIAL_HEALTHS,
+            filepath, seed, norms_module_type,
         )
     raise ValueError(f"unknown scenario {scenario}")
 

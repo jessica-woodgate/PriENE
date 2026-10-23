@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from src.agent.modules.bayesian_norms_module import OBLIGATION, PROHIBITION, BayesianNormsModule, BehaviourView
+from src.agent.modules.bayesian_norms_module import COMMITMENT, PROHIBITION, BayesianNormsModule, BehaviourView
 from src.harvest_exception import UnmappedActionException
 
 # the norm actions HarvestAgent registers (every throw_X collapses to "throw")
@@ -116,7 +116,7 @@ def test_total_behaviours_match_old_structure():
     print(f"\n{len(predicates)} predicates (4 scalar features x 4 bins + 3 other-agent well-being x 5 bins)"
           f"\n{len(module.behaviour_base)} preconditions = {n_singles} single predicates + {n_pairs} pairs"
           f" (C({len(predicates)},2) = {len(predicates) * (len(predicates) - 1) // 2} minus same-feature pairs)"
-          f"\n{len(ACTIONS)} actions x 2 types (prohibition, obligation)"
+          f"\n{len(ACTIONS)} actions x 2 types (prohibition, commitment)"
           f"\n{len(module.behaviour_base)} x {len(ACTIONS)} x 2 = {n_behaviours} behaviours")
     assert (len(predicates), n_singles, n_pairs) == (31, 31, 411)
     assert n_behaviours == len(module.behaviour_base) * len(ACTIONS) * 2 == 2652
@@ -148,34 +148,34 @@ def test_behaviour_ids_are_unique_and_stable():
     ids = [module.behaviour_id(view) for view in module.iter_behaviours()]
     assert len(set(ids)) == len(ids)
     assert ids == [make_module(HARVEST_SPECS, max_predicates=2).behaviour_id(v) for v in module.iter_behaviours()]
-    assert module.behaviour_id(BehaviourView(frozenset(["distance>=7", "health<1"]), THROW, "obligation")) == \
-        "obligation|throw|distance>=7 AND health<1"
+    assert module.behaviour_id(BehaviourView(frozenset(["distance>=7", "health<1"]), THROW, "commitment")) == \
+        "commitment|throw|distance>=7 AND health<1"
 
 
 def test_views_cover_every_entry_action_and_type():
     module = make_module(HARVEST_SPECS, max_predicates=2)
     views = list(module.iter_behaviours())
     assert set(views) == {BehaviourView(key, a, t) for key in module.behaviour_base
-                          for a in range(len(ACTIONS)) for t in ("prohibition", "obligation")}
-    # per (precondition, action): prohibition then obligation, the original generation order
-    assert [v.type for v in views[:4]] == ["prohibition", "obligation"] * 2
+                          for a in range(len(ACTIONS)) for t in ("prohibition", "commitment")}
+    # per (precondition, action): prohibition then commitment, the original generation order
+    assert [v.type for v in views[:4]] == ["prohibition", "commitment"] * 2
 
 
 def test_posterior_columns():
     module = make_module()
     entry = module.behaviour_base[frozenset([NO_BERRIES])]
     entry["posteriors"][EAT, PROHIBITION] = 0.2
-    entry["posteriors"][EAT, OBLIGATION] = 0.7
+    entry["posteriors"][EAT, COMMITMENT] = 0.7
     assert module.posterior(behaviour(module, "prohibition", "eat")) == 0.2
-    assert module.posterior(behaviour(module, "obligation", "eat")) == 0.7
+    assert module.posterior(behaviour(module, "commitment", "eat")) == 0.7
 
 
-def test_every_precondition_action_pair_has_one_prohibition_and_one_obligation():
+def test_every_precondition_action_pair_has_one_prohibition_and_one_commitment():
     module = make_module(HARVEST_SPECS, max_predicates=2)
     pairs = {}
     for b in all_behaviours(module):
         pairs.setdefault((tuple(b["precondition"]), b["action"]), []).append(b["type"])
-    assert all(sorted(types) == ["obligation", "prohibition"] for types in pairs.values())
+    assert all(sorted(types) == ["commitment", "prohibition"] for types in pairs.values())
 
 
 def test_bin_names():
@@ -332,14 +332,14 @@ def test_update_counts():
     module = make_module()
     module.update(PRECONDITION_MET, EAT)
     module.update(PRECONDITION_MET, MOVE)
-    eat_obligation = behaviour(module, "obligation", "eat")
+    eat_commitment = behaviour(module, "commitment", "eat")
     eat_prohibition = behaviour(module, "prohibition", "eat")
-    assert module.behaviour_counts(*eat_obligation) == (2, 1)   # consistent only when eating
+    assert module.behaviour_counts(*eat_commitment) == (2, 1)   # consistent only when eating
     assert module.behaviour_counts(*eat_prohibition) == (2, 1)  # consistent only when not eating
 
 
 def test_action_counts_are_stored_once_per_precondition():
-    """One count per action for each precondition, shared by its obligations and prohibitions."""
+    """One count per action for each precondition, shared by its commitments and prohibitions."""
     module = make_module()
     for action in [EAT, EAT, MOVE, THROW, EAT]:
         module.update(PRECONDITION_MET, action)
@@ -347,7 +347,7 @@ def test_action_counts_are_stored_once_per_precondition():
     assert len(module.behaviour_base) == 2  # berries<1, berries>=1
     assert list(module.behaviour_base[frozenset([NO_BERRIES])]["action_counts"]) == [1, 3, 1]
     assert list(module.behaviour_base[frozenset([HAS_BERRIES])]["action_counts"]) == [1, 0, 0]
-    assert module.behaviour_counts(*behaviour(module, "obligation", "throw")) == (5, 1)
+    assert module.behaviour_counts(*behaviour(module, "commitment", "throw")) == (5, 1)
     assert module.behaviour_counts(*behaviour(module, "prohibition", "throw")) == (5, 4)
 
 
@@ -375,20 +375,20 @@ def test_action_counts_track_every_update():
 def test_single_update_matches_hand_computed_bayes():
     """
     First step, so no actions have been counted yet and the smoothed frequencies are uniform (1/3).
-    Obligation "eat", agent eats (consistent), epsilon=0.1:
+    Commitment "eat", agent eats (consistent), epsilon=0.1:
     P(consistent | learned) = max(0.9, 1/3) = 0.9, P(consistent | not learned) = 1/3
     posterior = 0.9 * 0.05 / (0.9 * 0.05 + 1/3 * 0.95)
     """
     module = make_module(epsilon=0.1)
     module.update(PRECONDITION_MET, EAT)
     expected = 0.9 * 0.05 / (0.9 * 0.05 + (1 / 3) * 0.95)
-    assert module.posterior(behaviour(module, "obligation", "eat")) == pytest.approx(expected)
+    assert module.posterior(behaviour(module, "commitment", "eat")) == pytest.approx(expected)
 
 
 def test_update_uses_agents_own_action_frequencies():
     """
     After the agent has eaten 3 times and moved once (smoothed frequency of eat = (3+1)/(4+3) = 4/7),
-    eating again is weaker evidence for obligation "eat" than under a uniform baseline:
+    eating again is weaker evidence for commitment "eat" than under a uniform baseline:
     P(consistent | not learned) = 4/7.
     """
     module = make_module(epsilon=0.1)
@@ -396,7 +396,7 @@ def test_update_uses_agents_own_action_frequencies():
         module.update(PRECONDITION_NOT_MET, action)  # counted, but outside the berries<1 bin
     module.update(PRECONDITION_MET, EAT)
     expected = 0.9 * 0.05 / (0.9 * 0.05 + (4 / 7) * 0.95)
-    assert module.posterior(behaviour(module, "obligation", "eat")) == pytest.approx(expected)
+    assert module.posterior(behaviour(module, "commitment", "eat")) == pytest.approx(expected)
 
 
 def test_likelihood_floor_holds_when_epsilon_is_zero():
@@ -407,8 +407,8 @@ def test_likelihood_floor_holds_when_epsilon_is_zero():
     posteriors = []
     for epsilon in [0.0, 1e-6, 0.01]:
         module = make_module(epsilon=epsilon)
-        module.update(PRECONDITION_MET, MOVE)  # a slip against obligation "eat"
-        posteriors.append(module.posterior(behaviour(module, "obligation", "eat")))
+        module.update(PRECONDITION_MET, MOVE)  # a slip against commitment "eat"
+        posteriors.append(module.posterior(behaviour(module, "commitment", "eat")))
     assert posteriors[0] > 0
     assert posteriors == pytest.approx([posteriors[0]] * 3)
 
@@ -484,7 +484,7 @@ def test_behaviour_and_its_opposite_are_never_both_learned(policies):
     run_policy(module, *policies, 500)
     learned = {(tuple(b["precondition"]), b["action"], b["type"]) for b in module.get_learned_behaviours()}
     for precondition, action, _ in learned:
-        assert not {(precondition, action, "prohibition"), (precondition, action, "obligation")} <= learned
+        assert not {(precondition, action, "prohibition"), (precondition, action, "commitment")} <= learned
 
 
 @pytest.mark.parametrize("epsilon", [0.2, 0.3, 0.5])
@@ -531,24 +531,24 @@ def test_episode_report_values():
         module.update(PRECONDITION_MET, action)
     rows = module.episode_report()
     eat = report_row(rows, "eat")
-    assert eat["behaviour_id"] == module.behaviour_id(behaviour(module, "obligation", "eat")) == "obligation|eat|berries<1"
+    assert eat["behaviour_id"] == module.behaviour_id(behaviour(module, "commitment", "eat")) == "commitment|eat|berries<1"
     assert (eat["n_precon_met"], eat["n_action_matched"]) == (3, 2)
     assert eat["rate"] == pytest.approx(2 / 3)
-    assert eat["posterior"] == pytest.approx(module.posterior(behaviour(module, "obligation", "eat")))
+    assert eat["posterior"] == pytest.approx(module.posterior(behaviour(module, "commitment", "eat")))
     not_eat = report_row(rows, "NOT eat")  # consistent only when not eating
     assert (not_eat["n_precon_met"], not_eat["n_action_matched"]) == (3, 1)
     assert [r["action"] for r in rows if r["is_cooperative"]] == ["throw"]  # not "NOT throw"
 
 
 def test_episode_report_type_and_cooperative_flags():
-    """Every row's type matches its "NOT " prefix; only obligations to throw are cooperative --
+    """Every row's type matches its "NOT " prefix; only commitments to throw are cooperative --
     NOT throw is never cooperative, even when the agent consistently avoids throwing."""
     module = make_module(cooperative_actions=["throw"])
     for _ in range(10):
         module.update(PRECONDITION_MET, EAT)  # consistent with NOT throw every step
     rows = module.episode_report()
     for row in rows:
-        assert row["type"] == ("prohibition" if row["action"].startswith("NOT ") else "obligation")
+        assert row["type"] == ("prohibition" if row["action"].startswith("NOT ") else "commitment")
     not_throw = report_row(rows, "NOT throw")
     assert not_throw["rate"] == 1.0
     assert not_throw["is_cooperative"] is False
@@ -588,9 +588,9 @@ def test_episode_report_is_empty_after_reset():
 
 def test_learned_behaviours_require_min_observations():
     module = make_module(min_observations=5)
-    eat = behaviour(module, "obligation", "eat")
+    eat = behaviour(module, "commitment", "eat")
     entry = module.behaviour_base[eat.precondition_key]
-    entry["posteriors"][EAT, OBLIGATION] = 0.99
+    entry["posteriors"][EAT, COMMITMENT] = 0.99
     entry["action_counts"][EAT] = 4
     assert module.get_learned_behaviours() == []
     entry["action_counts"][EAT] = 5

@@ -2,6 +2,7 @@ from src.scenarios.basic_harvest import BasicHarvest
 from src.scenarios.colours_harvest import ColoursHarvest
 from src.scenarios.allotment_harvest import AllotmentHarvest
 from src.scenarios.capabilities_harvest import CapabilitiesHarvest
+from src.scenarios.health_harvest import HealthHarvest
 from src.data_handling.data_analysis import DataAnalysis
 from src.data_handling.render_pygame import RenderPygame
 from src.agent.harvest_agent import NORMS_MODULE_TYPES
@@ -15,7 +16,7 @@ import re
 PRINCIPLES = ["baseline", "utilitarian", "maximin", "egalitarian"]
 AGGREGATIONS = ["average", "majoritarian", "optimist", "veto"]
 AGENT_TYPES = PRINCIPLES + AGGREGATIONS
-SCENARIO_TYPES = ["colours", "capabilities", "allotment"]
+SCENARIO_TYPES = ["colours", "capabilities", "allotment", "health"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6", "20", "50", "100"]
 MAX_EPISODES = 1000
 MAX_TRAINING_EPISODES = 17000
@@ -23,6 +24,7 @@ TIME_LIMIT = 24*3600-15*60
 RUN_OPTIONS = ["current_run", "50_days", "200_days"]
 SOCIETY_MIXES = ["homogeneous", "heterogeneous"]
 DEFAULT_SEED = 42
+DEFAULT_INITIAL_HEALTHS = [1.0, 1.0, 1.0, 0.5]
 
 def generate_paper_graphs(scenario):
     """
@@ -113,7 +115,7 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
     print(f"simulation finished time: {time.time()}")
     return num_episodes
 
-def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based"):
+def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",initial_healths=None):
     file_string = scenario+"_"+agent_type
     checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
     if scenario == "basic":
@@ -124,17 +126,40 @@ def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berr
         model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type)
     elif scenario == "capabilities":
         model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type)
+    elif scenario == "health":
+        model_inst = HealthHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,initial_healths,file_string,seed,norms_module_type)
     else:
         ValueError("Unknown argument: "+scenario)
     run_simulation(model_inst,render,log_wandb,wandb_project)
 
-def run_all(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based"):
+def run_all(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",initial_healths=None):
     if society_mix == "heterogeneous":
         agent_types = AGENT_TYPES[1:]
     else:
         agent_types = AGENT_TYPES
     for agent_type in agent_types:
-        create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type)
+        create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,initial_healths)
+
+def get_initial_healths_input(num_agents):
+    """
+    Ask for one starting health per agent as comma-separated numbers greater than 0;
+    pressing enter uses DEFAULT_INITIAL_HEALTHS when it has one value per agent
+    """
+    has_default = len(DEFAULT_INITIAL_HEALTHS) == num_agents
+    default_string = f" or press enter for the default {DEFAULT_INITIAL_HEALTHS}" if has_default else ""
+    while True:
+        value = input(f"What health should each of the {num_agents} agents start with? Enter {num_agents} comma-separated numbers greater than 0{default_string}: ").strip()
+        if value == "" and has_default:
+            return list(DEFAULT_INITIAL_HEALTHS)
+        try:
+            initial_healths = [float(health) for health in value.split(",")]
+        except ValueError:
+            print("Invalid input. Please enter numbers separated by commas.")
+            continue
+        if len(initial_healths) != num_agents or any(health <= 0 for health in initial_healths):
+            print(f"Invalid choice. Must be {num_agents} numbers, each greater than 0.")
+            continue
+        return initial_healths
 
 def get_integer_input(prompt, error_string=None, max_value=None, min_value=None):
     while True:
@@ -225,6 +250,9 @@ elif args.option == "test" or args.option == "train":
     else:
         MAX_WIDTH = num_agents * 2
         num_allocations = 1
+    initial_healths = None
+    if scenario == "health":
+        initial_healths = get_initial_healths_input(num_agents)
     MAX_HEIGHT = num_agents * 2
     NUM_BERRIES = num_agents * 3
     #########################################################################################
@@ -249,9 +277,9 @@ elif args.option == "test" or args.option == "train":
         log_wandb = False
         wandb_project = None
     if agent_type == "all":
-        run_all(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type)
+        run_all(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,initial_healths=initial_healths)
     else:
-        create_and_run_model(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type)
+        create_and_run_model(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,initial_healths=initial_healths)
 #########################################################################################
 elif args.option == "graphs":
     graph_runs = ["current_run", "50_days", "200_days", "paper"]

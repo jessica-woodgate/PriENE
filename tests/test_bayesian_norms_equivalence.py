@@ -112,9 +112,9 @@ class _OldBayesianNormsModule():
             rows.append({
                 "behaviour_id":     b["id"],
                 "precondition":     " AND ".join(b["precondition"]),
-                "action":           b["action"] if b["type"] == "obligation" else f"NOT {b['action']}",
+                "action":           b["action"] if b["type"] == "commitment" else f"NOT {b['action']}",
                 "type":             b["type"],
-                "is_cooperative":   b["type"] == "obligation" and b["action"] in self.cooperative_actions,
+                "is_cooperative":   b["type"] == "commitment" and b["action"] in self.cooperative_actions,
                 "n_precon_met":     n_precon_met,
                 "n_action_matched": n_action_matched,
                 "rate":             rate,
@@ -204,7 +204,7 @@ class _OldBayesianNormsModule():
 
                     candidates.append({
                         "id":           behaviour_id,
-                        "type":         "obligation",
+                        "type":         "commitment",
                         "predicates":   pred_combo,
                         "precondition": precondition_names,
                         "action":       action,

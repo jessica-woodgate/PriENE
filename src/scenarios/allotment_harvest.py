@@ -84,3 +84,9 @@ class AllotmentHarvest(HarvestModel):
             if agent_id in allocation_data["agent_ids"]:
                 return allocation_id
         raise NoAllocationException(agent_id)
+
+    def can_throw_to(self, thrower, benefactor):
+        """
+        Berries can only be thrown to agents in the same allotment
+        """
+        return thrower.allocation_id == benefactor.allocation_id

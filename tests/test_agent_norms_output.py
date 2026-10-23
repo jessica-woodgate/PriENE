@@ -11,7 +11,7 @@ from tests.conftest import SCENARIOS, _build, make_scenario_model
 
 CSV_COLUMNS = [
     "episode", "agent_id", "agent_type", "end_day", "num_learned_norms", "num_learned_prohibitions",
-    "num_learned_obligations", "num_gained_norms", "num_lost_norms", "mean_learned_posterior",
+    "num_learned_commitments", "num_gained_norms", "num_lost_norms", "mean_learned_posterior",
     "num_observed_behaviours", "num_learned_cooperative_norms", "num_learned_uncooperative_norms",
 ]
 
@@ -86,7 +86,7 @@ def test_csv_has_one_row_per_agent_per_episode(in_tmp_dir):
 
 
 def test_csv_counts_gained_and_lost_norms_against_previous_episode(in_tmp_dir):
-    """Behaviours alternate prohibition/obligation in iter_behaviours(), so even positions are prohibitions."""
+    """Behaviours alternate prohibition/commitment in iter_behaviours(), so even positions are prohibitions."""
     model = make_norms_model(in_tmp_dir)
     agent = harvest_agents(model)[0]
     model.step()
@@ -98,22 +98,22 @@ def test_csv_counts_gained_and_lost_norms_against_previous_episode(in_tmp_dir):
     rows = read_csv().query("agent_id == 0").sort_values("episode").to_dict("records")
     assert rows[0]["num_learned_norms"] == 3
     assert rows[0]["num_learned_prohibitions"] == 1
-    assert rows[0]["num_learned_obligations"] == 2
+    assert rows[0]["num_learned_commitments"] == 2
     assert (rows[0]["num_gained_norms"], rows[0]["num_lost_norms"]) == (3, 0)
     assert rows[0]["mean_learned_posterior"] == pytest.approx(0.99)
     assert rows[1]["num_learned_norms"] == 4
     assert (rows[1]["num_gained_norms"], rows[1]["num_lost_norms"]) == (2, 1)
 
 
-def test_csv_counts_throw_obligations_as_cooperative_and_throw_prohibitions_as_uncooperative(in_tmp_dir):
+def test_csv_counts_throw_commitments_as_cooperative_and_throw_prohibitions_as_uncooperative(in_tmp_dir):
     model = make_norms_model(in_tmp_dir)
     agent = harvest_agents(model)[0]
     base = list(enumerate(agent.norms_module.behaviour_dict(v) for v in agent.norms_module.iter_behaviours()))
-    throw_obligations = [i for i, b in base if b["type"] == "obligation" and b["action"] == "throw"][:3]
+    throw_commitments = [i for i, b in base if b["type"] == "commitment" and b["action"] == "throw"][:3]
     throw_prohibitions = [i for i, b in base if b["type"] == "prohibition" and b["action"] == "throw"][:2]
-    eat_obligations = [i for i, b in base if b["type"] == "obligation" and b["action"] == "eat"][:2]
+    eat_commitments = [i for i, b in base if b["type"] == "commitment" and b["action"] == "eat"][:2]
     model.step()
-    force_learned(agent, set(throw_obligations + throw_prohibitions + eat_obligations))
+    force_learned(agent, set(throw_commitments + throw_prohibitions + eat_commitments))
     model.finish_episode()
     row = read_csv().query("agent_id == 0").iloc[0]
     assert row["num_learned_norms"] == 7
@@ -244,7 +244,7 @@ def test_every_predicate_is_informative_under_trained_policy(in_tmp_dir, monkeyp
 
     monkeypatch.setattr(BayesianNormsModule, "update", logging_update)
     model = _build("basic", "homogeneous", 12, agent_type, False, TRAINED_CHECKPOINTS_ABS, False, True, "informative", 3, 200,
-                   norms_module_type="bayesian")
+                   seed=42, norms_module_type="bayesian")
     while model.episode <= 3:
         model.step()
     observations = np.array(observations)

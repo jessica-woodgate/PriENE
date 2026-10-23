@@ -6,10 +6,10 @@ from src.harvest_exception import UnmappedActionException
 
 # columns of each behaviour_base entry's posteriors array
 PROHIBITION = 0
-OBLIGATION = 1
-TYPE_COLUMNS = {"prohibition": PROHIBITION, "obligation": OBLIGATION}
+COMMITMENT = 1
+TYPE_COLUMNS = {"prohibition": PROHIBITION, "commitment": COMMITMENT}
 # order behaviours of one (precondition, action) are listed in
-TYPES = ("prohibition", "obligation")
+TYPES = ("prohibition", "commitment")
 
 # one behaviour, "IF precondition THEN (NOT) action": a view onto a behaviour_base entry
 BehaviourView = namedtuple("BehaviourView", ["precondition_key", "action_idx", "type"])
@@ -18,7 +18,7 @@ class BayesianNormsModule():
     """
     Domain-agnostic norm base with Bayesian updating.
 
-    Generates a candidate set of prohibition and obligation behaviours from
+    Generates a candidate set of prohibition and commitment behaviours from
     bucket specifications provided at construction time, then performs
     Bayesian updating at each step using the agent's own (observation, action)
     pairs to estimate which behaviours the agent has learned.
@@ -46,7 +46,7 @@ class BayesianNormsModule():
                                 precondition must be met before it can be
                                 considered learned (default 5)
         epsilon              -- exploration probability for agent's action selection
-        cooperative_actions  -- set of action names whose obligations count as
+        cooperative_actions  -- set of action names whose commitments count as
                                 cooperative in episode_report() (e.g. {"throw"})
         action_counts        -- number of times the agent has taken each action, over
                                 every update (not reset per episode: the policy, and so
@@ -61,7 +61,7 @@ class BayesianNormsModule():
                                                      precondition held this episode
                                     posteriors    -- float array (len(actions), 2):
                                                      P(learned) per action, column
-                                                     PROHIBITION / OBLIGATION
+                                                     PROHIBITION / COMMITMENT
                                 Individual behaviours are BehaviourViews (see
                                 iter_behaviours()), identified by behaviour_id()
     """
@@ -123,15 +123,15 @@ class BayesianNormsModule():
         # likelihoods for every (action, type) cell -- they depend only on the action taken and the
         # agent's overall action frequencies, so they are shared by every matching precondition
         p_consistent_given_not_learned = np.empty((n_actions, 2))
-        # prohibition learned <=> agent avoids the action; obligation learned <=> agent takes it
+        # prohibition learned <=> agent avoids the action; commitment learned <=> agent takes it
         p_consistent_given_not_learned[:, PROHIBITION] = 1.0 - action_frequencies
-        p_consistent_given_not_learned[:, OBLIGATION]  = action_frequencies
+        p_consistent_given_not_learned[:, COMMITMENT]  = action_frequencies
         p_consistent_given_learned = np.maximum(1.0 - self.epsilon, p_consistent_given_not_learned)
 
         took_action = np.arange(n_actions) == action_taken
         consistent = np.empty((n_actions, 2), dtype=bool)
         consistent[:, PROHIBITION] = ~took_action
-        consistent[:, OBLIGATION]  = took_action
+        consistent[:, COMMITMENT]  = took_action
 
         p_evidence_given_learned     = np.where(consistent, p_consistent_given_learned,
                                                 1.0 - p_consistent_given_learned)
@@ -155,7 +155,7 @@ class BayesianNormsModule():
         """
         (n_precon_met, n_action_matched) for a behaviour this episode, derived from
         its precondition's action counts: n_action_matched is how often the agent
-        took the obligated action, or avoided the prohibited one.
+        took the committed action, or avoided the prohibited one.
         """
         counts = self.behaviour_base[precondition_key]["action_counts"]
         n_precon_met = int(counts.sum())
@@ -167,7 +167,7 @@ class BayesianNormsModule():
     def iter_behaviours(self):
         """
         Yield a BehaviourView for every behaviour: each precondition, each action, then
-        prohibition before obligation (the order behaviours were originally generated in).
+        prohibition before commitment (the order behaviours were originally generated in).
         """
         for key in self.behaviour_base:
             yield from self._entry_behaviours(key)
@@ -236,12 +236,12 @@ class BayesianNormsModule():
             behaviour_id     -- behaviour_id(), "type|action|sorted precondition"
             precondition     -- predicate names joined with " AND "
             action           -- the action, prefixed "NOT " for prohibitions
-            type             -- "obligation" or "prohibition"
-            is_cooperative   -- obligation to take one of cooperative_actions
+            type             -- "commitment" or "prohibition"
+            is_cooperative   -- commitment to take one of cooperative_actions
                                 (prohibitions, e.g. NOT throw, are never cooperative)
             n_precon_met     -- steps this episode where the precondition held
             n_action_matched -- of those, steps where the agent acted consistently
-                                (took the obligated / avoided the prohibited action)
+                                (took the committed / avoided the prohibited action)
             rate             -- n_action_matched / n_precon_met
             exhibited        -- rate > 0 and n_precon_met > min_observations, i.e.
                                 seen often enough for the rate to mean something
@@ -258,9 +258,9 @@ class BayesianNormsModule():
                 rows.append({
                     "behaviour_id":     self.behaviour_id(view),
                     "precondition":     " AND ".join(entry["precondition"]),
-                    "action":           action if view.type == "obligation" else f"NOT {action}",
+                    "action":           action if view.type == "commitment" else f"NOT {action}",
                     "type":             view.type,
-                    "is_cooperative":   view.type == "obligation" and action in self.cooperative_actions,
+                    "is_cooperative":   view.type == "commitment" and action in self.cooperative_actions,
                     "n_precon_met":     n_precon_met,
                     "n_action_matched": n_action_matched,
                     "rate":             rate,
@@ -294,7 +294,7 @@ class BayesianNormsModule():
         return self
 
     def _entry_behaviours(self, precondition_key):
-        """BehaviourViews of one precondition: each action, prohibition before obligation."""
+        """BehaviourViews of one precondition: each action, prohibition before commitment."""
         for action in self.actions:
             action_idx = self.action_name_to_index[action]
             for behaviour_type in TYPES:
@@ -344,7 +344,7 @@ class BayesianNormsModule():
     def _generate_preconditions(self, predicates):
         """
         Yield every combination of up to max_predicates predicates as a candidate
-        precondition; each gets a prohibition and an obligation for every action (the
+        precondition; each gets a prohibition and a commitment for every action (the
         Bayesian update determines which are learned, not the generation step).
         Combinations containing two bins of the same feature are skipped: bins don't
         overlap, so they could never be met.

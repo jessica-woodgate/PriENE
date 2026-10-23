@@ -92,3 +92,27 @@ def test_render_pygame_does_not_raise_for_any_agent_type(tmp_path, agent_type, m
     model = make_training_model(tmp_path, agent_type, max_days=10, max_episodes=2)
     render_inst = RenderPygame(model.max_width, model.max_height)
     render_inst.render_pygame(model)
+
+
+@pytest.mark.parametrize("scenario, reachable", [("allotment", False), ("capabilities", True)])
+def test_berries_can_only_be_thrown_within_an_allotment(tmp_path, scenario, reachable):
+    """
+    Agents 0,1 share allocation_0 and agents 2,3 share allocation_1. In allotment a berry thrown
+    to the other allotment is out of reach; in capabilities every agent shares the grid.
+    """
+    model = make_scenario_model(tmp_path, scenario, "baseline")
+    agents = {a.unique_id: a for a in model.get_living_agents()}
+    thrower = agents[0]
+    thrower.berries = 2
+    thrower.health = thrower.low_health_threshold
+
+    assert thrower._throw(1) == thrower.rewards["throw"]
+    other_allotment_health = agents[2].health
+    reward = thrower._throw(2)
+    if reachable:
+        assert reward == thrower.rewards["throw"]
+        assert thrower.berries == 0
+    else:
+        assert reward == thrower.rewards["no_benefactor"]
+        assert thrower.berries == 1
+        assert agents[2].health == other_allotment_health

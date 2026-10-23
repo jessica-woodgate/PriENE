@@ -194,7 +194,13 @@ class HarvestModel(Model):
     
     def get_living_agents(self):
         return self.living_agents
-    
+
+    def can_throw_to(self, thrower, benefactor):
+        """
+        Whether thrower can reach benefactor with a berry; any agent can by default, scenarios restrict this by overriding
+        """
+        return True
+
     def get_day(self):
         return self.day
     
@@ -403,7 +409,7 @@ class HarvestModel(Model):
         Collects one row per agent summarising the norms it has learned by the end of this episode and
         appends them to agent_norms_<filepath>.csv. Gained/lost compare against the behaviours the same
         agent had learned at the end of the previous episode (posteriors decay between episodes, so
-        behaviours can be lost as well as gained). Cooperative norms are learned obligations to throw a
+        behaviours can be lost as well as gained). Cooperative norms are learned commitments to throw a
         berry to another agent ("IF ... THEN throw"); uncooperative norms are learned prohibitions on
         throwing ("IF ... THEN NOT throw"). Agents' throw_X actions are collapsed to "throw" for norms.
         """
@@ -420,12 +426,12 @@ class HarvestModel(Model):
                          "end_day": self.day,
                          "num_learned_norms": len(learned),
                          "num_learned_prohibitions": sum(b["type"] == "prohibition" for b in learned),
-                         "num_learned_obligations": sum(b["type"] == "obligation" for b in learned),
+                         "num_learned_commitments": sum(b["type"] == "commitment" for b in learned),
                          "num_gained_norms": len(learned_ids - previous_ids),
                          "num_lost_norms": len(previous_ids - learned_ids),
                          "mean_learned_posterior": float(np.mean([b["posterior"] for b in learned])) if learned else None,
                          "num_observed_behaviours": sum(agent.norms_module.behaviour_counts(*view)[0] > 0 for view in agent.norms_module.iter_behaviours()),
-                         "num_learned_cooperative_norms": sum(b["type"] == "obligation" and b["action"] == "throw" for b in learned),
+                         "num_learned_cooperative_norms": sum(b["type"] == "commitment" and b["action"] == "throw" for b in learned),
                          "num_learned_uncooperative_norms": sum(b["type"] == "prohibition" and b["action"] == "throw" for b in learned)})
             self.previous_learned_norms[agent.unique_id] = learned_ids
         pd.DataFrame(rows, columns=self._agent_norms_columns()).to_csv(self._agent_norms_csv_filename(), header=None, mode='a', index=False)
@@ -454,7 +460,7 @@ class HarvestModel(Model):
 
     def _agent_norms_columns(self):
         return ["episode", "agent_id", "agent_type", "end_day", "num_learned_norms", "num_learned_prohibitions",
-                "num_learned_obligations", "num_gained_norms", "num_lost_norms", "mean_learned_posterior",
+                "num_learned_commitments", "num_gained_norms", "num_lost_norms", "mean_learned_posterior",
                 "num_observed_behaviours", "num_learned_cooperative_norms",
                 "num_learned_uncooperative_norms"]
 

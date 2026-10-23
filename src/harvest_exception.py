@@ -145,3 +145,14 @@ class ImpossibleNormException(HarvestException):
     
     def __str__(self):
         return (f"Day {self.day}, agent {self.agent_id} saving an impossible behaviour! Antecedent {self.antecedent} consequent {self.action}; got reward {self.reward}")
+
+class InitialHealthsException(HarvestException):
+    def __init__(self, num_agents, initial_healths):
+        super().__init__()
+        self.num_agents = num_agents
+        self.initial_healths = initial_healths
+
+    def __str__(self):
+        if len(self.initial_healths) != self.num_agents:
+            return (f"Expected {self.num_agents} initial healths (one per agent) and got {len(self.initial_healths)}: {self.initial_healths}")
+        return (f"Initial healths must all be greater than 0, got {self.initial_healths}")
