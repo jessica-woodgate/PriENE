@@ -80,6 +80,9 @@ class NormProcessing():
         for norm_name, norm_value in data.items():
             if "throw" in norm_name:
                 norm_data = {"norm": norm_name, "reward": norm_value["reward"], "numerosity": norm_value["numerosity"], "fitness": norm_value["fitness"], "num_instances_across_episodes": norm_value["num_instances_across_episodes"]}
+                for held_field in ["total_days_held", "mean_days_held", "mean_first_day_held", "mean_last_day_held"]:
+                    if held_field in norm_value:
+                        norm_data[held_field] = norm_value[held_field]
                 cooperative_norms.append(norm_data)
         df = pd.DataFrame(cooperative_norms)
         df.to_csv(output_file+"_cooperative_data.csv",index=False)
@@ -115,6 +118,15 @@ class NormProcessing():
                         emerged_norms[norm_name]["fitness"] += norm_data["fitness"]
                         emerged_norms[norm_name]["adoption"] += norm_data["adoption"]
                         emerged_norms[norm_name]["num_instances_across_episodes"] += 1
+                    #held-day fields are only written by runs after emerged norm statistics stopped being summed every step
+                    if "days_held" in norm_data:
+                        self._merge_days_held(emerged_norms[norm_name], norm_data)
+        for norm_value in emerged_norms.values():
+            if "total_days_held" in norm_value:
+                instances_held = norm_value.pop("instances_held")
+                norm_value["mean_days_held"] = norm_value["total_days_held"] / instances_held
+                norm_value["mean_first_day_held"] = norm_value.pop("sum_first_day_held") / instances_held
+                norm_value["mean_last_day_held"] = norm_value.pop("sum_last_day_held") / instances_held
         emerged_norms = dict(sorted(emerged_norms.items(), key=lambda item: item[1]["fitness"], reverse=True))
 
         filename = output_file+"_merged.json"
@@ -133,6 +145,18 @@ class NormProcessing():
                     keys_file.write(key+"\n")
         return emerged_norms
     
+    def _merge_days_held(self, merged_norm, norm_data):
+        """
+        Accumulates when a norm was held in an episode into its merged entry; _merge_norms turns the
+        sums into means across the episodes it emerged in
+        """
+        if "total_days_held" not in merged_norm:
+            merged_norm.update({"total_days_held": 0, "instances_held": 0, "sum_first_day_held": 0, "sum_last_day_held": 0})
+        merged_norm["total_days_held"] += norm_data["days_held"]
+        merged_norm["instances_held"] += 1
+        merged_norm["sum_first_day_held"] += norm_data["first_day_held"]
+        merged_norm["sum_last_day_held"] += norm_data["last_day_held"]
+
     def _generalise_norms(self, norms, output_file, cooperative_norms=False):
         """
         Generalises a set of norms (rules) by merging redundant or overly specific rules 

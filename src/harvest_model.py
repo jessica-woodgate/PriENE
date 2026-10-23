@@ -461,39 +461,56 @@ class HarvestModel(Model):
     def _check_emerged_norms(self):
         """
         function to check the current emerged norms at this step and update the norms that have emerged across the whole episode
-        for each agent, look at the norms in its behaviour base and store in current_emerged_norms
-        pass to update_norm to store a norm if it hasn't been seen before else to update it
-        filter emerged norms by emergence threshold
+        for each living agent, add the behaviours in its behaviour base to society_norms_snapshot
+        filter society_norms_snapshot by emergence threshold
         update norms emerged across the whole episode with the norms emerged at this step
         """
         if len(self.living_agents) < 2:
             return
         emergence_threshold = len(self.living_agents) * self.societal_norm_emergence_threshold
-        current_emerged_norms = {}
+        society_norms_snapshot = {}
         for agent in self.schedule.agents:
-            if agent.agent_type != "berry":
+            if agent.agent_type != "berry" and not agent.off_grid:
                 for norm_name, norm_value in agent.norms_module.behaviour_base.items():
-                    current_emerged_norms = self._update_norm(norm_name, norm_value, current_emerged_norms, tracking_adoption=True)
-        current_emerged_norms = {norm: norm_value for norm, norm_value in current_emerged_norms.items() if norm_value["adoption"] >= emergence_threshold}
-        for norm_name, norm_value in current_emerged_norms.items():
-            self.emerged_norms = self._update_norm(norm_name, norm_value, self.emerged_norms)
-    
-    def _update_norm(self, norm_name, norm_value, norm_base, tracking_adoption=False):
-        if norm_name not in norm_base.keys():
-            norm_base[norm_name] = {"reward": 0,
+                    society_norms_snapshot = self._add_agent_behaviour_to_snapshot(norm_name, norm_value, society_norms_snapshot)
+        society_norms_snapshot = {norm: norm_value for norm, norm_value in society_norms_snapshot.items() if norm_value["adoption"] >= emergence_threshold}
+        for norm_name, norm_value in society_norms_snapshot.items():
+            self._update_episode_emerged_norm(norm_name, norm_value)
+
+    def _update_episode_emerged_norm(self, norm_name, norm_value):
+        """
+        Overwrite an emerged norm's statistics with the society's current totals (agents' behaviour
+        bases already hold running totals for the episode) and track when the norm was held: 
+        first and last day above the emergence threshold, and number of days held
+        """
+        norm = self.emerged_norms.get(norm_name)
+        if norm is None:
+            norm = {"first_day_held": self.day, "days_held": 0}
+            self.emerged_norms[norm_name] = norm
+        norm["reward"] = norm_value["reward"]
+        norm["numerosity"] = norm_value["numerosity"]
+        norm["fitness"] = norm_value["fitness"]
+        #number of living agents with the norm in their behaviour base on the last day it was held
+        norm["adoption"] = norm_value["adoption"]
+        norm["last_day_held"] = self.day
+        norm["days_held"] += 1
+
+    def _add_agent_behaviour_to_snapshot(self, norm_name, norm_value, society_norms_snapshot):
+        """
+        Add one agent's totals for a behaviour to the society's totals at this step
+        """
+        if norm_name not in society_norms_snapshot.keys():
+            society_norms_snapshot[norm_name] = {"reward": 0,
                                         "numerosity": 0,
                                         "fitness": 0,
                                         "adoption": 0}
-        norm_base[norm_name]["reward"] += norm_value["reward"]
+        society_norms_snapshot[norm_name]["reward"] += norm_value["reward"]
         #number times it has been used by individual agents
-        norm_base[norm_name]["numerosity"] += norm_value["numerosity"]
-        norm_base[norm_name]["fitness"] += norm_value["fitness"]
-        #number of times it has been adopted in the behaviour bases of individual agents in a society
-        if tracking_adoption:
-            norm_base[norm_name]["adoption"] += 1
-        else:
-            norm_base[norm_name]["adoption"] += norm_value["adoption"]
-        return norm_base
+        society_norms_snapshot[norm_name]["numerosity"] += norm_value["numerosity"]
+        society_norms_snapshot[norm_name]["fitness"] += norm_value["fitness"]
+        #number of agents in the society with it in their behaviour base
+        society_norms_snapshot[norm_name]["adoption"] += 1
+        return society_norms_snapshot
     
     def _update_schedule(self):
         #check for dead agents & foraged berries

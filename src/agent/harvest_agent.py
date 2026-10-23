@@ -372,7 +372,7 @@ class HarvestAgent(Agent):
             {
                 "name":       "distance",
                 "index":      3,
-                "thresholds": [1, 3, 7],
+                "thresholds": [1, 2, 3],
                 "repeated":   False,
             },
             {

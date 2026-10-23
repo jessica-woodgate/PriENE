@@ -226,11 +226,6 @@ TRAINED_CHECKPOINTS_ABS = os.path.abspath(TRAINED_CHECKPOINTS) + "/"
 
 
 @pytest.mark.skipif(not os.path.isdir(TRAINED_CHECKPOINTS), reason="needs the trained 200_days checkpoints")
-@pytest.mark.xfail(strict=True, reason=(
-    "HarvestAgent._build_norm_base has a bin that is (almost) never used under trained policies: "
-    "distance>=7 (0-0.2% of observations; distance rarely exceeds 5 on an 8x8 grid). "
-    "Remove this marker once the distance thresholds are changed."
-))
 @pytest.mark.parametrize("agent_type", ["baseline", "utilitarian"])
 def test_every_predicate_is_informative_under_trained_policy(in_tmp_dir, monkeypatch, agent_type):
     """
