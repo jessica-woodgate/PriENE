@@ -35,7 +35,8 @@ class DataAnalysis():
             agent_final_rows_dfs = agent_df_list
         if write:
             self._display_graphs(agent_final_rows_dfs, end_episode_totals_dfs, df_labels, normalised_df_list)
-        exclude_list = ["agent_id", "episode", "action"]
+        #initial_health is set by the run, not an outcome of it, so it isn't tested for significance
+        exclude_list = ["agent_id", "episode", "action", "initial_health"]
         self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "principles", exclude_list)
         self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "principles", exclude_list)
         self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "aggregations", exclude_list)
@@ -201,9 +202,12 @@ class DataAnalysis():
         #     json.dump(berries_consumed_tendency, f, indent=4)
 
     def _display_swarmplot(self, df_list, df_labels, column, filename):
-        fig, ax = plt.subplots()
         #combine the DataFrames and add labels
         combined_df = pd.concat([df.assign(label=label) for df, label in zip(df_list, df_labels)])
+        if combined_df.empty:
+            print("no data for", column, "in any society, skipping", filename)
+            return
+        fig, ax = plt.subplots()
         #plot the swarm plot with reduced marker size
         sns.swarmplot(data=combined_df, x=column, y='label', ax=ax, size=2, hue='label', dodge=True, alpha=0.6)
         plt.xlabel(column)

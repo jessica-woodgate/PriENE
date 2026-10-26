@@ -17,6 +17,7 @@ from .harvest_exception import AgentTypeException
 from .harvest_exception import NoBerriesException
 from .harvest_exception import NumBerriesException
 from .harvest_exception import UnrecognisedNormsModule
+from .harvest_exception import InitialHealthsException
 from os.path import exists
 from abc import abstractmethod
 
@@ -50,13 +51,17 @@ class HarvestModel(Model):
         emerged_norms -- all norms which emerge in current episode
         epsilon -- probability of exploration for agents (tracks when to end training)
         seed -- random seed for the run (None = unseeded)
+        initial_healths -- health each agent starts every episode with, indexed by agent id (None = every agent starts with the agent's default start health)
     """
-    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based"):
+    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None):
         super().__init__()
         self._set_seed(seed)
         self.num_agents = num_agents
         if self.num_agents <= 0:
             raise NumAgentsException(">0", 0)
+        if initial_healths is not None and (len(initial_healths) != num_agents or any(health <= 0 for health in initial_healths)):
+            raise InitialHealthsException(num_agents, initial_healths)
+        self.initial_healths = None if initial_healths is None else list(initial_healths)
         self.num_berries = 0
         self.end_day = 0
         self.day = 0
@@ -229,11 +234,23 @@ class HarvestModel(Model):
 
     def _add_agent(self, i, agent_type, allotment, checkpoint_path, allocation_id=None):
         a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.track_norms,shared_replay_buffer=self.shared_replay_buffer,allocation_id=allocation_id,norms_module_type=self.norms_module_type)
+        if self.initial_healths is not None:
+            self._apply_initial_health(a)
         self.schedule.add(a)
         self._place_agent_in_allotment(a)
         if a.agent_type != "berry":
             self.agent_id += 1
             self.living_agents.append(a)
+
+    def _apply_initial_health(self, agent):
+        """
+        Set the agent's start health, which agent.reset() restores at the start of every episode,
+        and its current health for the first episode
+        """
+        agent.start_health = self.initial_healths[agent.unique_id]
+        agent.health = agent.start_health
+        agent.days_left_to_live = agent.get_days_left_to_live()
+        agent.total_days_left_to_live = agent.days_left_to_live
 
     def _reset(self):
         self.living_agents = []
@@ -267,7 +284,8 @@ class HarvestModel(Model):
                                "total_days_left_to_live": [],
                                "action": [],
                                "reward": [],
-                               "num_norms": []})
+                               "num_norms": [],
+                               "initial_health": []})
     
     def _reset_agent(self, agent):
         if agent.agent_type == "berry":
@@ -299,7 +317,8 @@ class HarvestModel(Model):
                                "total_days_left_to_live": [],
                                "action": [],
                                "reward": [],
-                               "num_norms": []})
+                               "num_norms": [],
+                               "initial_health": []})
         if self.write_data and not self.training:
            if exists("data/results/current_run/agent_reports_"+self.filepath+".csv"):
                raise FileExistsException("data/results/current_run/agent_reports_"+self.filepath+".csv")
@@ -344,7 +363,8 @@ class HarvestModel(Model):
                                "total_days_left_to_live": [agent.total_days_left_to_live],
                                "action": [agent.current_action],
                                "reward": [agent.current_reward],
-                               "num_norms": [self._num_agent_norms(agent)]})
+                               "num_norms": [self._num_agent_norms(agent)],
+                               "initial_health": [agent.start_health]})
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry])
         if self.write_data and not self.training:
            new_entry.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", header=None, mode='a',index=False)

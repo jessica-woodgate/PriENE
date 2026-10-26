@@ -2,7 +2,6 @@ from src.scenarios.basic_harvest import BasicHarvest
 from src.scenarios.colours_harvest import ColoursHarvest
 from src.scenarios.allotment_harvest import AllotmentHarvest
 from src.scenarios.capabilities_harvest import CapabilitiesHarvest
-from src.scenarios.health_harvest import HealthHarvest
 from src.data_handling.data_analysis import DataAnalysis
 from src.data_handling.render_pygame import RenderPygame
 from src.agent.harvest_agent import NORMS_MODULE_TYPES
@@ -16,7 +15,7 @@ import re
 PRINCIPLES = ["baseline", "utilitarian", "maximin", "egalitarian"]
 AGGREGATIONS = ["average", "majoritarian", "optimist", "veto"]
 AGENT_TYPES = PRINCIPLES + AGGREGATIONS
-SCENARIO_TYPES = ["colours", "capabilities", "allotment", "health"]
+SCENARIO_TYPES = ["colours", "capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6", "20", "50", "100"]
 MAX_EPISODES = 1000
 MAX_TRAINING_EPISODES = 17000
@@ -24,6 +23,7 @@ TIME_LIMIT = 24*3600-15*60
 RUN_OPTIONS = ["current_run", "50_days", "200_days"]
 SOCIETY_MIXES = ["homogeneous", "heterogeneous"]
 DEFAULT_SEED = 42
+STARTING_HEALTH_OPTIONS = ["equal", "unequal"]
 DEFAULT_INITIAL_HEALTHS = [1.0, 1.0, 1.0, 0.5]
 
 def generate_paper_graphs(scenario):
@@ -49,23 +49,25 @@ def generate_paper_graphs(scenario):
         end_episode_totals_dfs.append(df)
     data_analysis.proccess_and_display_data(agent_end_episode_dfs, PRINCIPLES, AGGREGATIONS, scenario, end_episode_totals_dfs=end_episode_totals_dfs, write=True, get_normalised=False, process_norms=False)
 
-def generate_graphs(scenario, run_name, num_agents):
+def generate_graphs(scenario, run_name, num_agents, starting_health="equal"):
     """
     takes raw files and generates graphs
     processed dfs contain data for each agent at the end of each episode
+    unequal starting health runs are read from the same scenario folder, with "_unequal_health" after the scenario in each filename
     """
     writing_filepath = "data/results/current_run/"
+    file_scenario = scenario if starting_health == "equal" else scenario+"_unequal_health"
     if run_name == "current_run":
-        norms_filepath = "data/results/"+run_name+"/"+scenario+"_"
+        norms_filepath = "data/results/"+run_name+"/"+file_scenario+"_"
     else:
-        norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/norms/"+scenario+"_"
+        norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/norms/"+file_scenario+"_"
     data_analysis = DataAnalysis(num_agents, writing_filepath)
     if run_name == "current_run":
-        reading_filepath = "data/results/"+run_name+"/agent_reports_"+scenario+"_"
+        reading_filepath = "data/results/"+run_name+"/agent_reports_"+file_scenario+"_"
     else:
-        reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+scenario+"_"
-    #files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv",reading_filepath+"majoritarian.csv",reading_filepath+"optimist.csv",reading_filepath+"veto.csv"]
-    files = [reading_filepath+"baseline.csv",reading_filepath+"egalitarian.csv",reading_filepath+"maximin.csv",reading_filepath+"utilitarian.csv",reading_filepath+"average.csv"]
+        reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+file_scenario+"_"
+    #built from AGENT_TYPES so the files are in the same order as the labels (PRINCIPLES + AGGREGATIONS) the analysis gives them
+    files = [reading_filepath+agent_type+".csv" for agent_type in AGENT_TYPES]
     dfs = []
     for file in files:
         df = pd.read_csv(file)
@@ -116,18 +118,19 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
     return num_episodes
 
 def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",initial_healths=None):
-    file_string = scenario+"_"+agent_type
+    if initial_healths is None:
+        file_string = scenario+"_"+agent_type
+    else:
+        file_string = scenario+"_unequal_health_"+agent_type
     checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
     if scenario == "basic":
-        model_inst = BasicHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type)
+        model_inst = BasicHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths)
     elif scenario == "colours":
-        model_inst = ColoursHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type)
+        model_inst = ColoursHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type)
+        model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths)
     elif scenario == "capabilities":
-        model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type)
-    elif scenario == "health":
-        model_inst = HealthHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,initial_healths,file_string,seed,norms_module_type)
+        model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths)
     else:
         ValueError("Unknown argument: "+scenario)
     run_simulation(model_inst,render,log_wandb,wandb_project)
@@ -220,6 +223,7 @@ if args.option not in ["test", "train", "graphs"]:
 elif args.option == "test" or args.option == "train":
     if args.option == "test":
         scenario = get_input(f"What type of scenario do you want to run {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES)
+        starting_health = get_input(f"Do you want agents to start with equal or unequal health {STARTING_HEALTH_OPTIONS}: ", f"Invalid starting health. Please choose {STARTING_HEALTH_OPTIONS}: ", STARTING_HEALTH_OPTIONS)
         run_name = get_input(f"What run do you want to test (select 200_days to replicate results in the paper) {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
         society_mix = get_input(f"What mix of society do you want to test {SOCIETY_MIXES}: ", f"Invalid society mix. Please choose {SOCIETY_MIXES}: ", SOCIETY_MIXES)
         max_episodes = MAX_EPISODES
@@ -231,6 +235,7 @@ elif args.option == "test" or args.option == "train":
     else:
         training = True
         scenario = "basic"
+        starting_health = "equal"
         run_name = "current_run"
         society_mix = "homogeneous"
         max_episodes = 0
@@ -251,7 +256,7 @@ elif args.option == "test" or args.option == "train":
         MAX_WIDTH = num_agents * 2
         num_allocations = 1
     initial_healths = None
-    if scenario == "health":
+    if starting_health == "unequal":
         initial_healths = get_initial_healths_input(num_agents)
     MAX_HEIGHT = num_agents * 2
     NUM_BERRIES = num_agents * 3
@@ -289,5 +294,6 @@ elif args.option == "graphs":
     if run_name == "paper":
         generate_paper_graphs(scenario)
     else:
+        starting_health = get_input(f"Did agents start with equal or unequal health {STARTING_HEALTH_OPTIONS}: ", f"Invalid starting health. Please choose {STARTING_HEALTH_OPTIONS}: ", STARTING_HEALTH_OPTIONS)
         num_agents = int(get_input(f"How many agents {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
-        generate_graphs(scenario,run_name,num_agents)
+        generate_graphs(scenario,run_name,num_agents,starting_health)

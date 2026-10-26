@@ -156,3 +156,12 @@ class InitialHealthsException(HarvestException):
         if len(self.initial_healths) != self.num_agents:
             return (f"Expected {self.num_agents} initial healths (one per agent) and got {len(self.initial_healths)}: {self.initial_healths}")
         return (f"Initial healths must all be greater than 0, got {self.initial_healths}")
+
+class InitialHealthsNotSupported(HarvestException):
+    def __init__(self, scenario, initial_healths):
+        super().__init__()
+        self.scenario = scenario
+        self.initial_healths = initial_healths
+
+    def __str__(self):
+        return (f"The {self.scenario} scenario is for training, where all agents start with equal health; initial healths {self.initial_healths} can only be set for the colours, capabilities and allotment scenarios")

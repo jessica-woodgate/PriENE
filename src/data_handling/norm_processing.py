@@ -84,7 +84,11 @@ class NormProcessing():
                     if held_field in norm_value:
                         norm_data[held_field] = norm_value[held_field]
                 cooperative_norms.append(norm_data)
-        df = pd.DataFrame(cooperative_norms)
+        if cooperative_norms:
+            df = pd.DataFrame(cooperative_norms)
+        else:
+            #a society with no cooperative norms still gives a table with the expected columns
+            df = pd.DataFrame(columns=["norm", "reward", "numerosity", "fitness", "num_instances_across_episodes"])
         df.to_csv(output_file+"_cooperative_data.csv",index=False)
         return df
 
