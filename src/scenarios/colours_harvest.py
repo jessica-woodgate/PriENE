@@ -17,19 +17,14 @@ class ColoursHarvest(HarvestModel):
         self.berries = self._init_berries()
         self._init_seasons()
 
-    def get_forage_allocation(self, allocation_id):
-        """
-        Seasons move ownership of colours between agents: berries keep their colour, and an agent forages
-        the colour its home allocation holds this season
-        """
-        return self.season_assignment[allocation_id]
-
     def _assign_allocations(self):
         resources = self._generate_resource_allocations(self.num_agents)
+        self.resources = resources
         allocations = {}
         for i in range(self.num_agents):
             key = "allocation_"+str(i)
-            allocations[key] = {"id": i, "berry_allocation": resources[i]}
+            #each colour is a group of one agent, so seasons treat colours like capability groups or allotments
+            allocations[key] = {"id": i, "berry_allocation": resources[i], "agent_ids": [i]}
         return allocations
 
     def _init_berries(self):

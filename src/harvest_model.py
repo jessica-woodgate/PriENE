@@ -57,7 +57,9 @@ class HarvestModel(Model):
         seasons -- boolean to randomly reassign the berry allocations between holders (agents, capability groups or allotments) every season_length days
         season_length -- days in each season; swaps happen after the steps on days season_length, 2*season_length, ...
         season -- index of the current season in this episode (0 = the original assignment)
-        season_assignment -- dict mapping each holder (an allocation key) to the original allocation whose berries it holds this season (None for scenarios without allocations)
+        resources -- each agent's individual berry allocation at season 0, from _generate_resource_allocations (set by scenarios with allocations)
+        individual_allocations -- each agent's individual berry allocation this season, a permutation of resources (None for scenarios without allocations);
+            each group's (allocation's) berries are the total of its members' individual allocations, and group membership never changes
         season_rng -- generator for season swaps, seeded from seed and separate from the other random streams so seasons don't shift them
     """
     def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=25):
@@ -102,7 +104,7 @@ class HarvestModel(Model):
         self.seasons = seasons
         self.season_length = season_length
         self.season = 0
-        self.season_assignment = None
+        self.individual_allocations = None
         self.season_rng = np.random.default_rng(seed) if seasons else None
         self._init_reporters()
 
@@ -222,13 +224,6 @@ class HarvestModel(Model):
         """
         return True
 
-    def get_forage_allocation(self, allocation_id):
-        """
-        The allocation of berries an agent with home allocation allocation_id can forage this season;
-        its home allocation by default, scenarios where seasons move ownership of berries override this
-        """
-        return allocation_id
-
     def get_day(self):
         return self.day
     
@@ -311,76 +306,77 @@ class HarvestModel(Model):
                                "reward": [],
                                "num_norms": [],
                                "initial_health": [],
-                               "seasonal_berry_allocation": []})
+                               "seasonal_berry_allocation": [],
+                               "seasonal_group_berry_allocation": []})
 
     def _init_seasons(self):
         """
-        Called by scenarios with allocations once their agents and berries exist: season 0 is the original
-        assignment, where every holder (allocation key) holds its own allocation
+        Called by scenarios with allocations once their agents and berries exist: at season 0 every agent has
+        its own resource from _generate_resource_allocations, so each group has its original berry allocation
         """
         self.season = 0
-        self.season_assignment = {holder: holder for holder in self.allocations}
+        self.individual_allocations = list(self.resources)
         if not self.seasons:
             return
         if len(self.allocations) < 2:
-            raise SeasonsException(f"needs at least 2 agents, capability groups or allotments to swap berry allocations between, got {len(self.allocations)}")
-        if len(set(self._season_values(self.season_assignment))) < 2:
-            raise SeasonsException(f"every holder has the same berry allocation, so a swap can't change anything: {self._season_values(self.season_assignment)}")
-        #which holder each berry belongs to originally, restored at the start of every episode
+            raise SeasonsException(f"needs at least 2 agents, capability groups or allotments for berry allocations to change between, got {len(self.allocations)}")
+        if len(set(self.resources)) < 2:
+            raise SeasonsException(f"every agent has the same berry allocation, so a swap can't change anything: {self.resources}")
+        #which group each berry belongs to originally, restored at the start of every episode
         self.original_berry_holders = {b.unique_id: b.allocation_id for b in self.berries}
 
-    def _season_values(self, assignment):
+    def _group_targets(self):
         """
-        Number of berries each holder has under assignment, in holder order
+        Number of berries each group (allocation key) has this season: the total of its members' individual allocations
         """
-        return [self.allocations[assignment[holder]]["berry_allocation"] for holder in self.allocations]
+        return {holder: sum(self.individual_allocations[agent_id] for agent_id in allocation_data["agent_ids"])
+                for holder, allocation_data in self.allocations.items()}
 
     def _seasonal_berry_allocation(self, agent):
         """
-        Number of berries allocated to the agent's holder this season: its own allocation in colours, its
-        group's or allotment's in capabilities and allotment (None for scenarios without allocations)
+        Agent's individual berry allocation this season (None for scenarios without allocations)
         """
-        if self.season_assignment is None:
+        if self.individual_allocations is None:
             return None
-        return self.allocations[self.season_assignment[agent.allocation_id]]["berry_allocation"]
+        return self.individual_allocations[agent.unique_id]
+
+    def _seasonal_group_berry_allocation(self, agent):
+        """
+        Berry allocation of the agent's group this season, shared by its members (None for scenarios without allocations)
+        """
+        if self.individual_allocations is None:
+            return None
+        return self._group_targets()[agent.allocation_id]
 
     def _start_new_season(self):
         """
-        Randomly reassign the original allocations between holders, redrawing until the number of berries
-        each holder has differs from the previous season; then move berries to match (if the scenario moves
-        berries rather than ownership) and update agents' paths so they head for berries they can now forage
+        Randomly permute the individual allocations across all agents, regardless of group, redrawing until at
+        least one agent's allocation differs from the previous season; then move berries so each group has the
+        total of its members' allocations, and update agents' paths so they head for berries they can now forage
         """
         #foraged berries regrow in the same step, so every berry should be on the grid at a swap
         for b in self.berries:
             if b.pos is None or b.foraged:
                 raise BerryOffGrid(b.unique_id, self.day)
-        holders = list(self.allocations.keys())
-        previous_values = self._season_values(self.season_assignment)
+        previous = self.individual_allocations
         while True:
-            assignment = {holder: holders[i] for holder, i in zip(holders, self.season_rng.permutation(len(holders)))}
-            if self._season_values(assignment) != previous_values:
+            individual_allocations = [previous[i] for i in self.season_rng.permutation(len(previous))]
+            if individual_allocations != previous:
                 break
         self.season += 1
-        self.season_assignment = assignment
-        self._apply_season_assignment()
+        self.individual_allocations = individual_allocations
+        self._move_berries_to_group_targets()
         for agent in self.living_agents:
             agent.moving_module.reset()
             agent.moving_module.check_nearest_berry(agent.pos)
 
-    def _apply_season_assignment(self):
+    def _move_berries_to_group_targets(self):
         """
-        Make the berries match season_assignment; nothing to do by default, where ownership of berries moves
-        (see get_forage_allocation); scenarios where berries move override this
+        Give each group as many berries as its target this season: randomly chosen surplus berries from groups
+        whose allocation shrank go to groups whose allocation grew; a berry outside its new group's region of
+        the grid (an allotment) is moved to a random cell inside it, otherwise it stays where it is
         """
-        pass
-
-    def _move_berries_to_season_targets(self):
-        """
-        Give each holder as many berries as the allocation it holds this season: randomly chosen surplus
-        berries from holders whose allocation shrank go to holders whose allocation grew; a berry outside
-        its new holder's region of the grid is moved to a random cell inside it
-        """
-        targets = dict(zip(self.allocations, self._season_values(self.season_assignment)))
+        targets = self._group_targets()
         held = {holder: [b for b in self.berries if b.allocation_id == holder] for holder in self.allocations}
         surplus = []
         for holder, berries in held.items():
@@ -411,7 +407,7 @@ class HarvestModel(Model):
         holders back before they are placed on the grid
         """
         self.season = 0
-        self.season_assignment = {holder: holder for holder in self.allocations}
+        self.individual_allocations = list(self.resources)
         for b in self.berries:
             self._set_berry_holder(b, self.original_berry_holders[b.unique_id])
 
@@ -447,7 +443,8 @@ class HarvestModel(Model):
                                "reward": [],
                                "num_norms": [],
                                "initial_health": [],
-                               "seasonal_berry_allocation": []})
+                               "seasonal_berry_allocation": [],
+                               "seasonal_group_berry_allocation": []})
         if self.write_data and not self.training:
            if exists("data/results/current_run/agent_reports_"+self.filepath+".csv"):
                raise FileExistsException("data/results/current_run/agent_reports_"+self.filepath+".csv")
@@ -494,7 +491,8 @@ class HarvestModel(Model):
                                "reward": [agent.current_reward],
                                "num_norms": [self._num_agent_norms(agent)],
                                "initial_health": [agent.start_health],
-                               "seasonal_berry_allocation": [self._seasonal_berry_allocation(agent)]})
+                               "seasonal_berry_allocation": [self._seasonal_berry_allocation(agent)],
+                               "seasonal_group_berry_allocation": [self._seasonal_group_berry_allocation(agent)]})
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry])
         if self.write_data and not self.training:
            new_entry.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
