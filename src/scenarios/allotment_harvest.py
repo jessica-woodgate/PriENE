@@ -13,8 +13,8 @@ class AllotmentHarvest(HarvestModel):
         allocations -- dictionary of agent ids, the part of the grid they have access to, and the berries assigned to that agent
         berries -- list of active berry objects
     """
-    def __init__(self,society_mix,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None):
-        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,initial_healths)
+    def __init__(self,society_mix,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=25):
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,initial_healths,seasons,season_length)
         self.num_start_berries = num_start_berries
         if num_allotments > num_agents or num_allotments < 1:
             raise NumAllotmentsException(num_agents, num_allotments)
@@ -23,6 +23,22 @@ class AllotmentHarvest(HarvestModel):
         self.allocations = self._assign_allocations(allotment_interval)
         self._init_agents(society_mix, agent_type, checkpoint_path)
         self.berries = self._init_berries()
+        self._init_seasons()
+
+    def _apply_season_assignment(self):
+        """
+        Agents stay in their allotments with the same movement bounds; seasons change how many berries grow
+        in each allotment, by moving berries from allotments whose allocation shrank to allotments whose
+        allocation grew
+        """
+        self._move_berries_to_season_targets()
+
+    def _set_berry_holder(self, berry, holder):
+        """
+        A berry given to another allotment takes that allotment's bounds, so it is placed and regrows inside it
+        """
+        berry.allocation_id = holder
+        berry.min_width, berry.max_width, berry.min_height, berry.max_height = self.allocations[holder]["allotment"]
 
     def _assign_allocations(self, allotment_interval):
         resources = self._generate_resource_allocations(self.num_agents)

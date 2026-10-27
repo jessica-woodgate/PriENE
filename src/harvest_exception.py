@@ -165,3 +165,28 @@ class InitialHealthsNotSupported(HarvestException):
 
     def __str__(self):
         return (f"The {self.scenario} scenario is for training, where all agents start with equal health; initial healths {self.initial_healths} can only be set for the colours, capabilities and allotment scenarios")
+
+class SeasonsNotSupported(HarvestException):
+    def __init__(self, scenario):
+        super().__init__()
+        self.scenario = scenario
+
+    def __str__(self):
+        return (f"The {self.scenario} scenario has no berry allocations to swap; seasons can only be used with the colours, capabilities and allotment scenarios")
+
+class SeasonsException(HarvestException):
+    def __init__(self, reason):
+        super().__init__()
+        self.reason = reason
+
+    def __str__(self):
+        return (f"Can't use seasons: {self.reason}")
+
+class BerryOffGrid(HarvestException):
+    def __init__(self, berry_id, day):
+        super().__init__()
+        self.berry_id = berry_id
+        self.day = day
+
+    def __str__(self):
+        return (f"Berry {self.berry_id} was off the grid at the season swap on day {self.day}; every berry should have regrown by then")

@@ -35,8 +35,8 @@ class DataAnalysis():
             agent_final_rows_dfs = agent_df_list
         if write:
             self._display_graphs(agent_final_rows_dfs, end_episode_totals_dfs, df_labels, normalised_df_list)
-        #initial_health is set by the run, not an outcome of it, so it isn't tested for significance
-        exclude_list = ["agent_id", "episode", "action", "initial_health"]
+        #initial_health and seasonal_berry_allocation are set by the run, not outcomes of it, so they aren't tested for significance
+        exclude_list = ["agent_id", "episode", "action", "initial_health", "seasonal_berry_allocation"]
         self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "principles", exclude_list)
         self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "principles", exclude_list)
         self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "aggregations", exclude_list)

@@ -12,14 +12,23 @@ class CapabilitiesHarvest(HarvestModel):
         allocations -- dictionary of agent ids and the berries assigned to that agent
         berries -- list of active berry objects
     """
-    def __init__(self,society_mix,num_agents,num_start_berries,num_capabilities,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None):
-        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,initial_healths)
+    def __init__(self,society_mix,num_agents,num_start_berries,num_capabilities,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=25):
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,initial_healths,seasons,season_length)
         self.num_start_berries = num_start_berries
         self.num_capabilities = num_capabilities
         self.allocations = self._assign_allocations()
         self._init_agents(society_mix,agent_type, checkpoint_path)
         self.berries = self._init_berries()
-    
+        self._init_seasons()
+
+    def _apply_season_assignment(self):
+        """
+        Each group keeps its capability; seasons change how many berries of each kind there are, by giving
+        berries of a kind whose allocation shrank to a kind whose allocation grew (they stay where they are,
+        since every kind grows over the whole grid)
+        """
+        self._move_berries_to_season_targets()
+
     def _assign_allocations(self):
         resources = self._generate_resource_allocations(self.num_agents)
         allocations = {}

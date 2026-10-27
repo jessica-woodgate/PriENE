@@ -9,13 +9,21 @@ class ColoursHarvest(HarvestModel):
         allocations -- dictionary of agent ids and the berries assigned to that agent
         berries -- list of active berry objects
     """
-    def __init__(self,society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None):
-        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,initial_healths)
+    def __init__(self,society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=25):
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,initial_healths,seasons,season_length)
         self.num_start_berries = num_start_berries
         self.allocations = self._assign_allocations()
         self._init_agents(society_mix, agent_type, checkpoint_path)
         self.berries = self._init_berries()
-    
+        self._init_seasons()
+
+    def get_forage_allocation(self, allocation_id):
+        """
+        Seasons move ownership of colours between agents: berries keep their colour, and an agent forages
+        the colour its home allocation holds this season
+        """
+        return self.season_assignment[allocation_id]
+
     def _assign_allocations(self):
         resources = self._generate_resource_allocations(self.num_agents)
         allocations = {}

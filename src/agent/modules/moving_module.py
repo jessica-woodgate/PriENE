@@ -11,6 +11,7 @@ class MovingModule():
     Instance variables:
         agent_id -- unique id of agent
         training -- boolean to indicate if training or testing (only affects DQN learning; kept for interface consistency but not used to gate berry access -- see restrict_to_allocation)
+        allocation_id -- this agent's home allocation; the allocation it can forage this season comes from model.get_forage_allocation
         restrict_to_allocation -- whether berry search/foraging is restricted to this agent's own allocation_id (true for scenarios that partition berries, e.g. colours/allotment/capabilities; false for basic_harvest); independent of training so evaluating a policy without further learning doesn't silently change berry access
         max_width -- width of grid agent has access to
         max_height -- height of grid agent has access to
@@ -45,7 +46,7 @@ class MovingModule():
             if self.nearest_berry_coordinates == None:
                 return False
             if self.restrict_to_allocation:
-                self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates, self.allocation_id)
+                self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates, self._forage_allocation())
             else:
                 self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates)
             self.path = self._find_path_to_berry(current_pos,self.nearest_berry.pos)
@@ -120,12 +121,16 @@ class MovingModule():
         for b in location:
             #there can be multiple berries at one location: check we are foraging the one we were going for
             if b.agent_type == "berry" and b.unique_id == self.nearest_berry.unique_id:
-                if self.restrict_to_allocation and b.allocation_id != self.allocation_id:
+                if self.restrict_to_allocation and b.allocation_id != self._forage_allocation():
                     raise IllegalBerry(self.agent_id, f"allocated to {b.allocation_id}")
                 else:
                     b.foraged = True
                     return True
         return False
+
+    def _forage_allocation(self):
+        #asked of the model each time, since seasons can change which allocation this agent forages
+        return self.model.get_forage_allocation(self.allocation_id)
 
     def _calculate_distance(self, point1, point2):
         #Euclidean distance between two points
@@ -133,7 +138,7 @@ class MovingModule():
 
     def _find_nearest_berry_coordinates(self, agent_coordinates):
         if self.restrict_to_allocation:
-            uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.allocation_id)
+            uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self._forage_allocation())
         else:
             uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates()
         if not uneaten_berries_coordinates:
