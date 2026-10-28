@@ -1,10 +1,12 @@
 import os
+import warnings
 from collections import Counter
 
 import pandas as pd
 import pytest
 
 from src.harvest_exception import BerryOffGrid, SeasonsException, SeasonsNotSupported
+from src.harvest_model import HarvestModel
 from tests.conftest import INITIAL_HEALTHS, NUM_AGENTS, TEST_SCENARIOS, _build, _make_pretrained_checkpoint
 
 TRAINED_CHECKPOINTS = "data/model_variables/200_days/4_agents/"
@@ -50,12 +52,29 @@ def agents(model):
     return sorted((a for a in model.schedule.agents if a.agent_type != "berry"), key=lambda a: a.unique_id)
 
 
-def assert_paths_follow_assignment(model):
-    """Each agent heads for the nearest berry it can forage this season, and observes the distance to it."""
+def agent_groups_and_bounds(model):
+    return [(a.allocation_id, a.min_width, a.max_width, a.min_height, a.max_height,
+             a.moving_module.min_width, a.moving_module.max_width, a.moving_module.min_height, a.moving_module.max_height)
+            for a in agents(model)]
+
+
+def berry_labels(model):
+    return {b.unique_id: b.allocation_id for b in model.berries}
+
+
+def assert_berries_in_their_holders_region(model):
+    """Every berry is inside its holder's region of the grid (the whole grid unless the holder is an allotment)."""
+    for b in model.berries:
+        allotment = model.allocations[b.allocation_id].get("allotment", [0, model.max_width, 0, model.max_height])
+        assert [b.min_width, b.max_width, b.min_height, b.max_height] == allotment
+        assert allotment[0] <= b.pos[0] < allotment[1] and allotment[2] <= b.pos[1] < allotment[3]
+
+
+def assert_paths_follow_holders(model):
+    """Each agent heads for the nearest berry its holder has this season, and observes the distance to it."""
     for agent in model.get_living_agents():
         mm = agent.moving_module
-        forage_allocation = model.get_forage_allocation(agent.allocation_id)
-        assert mm.nearest_berry.allocation_id == forage_allocation
+        assert mm.nearest_berry.allocation_id == agent.allocation_id
         coordinates = mm._find_nearest_berry_coordinates(agent.pos)
         assert agent.observe()[3] == len(mm._find_path_to_berry(agent.pos, coordinates))
 
@@ -90,7 +109,7 @@ def test_swaps_happen_exactly_at_multiples_of_season_length(in_tmp_dir, checkpoi
 
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
-def test_each_season_is_a_permutation_with_different_values_from_the_last(in_tmp_dir, checkpoint_path, scenario):
+def test_each_season_is_a_permutation_of_group_totals_differing_from_the_last(in_tmp_dir, checkpoint_path, scenario):
     model = build(checkpoint_path, scenario)
     record = run_episode_recording_seasons(model)
     holders = list(model.allocations)
@@ -104,9 +123,10 @@ def test_each_season_is_a_permutation_with_different_values_from_the_last(in_tmp
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
 def test_assignments_are_reproducible_with_the_same_seed(in_tmp_dir, checkpoint_path, scenario):
-    first = [assignment for _, _, assignment in run_episode_recording_seasons(build(checkpoint_path, scenario, seed=7))]
-    second = [assignment for _, _, assignment in run_episode_recording_seasons(build(checkpoint_path, scenario, seed=7))]
-    assert first == second
+    def swaps(model):
+        record = run_episode_recording_seasons(model)
+        return [assignment for _, _, assignment in record], berry_labels(model)
+    assert swaps(build(checkpoint_path, scenario, seed=7)) == swaps(build(checkpoint_path, scenario, seed=7))
 
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
@@ -118,80 +138,63 @@ def test_assignment_resets_at_the_start_of_each_episode(in_tmp_dir, checkpoint_p
     assert model.season == 0
     assert model.season_assignment == {holder: holder for holder in model.allocations}
     assert {b.unique_id: (b.allocation_id, b.min_width, b.max_width) for b in model.berries} == original_holders
+    assert berries_per_holder(model) == dict(zip(model.allocations, original_values(model)))
     # the second episode swaps again
     assert run_episode_recording_seasons(model)[-1][1] > 0
 
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
-def test_total_berries_and_allocation_values_never_change(in_tmp_dir, checkpoint_path, scenario):
+def test_groups_and_berries_stay_consistent_throughout_a_run(in_tmp_dir, checkpoint_path, scenario):
     model = build(checkpoint_path, scenario)
+    groups_and_bounds = agent_groups_and_bounds(model)
     num_berries = model.num_berries
     while model.episode <= 2:
         model.step()
+        assert agent_groups_and_bounds(model) == groups_and_bounds
         assert len(model.berries) == num_berries
-        assert sum(berries_per_holder(model).values()) == num_berries
-        assert sorted(model._season_values(model.season_assignment)) == sorted(original_values(model))
+        # every berry regrows in the step it is foraged, with the holder it has this season
+        assert berries_per_holder(model) == season_targets(model)
+        assert_berries_in_their_holders_region(model)
 
 
-def test_colours_swap_moves_ownership_of_colours(in_tmp_dir, checkpoint_path):
-    model = build(checkpoint_path, "colours")
-    colours_before = {b.unique_id: b.allocation_id for b in model.berries}
-    model._start_new_season()
-    # berries keep their colour; agents forage the colour their home allocation holds this season
-    assert {b.unique_id: b.allocation_id for b in model.berries} == colours_before
-    for agent in agents(model):
-        forage_allocation = model.get_forage_allocation(agent.allocation_id)
-        assert forage_allocation == model.season_assignment[agent.allocation_id]
-        assert len(model.get_uneaten_berries_coordinates(forage_allocation)) == model._seasonal_berry_allocation(agent)
-    assert_paths_follow_assignment(model)
-    # regrowth keeps the colour, so the new owner can forage it
-    berry = model.berries[0]
-    colour = berry.allocation_id
-    regrow(model, [berry])
-    assert berry.allocation_id == colour and not berry.foraged and berry.pos is not None
-
-
-def test_capabilities_swap_changes_how_many_berries_of_each_kind(in_tmp_dir, checkpoint_path):
-    model = build(checkpoint_path, "capabilities")
-    groups_before = [a.allocation_id for a in agents(model)]
+@pytest.mark.parametrize("scenario", TEST_SCENARIOS)
+def test_swap_moves_berries_to_the_new_group_totals(in_tmp_dir, checkpoint_path, scenario):
+    model = build(checkpoint_path, scenario)
+    groups_and_bounds = agent_groups_and_bounds(model)
+    agent_positions = [a.pos for a in agents(model)]
+    labels_before = berry_labels(model)
     positions_before = {b.unique_id: b.pos for b in model.berries}
     model._start_new_season()
-    # groups keep their capability; berries are relabelled where they are
-    assert [a.allocation_id for a in agents(model)] == groups_before
-    assert all(model.get_forage_allocation(a.allocation_id) == a.allocation_id for a in agents(model))
-    assert {b.unique_id: b.pos for b in model.berries} == positions_before
+    # agents keep their group, position and bounds; berries are relabelled to match the new totals
+    assert agent_groups_and_bounds(model) == groups_and_bounds
+    assert [a.pos for a in agents(model)] == agent_positions
     assert berries_per_holder(model) == season_targets(model)
+    assert_berries_in_their_holders_region(model)
+    changed = [b for b in model.berries if b.allocation_id != labels_before[b.unique_id]]
+    assert changed
+    for b in model.berries:
+        if b not in changed or scenario != "allotment":
+            # colours and capabilities berries span the whole grid, so they are converted where they are
+            assert b.pos == positions_before[b.unique_id]
     for agent in agents(model):
         assert len(model.get_uneaten_berries_coordinates(agent.allocation_id)) == model._seasonal_berry_allocation(agent)
-    assert_paths_follow_assignment(model)
-    # regrowth keeps the new kind
-    berry = model.berries[0]
-    kind = berry.allocation_id
-    regrow(model, [berry])
-    assert berry.allocation_id == kind
-    assert berries_per_holder(model) == season_targets(model)
-
-
-def test_allotment_swap_moves_berries_between_allotments(in_tmp_dir, checkpoint_path):
-    model = build(checkpoint_path, "allotment")
-    agents_before = [(a.pos, a.allocation_id, a.min_width, a.max_width, a.min_height, a.max_height) for a in agents(model)]
-    bounds_before = [(a.moving_module.min_width, a.moving_module.max_width) for a in agents(model)]
-    model._start_new_season()
-    # agents don't move between allotments and their movement bounds don't change
-    assert [(a.pos, a.allocation_id, a.min_width, a.max_width, a.min_height, a.max_height) for a in agents(model)] == agents_before
-    assert [(a.moving_module.min_width, a.moving_module.max_width) for a in agents(model)] == bounds_before
-    assert berries_per_holder(model) == season_targets(model)
-    for b in model.berries:
-        allotment = model.allocations[b.allocation_id]["allotment"]
-        assert [b.min_width, b.max_width, b.min_height, b.max_height] == allotment
-        assert allotment[0] <= b.pos[0] < allotment[1] and allotment[2] <= b.pos[1] < allotment[3]
-    assert_paths_follow_assignment(model)
-    # regrowth puts the berry back inside its new allotment
+    assert_paths_follow_holders(model)
+    # regrowth keeps the new holder and region
     regrow(model, model.berries)
     assert berries_per_holder(model) == season_targets(model)
-    for b in model.berries:
-        allotment = model.allocations[b.allocation_id]["allotment"]
-        assert allotment[0] <= b.pos[0] < allotment[1] and allotment[2] <= b.pos[1] < allotment[3]
+    assert_berries_in_their_holders_region(model)
+
+
+def test_colours_are_groups_of_one_agent(in_tmp_dir, checkpoint_path):
+    model = build(checkpoint_path, "colours")
+    assert len(model.allocations) == NUM_AGENTS
+    assert [a.allocation_id for a in agents(model)] == list(model.allocations)
+    model._start_new_season()
+    # each agent keeps its colour, and has as many berries of it as the allocation its colour holds this season
+    for agent in agents(model):
+        expected = model.allocations[model.season_assignment[agent.allocation_id]]["berry_allocation"]
+        assert model._seasonal_berry_allocation(agent) == expected
+        assert berries_per_holder(model)[agent.allocation_id] == expected
 
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
@@ -208,10 +211,24 @@ def test_seasons_with_basic_raise(in_tmp_dir):
                False, False, "basic", 2, 10, seasons=True)
 
 
+def assert_warns_once_and_never_swaps(make_model):
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        model = make_model()
+        record = run_episode_recording_seasons(model) + run_episode_recording_seasons(model)
+    assert len([w for w in caught if "seasons:" in str(w.message)]) == 1
+    assert all(season == 0 for _, season, _ in record)
+
+
 @pytest.mark.parametrize("scenario", ["capabilities", "allotment"])
-def test_seasons_with_a_single_group_raise(in_tmp_dir, checkpoint_path, scenario):
-    with pytest.raises(SeasonsException):
-        build(checkpoint_path, scenario, num_allocations=1)
+def test_seasons_with_a_single_group_warn_and_skip_swaps(in_tmp_dir, checkpoint_path, scenario):
+    assert_warns_once_and_never_swaps(lambda: build(checkpoint_path, scenario, num_allocations=1))
+
+
+@pytest.mark.parametrize("scenario", TEST_SCENARIOS)
+def test_seasons_with_equal_group_totals_warn_and_skip_swaps(in_tmp_dir, checkpoint_path, scenario, monkeypatch):
+    monkeypatch.setattr(HarvestModel, "_generate_resource_allocations", lambda self, num_agents: [3] * num_agents)
+    assert_warns_once_and_never_swaps(lambda: build(checkpoint_path, scenario))
 
 
 @pytest.mark.parametrize("season_length", [0, -1, 2.5])
@@ -253,6 +270,14 @@ def test_trained_run_with_seasons_and_initial_healths_writes_seasonal_berry_allo
     # rows for day d are written before the swap on day d, so they belong to season (d-1) // season_length
     reports["season"] = (reports["day"] - 1) // SEASON_LENGTH
     assert (reports.groupby(["episode", "agent_id", "season"])["seasonal_berry_allocation"].nunique() == 1).all()
+    # members of a group share its total, and each day's totals are a permutation of the original group totals
+    group_of = {a.unique_id: a.allocation_id for a in agents(model)}
+    reports["group"] = reports["agent_id"].map(group_of)
+    assert (reports.groupby(["episode", "day", "group"])["seasonal_berry_allocation"].nunique() == 1).all()
+    for _, day_rows in reports.groupby(["episode", "day"]):
+        totals = day_rows.groupby("group")["seasonal_berry_allocation"].first()
+        if len(totals) == len(model.allocations):
+            assert sorted(totals) == sorted(original_values(model))
     first_season = reports[reports["season"] == 0].groupby("agent_id")["seasonal_berry_allocation"].first()
     original = {a.unique_id: model.allocations[a.allocation_id]["berry_allocation"] for a in agents(model)}
     assert first_season.to_dict() == original

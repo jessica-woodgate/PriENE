@@ -121,7 +121,7 @@ def test_get_distance_to_berry_with_path():
 
 def _make_module_with_berry(allocation_id, berry_allocation_id, restrict_to_allocation, training=False):
     berry = types.SimpleNamespace(agent_type="berry", unique_id=5, allocation_id=berry_allocation_id, foraged=False)
-    fake_model = types.SimpleNamespace(get_cell_contents=lambda cell: [berry], get_forage_allocation=lambda allocation_id: allocation_id)
+    fake_model = types.SimpleNamespace(get_cell_contents=lambda cell: [berry])
     mm = MovingModule(
         agent_id=1, model=fake_model, training=training, allotment=[0, 10, 0, 10],
         allocation_id=allocation_id, restrict_to_allocation=restrict_to_allocation,

@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import json
 import os
+import warnings
 import tensorflow
 from tensorflow import keras
 from .agent.harvest_agent import HarvestAgent
@@ -54,8 +55,9 @@ class HarvestModel(Model):
         epsilon -- probability of exploration for agents (tracks when to end training)
         seed -- random seed for the run (None = unseeded)
         initial_healths -- health each agent starts every episode with, indexed by agent id (None = every agent starts with the agent's default start health)
-        seasons -- boolean to randomly reassign the berry allocations between holders (agents, capability groups or allotments) every season_length days
+        seasons -- boolean to randomly reassign the berry allocations between holders (groups: capability groups, allotments, or in colours single agents) every season_length days
         season_length -- days in each season; swaps happen after the steps on days season_length, 2*season_length, ...
+        season_swaps -- whether swaps can change anything; False with seasons on if there is one holder or every holder has the same allocation, and swaps are skipped
         season -- index of the current season in this episode (0 = the original assignment)
         season_assignment -- dict mapping each holder (an allocation key) to the original allocation whose berries it holds this season (None for scenarios without allocations)
         season_rng -- generator for season swaps, seeded from seed and separate from the other random streams so seasons don't shift them
@@ -103,6 +105,7 @@ class HarvestModel(Model):
         self.season_length = season_length
         self.season = 0
         self.season_assignment = None
+        self.season_swaps = False
         self.season_rng = np.random.default_rng(seed) if seasons else None
         self._init_reporters()
 
@@ -119,7 +122,7 @@ class HarvestModel(Model):
         #if exceeded max days or all agents died, reset for new episode
         if self.day >= self.max_days or len(self.living_agents) <= 0:
             self.finish_episode()
-        elif self.seasons and self.day % self.season_length == 0:
+        elif self.season_swaps and self.day % self.season_length == 0:
             self._start_new_season()
 
     def finish_episode(self, collect_data=True):
@@ -222,13 +225,6 @@ class HarvestModel(Model):
         """
         return True
 
-    def get_forage_allocation(self, allocation_id):
-        """
-        The allocation of berries an agent with home allocation allocation_id can forage this season;
-        its home allocation by default, scenarios where seasons move ownership of berries override this
-        """
-        return allocation_id
-
     def get_day(self):
         return self.day
     
@@ -322,12 +318,14 @@ class HarvestModel(Model):
         self.season_assignment = {holder: holder for holder in self.allocations}
         if not self.seasons:
             return
-        if len(self.allocations) < 2:
-            raise SeasonsException(f"needs at least 2 agents, capability groups or allotments to swap berry allocations between, got {len(self.allocations)}")
-        if len(set(self._season_values(self.season_assignment))) < 2:
-            raise SeasonsException(f"every holder has the same berry allocation, so a swap can't change anything: {self._season_values(self.season_assignment)}")
         #which holder each berry belongs to originally, restored at the start of every episode
         self.original_berry_holders = {b.unique_id: b.allocation_id for b in self.berries}
+        if len(self.allocations) < 2:
+            warnings.warn(f"seasons: needs at least 2 agents, capability groups or allotments to swap berry allocations between, got {len(self.allocations)}; no swaps this run")
+        elif len(set(self._season_values(self.season_assignment))) < 2:
+            warnings.warn(f"seasons: every holder has the same berry allocation, so a swap can't change anything: {self._season_values(self.season_assignment)}; no swaps this run")
+        else:
+            self.season_swaps = True
 
     def _season_values(self, assignment):
         """
@@ -347,8 +345,8 @@ class HarvestModel(Model):
     def _start_new_season(self):
         """
         Randomly reassign the original allocations between holders, redrawing until the number of berries
-        each holder has differs from the previous season; then move berries to match (if the scenario moves
-        berries rather than ownership) and update agents' paths so they head for berries they can now forage
+        each holder has differs from the previous season; then move berries to match and update agents' paths
+        so they head for berries they can now forage
         """
         #foraged berries regrow in the same step, so every berry should be on the grid at a swap
         for b in self.berries:
@@ -362,23 +360,18 @@ class HarvestModel(Model):
                 break
         self.season += 1
         self.season_assignment = assignment
-        self._apply_season_assignment()
+        self._move_berries_to_season_targets()
         for agent in self.living_agents:
             agent.moving_module.reset()
             agent.moving_module.check_nearest_berry(agent.pos)
 
-    def _apply_season_assignment(self):
-        """
-        Make the berries match season_assignment; nothing to do by default, where ownership of berries moves
-        (see get_forage_allocation); scenarios where berries move override this
-        """
-        pass
-
     def _move_berries_to_season_targets(self):
         """
         Give each holder as many berries as the allocation it holds this season: randomly chosen surplus
-        berries from holders whose allocation shrank go to holders whose allocation grew; a berry outside
-        its new holder's region of the grid is moved to a random cell inside it
+        berries from holders whose allocation shrank go to holders whose allocation grew. Holders never change
+        their members, capability or movement bounds, so in colours a berry changes colour, in capabilities it
+        changes between tree and ground, and in allotment a berry outside its new allotment is moved to a
+        random cell inside it; otherwise berries stay where they are
         """
         targets = dict(zip(self.allocations, self._season_values(self.season_assignment)))
         held = {holder: [b for b in self.berries if b.allocation_id == holder] for holder in self.allocations}
