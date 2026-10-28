@@ -47,7 +47,7 @@ def agent_healths(model):
 
 def report_hash(path):
     # columns added since the reference outputs were made
-    df = pd.read_csv(path).drop(columns=["initial_health", "seasonal_berry_allocation", "seasonal_group_berry_allocation"], errors="ignore")
+    df = pd.read_csv(path).drop(columns=["initial_health", "seasonal_berry_allocation"], errors="ignore")
     return hashlib.sha256(df.to_csv(index=False).encode()).hexdigest()
 
 

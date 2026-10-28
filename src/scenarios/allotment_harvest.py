@@ -25,6 +25,14 @@ class AllotmentHarvest(HarvestModel):
         self.berries = self._init_berries()
         self._init_seasons()
 
+    def _apply_season_assignment(self):
+        """
+        Agents stay in their allotments with the same movement bounds; seasons change how many berries grow
+        in each allotment, by moving berries from allotments whose allocation shrank to allotments whose
+        allocation grew
+        """
+        self._move_berries_to_season_targets()
+
     def _set_berry_holder(self, berry, holder):
         """
         A berry given to another allotment takes that allotment's bounds, so it is placed and regrows inside it
@@ -34,7 +42,6 @@ class AllotmentHarvest(HarvestModel):
 
     def _assign_allocations(self, allotment_interval):
         resources = self._generate_resource_allocations(self.num_agents)
-        self.resources = resources
         allocations = {}
         allotment_start = 0
         allotment_end = allotment_interval

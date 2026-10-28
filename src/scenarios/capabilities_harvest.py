@@ -21,9 +21,16 @@ class CapabilitiesHarvest(HarvestModel):
         self.berries = self._init_berries()
         self._init_seasons()
 
+    def _apply_season_assignment(self):
+        """
+        Each group keeps its capability; seasons change how many berries of each kind there are, by giving
+        berries of a kind whose allocation shrank to a kind whose allocation grew (they stay where they are,
+        since every kind grows over the whole grid)
+        """
+        self._move_berries_to_season_targets()
+
     def _assign_allocations(self):
         resources = self._generate_resource_allocations(self.num_agents)
-        self.resources = resources
         allocations = {}
         group_size = self.num_agents // self.num_capabilities
         remainder = self.num_agents % self.num_capabilities
