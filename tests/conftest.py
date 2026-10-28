@@ -34,31 +34,31 @@ GRID = {
 def _build(scenario, society_mix, num_start_berries, agent_type, training, checkpoint_path,
            write_data, write_norms, filepath, max_episodes, max_days, seed=None,
            norms_module_type="rule_based", initial_healths=None, seasons=False, season_length=25,
-           num_allocations=NUM_ALLOCATIONS):
+           num_allocations=NUM_ALLOCATIONS, season_quality=False):
     max_width, max_height = GRID[scenario]
     if scenario == "basic":
         return BasicHarvest(
             society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
             max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed, norms_module_type,
-            initial_healths, seasons, season_length,
+            initial_healths, seasons, season_length, season_quality,
         )
     elif scenario == "colours":
         return ColoursHarvest(
             society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
             max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed, norms_module_type,
-            initial_healths, seasons, season_length,
+            initial_healths, seasons, season_length, season_quality,
         )
     elif scenario == "allotment":
         return AllotmentHarvest(
             society_mix, NUM_AGENTS, num_start_berries, num_allocations, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
-            write_norms, filepath, seed, norms_module_type, initial_healths, seasons, season_length,
+            write_norms, filepath, seed, norms_module_type, initial_healths, seasons, season_length, season_quality,
         )
     elif scenario == "capabilities":
         return CapabilitiesHarvest(
             society_mix, NUM_AGENTS, num_start_berries, num_allocations, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
-            write_norms, filepath, seed, norms_module_type, initial_healths, seasons, season_length,
+            write_norms, filepath, seed, norms_module_type, initial_healths, seasons, season_length, season_quality,
         )
     raise ValueError(f"unknown scenario {scenario}")
 

@@ -50,14 +50,14 @@ def generate_paper_graphs(scenario):
         end_episode_totals_dfs.append(df)
     data_analysis.proccess_and_display_data(agent_end_episode_dfs, PRINCIPLES, AGGREGATIONS, scenario, end_episode_totals_dfs=end_episode_totals_dfs, write=True, get_normalised=False, process_norms=False)
 
-def generate_graphs(scenario, run_name, num_agents, starting_health="equal", seasons=False):
+def generate_graphs(scenario, run_name, num_agents, starting_health="equal", seasons=False, season_quality=False):
     """
     takes raw files and generates graphs
     processed dfs contain data for each agent at the end of each episode
-    unequal starting health and seasons runs are read from the same scenario folder, with "_unequal_health" and/or "_seasons" after the scenario in each filename
+    unequal starting health, seasons and season quality runs are read from the same scenario folder, with "_unequal_health", "_seasons" and/or "_quality" after the scenario in each filename
     """
     writing_filepath = "data/results/current_run/"
-    file_scenario = scenario_file_string(scenario, starting_health == "unequal", seasons)
+    file_scenario = scenario_file_string(scenario, starting_health == "unequal", seasons, season_quality)
     if run_name == "current_run":
         norms_filepath = "data/results/"+run_name+"/"+file_scenario+"_"
     else:
@@ -118,7 +118,7 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
     print(f"simulation finished time: {time.time()}")
     return num_episodes
 
-def scenario_file_string(scenario, unequal_health, seasons):
+def scenario_file_string(scenario, unequal_health, seasons, season_quality=False):
     """
     scenario part of output filenames; options that are on are added after the scenario so runs don't overwrite each other
     """
@@ -127,30 +127,32 @@ def scenario_file_string(scenario, unequal_health, seasons):
         file_scenario += "_unequal_health"
     if seasons:
         file_scenario += "_seasons"
+    if season_quality:
+        file_scenario += "_quality"
     return file_scenario
 
-def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=DEFAULT_SEASON_LENGTH):
-    file_string = scenario_file_string(scenario, initial_healths is not None, seasons)+"_"+agent_type
+def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=DEFAULT_SEASON_LENGTH,season_quality=False):
+    file_string = scenario_file_string(scenario, initial_healths is not None, seasons, season_quality)+"_"+agent_type
     checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
     if scenario == "basic":
-        model_inst = BasicHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length)
+        model_inst = BasicHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
     elif scenario == "colours":
-        model_inst = ColoursHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length)
+        model_inst = ColoursHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length)
+        model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
     elif scenario == "capabilities":
-        model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length)
+        model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
     else:
         ValueError("Unknown argument: "+scenario)
     run_simulation(model_inst,render,log_wandb,wandb_project)
 
-def run_all(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=DEFAULT_SEASON_LENGTH):
+def run_all(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=DEFAULT_SEASON_LENGTH,season_quality=False):
     if society_mix == "heterogeneous":
         agent_types = AGENT_TYPES[1:]
     else:
         agent_types = AGENT_TYPES
     for agent_type in agent_types:
-        create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,initial_healths,seasons,season_length)
+        create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
 
 def get_initial_healths_input(num_agents):
     """
@@ -252,7 +254,8 @@ elif args.option == "test" or args.option == "train":
         scenario = get_input(f"What type of scenario do you want to run {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES)
         starting_health = get_input(f"Do you want agents to start with equal or unequal health {STARTING_HEALTH_OPTIONS}: ", f"Invalid starting health. Please choose {STARTING_HEALTH_OPTIONS}: ", STARTING_HEALTH_OPTIONS)
         seasons = get_bool(get_input("Do you want seasons, where berry allocations are swapped between agents every season? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
-        season_length = get_season_length_input() if seasons else DEFAULT_SEASON_LENGTH
+        season_quality = get_bool(get_input("Do you want season quality, where seasons cycle through normal, good, normal and bad? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+        season_length = get_season_length_input() if seasons or season_quality else DEFAULT_SEASON_LENGTH
         run_name = get_input(f"What run do you want to test (select 200_days to replicate results in the paper) {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
         society_mix = get_input(f"What mix of society do you want to test {SOCIETY_MIXES}: ", f"Invalid society mix. Please choose {SOCIETY_MIXES}: ", SOCIETY_MIXES)
         max_episodes = MAX_EPISODES
@@ -266,6 +269,7 @@ elif args.option == "test" or args.option == "train":
         scenario = "basic"
         starting_health = "equal"
         seasons = False
+        season_quality = False
         season_length = DEFAULT_SEASON_LENGTH
         run_name = "current_run"
         society_mix = "homogeneous"
@@ -313,9 +317,9 @@ elif args.option == "test" or args.option == "train":
         log_wandb = False
         wandb_project = None
     if agent_type == "all":
-        run_all(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,initial_healths=initial_healths,seasons=seasons,season_length=season_length)
+        run_all(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,initial_healths=initial_healths,seasons=seasons,season_length=season_length,season_quality=season_quality)
     else:
-        create_and_run_model(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,initial_healths=initial_healths,seasons=seasons,season_length=season_length)
+        create_and_run_model(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,initial_healths=initial_healths,seasons=seasons,season_length=season_length,season_quality=season_quality)
 #########################################################################################
 elif args.option == "graphs":
     graph_runs = ["current_run", "50_days", "200_days", "paper"]
@@ -327,5 +331,6 @@ elif args.option == "graphs":
     else:
         starting_health = get_input(f"Did agents start with equal or unequal health {STARTING_HEALTH_OPTIONS}: ", f"Invalid starting health. Please choose {STARTING_HEALTH_OPTIONS}: ", STARTING_HEALTH_OPTIONS)
         seasons = get_bool(get_input("Did the run have seasons? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+        season_quality = get_bool(get_input("Did the run have season quality? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
         num_agents = int(get_input(f"How many agents {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
-        generate_graphs(scenario,run_name,num_agents,starting_health,seasons)
+        generate_graphs(scenario,run_name,num_agents,starting_health,seasons,season_quality)
