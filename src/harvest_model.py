@@ -58,14 +58,16 @@ class HarvestModel(Model):
         seasons -- boolean to randomly reassign the berry allocations between holders (groups: capability groups, allotments, or in colours single agents) every season_length days
         season_length -- days in each season; swaps and quality changes happen after the steps on days season_length, 2*season_length, ...
         season_swaps -- whether swaps can change anything; False with seasons on if there is one holder or every holder has the same allocation, and swaps are skipped
-        season_quality -- boolean for seasons to cycle through SEASON_QUALITIES; in a good season each holder's target is the allocation it holds plus
-            one berry per agent in the holder, in a bad season minus one per agent (at least 0), always from the original allocation
-        season -- index of the current season in this episode (0 = the original assignment, a normal season)
+        season_quality -- boolean for every season, including the first of each episode, to get a quality drawn at random from SEASON_QUALITIES;
+            in a good season each holder's target is the allocation it holds plus one berry per agent in the holder, in a bad season minus one per
+            agent (at least 0), always from the original allocation
+        season -- index of the current season in this episode (0 = the original assignment)
+        current_season_quality -- quality of the current season (None without season quality)
         season_assignment -- dict mapping each holder (an allocation key) to the original allocation whose berries it holds this season (None for scenarios without allocations)
         season_rng -- generator for season swaps and the berries season quality adds or removes, seeded from seed and separate from the other random streams so seasons don't shift them
         dormant_berries -- berry objects not used this season (off the grid and out of the schedule), reused before new berries are made
     """
-    SEASON_QUALITIES = ["normal", "good", "normal", "bad"]
+    SEASON_QUALITIES = ["normal", "good", "bad"]
     SEASON_QUALITY_CHANGE = {"normal": 0, "good": 1, "bad": -1}
 
     def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=25,season_quality=False):
@@ -111,6 +113,7 @@ class HarvestModel(Model):
         self.season_length = season_length
         self.season_quality = season_quality
         self.season = 0
+        self.current_season_quality = None
         self.season_assignment = None
         self.season_swaps = False
         self.season_rng = np.random.default_rng(seed) if seasons or season_quality else None
@@ -301,6 +304,8 @@ class HarvestModel(Model):
             raise NumAgentsException(self.num_agents, num_agents)
         if num_berries != self.num_berries:
             raise NumBerriesException(self.num_berries, num_berries)
+        if self.season_quality:
+            self._start_season_quality()
         self.agent_reporter = pd.DataFrame({"agent_id": [],
                                "agent_type": [],
                                "episode": [],
@@ -323,7 +328,8 @@ class HarvestModel(Model):
     def _init_seasons(self):
         """
         Called by scenarios with allocations once their agents and berries exist: season 0 is the original
-        assignment, where every holder (allocation key) holds its own allocation
+        assignment, where every holder (allocation key) holds its own allocation, with a random quality if
+        season quality is on
         """
         self.season = 0
         self.season_assignment = {holder: holder for holder in self.allocations}
@@ -332,6 +338,8 @@ class HarvestModel(Model):
         #the berries and which holder each belongs to originally, restored at the start of every episode
         self.original_berries = list(self.berries)
         self.original_berry_holders = {b.unique_id: b.allocation_id for b in self.berries}
+        if self.season_quality:
+            self._start_season_quality()
         if not self.seasons:
             return
         if len(self.allocations) < 2:
@@ -362,7 +370,20 @@ class HarvestModel(Model):
         """
         if not self.season_quality:
             return None
-        return self.SEASON_QUALITIES[self.season % len(self.SEASON_QUALITIES)]
+        return self.current_season_quality
+
+    def _draw_season_quality(self):
+        """
+        Quality for a new season, each of SEASON_QUALITIES equally likely (one draw from season_rng)
+        """
+        return self.SEASON_QUALITIES[self.season_rng.integers(len(self.SEASON_QUALITIES))]
+
+    def _start_season_quality(self):
+        """
+        Draw the quality of the season that is starting, and add or remove berries to match it
+        """
+        self.current_season_quality = self._draw_season_quality()
+        self._apply_season_quality()
 
     def _season_targets(self):
         """
@@ -403,7 +424,7 @@ class HarvestModel(Model):
             self.season_assignment = assignment
             self._move_berries_to_season_targets()
         if self.season_quality:
-            self._apply_season_quality()
+            self._start_season_quality()
         for agent in self.living_agents:
             agent.moving_module.reset()
             agent.moving_module.check_nearest_berry(agent.pos)
@@ -438,16 +459,20 @@ class HarvestModel(Model):
         """
         Give each holder as many berries as its target this season: randomly chosen uncollected berries are
         removed from holders above their target, and holders below it get new berries at random cells in their
-        region of the grid; carried berries are only counts on agents, so they are never removed
+        region of the grid; carried berries are only counts on agents, so they are never removed. Every removal
+        comes before any addition, so berries removed from one holder can be reused by another
         """
         targets = self._season_targets()
+        shortfalls = {}
         for holder in self.allocations:
             held = [b for b in self.berries if b.allocation_id == holder and not b.foraged]
             excess = len(held) - targets[holder]
             if excess > 0:
                 for i in sorted(self.season_rng.choice(len(held), excess, replace=False)):
                     self._remove_season_berry(held[i])
-            for _ in range(-excess):
+            shortfalls[holder] = max(0, -excess)
+        for holder, shortfall in shortfalls.items():
+            for _ in range(shortfall):
                 self._add_season_berry(holder)
 
     def _remove_season_berry(self, berry):

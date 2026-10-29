@@ -254,7 +254,7 @@ elif args.option == "test" or args.option == "train":
         scenario = get_input(f"What type of scenario do you want to run {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES)
         starting_health = get_input(f"Do you want agents to start with equal or unequal health {STARTING_HEALTH_OPTIONS}: ", f"Invalid starting health. Please choose {STARTING_HEALTH_OPTIONS}: ", STARTING_HEALTH_OPTIONS)
         seasons = get_bool(get_input("Do you want seasons, where berry allocations are swapped between agents every season? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
-        season_quality = get_bool(get_input("Do you want season quality, where seasons cycle through normal, good, normal and bad? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+        season_quality = get_bool(get_input("Do you want season quality, where each season is randomly normal, good or bad? (y, n):", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
         season_length = get_season_length_input() if seasons or season_quality else DEFAULT_SEASON_LENGTH
         run_name = get_input(f"What run do you want to test (select 200_days to replicate results in the paper) {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
         society_mix = get_input(f"What mix of society do you want to test {SOCIETY_MIXES}: ", f"Invalid society mix. Please choose {SOCIETY_MIXES}: ", SOCIETY_MIXES)

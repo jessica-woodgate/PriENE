@@ -76,6 +76,17 @@ def assert_berries_in_their_holders_region(model):
         assert b in model.schedule.agents and not b.foraged
 
 
+def force_qualities(monkeypatch, draw):
+    """Replaces the random draw of each season's quality with draw(model), from before the model is built."""
+    monkeypatch.setattr(HarvestModel, "_draw_season_quality", draw)
+
+
+def force_quality_sequence(monkeypatch, *qualities):
+    """Seasons get qualities in order, the first being season 0 at construction."""
+    sequence = iter(qualities)
+    force_qualities(monkeypatch, lambda self: next(sequence))
+
+
 def run_episode(model, check=None):
     """Steps through the current episode, calling check(model) after every step within it."""
     episode = model.episode
@@ -88,23 +99,48 @@ def run_episode(model, check=None):
 
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
-def test_quality_cycles_normal_good_normal_bad_and_resets_each_episode(in_tmp_dir, checkpoint_path, scenario):
+def test_every_season_has_one_random_quality_and_targets_to_match(in_tmp_dir, checkpoint_path, scenario):
+    model = build(checkpoint_path, scenario, max_episodes=3)
+    qualities = {}
+
+    def record(m):
+        assert m.season == m.day // SEASON_LENGTH
+        qualities.setdefault((m.episode, m.season), set()).add(m._current_season_quality())
+        assert berries_per_holder(m) == expected_targets(m, m._current_season_quality())
+    record(model)
+    for _ in range(3):
+        run_episode(model, record)
+        if model.episode <= 3:
+            assert model.day == 0
+            record(model)
+    assert all(len(seen) == 1 for seen in qualities.values())
+    seen = [quality for seen in qualities.values() for quality in seen]
+    assert set(seen) == set(HarvestModel.SEASON_QUALITIES)
+    # random, not a fixed cycle: the qualities aren't the same in every episode
+    assert len({tuple(frozenset(qualities[(episode, season)]) for season in range(20 // SEASON_LENGTH + 1)) for episode in (1, 2, 3)}) > 1
+
+
+@pytest.mark.parametrize("scenario", TEST_SCENARIOS)
+def test_first_season_of_each_episode_gets_its_quality_from_the_original_berries(in_tmp_dir, checkpoint_path, scenario, monkeypatch):
+    # bad at construction, good at the start of episode 2, normal otherwise
+    force_qualities(monkeypatch, lambda self: ("bad" if self.episode == 1 else "good") if self.season == 0 else "normal")
     model = build(checkpoint_path, scenario)
-    original = {b.unique_id: (b.allocation_id, b.min_width, b.max_width) for b in model.berries}
-    num_berries = model.num_berries
-    assert model.season == 0 and model._current_season_quality() == "normal"
-    record = []
-    run_episode(model, lambda m: record.append((m.day, m.season, m._current_season_quality())))
-    assert [day for day, _, _ in record] == list(range(1, 20))
-    for day, season, quality in record:
-        assert season == day // SEASON_LENGTH
-        assert quality == ["normal", "good", "normal", "bad"][season % 4]
-    assert {quality for _, _, quality in record} == {"normal", "good", "bad"}
-    # the next episode starts at season 0 with the original berries
-    assert model.episode == 2 and model.season == 0 and model._current_season_quality() == "normal"
-    assert {b.unique_id: (b.allocation_id, b.min_width, b.max_width) for b in model.berries} == original
-    assert model.num_berries == num_berries == len(model.berries)
-    assert sum(1 for a in model.schedule.agents if a.agent_type == "berry") == num_berries
+    original = {holder: data["berry_allocation"] for holder, data in model.allocations.items()}
+    num_original = len(model.original_berries)
+    assert model.season == 0 and model._current_season_quality() == "bad"
+    assert berries_per_holder(model) == {holder: original[holder] - group_size(model, holder) for holder in model.allocations}
+    assert_berries_in_their_holders_region(model)
+
+    def check(m):
+        if m.season > 0:
+            assert m._current_season_quality() == "normal" and berries_per_holder(m) == original
+    run_episode(model, check)
+    assert model.episode == 2 and model.season == 0 and model._current_season_quality() == "good"
+    assert berries_per_holder(model) == {holder: original[holder] + group_size(model, holder) for holder in model.allocations}
+    assert model.num_berries == len(model.berries) == num_original + NUM_AGENTS
+    assert sum(1 for a in model.schedule.agents if a.agent_type == "berry") == model.num_berries
+    assert all(b in model.berries for b in model.original_berries)
+    assert_berries_in_their_holders_region(model)
 
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
@@ -154,6 +190,7 @@ def test_with_swaps_the_change_uses_the_size_of_the_group_receiving_the_allocati
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
 def test_swap_comes_before_the_quality_change(in_tmp_dir, checkpoint_path, scenario, monkeypatch):
+    force_quality_sequence(monkeypatch, "normal", "good")
     model = build(checkpoint_path, scenario, seasons=True)
     calls = []
     move, apply = model._move_berries_to_season_targets, model._apply_season_quality
@@ -165,7 +202,8 @@ def test_swap_comes_before_the_quality_change(in_tmp_dir, checkpoint_path, scena
 
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
-def test_good_season_adds_berries_in_each_groups_place_and_type(in_tmp_dir, checkpoint_path, scenario):
+def test_good_season_adds_berries_in_each_groups_place_and_type(in_tmp_dir, checkpoint_path, scenario, monkeypatch):
+    force_quality_sequence(monkeypatch, "normal", "good")
     model = build(checkpoint_path, scenario)
     before = berries_per_holder(model)
     original_ids = {b.unique_id for b in model.berries}
@@ -187,7 +225,8 @@ def test_good_season_adds_berries_in_each_groups_place_and_type(in_tmp_dir, chec
 
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
-def test_bad_season_removes_uncollected_berries_from_each_group_and_not_carried_ones(in_tmp_dir, checkpoint_path, scenario):
+def test_bad_season_removes_uncollected_berries_from_each_group_and_not_carried_ones(in_tmp_dir, checkpoint_path, scenario, monkeypatch):
+    force_quality_sequence(monkeypatch, "normal", "good", "normal", "bad", "normal")
     model = build(checkpoint_path, scenario)
     original = {holder: data["berry_allocation"] for holder, data in model.allocations.items()}
     model._start_new_season()
@@ -216,7 +255,7 @@ def test_bad_season_removes_uncollected_berries_from_each_group_and_not_carried_
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
 def test_berry_objects_are_reused_across_seasons_and_episodes(in_tmp_dir, checkpoint_path, scenario):
     model = build(checkpoint_path, scenario, seasons=True, max_episodes=3)
-    original = len(model.berries)
+    original = len(model.original_berries)
     while model.episode <= 3:
         model.step()
         assert len(model.berries) + len(model.dormant_berries) <= original + NUM_AGENTS
@@ -225,6 +264,7 @@ def test_berry_objects_are_reused_across_seasons_and_episodes(in_tmp_dir, checkp
 
 def test_bad_season_clamps_a_group_at_zero(in_tmp_dir, checkpoint_path, monkeypatch):
     monkeypatch.setattr(HarvestModel, "_generate_resource_allocations", lambda self, num_agents: [6, 4, 2, 0])
+    force_quality_sequence(monkeypatch, "normal", "good", "normal", "bad")
     model = build(checkpoint_path, "colours")
     total = len(model.berries)
     for _ in range(3):
@@ -282,7 +322,7 @@ def test_trained_run_with_season_quality_and_initial_healths_writes_the_season_c
         assert (reports.loc[reports["agent_id"] == agent_id, "initial_health"] == initial_health).all()
     # rows for day d are written before the season change on day d
     assert (reports["season"] == (reports["day"] - 1) // SEASON_LENGTH).all()
-    assert (reports["season_quality"] == reports["season"].map(lambda s: ["normal", "good", "normal", "bad"][s % 4])).all()
+    assert (reports.groupby(["episode", "season"])["season_quality"].nunique() == 1).all()
     group_of = {a.unique_id: a.allocation_id for a in agents(model)}
     size = {a.unique_id: group_size(model, a.allocation_id) for a in agents(model)}
     change = reports["season_quality"].map(CHANGE) * reports["agent_id"].map(size)
