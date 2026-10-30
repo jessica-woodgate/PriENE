@@ -91,8 +91,11 @@ def prepare_training_checkpoints(checkpoint_path, agent_types, settings, society
             raise ValueError(f"{settings_path} records different settings {recorded} from this run's {settings}")
     else:
         os.makedirs(checkpoint_path, exist_ok=True)
-        with open(settings_path, "w") as file:
+        #written beside it and moved into place, so a run starting at the same time (e.g. another agent type's job) never reads it half-written
+        writing_path = f"{settings_path}.{os.getpid()}.writing"
+        with open(writing_path, "w") as file:
             json.dump(settings, file, indent=4)
+        os.replace(writing_path, settings_path)
 
 def resolve_checkpoint(value, trained_dir=TRAINED_DIR, checkpoints_dir=CHECKPOINTS_DIR):
     """
