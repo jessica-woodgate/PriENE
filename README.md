@@ -39,6 +39,17 @@ The following arguments can be used with the `run.py` script:
 - `test`: Evaluate the performance of the trained agent.
 - `graphs`: Generate relevant plots for analysis.
 
+Options:
+
+- `-s`, `--seed`: random seed for reproducible runs (default 42).
+- `-l`, `--log`: log to the given wandb project.
+
+Everything else about a run is chosen through prompts. With `test`, these include seasons and the number of days in each season (default 25). With seasons, every season is randomly normal, good (one more berry per agent in each group) or bad (one fewer, never below 0); berry allocations always stay with the same group. Output filenames get `_seasons` after the scenario, and `graphs` asks whether the run had seasons so it reads the right files.
+
+In the allotment scenario every allotment starts with an equal share of the berries, and berries in allotment 1 regrow 2 steps after they are foraged (instantly elsewhere). The grid is split into allotments of whole columns (the first allotments are one column wider when the width doesn't divide evenly). With a heterogeneous society, a prompt asks whether the two agent types are `split` (every allotment has both types) or `separate` (each type has half of the allotments, which needs an even number of allotments); separate runs get `_separate` in their output filenames.
+
+Unequal starting health and random swaps of berry allocations between groups have been removed: every agent starts with the default health, and `--initial-healths`, `--season-quality`, `--season-swaps`, `--seasons` and `--season-length` fail with a message saying so.
+
 ## Testing
 
 The test suite covers pure logic (exceptions, ethics/norms/movement modules), the DQN/network layer, and full-simulation integration/regression tests. Run it from the repository root with:

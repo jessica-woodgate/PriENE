@@ -35,8 +35,10 @@ class DataAnalysis():
             agent_final_rows_dfs = agent_df_list
         if write:
             self._display_graphs(agent_final_rows_dfs, end_episode_totals_dfs, df_labels, normalised_df_list)
-        #initial_health and the season columns are set by the run, not outcomes of it, so they aren't tested for significance
-        exclude_list = ["agent_id", "episode", "action", "initial_health", "seasonal_berry_allocation", "season", "season_quality", "seasonal_berry_target", "allotment_regrowth_delay"]
+        #the season and regrowth columns are set by the run, not outcomes of it, so they aren't tested for significance;
+        #initial_health and seasonal_berry_allocation are only in results from before those options were removed
+        exclude_list = ["agent_id", "episode", "action", "season", "season_quality", "seasonal_berry_target", "allotment_regrowth_delay",
+                        "initial_health", "seasonal_berry_allocation"]
         self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "principles", exclude_list)
         self._test_all_variables_significance(end_episode_totals_dfs, df_labels, "end_episode", "principles", exclude_list)
         self._test_all_variables_significance(agent_final_rows_dfs, df_labels, "agent_end", "aggregations", exclude_list)

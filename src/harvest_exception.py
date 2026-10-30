@@ -40,7 +40,37 @@ class NumAllotmentsException(HarvestException):
         self.num_allotments = num_allotments
     
     def __str__(self):
-        return (f"Can't have more agents than allotments: currently asking for {self.num_agents} agents and {self.num_allotments} allotments")
+        return (f"The number of allotments must be between 1 and the number of agents: currently asking for {self.num_agents} agents and {self.num_allotments} allotments")
+
+class AllotmentWidthException(HarvestException):
+    def __init__(self, max_width, num_allotments):
+        super().__init__()
+        self.max_width = max_width
+        self.num_allotments = num_allotments
+
+    def __str__(self):
+        return (f"Every allotment must be at least 1 column wide: a grid {self.max_width} columns wide can't be split into {self.num_allotments} allotments")
+
+class AllotmentCapacityException(HarvestException):
+    def __init__(self, allotment_id, allotment, num_cells, num_agents, num_berries):
+        super().__init__()
+        self.allotment_id = allotment_id
+        self.allotment = allotment
+        self.num_cells = num_cells
+        self.num_agents = num_agents
+        self.num_berries = num_berries
+
+    def __str__(self):
+        return (f"Allotment {self.allotment_id} (columns {self.allotment[0]} to {self.allotment[1]-1}, rows {self.allotment[2]} to {self.allotment[3]-1}) has {self.num_cells} cells, "
+                f"not enough for its {self.num_agents} agents and up to {self.num_berries} berries; use a bigger grid or fewer allotments")
+
+class MixedSocietyException(HarvestException):
+    def __init__(self, reason):
+        super().__init__()
+        self.reason = reason
+
+    def __str__(self):
+        return (f"Can't set up a mixed society: {self.reason}")
 
 class AgentTypeException(HarvestException):
     def __init__(self, expected_type, agent_type):
@@ -146,34 +176,13 @@ class ImpossibleNormException(HarvestException):
     def __str__(self):
         return (f"Day {self.day}, agent {self.agent_id} saving an impossible behaviour! Antecedent {self.antecedent} consequent {self.action}; got reward {self.reward}")
 
-class InitialHealthsException(HarvestException):
-    def __init__(self, num_agents, initial_healths):
-        super().__init__()
-        self.num_agents = num_agents
-        self.initial_healths = initial_healths
-
-    def __str__(self):
-        if len(self.initial_healths) != self.num_agents:
-            return (f"Expected {self.num_agents} initial healths (one per agent) and got {len(self.initial_healths)}: {self.initial_healths}")
-        return (f"Initial healths must all be greater than 0, got {self.initial_healths}")
-
-class InitialHealthsNotSupported(HarvestException):
-    def __init__(self, scenario, initial_healths):
-        super().__init__()
-        self.scenario = scenario
-        self.initial_healths = initial_healths
-
-    def __str__(self):
-        return (f"The {self.scenario} scenario is for training, where all agents start with equal health; initial healths {self.initial_healths} can only be set for the colours, capabilities and allotment scenarios")
-
 class SeasonsNotSupported(HarvestException):
-    def __init__(self, scenario, option="seasons"):
+    def __init__(self, scenario):
         super().__init__()
         self.scenario = scenario
-        self.option = option
 
     def __str__(self):
-        return (f"The {self.scenario} scenario has no berry allocations to change; {self.option} can only be used with the colours, capabilities and allotment scenarios")
+        return (f"The {self.scenario} scenario has no berry allocations to change; seasons can only be used with the colours, capabilities and allotment scenarios")
 
 class SeasonsException(HarvestException):
     def __init__(self, reason):
@@ -207,4 +216,4 @@ class BerryOffGrid(HarvestException):
         self.day = day
 
     def __str__(self):
-        return (f"Berry {self.berry_id} was off the grid at the season swap on day {self.day}; every berry should have regrown or be waiting to regrow by then")
+        return (f"Berry {self.berry_id} was off the grid at the season change on day {self.day}; every berry should have regrown or be waiting to regrow by then")

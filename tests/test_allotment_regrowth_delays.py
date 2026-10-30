@@ -1,4 +1,3 @@
-import os
 from collections import Counter
 
 import pandas as pd
@@ -6,7 +5,7 @@ import pytest
 
 from src.harvest_exception import RegrowthDelaysException, RegrowthDelaysNotSupported
 from src.harvest_model import HarvestModel
-from tests.conftest import NUM_AGENTS, _build, _make_pretrained_checkpoint, use_unequal_instant_allotments
+from tests.conftest import NUM_AGENTS, _build, _make_pretrained_checkpoint, long_lived
 
 SEASON_LENGTH = 3
 MAX_DAYS = 20
@@ -29,13 +28,11 @@ def in_tmp_dir(tmp_path, monkeypatch):
     return tmp_path
 
 
-def build(checkpoint_path, delays, seasons=False, season_quality=False, seed=42, max_days=MAX_DAYS, max_episodes=2,
+def build(checkpoint_path, delays, seasons=False, seed=42, max_days=MAX_DAYS, max_episodes=2,
           agent_type="baseline", scenario="allotment", **kwargs):
-    # agents start with enough health to live through every day of an episode, so episodes don't end early
-    return _build(scenario, "homogeneous", NUM_AGENTS * 3, agent_type, False, checkpoint_path,
-                  False, False, f"test_{scenario}", max_episodes, max_days, seed=seed,
-                  initial_healths=[3.0] * NUM_AGENTS, seasons=seasons, season_length=SEASON_LENGTH,
-                  season_quality=season_quality, allotment_regrowth_delays=delays, **kwargs)
+    return long_lived(_build(scenario, "homogeneous", NUM_AGENTS * 3, agent_type, False, checkpoint_path,
+                             False, False, f"test_{scenario}", max_episodes, max_days, seed=seed,
+                             seasons=seasons, season_length=SEASON_LENGTH, allotment_regrowth_delays=delays, **kwargs))
 
 
 def berries_of(model, holder):
@@ -95,7 +92,7 @@ def test_default_gives_the_same_outputs_as_delays_0_2(in_tmp_dir, checkpoint_pat
     for delays in [None, [0, 2]]:
         model = _build("allotment", "homogeneous", NUM_AGENTS * 3, "baseline", False, checkpoint_path, True, False,
                        f"allotment_{delays}", 2, MAX_DAYS, seed=42, seasons=True, season_length=SEASON_LENGTH,
-                       season_quality=True, allotment_regrowth_delays=delays)
+                       allotment_regrowth_delays=delays)
         while model.episode <= 2:
             model.step()
         reports.append({report: pd.read_csv(f"data/results/current_run/{report}_allotment_{delays}.csv")
@@ -105,14 +102,8 @@ def test_default_gives_the_same_outputs_as_delays_0_2(in_tmp_dir, checkpoint_pat
         pd.testing.assert_frame_equal(default[report], explicit[report])
 
 
-def test_with_default_equal_allotments_seasons_warn_and_skip_swaps(in_tmp_dir, checkpoint_path):
-    with pytest.warns(UserWarning, match="same berry allocation"):
-        model = build(checkpoint_path, None, seasons=True)
-    assert not model.season_swaps
-
-
 def test_all_zero_delays_never_start_a_timer(in_tmp_dir, checkpoint_path):
-    model = build(checkpoint_path, [0, 0], seasons=True, season_quality=True)
+    model = build(checkpoint_path, [0, 0], seasons=True)
 
     def check(m):
         assert m.regrowth_timers == {}
@@ -155,9 +146,9 @@ def test_berries_waiting_to_regrow_count_towards_their_allotment(in_tmp_dir, che
     run_episode(model, check)
 
 
-@pytest.mark.parametrize("seasons,season_quality", [(False, False), (True, False), (False, True), (True, True)])
-def test_all_timers_are_reset_at_the_start_of_every_episode(in_tmp_dir, checkpoint_path, seasons, season_quality):
-    model = build(checkpoint_path, [5, 7], seasons=seasons, season_quality=season_quality, max_episodes=3)
+@pytest.mark.parametrize("seasons", [False, True])
+def test_all_timers_are_reset_at_the_start_of_every_episode(in_tmp_dir, checkpoint_path, seasons):
+    model = build(checkpoint_path, [5, 7], seasons=seasons, max_episodes=3)
     for episode in [1, 2]:
         run_episode(model)
         # nothing waits across the episode boundary: every berry is back on the grid, uncollected
@@ -179,17 +170,13 @@ def test_reset_clears_timers_that_are_waiting_at_the_end_of_an_episode(in_tmp_di
     assert_every_berry_on_the_grid_or_waiting(model)
 
 
-def test_delays_stay_with_allotments_when_swaps_move_allocations(in_tmp_dir, checkpoint_path, monkeypatch):
-    # allotments split equally have nothing to swap
-    use_unequal_instant_allotments(monkeypatch)
+def test_delays_stay_with_their_allotments_through_seasons(in_tmp_dir, checkpoint_path):
     delays = [0, 4]
     model = build(checkpoint_path, delays, seasons=True, max_episodes=3)
     holder_delays = {holder: delays[data["id"]] for holder, data in model.allocations.items()}
-    assignments = set()
 
     def check(m):
         assert m.holder_regrowth_delays == holder_delays
-        assignments.add(tuple(m.season_assignment.items()))
         for agent in m.living_agents:
             assert m._allotment_regrowth_delay(agent) == holder_delays[agent.allocation_id]
         for berry, due in m.regrowth_timers.items():
@@ -199,45 +186,12 @@ def test_delays_stay_with_allotments_when_swaps_move_allocations(in_tmp_dir, che
         assert_every_berry_on_the_grid_or_waiting(m)
     for _ in range(3):
         run_episode(model, check)
-    # the allocations did move between allotments
-    assert len(assignments) > 1
-    # a berry foraged in allotment 1 after a swap still waits allotment 1's delay
-    model.step()
-    model.step()
-    model.step()
-    assert model.season_assignment["allocation_1"] == "allocation_0"
-    berry = next(b for b in berries_of(model, "allocation_1") if b not in model.regrowth_timers)
-    berry.foraged = True
-    model.step()
-    assert model.regrowth_timers[berry] == model.day + 4
-
-
-def test_swap_moves_waiting_berries_only_when_the_berries_on_the_grid_are_not_enough(in_tmp_dir, checkpoint_path, monkeypatch):
-    use_unequal_instant_allotments(monkeypatch)
-    model = build(checkpoint_path, [6, 6], seasons=True)
-    model.step()
-    big, small = sorted(model.allocations, key=lambda holder: -model.allocations[holder]["berry_allocation"])
-    # all but one of the bigger allotment's berries are waiting to regrow
-    forage_without_agents_acting(model, berries_of(model, big)[1:])
-    waiting = [b for b in berries_of(model, big) if b in model.regrowth_timers]
-    assert len(waiting) == len(berries_of(model, big)) - 1
-    excess = model.allocations[big]["berry_allocation"] - model.allocations[small]["berry_allocation"]
-    model._start_new_season()
-    assert model.season_assignment[big] == small
-    # the one berry on the grid moved first, then waiting berries, which are placed in the smaller allotment's land now
-    assert len(berries_of(model, big)) == model.allocations[small]["berry_allocation"]
-    assert len(berries_of(model, small)) == model.allocations[big]["berry_allocation"]
-    moved_waiting = [b for b in waiting if b.allocation_id == small]
-    assert len(moved_waiting) == excess - 1
-    assert all(b not in model.regrowth_timers and b.pos is not None for b in moved_waiting)
-    assert all(b in model.regrowth_timers for b in berries_of(model, big))
-    assert_every_berry_on_the_grid_or_waiting(model)
 
 
 def test_bad_season_removes_berries_on_the_grid_before_cancelling_timers(in_tmp_dir, checkpoint_path, monkeypatch):
     sequence = iter(["normal", "bad"])
     monkeypatch.setattr(HarvestModel, "_draw_season_quality", lambda self: next(sequence))
-    model = build(checkpoint_path, [6, 6], season_quality=True)
+    model = build(checkpoint_path, [6, 6], seasons=True)
     model.step()
     holder = "allocation_0"
     held = berries_of(model, holder)
@@ -257,9 +211,8 @@ def test_bad_season_removes_berries_on_the_grid_before_cancelling_timers(in_tmp_
     assert all(b in model.regrowth_timers for b in remaining)
 
 
-@pytest.mark.parametrize("seasons", [False, True])
-def test_seasons_and_season_quality_keep_allotments_at_their_targets(in_tmp_dir, checkpoint_path, seasons):
-    model = build(checkpoint_path, [1, 3], seasons=seasons, season_quality=True, max_episodes=3)
+def test_seasons_keep_allotments_at_their_targets(in_tmp_dir, checkpoint_path):
+    model = build(checkpoint_path, [1, 3], seasons=True, max_episodes=3)
     num_original = len(model.original_berries)
 
     def check(m):
@@ -275,18 +228,17 @@ def test_seasons_and_season_quality_keep_allotments_at_their_targets(in_tmp_dir,
             check(model)
 
 
-@pytest.mark.parametrize("seasons", [False, True])
-def test_two_agent_types_with_the_same_seed_get_the_same_seasons(in_tmp_dir, checkpoint_path, utilitarian_checkpoint_path, seasons):
+def test_two_agent_types_with_the_same_seed_get_the_same_seasons(in_tmp_dir, checkpoint_path, utilitarian_checkpoint_path):
     def boundaries(model):
         recorded = []
         while model.episode <= 2:
             model.step()
             if model.day > 0 and model.day % SEASON_LENGTH == 0:
-                recorded.append((model.episode, model.day, model._current_season_quality(), dict(model.season_assignment),
+                recorded.append((model.episode, model.day, model._current_season_quality(),
                                  Counter(b.allocation_id for b in model.berries)))
         return recorded
-    baseline = boundaries(build(checkpoint_path, [1, 3], seasons=seasons, season_quality=True))
-    utilitarian = boundaries(build(utilitarian_checkpoint_path, [1, 3], seasons=seasons, season_quality=True, agent_type="utilitarian"))
+    baseline = boundaries(build(checkpoint_path, [1, 3], seasons=True))
+    utilitarian = boundaries(build(utilitarian_checkpoint_path, [1, 3], seasons=True, agent_type="utilitarian"))
     assert len(baseline) == 2 * (MAX_DAYS // SEASON_LENGTH)
     assert baseline == utilitarian
 
@@ -311,8 +263,8 @@ def test_berry_allocations_and_placement_match_with_and_without_delays(in_tmp_di
 
 
 def test_output_records_each_agents_allotment_delay(in_tmp_dir, checkpoint_path):
-    model = _build("allotment", "homogeneous", NUM_AGENTS * 3, "baseline", False, checkpoint_path, True, False,
-                   "allotment_regrow2-5", 1, 10, seed=42, initial_healths=[3.0] * NUM_AGENTS, allotment_regrowth_delays=[2, 5])
+    model = long_lived(_build("allotment", "homogeneous", NUM_AGENTS * 3, "baseline", False, checkpoint_path, True, False,
+                              "allotment_regrow2-5", 1, 10, seed=42, allotment_regrowth_delays=[2, 5]))
     while model.episode <= 1:
         model.step()
     reports = pd.read_csv("data/results/current_run/agent_reports_allotment_regrow2-5.csv")

@@ -46,7 +46,7 @@ def test_num_agents_exception_message():
 def test_num_allotments_exception_message():
     e = NumAllotmentsException(4, 6)
     assert str(e) == (
-        "Can't have more agents than allotments: currently asking for 4 agents and 6 allotments"
+        "The number of allotments must be between 1 and the number of agents: currently asking for 4 agents and 6 allotments"
     )
 
 

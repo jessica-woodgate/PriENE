@@ -17,12 +17,11 @@ AGENT_TYPES = [
 ]
 
 SCENARIOS = ["basic", "colours", "allotment", "capabilities"]
-# scenarios that take the unequal starting health option
+# scenarios with berry allocations, which take seasons
 TEST_SCENARIOS = ["colours", "allotment", "capabilities"]
 
 NUM_AGENTS = 4
 NUM_ALLOCATIONS = 2
-INITIAL_HEALTHS = [1.0, 1.0, 1.0, 0.5]
 GRID = {
     "basic": (8, 8),
     "colours": (8, 8),
@@ -33,55 +32,61 @@ GRID = {
 
 def _build(scenario, society_mix, num_start_berries, agent_type, training, checkpoint_path,
            write_data, write_norms, filepath, max_episodes, max_days, seed=None,
-           norms_module_type="rule_based", initial_healths=None, seasons=False, season_length=25,
-           num_allocations=NUM_ALLOCATIONS, season_quality=False, allotment_regrowth_delays=None):
+           norms_module_type="rule_based", seasons=False, season_length=25,
+           num_allocations=NUM_ALLOCATIONS, allotment_regrowth_delays=None, mixed_allotments="split"):
     max_width, max_height = GRID[scenario]
     if scenario == "basic":
         return BasicHarvest(
             society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
             max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed, norms_module_type,
-            initial_healths, seasons, season_length, season_quality, allotment_regrowth_delays,
+            seasons, season_length, allotment_regrowth_delays,
         )
     elif scenario == "colours":
         return ColoursHarvest(
             society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
             max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed, norms_module_type,
-            initial_healths, seasons, season_length, season_quality, allotment_regrowth_delays,
+            seasons, season_length, allotment_regrowth_delays,
         )
     elif scenario == "allotment":
         return AllotmentHarvest(
             society_mix, NUM_AGENTS, num_start_berries, num_allocations, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
-            write_norms, filepath, seed, norms_module_type, initial_healths, seasons, season_length, season_quality,
-            allotment_regrowth_delays,
+            write_norms, filepath, seed, norms_module_type, seasons, season_length, allotment_regrowth_delays, mixed_allotments,
         )
     elif scenario == "capabilities":
         return CapabilitiesHarvest(
             society_mix, NUM_AGENTS, num_start_berries, num_allocations, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
-            write_norms, filepath, seed, norms_module_type, initial_healths, seasons, season_length, season_quality,
-            allotment_regrowth_delays,
+            write_norms, filepath, seed, norms_module_type, seasons, season_length, allotment_regrowth_delays,
         )
     raise ValueError(f"unknown scenario {scenario}")
+
+
+def long_lived(model, health=3.0):
+    """
+    Gives every agent enough start health to live through every day of a short episode (restored by agent.reset() each
+    episode), so episodes in tests don't end early; health draws nothing from any random stream
+    """
+    for agent in model.schedule.agents:
+        if agent.agent_type != "berry":
+            agent.start_health = health
+            agent.health = health
+            agent.days_left_to_live = agent.get_days_left_to_live()
+            agent.total_days_left_to_live = agent.days_left_to_live
+    return model
 
 
 def use_unequal_instant_allotments(monkeypatch):
     """
     The allotment scenario before the equal split: each allotment holds the sum of its agents' unequal resources and every
-    berry regrows in the step it is foraged, so seasons have allocations to swap. Delays passed explicitly still apply
+    berry regrows in the step it is foraged, as when the reference outputs were made. Delays passed explicitly still apply
     """
-    def assign_unequal_allocations(self, allotment_interval):
+    def assign_unequal_allocations(self, columns):
         resources = self._generate_resource_allocations(self.num_agents)
         allocations = {}
-        group_size = self.num_agents // self.num_allotments
-        remainder = self.num_agents % self.num_allotments
-        start_index = 0
-        for i in range(self.num_allotments):
-            end_index = start_index + group_size + (1 if i < remainder else 0)
-            allotment = [i * allotment_interval, (i + 1) * allotment_interval, 0, self.max_height]
-            allocations["allocation_"+str(i)] = {"id": i, "berry_allocation": sum(resources[start_index:end_index]),
-                                                 "allotment": allotment, "agent_ids": list(range(start_index, end_index))}
-            start_index = end_index
+        for i, ((start, end), agent_ids) in enumerate(zip(columns, self._agent_groups())):
+            allocations["allocation_"+str(i)] = {"id": i, "berry_allocation": sum(resources[agent_id] for agent_id in agent_ids),
+                                                 "allotment": [start, end, 0, self.max_height], "agent_ids": agent_ids}
         return allocations
     monkeypatch.setattr(AllotmentHarvest, "_assign_allocations", assign_unequal_allocations)
     monkeypatch.setattr(AllotmentHarvest, "_default_regrowth_delays", lambda self: [0] * self.num_allotments)
@@ -118,10 +123,8 @@ def make_scenario_model(tmp_path, scenario, agent_type, max_days=10, max_episode
     """
     Builds a model for the given scenario/agent_type the way it is actually used in practice:
     basic_harvest trains (training=True); colours/allotment/capabilities are test-only
-    (training=False), evaluating a policy pretrained on basic_harvest. Constructing
-    colours/allotment/capabilities with training=True is not a supported configuration -- in
-    particular, allotment agents' berry search only respects their own allotment boundary when
-    training=False, so training=True can raise NoPathFound.
+    (training=False), evaluating a policy pretrained on basic_harvest. run.py never trains on
+    colours/allotment/capabilities.
     """
     num_start_berries = NUM_AGENTS * 3
     if scenario == "basic":

@@ -10,10 +10,10 @@ class ColoursHarvest(HarvestModel):
         allocations -- dictionary of agent ids and the berries assigned to that agent
         berries -- list of active berry objects
     """
-    def __init__(self,society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=25,season_quality=False,allotment_regrowth_delays=None):
+    def __init__(self,society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None):
         if allotment_regrowth_delays is not None:
             raise RegrowthDelaysNotSupported("colours")
-        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,seasons,season_length)
         self.num_start_berries = num_start_berries
         self.allocations = self._assign_allocations()
         self._init_agents(society_mix, agent_type, checkpoint_path)
@@ -25,7 +25,7 @@ class ColoursHarvest(HarvestModel):
         allocations = {}
         for i in range(self.num_agents):
             key = "allocation_"+str(i)
-            #each colour is a group of one agent, so seasons treat colours like capability groups or allotments
+            #each colour is a group of one agent, so seasons change each colour by one berry
             allocations[key] = {"id": i, "berry_allocation": resources[i], "agent_ids": [i]}
         return allocations
 
@@ -51,11 +51,11 @@ class ColoursHarvest(HarvestModel):
             for i in range(self.num_agents):
                 self._add_agent(i, agent_type, allotment, checkpoint_path, allocation_id=f"allocation_{i}")
         else:
-            assert self.num_agents%2 == 0
-            half_pop = int(self.num_agents/2)
+            half_pop = self._half_population()
             for i in range(half_pop):
                 self._add_agent(i, agent_type, allotment, checkpoint_path, allocation_id=f"allocation_{i}")
+            #every agent has its own colour, so the baseline half take the colours after the first half's
             for i in range(half_pop):
-                self._add_agent(i+half_pop, "baseline", allotment, checkpoint_path, allocation_id=f"allocation_{i}")
+                self._add_agent(i+half_pop, "baseline", allotment, checkpoint_path, allocation_id=f"allocation_{i+half_pop}")
         assert self.num_agents == len(self.living_agents)
         self.berry_id = len(self.living_agents) + 1

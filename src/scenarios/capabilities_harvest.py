@@ -1,5 +1,4 @@
 from src.harvest_model import HarvestModel
-from ..agent.harvest_agent import HarvestAgent
 from src.harvest_exception import NumBerriesException
 from src.harvest_exception import NumAgentsException
 from src.harvest_exception import NoAllocationException
@@ -13,10 +12,10 @@ class CapabilitiesHarvest(HarvestModel):
         allocations -- dictionary of agent ids and the berries assigned to that agent
         berries -- list of active berry objects
     """
-    def __init__(self,society_mix,num_agents,num_start_berries,num_capabilities,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=25,season_quality=False,allotment_regrowth_delays=None):
+    def __init__(self,society_mix,num_agents,num_start_berries,num_capabilities,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None):
         if allotment_regrowth_delays is not None:
             raise RegrowthDelaysNotSupported("capabilities")
-        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,seasons,season_length)
         self.num_start_berries = num_start_berries
         self.num_capabilities = num_capabilities
         self.allocations = self._assign_allocations()
@@ -60,16 +59,15 @@ class CapabilitiesHarvest(HarvestModel):
         if society_mix == "homogeneous":
             for id in range(self.num_agents):
                 allocation_id = self._get_allocation_id(id)
-                #a = HarvestAgent(id,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.write_norms,shared_replay_buffer=self.shared_replay_buffer,allocation_id=allocation_id)
                 self._add_agent(id, agent_type, allotment, checkpoint_path, allocation_id=allocation_id)
         else:
-            assert self.num_agents%2 == 0
-            half_pop = int(self.num_agents/2)
+            half_pop = self._half_population()
             for id in range(half_pop):
                 allocation_id = self._get_allocation_id(id)
                 self._add_agent(id, agent_type, allotment, checkpoint_path, allocation_id=allocation_id)
+            #the baseline half are in the capability groups that list their own ids
             for id in range(half_pop):
-                allocation_id = self._get_allocation_id(id)
+                allocation_id = self._get_allocation_id(id+half_pop)
                 self._add_agent(id+half_pop, "baseline", allotment, checkpoint_path, allocation_id=allocation_id)
         self.num_living_agents = len(self.living_agents)
         self.berry_id = self.num_living_agents + 1
