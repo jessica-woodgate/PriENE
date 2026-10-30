@@ -50,14 +50,15 @@ def generate_paper_graphs(scenario):
         end_episode_totals_dfs.append(df)
     data_analysis.proccess_and_display_data(agent_end_episode_dfs, PRINCIPLES, AGGREGATIONS, scenario, end_episode_totals_dfs=end_episode_totals_dfs, write=True, get_normalised=False, process_norms=False)
 
-def generate_graphs(scenario, run_name, num_agents, starting_health="equal", seasons=False, season_quality=False):
+def generate_graphs(scenario, run_name, num_agents, starting_health="equal", seasons=False, season_quality=False, allotment_regrowth_delays=None):
     """
     takes raw files and generates graphs
     processed dfs contain data for each agent at the end of each episode
-    unequal starting health, seasons and season quality runs are read from the same scenario folder, with "_unequal_health", "_seasons" and/or "_quality" after the scenario in each filename
+    unequal starting health, seasons, season quality and allotment regrowth delay runs are read from the same scenario folder, with "_unequal_health", "_seasons",
+    "_quality" and/or "_regrow" and the delays (e.g. "_regrow0-1") after the scenario in each filename
     """
     writing_filepath = "data/results/current_run/"
-    file_scenario = scenario_file_string(scenario, starting_health == "unequal", seasons, season_quality)
+    file_scenario = scenario_file_string(scenario, starting_health == "unequal", seasons, season_quality, allotment_regrowth_delays)
     if run_name == "current_run":
         norms_filepath = "data/results/"+run_name+"/"+file_scenario+"_"
     else:
@@ -118,7 +119,7 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
     print(f"simulation finished time: {time.time()}")
     return num_episodes
 
-def scenario_file_string(scenario, unequal_health, seasons, season_quality=False):
+def scenario_file_string(scenario, unequal_health, seasons, season_quality=False, allotment_regrowth_delays=None):
     """
     scenario part of output filenames; options that are on are added after the scenario so runs don't overwrite each other
     """
@@ -129,30 +130,32 @@ def scenario_file_string(scenario, unequal_health, seasons, season_quality=False
         file_scenario += "_seasons"
     if season_quality:
         file_scenario += "_quality"
+    if allotment_regrowth_delays is not None:
+        file_scenario += "_regrow" + "-".join(str(delay) for delay in allotment_regrowth_delays)
     return file_scenario
 
-def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=DEFAULT_SEASON_LENGTH,season_quality=False):
-    file_string = scenario_file_string(scenario, initial_healths is not None, seasons, season_quality)+"_"+agent_type
+def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=DEFAULT_SEASON_LENGTH,season_quality=False,allotment_regrowth_delays=None):
+    file_string = scenario_file_string(scenario, initial_healths is not None, seasons, season_quality, allotment_regrowth_delays)+"_"+agent_type
     checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
     if scenario == "basic":
-        model_inst = BasicHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
+        model_inst = BasicHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length,season_quality,allotment_regrowth_delays)
     elif scenario == "colours":
-        model_inst = ColoursHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
+        model_inst = ColoursHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length,season_quality,allotment_regrowth_delays)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
+        model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length,season_quality,allotment_regrowth_delays)
     elif scenario == "capabilities":
-        model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
+        model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,initial_healths,seasons,season_length,season_quality,allotment_regrowth_delays)
     else:
         ValueError("Unknown argument: "+scenario)
     run_simulation(model_inst,render,log_wandb,wandb_project)
 
-def run_all(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=DEFAULT_SEASON_LENGTH,season_quality=False):
+def run_all(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=DEFAULT_SEASON_LENGTH,season_quality=False,allotment_regrowth_delays=None):
     if society_mix == "heterogeneous":
         agent_types = AGENT_TYPES[1:]
     else:
         agent_types = AGENT_TYPES
     for agent_type in agent_types:
-        create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
+        create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,initial_healths,seasons,season_length,season_quality,allotment_regrowth_delays)
 
 def get_initial_healths_input(num_agents):
     """
@@ -281,6 +284,8 @@ elif args.option == "test" or args.option == "train":
     #########################################################################################
     num_agents = int(get_input(f"How many agents do you want to implement (select 4 to replicate results in the paper) {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
     #########################################################################################
+    #allotment uses its default regrowth delays (allotment 1 regrows slower than the others)
+    allotment_regrowth_delays = None
     if scenario == "allotment":
         MAX_WIDTH = num_agents * 4
         num_allocations = get_integer_input(f"How many allotments do you want? (select 2 to replicate results in the paper) (must be more than 0 and less than {num_agents+1}): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1)
@@ -317,9 +322,9 @@ elif args.option == "test" or args.option == "train":
         log_wandb = False
         wandb_project = None
     if agent_type == "all":
-        run_all(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,initial_healths=initial_healths,seasons=seasons,season_length=season_length,season_quality=season_quality)
+        run_all(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,initial_healths=initial_healths,seasons=seasons,season_length=season_length,season_quality=season_quality,allotment_regrowth_delays=allotment_regrowth_delays)
     else:
-        create_and_run_model(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,initial_healths=initial_healths,seasons=seasons,season_length=season_length,season_quality=season_quality)
+        create_and_run_model(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,initial_healths=initial_healths,seasons=seasons,season_length=season_length,season_quality=season_quality,allotment_regrowth_delays=allotment_regrowth_delays)
 #########################################################################################
 elif args.option == "graphs":
     graph_runs = ["current_run", "50_days", "200_days", "paper"]

@@ -183,6 +183,23 @@ class SeasonsException(HarvestException):
     def __str__(self):
         return (f"Can't use seasons: {self.reason}")
 
+class RegrowthDelaysException(HarvestException):
+    def __init__(self, num_allotments, regrowth_delays):
+        super().__init__()
+        self.num_allotments = num_allotments
+        self.regrowth_delays = regrowth_delays
+
+    def __str__(self):
+        return (f"Expected {self.num_allotments} allotment regrowth delays (one per allotment, each a whole number of steps of at least 0) and got {self.regrowth_delays}")
+
+class RegrowthDelaysNotSupported(HarvestException):
+    def __init__(self, scenario):
+        super().__init__()
+        self.scenario = scenario
+
+    def __str__(self):
+        return (f"The {self.scenario} scenario has no allotments; allotment regrowth delays can only be used with the allotment scenario")
+
 class BerryOffGrid(HarvestException):
     def __init__(self, berry_id, day):
         super().__init__()
@@ -190,4 +207,4 @@ class BerryOffGrid(HarvestException):
         self.day = day
 
     def __str__(self):
-        return (f"Berry {self.berry_id} was off the grid at the season swap on day {self.day}; every berry should have regrown by then")
+        return (f"Berry {self.berry_id} was off the grid at the season swap on day {self.day}; every berry should have regrown or be waiting to regrow by then")

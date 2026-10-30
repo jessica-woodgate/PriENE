@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 
 from src.harvest_exception import InitialHealthsException, InitialHealthsNotSupported
-from tests.conftest import INITIAL_HEALTHS, NUM_AGENTS, TEST_SCENARIOS, _build, _make_pretrained_checkpoint
+from tests.conftest import INITIAL_HEALTHS, NUM_AGENTS, TEST_SCENARIOS, _build, _make_pretrained_checkpoint, use_unequal_instant_allotments
 
 TRAINED_CHECKPOINTS = "data/model_variables/200_days/4_agents/"
 # absolute, since in_tmp_dir changes the working directory before the model is built
@@ -47,13 +47,15 @@ def agent_healths(model):
 
 def report_hash(path):
     # columns added since the reference outputs were made
-    df = pd.read_csv(path).drop(columns=["initial_health", "seasonal_berry_allocation", "season", "season_quality", "seasonal_berry_target"], errors="ignore")
+    df = pd.read_csv(path).drop(columns=["initial_health", "seasonal_berry_allocation", "season", "season_quality", "seasonal_berry_target", "allotment_regrowth_delay"], errors="ignore")
     return hashlib.sha256(df.to_csv(index=False).encode()).hexdigest()
 
 
 @needs_trained_checkpoints
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
-def test_option_off_reproduces_reference_outputs(in_tmp_dir, scenario):
+def test_option_off_reproduces_reference_outputs(in_tmp_dir, scenario, monkeypatch):
+    # the references predate allotments' equal split and slower allotment, so allotment is run as it was then
+    use_unequal_instant_allotments(monkeypatch)
     model = _build(scenario, "homogeneous", NUM_AGENTS * 3, "utilitarian", False, TRAINED_CHECKPOINTS_ABS,
                    True, False, scenario, 2, 20, seed=42)
     while model.episode <= 2:

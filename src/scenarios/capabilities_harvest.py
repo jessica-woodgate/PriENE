@@ -3,6 +3,7 @@ from ..agent.harvest_agent import HarvestAgent
 from src.harvest_exception import NumBerriesException
 from src.harvest_exception import NumAgentsException
 from src.harvest_exception import NoAllocationException
+from src.harvest_exception import RegrowthDelaysNotSupported
 
 class CapabilitiesHarvest(HarvestModel):
     """
@@ -12,7 +13,9 @@ class CapabilitiesHarvest(HarvestModel):
         allocations -- dictionary of agent ids and the berries assigned to that agent
         berries -- list of active berry objects
     """
-    def __init__(self,society_mix,num_agents,num_start_berries,num_capabilities,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=25,season_quality=False):
+    def __init__(self,society_mix,num_agents,num_start_berries,num_capabilities,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=25,season_quality=False,allotment_regrowth_delays=None):
+        if allotment_regrowth_delays is not None:
+            raise RegrowthDelaysNotSupported("capabilities")
         super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,initial_healths,seasons,season_length,season_quality)
         self.num_start_berries = num_start_berries
         self.num_capabilities = num_capabilities

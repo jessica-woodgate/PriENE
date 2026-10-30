@@ -7,7 +7,7 @@ import pytest
 
 from src.harvest_exception import BerryOffGrid, SeasonsException, SeasonsNotSupported
 from src.harvest_model import HarvestModel
-from tests.conftest import INITIAL_HEALTHS, NUM_AGENTS, TEST_SCENARIOS, _build, _make_pretrained_checkpoint
+from tests.conftest import INITIAL_HEALTHS, NUM_AGENTS, TEST_SCENARIOS, _build, _make_pretrained_checkpoint, use_unequal_instant_allotments
 
 TRAINED_CHECKPOINTS = "data/model_variables/200_days/4_agents/"
 # absolute, since in_tmp_dir changes the working directory before the model is built
@@ -27,6 +27,12 @@ def in_tmp_dir(tmp_path, monkeypatch):
     """HarvestModel writes to the relative path data/results/current_run -- keep that inside tmp_path."""
     monkeypatch.chdir(tmp_path)
     return tmp_path
+
+
+@pytest.fixture(autouse=True)
+def unequal_allotments(monkeypatch):
+    """Allotments split equally have nothing to swap, so swaps are tested on unequal allotments with instant regrowth."""
+    use_unequal_instant_allotments(monkeypatch)
 
 
 def build(checkpoint_path, scenario, seasons=True, seed=42, max_days=20, max_episodes=2, initial_healths=(3.0,) * NUM_AGENTS, **kwargs):

@@ -66,11 +66,16 @@ class HarvestModel(Model):
         season_assignment -- dict mapping each holder (an allocation key) to the original allocation whose berries it holds this season (None for scenarios without allocations)
         season_rng -- generator for season swaps and the berries season quality adds or removes, seeded from seed and separate from the other random streams so seasons don't shift them
         dormant_berries -- berry objects not used this season (off the grid and out of the schedule), reused before new berries are made
+        allotment_regrowth_delays -- steps a foraged berry waits before regrowing, one per allotment in allotment order (None = every berry
+            regrows in the step it is foraged); only the allotment scenario takes it
+        holder_regrowth_delays -- dict mapping each holder (allotment key) to its regrowth delay; delays belong to the allotment, not the allocation
+            it holds, so they don't move with swaps (None without allotment regrowth delays)
+        regrowth_timers -- dict mapping each berry waiting to regrow (foraged, off the grid) to the day it is due back; emptied at the start of every episode
     """
     SEASON_QUALITIES = ["normal", "good", "bad"]
     SEASON_QUALITY_CHANGE = {"normal": 0, "good": 1, "bad": -1}
 
-    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=25,season_quality=False):
+    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based",initial_healths=None,seasons=False,season_length=25,season_quality=False,allotment_regrowth_delays=None):
         super().__init__()
         self._set_seed(seed)
         self.num_agents = num_agents
@@ -118,6 +123,9 @@ class HarvestModel(Model):
         self.season_swaps = False
         self.season_rng = np.random.default_rng(seed) if seasons or season_quality else None
         self.dormant_berries = []
+        self.allotment_regrowth_delays = None if allotment_regrowth_delays is None else list(allotment_regrowth_delays)
+        self.holder_regrowth_delays = None
+        self.regrowth_timers = {}
         self._init_reporters()
 
     def step(self):
@@ -290,6 +298,8 @@ class HarvestModel(Model):
         num_berries = 0
         self.episode += 1
         self.total_episode_reward = 0
+        #every berry waiting to regrow is placed again below, so no timer carries over to the new episode
+        self.regrowth_timers = {}
         self._clear_grid()
         if self.seasons or self.season_quality:
             self._restore_original_season()
@@ -323,7 +333,8 @@ class HarvestModel(Model):
                                "seasonal_berry_allocation": [],
                                "season": [],
                                "season_quality": [],
-                               "seasonal_berry_target": []})
+                               "seasonal_berry_target": [],
+                               "allotment_regrowth_delay": []})
 
     def _init_seasons(self):
         """
@@ -409,9 +420,9 @@ class HarvestModel(Model):
         quality is on) add or remove berries for this season's quality, and update agents' paths so they head
         for berries they can now forage
         """
-        #foraged berries regrow in the same step, so every berry should be on the grid at a swap
+        #foraged berries regrow in the same step or wait on a regrowth timer, so every other berry should be on the grid at a swap
         for b in self.berries:
-            if b.pos is None or b.foraged:
+            if (b.pos is None or b.foraged) and b not in self.regrowth_timers:
                 raise BerryOffGrid(b.unique_id, self.day)
         self.season += 1
         if self.season_swaps:
@@ -437,7 +448,8 @@ class HarvestModel(Model):
         changes between tree and ground, and in allotment a berry outside its new allotment is moved to a
         random cell inside it; otherwise berries stay where they are. With season quality the total in use can
         differ from the total allocated, so only the berries available are moved and _apply_season_quality
-        adds or removes the rest
+        adds or removes the rest. Berries waiting to regrow count as their holder's; one moved to another holder
+        has its timer cancelled and is placed there now
         """
         targets = dict(zip(self.allocations, self._season_values(self.season_assignment)))
         held = {holder: [b for b in self.berries if b.allocation_id == holder] for holder in self.allocations}
@@ -445,31 +457,49 @@ class HarvestModel(Model):
         for holder, berries in held.items():
             excess = len(berries) - targets[holder]
             if excess > 0:
-                chosen = sorted(self.season_rng.choice(len(berries), excess, replace=False))
-                surplus += [berries[i] for i in chosen]
+                surplus += self._choose_surplus_berries(berries, excess)
         for holder, berries in held.items():
             for _ in range(min(targets[holder] - len(berries), len(surplus))):
                 berry = surplus.pop()
                 self._set_berry_holder(berry, holder)
-                if not self._inside_bounds(berry, berry.pos):
+                if berry in self.regrowth_timers:
+                    del self.regrowth_timers[berry]
+                    berry.reset()
+                    self._place_agent_in_allotment(berry)
+                elif not self._inside_bounds(berry, berry.pos):
                     self.grid.remove_agent(berry)
                     self._place_agent_in_allotment(berry)
+
+    def _choose_surplus_berries(self, berries, excess):
+        """
+        Randomly choose excess of a holder's berries to give up: uncollected berries on the grid first, then, only
+        if there aren't enough of those, berries waiting to regrow
+        """
+        #with no delay above 0 no berry ever waits, so the draw is the same as without regrowth delays
+        if self.holder_regrowth_delays is None or not any(self.holder_regrowth_delays.values()):
+            return [berries[i] for i in sorted(self.season_rng.choice(len(berries), excess, replace=False))]
+        #one permutation of all the holder's berries however many are waiting, so the stream doesn't depend on agents' behaviour
+        order = [berries[i] for i in self.season_rng.permutation(len(berries))]
+        ranked = [b for b in order if b not in self.regrowth_timers] + [b for b in order if b in self.regrowth_timers]
+        return ranked[:excess]
 
     def _apply_season_quality(self):
         """
         Give each holder as many berries as its target this season: randomly chosen uncollected berries are
         removed from holders above their target, and holders below it get new berries at random cells in their
-        region of the grid; carried berries are only counts on agents, so they are never removed. Every removal
-        comes before any addition, so berries removed from one holder can be reused by another
+        region of the grid; carried berries are only counts on agents, so they are never removed. Berries waiting
+        to regrow count as their holder's, and are only removed (cancelling their timers) once no uncollected
+        berries are left to remove. Every removal comes before any addition, so berries removed from one holder
+        can be reused by another
         """
         targets = self._season_targets()
         shortfalls = {}
         for holder in self.allocations:
-            held = [b for b in self.berries if b.allocation_id == holder and not b.foraged]
+            held = [b for b in self.berries if b.allocation_id == holder and (not b.foraged or b in self.regrowth_timers)]
             excess = len(held) - targets[holder]
             if excess > 0:
-                for i in sorted(self.season_rng.choice(len(held), excess, replace=False)):
-                    self._remove_season_berry(held[i])
+                for berry in self._choose_surplus_berries(held, excess):
+                    self._remove_season_berry(berry)
             shortfalls[holder] = max(0, -excess)
         for holder, shortfall in shortfalls.items():
             for _ in range(shortfall):
@@ -477,9 +507,11 @@ class HarvestModel(Model):
 
     def _remove_season_berry(self, berry):
         """
-        Take a berry out of use for this season, keeping it to reuse
+        Take a berry out of use for this season, keeping it to reuse; a berry waiting to regrow has its timer cancelled
         """
-        self.grid.remove_agent(berry)
+        self.regrowth_timers.pop(berry, None)
+        if berry.pos is not None:
+            self.grid.remove_agent(berry)
         self.schedule.remove(berry)
         self.berries.remove(berry)
         self.dormant_berries.append(berry)
@@ -569,7 +601,8 @@ class HarvestModel(Model):
                                "seasonal_berry_allocation": [],
                                "season": [],
                                "season_quality": [],
-                               "seasonal_berry_target": []})
+                               "seasonal_berry_target": [],
+                               "allotment_regrowth_delay": []})
         if self.write_data and not self.training:
            if exists("data/results/current_run/agent_reports_"+self.filepath+".csv"):
                raise FileExistsException("data/results/current_run/agent_reports_"+self.filepath+".csv")
@@ -619,7 +652,8 @@ class HarvestModel(Model):
                                "seasonal_berry_allocation": [self._seasonal_berry_allocation(agent)],
                                "season": [self.season],
                                "season_quality": [self._current_season_quality()],
-                               "seasonal_berry_target": [self._seasonal_berry_target(agent)]})
+                               "seasonal_berry_target": [self._seasonal_berry_target(agent)],
+                               "allotment_regrowth_delay": [self._allotment_regrowth_delay(agent)]})
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry])
         if self.write_data and not self.training:
            new_entry.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
@@ -794,16 +828,47 @@ class HarvestModel(Model):
         return society_norms_snapshot
     
     def _update_schedule(self):
+        if self.regrowth_timers:
+            self._regrow_due_berries()
         #check for dead agents & foraged berries
         for a in self.schedule.agents:
             if a.agent_type == "berry" and a.foraged == True:
-                self._reset_berry(a, False)
+                if self.holder_regrowth_delays is None or self.holder_regrowth_delays[a.allocation_id] == 0:
+                    self._reset_berry(a, False)
+                elif a not in self.regrowth_timers:
+                    #off the grid until its allotment's delay has passed
+                    self.grid.remove_agent(a)
+                    self.regrowth_timers[a] = self.day + self.holder_regrowth_delays[a.allocation_id]
             if a.agent_type != "berry":
                 if a.off_grid == False:
                     self._collect_agent_data(a)
                     if a.done == True:
                         self._remove_agent(a)
-    
+
+    def _regrow_due_berries(self):
+        """
+        Berries whose regrowth timer is due today regrow at a random cell in their allotment, as long as the
+        allotment has fewer berries on the grid than its target this season; otherwise the timer is discarded
+        and the berry is kept to reuse
+        """
+        targets = self._season_targets()
+        for berry in [b for b, due in self.regrowth_timers.items() if due <= self.day]:
+            del self.regrowth_timers[berry]
+            on_grid = sum(1 for b in self.berries if b.allocation_id == berry.allocation_id and b.pos is not None)
+            if on_grid < targets[berry.allocation_id]:
+                berry.reset()
+                self._place_agent_in_allotment(berry)
+            else:
+                self._remove_season_berry(berry)
+
+    def _allotment_regrowth_delay(self, agent):
+        """
+        Regrowth delay of the agent's allotment (None without allotment regrowth delays)
+        """
+        if self.holder_regrowth_delays is None:
+            return None
+        return self.holder_regrowth_delays[agent.allocation_id]
+
     def _place_agent_in_allotment(self, agent):
         #for new agents who aren't yet on the grid
         if not self.grid.exists_empty_cells:
@@ -814,6 +879,9 @@ class HarvestModel(Model):
     def _clear_grid(self):
         for a in self.schedule.agents:
             if a.agent_type != "berry" and a.off_grid:
+                continue
+            #berries waiting to regrow are already off the grid
+            if a.agent_type == "berry" and a.pos is None:
                 continue
             self.grid.remove_agent(a)
     

@@ -34,33 +34,57 @@ GRID = {
 def _build(scenario, society_mix, num_start_berries, agent_type, training, checkpoint_path,
            write_data, write_norms, filepath, max_episodes, max_days, seed=None,
            norms_module_type="rule_based", initial_healths=None, seasons=False, season_length=25,
-           num_allocations=NUM_ALLOCATIONS, season_quality=False):
+           num_allocations=NUM_ALLOCATIONS, season_quality=False, allotment_regrowth_delays=None):
     max_width, max_height = GRID[scenario]
     if scenario == "basic":
         return BasicHarvest(
             society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
             max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed, norms_module_type,
-            initial_healths, seasons, season_length, season_quality,
+            initial_healths, seasons, season_length, season_quality, allotment_regrowth_delays,
         )
     elif scenario == "colours":
         return ColoursHarvest(
             society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
             max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed, norms_module_type,
-            initial_healths, seasons, season_length, season_quality,
+            initial_healths, seasons, season_length, season_quality, allotment_regrowth_delays,
         )
     elif scenario == "allotment":
         return AllotmentHarvest(
             society_mix, NUM_AGENTS, num_start_berries, num_allocations, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
             write_norms, filepath, seed, norms_module_type, initial_healths, seasons, season_length, season_quality,
+            allotment_regrowth_delays,
         )
     elif scenario == "capabilities":
         return CapabilitiesHarvest(
             society_mix, NUM_AGENTS, num_start_berries, num_allocations, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
             write_norms, filepath, seed, norms_module_type, initial_healths, seasons, season_length, season_quality,
+            allotment_regrowth_delays,
         )
     raise ValueError(f"unknown scenario {scenario}")
+
+
+def use_unequal_instant_allotments(monkeypatch):
+    """
+    The allotment scenario before the equal split: each allotment holds the sum of its agents' unequal resources and every
+    berry regrows in the step it is foraged, so seasons have allocations to swap. Delays passed explicitly still apply
+    """
+    def assign_unequal_allocations(self, allotment_interval):
+        resources = self._generate_resource_allocations(self.num_agents)
+        allocations = {}
+        group_size = self.num_agents // self.num_allotments
+        remainder = self.num_agents % self.num_allotments
+        start_index = 0
+        for i in range(self.num_allotments):
+            end_index = start_index + group_size + (1 if i < remainder else 0)
+            allotment = [i * allotment_interval, (i + 1) * allotment_interval, 0, self.max_height]
+            allocations["allocation_"+str(i)] = {"id": i, "berry_allocation": sum(resources[start_index:end_index]),
+                                                 "allotment": allotment, "agent_ids": list(range(start_index, end_index))}
+            start_index = end_index
+        return allocations
+    monkeypatch.setattr(AllotmentHarvest, "_assign_allocations", assign_unequal_allocations)
+    monkeypatch.setattr(AllotmentHarvest, "_default_regrowth_delays", lambda self: [0] * self.num_allotments)
 
 
 def make_training_model(tmp_path, agent_type, max_days=10, max_episodes=2, society_mix="homogeneous"):

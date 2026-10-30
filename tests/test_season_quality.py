@@ -6,7 +6,7 @@ import pytest
 
 from src.harvest_exception import SeasonsNotSupported
 from src.harvest_model import HarvestModel
-from tests.conftest import INITIAL_HEALTHS, NUM_AGENTS, TEST_SCENARIOS, _build, _make_pretrained_checkpoint
+from tests.conftest import INITIAL_HEALTHS, NUM_AGENTS, TEST_SCENARIOS, _build, _make_pretrained_checkpoint, use_unequal_instant_allotments
 
 TRAINED_CHECKPOINTS = "data/model_variables/200_days/4_agents/"
 # absolute, since in_tmp_dir changes the working directory before the model is built
@@ -164,8 +164,10 @@ def test_quality_only_targets_are_the_original_allocation_plus_or_minus_group_si
 
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
-def test_with_swaps_the_change_uses_the_size_of_the_group_receiving_the_allocation(in_tmp_dir, checkpoint_path, scenario):
+def test_with_swaps_the_change_uses_the_size_of_the_group_receiving_the_allocation(in_tmp_dir, checkpoint_path, scenario, monkeypatch):
     # three groups of sizes 2, 1, 1 in capabilities and allotment; groups of one in colours
+    # (allotments split equally have nothing to swap, so allotment is unequal here)
+    use_unequal_instant_allotments(monkeypatch)
     model = build(checkpoint_path, scenario, seasons=True, num_allocations=3)
     groups_and_bounds = agent_groups_and_bounds(model)
     original_total = sum(data["berry_allocation"] for data in model.allocations.values())
@@ -190,6 +192,7 @@ def test_with_swaps_the_change_uses_the_size_of_the_group_receiving_the_allocati
 
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
 def test_swap_comes_before_the_quality_change(in_tmp_dir, checkpoint_path, scenario, monkeypatch):
+    use_unequal_instant_allotments(monkeypatch)
     force_quality_sequence(monkeypatch, "normal", "good")
     model = build(checkpoint_path, scenario, seasons=True)
     calls = []
