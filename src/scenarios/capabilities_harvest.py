@@ -56,19 +56,11 @@ class CapabilitiesHarvest(HarvestModel):
     def _init_agents(self, society_mix, agent_type, checkpoint_path):
         self.living_agents = []
         allotment = [0,self.max_width,0,self.max_height]
-        if society_mix == "homogeneous":
-            for id in range(self.num_agents):
-                allocation_id = self._get_allocation_id(id)
-                self._add_agent(id, agent_type, allotment, checkpoint_path, allocation_id=allocation_id)
-        else:
-            half_pop = self._half_population()
-            for id in range(half_pop):
-                allocation_id = self._get_allocation_id(id)
-                self._add_agent(id, agent_type, allotment, checkpoint_path, allocation_id=allocation_id)
-            #the baseline half are in the capability groups that list their own ids
-            for id in range(half_pop):
-                allocation_id = self._get_allocation_id(id+half_pop)
-                self._add_agent(id+half_pop, "baseline", allotment, checkpoint_path, allocation_id=allocation_id)
+        #every agent is in the capability group that lists its id; in a mixed society the baseline agents are chosen from the seed
+        self._choose_agent_types(society_mix)
+        for id in range(self.num_agents):
+            allocation_id = self._get_allocation_id(id)
+            self._add_agent(id, self._agent_type_of(id, agent_type), allotment, checkpoint_path, allocation_id=allocation_id)
         self.num_living_agents = len(self.living_agents)
         self.berry_id = self.num_living_agents + 1
         if self.num_living_agents != self.num_agents:

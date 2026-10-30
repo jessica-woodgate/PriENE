@@ -260,40 +260,56 @@ def test_a_missing_checkpoint_fails_clearly(in_tmp_dir):
         build("colours", False, str(in_tmp_dir / "empty") + "/")
 
 
-# the agent type of each agent id in a mixed society of utilitarian and baseline agents
-MIXED_TYPES = {
-    "basic": ["utilitarian", "utilitarian", "baseline", "baseline"],
-    "colours": ["utilitarian", "utilitarian", "baseline", "baseline"],
-    "capabilities": ["utilitarian", "utilitarian", "baseline", "baseline"],
-    "allotment": ["utilitarian", "baseline", "utilitarian", "baseline"],
-    "allotment-separate": ["utilitarian", "utilitarian", "baseline", "baseline"],
-}
+# mixed societies of utilitarian and baseline agents in each scenario, and in allotment with each layout
+MIXED_LAYOUTS = ["basic", "colours", "capabilities", "allotment", "allotment-separate"]
 
 
-def build_mixed(layout, training, checkpoint_path, seasons=True, max_episodes=1):
+def build_mixed(layout, training, checkpoint_path, seasons=True, max_episodes=1, seed=42):
     scenario = layout.split("-")[0]
     kwargs = {"mixed_allotments": "separate"} if layout == "allotment-separate" else {}
     return long_lived(_build(scenario, "heterogeneous", NUM_AGENTS * 3, "utilitarian", training, checkpoint_path, False, False, scenario,
-                             max_episodes, 5, seed=42, seasons=seasons, season_length=SEASON_LENGTH, **kwargs))
+                             max_episodes, 5, seed=seed, seasons=seasons, season_length=SEASON_LENGTH, **kwargs))
 
 
-def train_mixed(layout, root):
+def train_mixed(layout, root, seed=42):
     """Trains a mixed society for an episode as run.py does, returning the folder its checkpoints are saved in."""
     society_path = society_checkpoint_path(root, "heterogeneous", "utilitarian")
-    model = build_mixed(layout, True, society_path)
+    model = build_mixed(layout, True, society_path, seed=seed)
     record_agent_types(society_path, model.get_living_agents())
     while model.episode <= 1:
         model.step()
     return society_path, model
 
 
-@pytest.mark.parametrize("layout", list(MIXED_TYPES))
+def assert_mixed_layout(layout, model, baseline_ids):
+    """Half the agents are baseline, keeping allotment's layout: types alternating in every allotment (split), or each type in its own
+    half of the allotments (separate)."""
+    assert len(baseline_ids) == NUM_AGENTS // 2
+    if layout == "allotment":
+        assert len({agent_id % 2 for agent_id in baseline_ids}) == 1
+        for data in model.allocations.values():
+            if len(data["agent_ids"]) >= 2:
+                assert set(data["agent_ids"]) & baseline_ids and set(data["agent_ids"]) - baseline_ids
+    elif layout == "allotment-separate":
+        half = NUM_AGENTS // 2
+        assert baseline_ids in [set(range(half)), set(range(half, NUM_AGENTS))]
+        for data in model.allocations.values():
+            assert set(data["agent_ids"]) <= baseline_ids or not set(data["agent_ids"]) & baseline_ids
+
+
+def agent_types_of(model):
+    return [agent.agent_type for agent in agents(model)]
+
+
+@pytest.mark.parametrize("layout", MIXED_LAYOUTS)
 def test_mixed_training_saves_each_agent_under_its_own_type(in_tmp_dir, layout):
     root = str(in_tmp_dir / "checkpoints") + "/"
     society_path, model = train_mixed(layout, root)
     assert society_path == root + "utilitarian_with_baseline/"
-    types = MIXED_TYPES[layout]
-    assert [agent.agent_type for agent in agents(model)] == types
+    types = agent_types_of(model)
+    assert {agent_id for agent_id, agent_type in enumerate(types) if agent_type == "baseline"} == model.baseline_ids
+    assert set(types) == {"utilitarian", "baseline"}
+    assert_mixed_layout(layout, model, model.baseline_ids)
     # every agent's networks are saved under its own type, and the recorded types say which agent is which
     expected = {f"{agent_type}/agent_{agent_id}" for agent_id, agent_type in enumerate(types)}
     saved = {os.path.relpath(os.path.dirname(path), society_path)
@@ -327,24 +343,52 @@ def test_mixed_training_keeps_each_types_experiences_apart(in_tmp_dir, layout):
     assert model.shared_replay_buffers["utilitarian"] is not model.shared_replay_buffers["baseline"]
 
 
-@pytest.mark.parametrize("layout", list(MIXED_TYPES))
+@pytest.mark.parametrize("layout", MIXED_LAYOUTS)
 def test_a_mixed_society_trained_together_tests_together(in_tmp_dir, layout):
     root = str(in_tmp_dir / "checkpoints") + "/"
     society_path, trained = train_mixed(layout, root)
     assert loading_checkpoint_path(root, "heterogeneous", "utilitarian") == society_path
+    # the same seed chooses the same baseline agents
     model = build_mixed(layout, False, loading_checkpoint_path(root, "heterogeneous", "utilitarian"))
-    assert [agent.agent_type for agent in agents(model)] == MIXED_TYPES[layout]
+    assert agent_types_of(model) == agent_types_of(trained)
     assert same_weights(network_weights(model), network_weights(trained))
     while model.episode <= 1:
         model.step()
 
 
+@pytest.mark.parametrize("layout", MIXED_LAYOUTS)
+def test_the_baseline_agents_are_chosen_from_the_seed(in_tmp_dir, layout):
+    model = build_mixed(layout, True, str(in_tmp_dir / "checkpoints") + "/")
+    choices = set()
+    for seed in range(20):
+        baseline_ids = model._choose_baseline_ids(np.random.default_rng([seed, model.MIXED_SOCIETY_STREAM]))
+        assert_mixed_layout(layout, model, baseline_ids)
+        choices.add(frozenset(baseline_ids))
+    # different seeds choose different agents (all 6 halves of 4 agents, or both options when the layout allows only 2)
+    assert len(choices) == (2 if layout.startswith("allotment") else 6)
+    again = build_mixed(layout, True, str(in_tmp_dir / "again") + "/")
+    assert again.baseline_ids == model.baseline_ids
+
+
+@pytest.mark.parametrize("layout", MIXED_LAYOUTS)
+def test_choosing_baseline_agents_draws_nothing_from_the_other_random_streams(in_tmp_dir, layout):
+    def start(model):
+        return sorted((b.unique_id, b.pos) for b in model.berries) + [(a.unique_id, a.pos) for a in agents(model)]
+    scenario = layout.split("-")[0]
+    homogeneous = long_lived(_build(scenario, "homogeneous", NUM_AGENTS * 3, "utilitarian", True, str(in_tmp_dir / "homogeneous") + "/",
+                                    False, False, scenario, 1, 5, seed=42, seasons=True, season_length=SEASON_LENGTH))
+    mixed = build_mixed(layout, True, str(in_tmp_dir / "mixed") + "/")
+    # with 4 agents in 2 allotments every layout groups agents as a homogeneous society does, so every agent and berry starts in the same place
+    assert start(mixed) == start(homogeneous)
+
+
 def test_a_mixed_society_tested_with_other_agent_types_fails_clearly(in_tmp_dir):
-    # trained split between allotments (baseline agents are 1 and 3), tested in colours (baseline agents are 2 and 3)
     root = str(in_tmp_dir / "checkpoints") + "/"
-    society_path, _ = train_mixed("allotment", root)
-    with pytest.raises(CheckpointNotFoundException, match=r"utilitarian/agent_1/.*trained together as .*'agent_1': 'baseline'"):
-        build_mixed("colours", False, loading_checkpoint_path(root, "heterogeneous", "utilitarian"))
+    _, trained = train_mixed("colours", root, seed=42)
+    # a seed that chooses other baseline agents
+    seed = next(s for s in range(100) if build_mixed("colours", True, str(in_tmp_dir / f"probe{s}") + "/", seed=s).baseline_ids != trained.baseline_ids)
+    with pytest.raises(CheckpointNotFoundException, match=r"No checkpoint at .*trained together as \{'agent_0'"):
+        build_mixed("colours", False, loading_checkpoint_path(root, "heterogeneous", "utilitarian"), seed=seed)
 
 
 @needs_paper_checkpoints

@@ -47,15 +47,9 @@ class ColoursHarvest(HarvestModel):
     def _init_agents(self, society_mix, agent_type, checkpoint_path):
         self.living_agents = []
         allotment = [0,self.max_width,0,self.max_height]
-        if society_mix == "homogeneous":
-            for i in range(self.num_agents):
-                self._add_agent(i, agent_type, allotment, checkpoint_path, allocation_id=f"allocation_{i}")
-        else:
-            half_pop = self._half_population()
-            for i in range(half_pop):
-                self._add_agent(i, agent_type, allotment, checkpoint_path, allocation_id=f"allocation_{i}")
-            #every agent has its own colour, so the baseline half take the colours after the first half's
-            for i in range(half_pop):
-                self._add_agent(i+half_pop, "baseline", allotment, checkpoint_path, allocation_id=f"allocation_{i+half_pop}")
+        #every agent has its own colour; in a mixed society the baseline agents are chosen from the seed
+        self._choose_agent_types(society_mix)
+        for i in range(self.num_agents):
+            self._add_agent(i, self._agent_type_of(i, agent_type), allotment, checkpoint_path, allocation_id=f"allocation_{i}")
         assert self.num_agents == len(self.living_agents)
         self.berry_id = len(self.living_agents) + 1

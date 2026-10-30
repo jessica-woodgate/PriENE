@@ -68,9 +68,12 @@ class HarvestModel(Model):
             regrows in the step it is foraged); only the allotment scenario takes it
         holder_regrowth_delays -- dict mapping each holder (allotment key) to its regrowth delay (None without allotment regrowth delays)
         regrowth_timers -- dict mapping each berry waiting to regrow (foraged, off the grid) to the day it is due back; emptied at the start of every episode
+        baseline_ids -- ids of the baseline agents in a mixed society, chosen from the seed (empty in a homogeneous society)
     """
     SEASON_QUALITIES = ["normal", "good", "bad"]
     SEASON_QUALITY_CHANGE = {"normal": 0, "good": 1, "bad": -1}
+    #spawn key for the random stream that chooses which agents of a mixed society are baseline
+    MIXED_SOCIETY_STREAM = 1
 
     def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None):
         super().__init__()
@@ -246,17 +249,31 @@ class HarvestModel(Model):
     def _init_agents(self, society_mix, agent_type, checkpoint_path):
         self.living_agents = []
         allotment = [0,self.max_width,0,self.max_height]
-        if society_mix == "homogeneous":
-            for i in range(self.num_agents):
-                self._add_agent(i, agent_type, allotment, checkpoint_path)
-        else:
-            half_pop = self._half_population()
-            for i in range(half_pop):
-                self._add_agent(i, agent_type, allotment, checkpoint_path)
-            for i in range(half_pop):
-                self._add_agent(i+half_pop, "baseline", allotment, checkpoint_path)
+        self._choose_agent_types(society_mix)
+        for i in range(self.num_agents):
+            self._add_agent(i, self._agent_type_of(i, agent_type), allotment, checkpoint_path)
         assert self.num_agents == len(self.living_agents)
         self.berry_id = len(self.living_agents) + 1
+
+    def _choose_agent_types(self, society_mix):
+        """
+        Choose which agents are baseline: none in a homogeneous society; in a mixed society, half the agents, chosen from the seed (see
+        _choose_baseline_ids), since agent ids decide resources in some scenarios and neither type should always get the better ones
+        """
+        self.baseline_ids = set() if society_mix == "homogeneous" else self._choose_baseline_ids(self._mixed_society_rng())
+
+    def _mixed_society_rng(self):
+        #its own stream from the seed, so choosing the baseline agents doesn't shift any other random draws
+        return np.random.default_rng(None if self.seed is None else [self.seed, self.MIXED_SOCIETY_STREAM])
+
+    def _choose_baseline_ids(self, rng):
+        """
+        A random half of the agent ids (scenarios with layouts that must keep both types together or apart override this)
+        """
+        return {int(agent_id) for agent_id in rng.choice(self.num_agents, self._half_population(), replace=False)}
+
+    def _agent_type_of(self, agent_id, agent_type):
+        return "baseline" if agent_id in self.baseline_ids else agent_type
 
     def _half_population(self):
         """

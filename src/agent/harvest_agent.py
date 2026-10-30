@@ -121,6 +121,9 @@ class HarvestAgent(Agent):
             society_well_being = self.model.get_society_well_being(self, False, True)
             self.ethics_module.update_ethics_state(society_well_being)
         reward_vector = [self._perform_action(action)]
+        #recalculated straight after acting, so the sanction (and the next state) see the effect of every action on this agent's
+        #well-being, e.g. a foraged berry; health decay comes after, in _update_attributes
+        self.days_left_to_live = self.get_days_left_to_live()
         next_state = self.observe()
         if self.agent_type != "baseline":
             reward_vector = reward_vector + self._ethics_sanction()

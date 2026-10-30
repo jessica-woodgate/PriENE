@@ -243,7 +243,9 @@ def types_by_allotment(model):
 def test_split_mixed_allotments_alternate_agent_types(in_tmp_dir, random_agents, num_agents, num_allotments):
     model = build(num_agents, num_allotments, 4 * num_agents, 2 * num_agents, society_mix="heterogeneous")
     assert [data["agent_ids"] for data in model.allocations.values()] == expected_groups(num_agents, num_allotments)
-    assert [a.agent_type for a in agents(model)] == ["utilitarian" if i % 2 == 0 else "baseline" for i in range(num_agents)]
+    # the even or the odd ids are baseline, chosen from the seed
+    types = [a.agent_type for a in agents(model)]
+    assert types in [["utilitarian" if i % 2 == parity else "baseline" for i in range(num_agents)] for parity in [0, 1]]
     for holder, types in types_by_allotment(model).items():
         assert len(types) == len(model.allocations[holder]["agent_ids"])
         if len(types) >= 2:
@@ -262,8 +264,10 @@ def test_separate_mixed_allotments_give_each_agent_type_half_the_allotments(in_t
     assert [data["agent_ids"] for data in model.allocations.values()] == groups
     types = list(types_by_allotment(model).values())
     half = num_allotments // 2
-    assert all(set(t) == {"utilitarian"} for t in types[:half])
-    assert all(set(t) == {"baseline"} for t in types[half:])
+    # the seed chooses which half of the allotments the baseline agents have
+    first, second = ("baseline", "utilitarian") if set(types[0]) == {"baseline"} else ("utilitarian", "baseline")
+    assert all(set(t) == {first} for t in types[:half])
+    assert all(set(t) == {second} for t in types[half:])
     assert sum(len(t) for t in types) == num_agents
 
 
@@ -304,4 +308,6 @@ def test_mixed_society_agents_are_in_the_groups_that_list_them(in_tmp_dir, rando
     for holder, data in model.allocations.items():
         assert [a.unique_id for a in agents(model) if a.allocation_id == holder] == data["agent_ids"]
         assert members[holder] == len(data["agent_ids"])
-    assert [a.agent_type for a in agents(model)] == ["utilitarian"] * (NUM_AGENTS // 2) + ["baseline"] * (NUM_AGENTS // 2)
+    # half the agents are baseline, chosen from the seed
+    assert Counter(a.agent_type for a in agents(model)) == {"utilitarian": NUM_AGENTS // 2, "baseline": NUM_AGENTS // 2}
+    assert {a.unique_id for a in agents(model) if a.agent_type == "baseline"} == model.baseline_ids

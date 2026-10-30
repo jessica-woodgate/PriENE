@@ -80,6 +80,29 @@ def test_rendering_skips_berries_waiting_to_regrow(in_tmp_dir, checkpoint_path, 
     assert render.render_pygame(model)
 
 
+@pytest.mark.parametrize("action,berries,health,sanction", [
+    ("forage", 1, 0.0, 0.4),     # a foraged berry is +6 days left to live: society's welfare rises
+    ("eat", -1, 0.6, 0.0),       # eating turns a berry into health: days left to live is unchanged
+])
+def test_the_sanction_sees_the_effect_of_every_action(in_tmp_dir, monkeypatch, action, berries, health, sanction):
+    model = _build("colours", "homogeneous", NUM_AGENTS * 3, "utilitarian", True, str(in_tmp_dir / "checkpoints") + "/", False, False,
+                   "colours", 1, 10, seed=42)
+    agent = agents(model)[0]
+    agent.berries = 1
+    agent.days_left_to_live = agent.get_days_left_to_live()
+
+    def act(action_index):
+        agent.berries += berries
+        agent.health += health
+        return agent.rewards[action]
+    monkeypatch.setattr(agent, "_perform_action", act)
+    reward_vector, next_state, _ = agent.perform_transition(0, agent.observe())
+    assert reward_vector[0] == pytest.approx(agent.rewards[action])
+    assert reward_vector[1] == pytest.approx(sanction)
+    # the next state has the agent's well-being after acting (before health decay)
+    assert next_state[2] == pytest.approx((agent.berry_health_payoff * agent.berries + agent.health + agent.health_decay) / agent.health_decay)
+
+
 def test_an_unknown_principle_raises_clearly():
     with pytest.raises(UnrecognisedPrinciple, match="multiobjective"):
         EthicsModule(0.4, "multiobjective")

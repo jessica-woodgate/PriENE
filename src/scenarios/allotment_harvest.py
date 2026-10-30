@@ -23,7 +23,8 @@ class AllotmentHarvest(HarvestModel):
     SLOW_ALLOTMENT = 1
     SLOW_ALLOTMENT_DELAY = 2
     #"split": allotments hold consecutive agent ids, and the two agent types alternate by id, so every allotment of 2 or more agents has
-    #both types; "separate": the agent_type agents share the first half of the allotments and the baseline agents the second half
+    #both types; "separate": each type shares half of the allotments. Which ids are baseline (the even or odd ones, or which half of the
+    #allotments) is chosen from the seed, so neither type always gets the extra place in an odd-sized allotment or the slower allotments
     MIXED_ALLOTMENT_LAYOUTS = ["split", "separate"]
 
     def __init__(self,society_mix,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,mixed_allotments="split"):
@@ -97,7 +98,8 @@ class AllotmentHarvest(HarvestModel):
     def _agent_groups(self):
         """
         Agent ids in each allotment: consecutive ids, with any agents left over going to the first allotments; with separate allotments
-        for a mixed society, the agent_type half (the lower ids) share the first half of the allotments and the baseline half the rest
+        for a mixed society, the lower half of ids share the first half of the allotments and the upper half the rest (one half is
+        baseline, see _choose_baseline_ids)
         """
         if self.society_mix != "homogeneous" and self.mixed_allotments == "separate":
             half_pop = self.num_agents // 2
@@ -157,6 +159,7 @@ class AllotmentHarvest(HarvestModel):
 
     def _init_agents(self, society_mix, agent_type, checkpoint_path):
         self.living_agents = []
+        self._choose_agent_types(society_mix)
         for id in range(self.num_agents):
             allocation_id = self._get_allocation_id(id)
             allotment = self.allocations[allocation_id]["allotment"]
@@ -166,15 +169,17 @@ class AllotmentHarvest(HarvestModel):
         if self.num_living_agents != self.num_agents:
             raise NumAgentsException(self.num_agents, self.num_living_agents)
 
-    def _agent_type_of(self, agent_id, agent_type):
+    def _choose_baseline_ids(self, rng):
         """
-        In a mixed society half the agents are baseline: odd ids with split allotments, the upper half of ids with separate allotments
+        Half the agents are baseline, keeping the layout: with split allotments the even or the odd ids (so the types still alternate in
+        every allotment), with separate allotments the lower or the upper half of ids (so each type still has its own half of the allotments)
         """
-        if self.society_mix == "homogeneous":
-            return agent_type
+        half_pop = self._half_population()
         if self.mixed_allotments == "split":
-            return agent_type if agent_id % 2 == 0 else "baseline"
-        return agent_type if agent_id < self.num_agents // 2 else "baseline"
+            parity = int(rng.integers(2))
+            return {agent_id for agent_id in range(self.num_agents) if agent_id % 2 == parity}
+        upper = bool(rng.integers(2))
+        return set(range(half_pop, self.num_agents)) if upper else set(range(half_pop))
 
     def _get_allocation_id(self, agent_id):
         for allocation_id, allocation_data in self.allocations.items():
