@@ -1,4 +1,5 @@
 import numpy as np
+from src.harvest_exception import UnrecognisedPrinciple
 
 class EthicsModule():
     """
@@ -10,7 +11,12 @@ class EthicsModule():
         measure_of_well_being -- metric to evaluate well-being before and after acting (minimum experience)
         number_of_minimums -- number of agents which have minimum experience
     """
+    PRINCIPLES = ["egalitarian", "maximin", "utilitarian"]
+    AGGREGATIONS = ["veto", "optimist", "majoritarian", "average"]
+
     def __init__(self,sanction,principle):
+        if principle not in self.PRINCIPLES + self.AGGREGATIONS:
+            raise UnrecognisedPrinciple(principle)
         self.sanction = sanction
         self.principle = principle
         self.society_well_being = None
@@ -111,41 +117,30 @@ class EthicsModule():
         current_number_of_previous_mins = np.count_nonzero(society_well_being==previous_min)
         #if the global min has been made better, pos reward
         if current_min > previous_min:
-            #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning pos reward")
             return self.sanction
         #if the global min has been made worse, neg reward
         elif current_min < previous_min:
-            #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning neg reward")
             return -self.sanction
         #if the global min has not changed, but there are fewer instances of it, pos reward
         elif current_number_of_previous_mins < number_of_previous_mins and current_min == previous_min:
-            #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning pos less numbers reward")
             return self.sanction
         #if the global min has not changed, and there are more or same number of instances of it, neg reward
         elif current_number_of_previous_mins > number_of_previous_mins and current_min == previous_min:
-            #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning neg more numbers reward")
             return -self.sanction
-        #print("day",self.day,"agent", self.agent_id, "current_min", current_min, "previous_min", previous_min, "returning neutral reward")
         return 0
-    
+
     def _egalitarian_sanction(self, previous_loss, society_well_being):
         current_loss = self._calculate_egalitarian_welfare(society_well_being)
         if previous_loss > current_loss:
-            #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning pos reward")
             return self.sanction
         elif previous_loss < current_loss:
-            #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning neg reward")
             return -self.sanction
-        #print("day",self.day,"agent", self.agent_id, "current loss", current_loss, "previous loss", previous_loss, "returning neutral reward")
         return 0
-    
+
     def _utilitarian_sanction(self, previous_welfare, society_well_being):
         current_welfare = self._calculate_utilitarian_welfare(society_well_being)
         if current_welfare > previous_welfare:
-            #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning pos reward")
             return self.sanction
         elif current_welfare < previous_welfare:
-            #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning neg reward")
             return -self.sanction
-        #print("day",self.day,"agent", self.agent_id, "current_welfare", current_welfare, "previous_welfare", previous_welfare, "returning neutral reward")
         return 0

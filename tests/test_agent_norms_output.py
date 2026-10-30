@@ -1,4 +1,3 @@
-import json
 import os
 
 import numpy as np
@@ -34,13 +33,6 @@ def harvest_agents(model):
     return sorted((a for a in model.schedule.agents if a.agent_type != "berry"), key=lambda a: a.unique_id)
 
 
-def nth_behaviour(agent, position):
-    """The behaviour (as a dict) at this position in iter_behaviours() order -- the order of the old
-    integer ids, so position 0 is the first precondition's prohibition of the first action."""
-    module = agent.norms_module
-    return module.behaviour_dict(list(module.iter_behaviours())[position])
-
-
 def force_learned(agent, learned_positions, times_precondition_met=10):
     """
     Set an agent's posteriors directly so exactly the behaviours at learned_positions (in
@@ -59,11 +51,6 @@ def force_learned(agent, learned_positions, times_precondition_met=10):
 
 def read_csv(filepath="norms"):
     return pd.read_csv(f"data/results/current_run/agent_norms_{filepath}.csv")
-
-
-def read_agent_json(agent_id, filepath="norms"):
-    with open(f"data/results/current_run/{filepath}_agent_{agent_id}_norms.json") as file:
-        return json.load(file)
 
 
 # --- _analyse_agent_norms (CSV) ---
@@ -162,48 +149,6 @@ def test_agent_passes_norm_actions_to_module(in_tmp_dir, monkeypatch):
         model.step()
     assert received and set(received) <= {0, 1, 2}
     assert sum(a.norms_module.action_counts.sum() for a in harvest_agents(model)) == len(received)
-
-
-# --- _write_agent_norms_to_file (JSON, one per agent) ---
-
-def test_one_json_per_agent_keyed_by_episode(in_tmp_dir):
-    # called directly: the finish_episode() call to _write_agent_norms_to_file is currently disabled
-    model = make_norms_model(in_tmp_dir)
-    agents = harvest_agents(model)
-    model.step()
-    force_learned(agents[0], {0, 1, 3})
-    model._write_agent_norms_to_file()
-    model.finish_episode()
-    model.step()
-    force_learned(agents[0], {1})
-    model._write_agent_norms_to_file()
-    model.finish_episode()
-    for agent in agents:
-        assert list(read_agent_json(agent.unique_id).keys()) == ["1", "2"]
-    episodes = read_agent_json(0)
-    assert [list(norm)[0] for norm in episodes["1"]] == [nth_behaviour(agents[0], i)["label"] for i in (0, 1, 3)]
-    assert [list(norm)[0] for norm in episodes["2"]] == [nth_behaviour(agents[0], 1)["label"]]
-
-
-def test_json_norm_entry_contents(in_tmp_dir):
-    model = make_norms_model(in_tmp_dir)
-    agent = harvest_agents(model)[0]
-    model.step()
-    force_learned(agent, {1})
-    model._write_agent_norms_to_file()
-    [entry] = read_agent_json(0)["1"]
-    label, data = next(iter(entry.items()))
-    expected = nth_behaviour(agent, 1)
-    assert label == expected["label"]
-    assert data == {
-        "type": expected["type"],
-        "precondition": expected["precondition"],
-        "action": expected["action"],
-        "posterior": 0.99,
-        "times_precondition_met": 10,
-        "times_action_matched": agent.norms_module.behaviour_counts(
-            expected["precondition_key"], expected["action_idx"], expected["type"])[1],
-    }
 
 
 # --- integration ---

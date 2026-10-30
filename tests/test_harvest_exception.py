@@ -14,7 +14,6 @@ from src.harvest_exception import (
     IllegalBerry,
     NumBerriesException,
     NumFeaturesException,
-    ImpossibleNormException,
 )
 
 
@@ -97,14 +96,6 @@ def test_num_features_exception_message():
     assert "berries" not in str(e)
 
 
-def test_impossible_norm_exception_message():
-    e = ImpossibleNormException(3, 1, "IF,no berries,low health", "throw_2", -0.2)
-    assert str(e) == (
-        "Day 3, agent 1 saving an impossible behaviour! "
-        "Antecedent IF,no berries,low health consequent throw_2; got reward -0.2"
-    )
-
-
 @pytest.mark.parametrize(
     "exception_cls,args",
     [
@@ -121,7 +112,6 @@ def test_impossible_norm_exception_message():
         (IllegalBerry, (1, "bad")),
         (NumBerriesException, (10, 8)),
         (NumFeaturesException, (6, 5)),
-        (ImpossibleNormException, (3, 1, "IF,x", "throw_2", -0.2)),
     ],
 )
 def test_all_exceptions_are_raisable_and_catchable(exception_cls, args):

@@ -1,4 +1,3 @@
-import tensorflow
 from tensorflow import keras
 from keras import layers
 from keras import initializers as initialiser

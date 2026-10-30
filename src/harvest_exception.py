@@ -164,25 +164,41 @@ class NumFeaturesException(HarvestException):
     def __str__(self):
         return (f"Expected {self.num_expected_features} features and got {self.num_features}")
 
-class ImpossibleNormException(HarvestException):
-    def __init__(self, day, agent_id, antecedent, action, reward):
+class CheckpointNotFoundException(HarvestException):
+    def __init__(self, checkpoint_path, agent_types=None):
         super().__init__()
-        self.day = day
-        self.agent_id = agent_id
-        self.antecedent = antecedent
-        self.action = action
-        self.reward = reward
-    
-    def __str__(self):
-        return (f"Day {self.day}, agent {self.agent_id} saving an impossible behaviour! Antecedent {self.antecedent} consequent {self.action}; got reward {self.reward}")
-
-class SeasonsNotSupported(HarvestException):
-    def __init__(self, scenario):
-        super().__init__()
-        self.scenario = scenario
+        self.checkpoint_path = checkpoint_path
+        self.agent_types = agent_types
 
     def __str__(self):
-        return (f"The {self.scenario} scenario has no berry allocations to change; seasons can only be used with the colours, capabilities and allotment scenarios")
+        message = f"No checkpoint at {self.checkpoint_path}; test mode loads a checkpoint trained with the same agent type and number of agents"
+        if self.agent_types is not None:
+            message += (f". These agents were trained together as {self.agent_types}, so test them in a society with the same type for each agent "
+                        "(the same scenario layout and mixed allotments)")
+        return message
+
+class CheckpointExistsException(HarvestException):
+    def __init__(self, checkpoint_path):
+        super().__init__()
+        self.checkpoint_path = checkpoint_path
+
+    def __str__(self):
+        return (f"A checkpoint already exists at {self.checkpoint_path}; training never overwrites checkpoints, so use other settings or another seed, or move it")
+
+class CheckpointMismatchException(HarvestException):
+    def __init__(self, checkpoint_path, expected_features, expected_actions, checkpoint_features, checkpoint_actions):
+        super().__init__()
+        self.checkpoint_path = checkpoint_path
+        self.expected_features = expected_features
+        self.expected_actions = expected_actions
+        self.checkpoint_features = checkpoint_features
+        self.checkpoint_actions = checkpoint_actions
+
+    def __str__(self):
+        #agents observe 4 features of their own plus one per other agent, and have move, eat and one throw per other agent
+        return (f"Checkpoint {self.checkpoint_path} was trained with {self.checkpoint_actions - 1} agents ({self.checkpoint_features} inputs, "
+                f"{self.checkpoint_actions} actions), but this run has {self.expected_actions - 1} agents ({self.expected_features} inputs, "
+                f"{self.expected_actions} actions); test with the number of agents it was trained with")
 
 class SeasonsException(HarvestException):
     def __init__(self, reason):

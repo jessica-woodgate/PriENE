@@ -5,21 +5,21 @@ from src.scenarios.capabilities_harvest import CapabilitiesHarvest
 from src.data_handling.data_analysis import DataAnalysis
 from src.data_handling.render_pygame import RenderPygame
 from src.agent.harvest_agent import NORMS_MODULE_TYPES
+from src.checkpoints import RUN_OPTIONS, DEFAULT_CHECKPOINT
+from src.checkpoints import training_checkpoint_name, training_checkpoint_path, prepare_training_checkpoints
+from src.checkpoints import society_checkpoint_path, loading_checkpoint_path, record_agent_types
+from src.checkpoints import resolve_checkpoint, trained_checkpoints, checkpoint_max_days, days_in_name
 import pandas as pd
 import argparse
 import wandb
 import time
-import re
 
 PRINCIPLES = ["baseline", "utilitarian", "maximin", "egalitarian"]
 AGGREGATIONS = ["average", "majoritarian", "optimist", "veto"]
 AGENT_TYPES = PRINCIPLES + AGGREGATIONS
-SCENARIO_TYPES = ["colours", "capabilities", "allotment"]
+SCENARIO_TYPES = ["basic", "colours", "capabilities", "allotment"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6", "20", "50", "100"]
 MAX_EPISODES = 1000
-MAX_TRAINING_EPISODES = 17000
-TIME_LIMIT = 24*3600-15*60
-RUN_OPTIONS = ["current_run", "50_days", "200_days"]
 SOCIETY_MIXES = ["homogeneous", "heterogeneous"]
 DEFAULT_SEED = 42
 DEFAULT_SEASON_LENGTH = 25
@@ -55,15 +55,17 @@ def generate_paper_graphs(scenario):
         end_episode_totals_dfs.append(df)
     data_analysis.proccess_and_display_data(agent_end_episode_dfs, PRINCIPLES, AGGREGATIONS, scenario, end_episode_totals_dfs=end_episode_totals_dfs, write=True, get_normalised=False, process_norms=False)
 
-def generate_graphs(scenario, run_name, num_agents, seasons=False, allotment_regrowth_delays=None, mixed_allotments="split"):
+def generate_graphs(scenario, run_name, num_agents, seasons=False, allotment_regrowth_delays=None, mixed_allotments="split", society_mix="homogeneous", process_norms=True):
     """
     takes raw files and generates graphs
     processed dfs contain data for each agent at the end of each episode
-    seasons, allotment regrowth delay and separate mixed allotment runs are read from the same scenario folder, with "_seasons", "_regrow"
-    and the delays (e.g. "_regrow0-1") and/or "_separate" after the scenario in each filename
+    seasons, allotment regrowth delay and mixed society runs are read from the same scenario folder, with "_seasons", "_regrow" and the
+    delays (e.g. "_regrow0-1"), and/or "_mixed" ("_mixed_separate" for separate allotments) after the scenario in each filename;
+    a mixed society has no baseline-only run, so its graphs compare the other agent types
+    process_norms -- whether the run wrote rule-based norms (<file>_emerged_norms.json) to analyse
     """
     writing_filepath = "data/results/current_run/"
-    file_scenario = scenario_file_string(scenario, seasons, allotment_regrowth_delays, mixed_allotments)
+    file_scenario = scenario_file_string(scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix)
     if run_name == "current_run":
         norms_filepath = "data/results/"+run_name+"/"+file_scenario+"_"
     else:
@@ -73,58 +75,36 @@ def generate_graphs(scenario, run_name, num_agents, seasons=False, allotment_reg
         reading_filepath = "data/results/"+run_name+"/agent_reports_"+file_scenario+"_"
     else:
         reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+file_scenario+"_"
-    #built from AGENT_TYPES so the files are in the same order as the labels (PRINCIPLES + AGGREGATIONS) the analysis gives them
-    files = [reading_filepath+agent_type+".csv" for agent_type in AGENT_TYPES]
+    #the agent types run, in the same order as the labels (principles + aggregations) the analysis gives them
+    agent_types = agent_types_to_run(society_mix)
+    principles = [agent_type for agent_type in PRINCIPLES if agent_type in agent_types]
+    files = [reading_filepath+agent_type+".csv" for agent_type in agent_types]
     dfs = []
     for file in files:
         df = pd.read_csv(file)
         dfs.append(df)
-    data_analysis.proccess_and_display_data(dfs, PRINCIPLES, AGGREGATIONS, scenario, norms_filepath, write=True, get_normalised=False, process_norms=True)
-
-def log_wandb_agents(model_inst, last_episode, reward_tracker):
-    for i, agent in enumerate(model_inst.schedule.agents):
-        if agent.agent_type != "berry":
-            base_string = agent.agent_type+"_agent_"+str(agent.unique_id)
-            if last_episode != model_inst.episode:
-                string = base_string+"_total_episode_reward"
-                reward = reward_tracker[i]
-                wandb.log({string: reward})
-            string = base_string+"_reward"
-            wandb.log({string: agent.current_reward})
-            mean_loss = (agent.get_mean_loss() if model_inst.training else 0)
-            string = base_string+"_mean_loss"
-            wandb.log({string: mean_loss})
-            string = base_string+"_epsilon"
-            wandb.log({string: agent.get_epsilon()})
+    data_analysis.proccess_and_display_data(dfs, principles, AGGREGATIONS, scenario, norms_filepath, write=True, get_normalised=False, process_norms=process_norms)
 
 def run_simulation(model_inst, render, log_wandb, wandb_project):
-    start_time = time.time()
-    elapsed_time = time.time() - start_time
     if log_wandb:
         wandb.init(project=wandb_project)
     if render:
         render_inst = RenderPygame(model_inst.max_width, model_inst.max_height)
-    #while (
-    #(model_inst.training and model_inst.episode <= MAX_TRAINING_EPISODES and elapsed_time < TIME_LIMIT)
-    #or (not model_inst.training and model_inst.episode <= model_inst.max_episodes)
-    #):
+    #training runs until exploration has decayed to its floor; testing runs max_episodes
     while (model_inst.training and round(model_inst.epsilon, 5) > model_inst.min_epsilon) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
         model_inst.step()
         if log_wandb:
-            #reward_tracker = [a.total_episode_reward for a in model_inst.schedule.agents if a.agent_type != "berry"]
-            #log_wandb_agents(model_inst, last_episode, reward_tracker)
             mean_reward = model_inst._mean_reward()
             wandb.log({'mean_episode_reward': mean_reward})
         if render:
             if not render_inst.render_pygame(model_inst):
                 break
-        elapsed_time = time.time() - start_time
     model_inst.finish_episode(collect_data=False)
     num_episodes = model_inst.episode
     print(f"simulation finished time: {time.time()}")
     return num_episodes
 
-def scenario_file_string(scenario, seasons, allotment_regrowth_delays=None, mixed_allotments="split"):
+def scenario_file_string(scenario, seasons, allotment_regrowth_delays=None, mixed_allotments="split", society_mix="homogeneous"):
     """
     scenario part of output filenames; options that are on are added after the scenario so runs don't overwrite each other
     """
@@ -133,13 +113,48 @@ def scenario_file_string(scenario, seasons, allotment_regrowth_delays=None, mixe
         file_scenario += "_seasons"
     if allotment_regrowth_delays is not None:
         file_scenario += "_regrow" + "-".join(str(delay) for delay in allotment_regrowth_delays)
-    if mixed_allotments == "separate":
-        file_scenario += "_separate"
+    if society_mix != "homogeneous":
+        file_scenario += "_mixed"
+        if scenario == "allotment" and mixed_allotments == "separate":
+            file_scenario += "_separate"
     return file_scenario
 
-def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split"):
-    file_string = scenario_file_string(scenario, seasons, allotment_regrowth_delays, mixed_allotments)+"_"+agent_type
-    checkpoint_path = "data/model_variables/"+run_name+"/"+str(num_agents)+"_agents/"
+def get_checkpoint_input():
+    """
+    Ask which checkpoint to test: one of RUN_OPTIONS, a trained checkpoint's name, or a path to a folder holding <n>_agents folders;
+    pressing enter uses DEFAULT_CHECKPOINT, the agents trained in basic for the paper. Returns the folder and the answer given
+    """
+    trained = trained_checkpoints()
+    trained_string = f", a trained checkpoint {trained}" if trained else ""
+    while True:
+        value = input(f"Which checkpoint do you want to test? Choose a run {RUN_OPTIONS}{trained_string} or a path; press enter for {DEFAULT_CHECKPOINT} (the agents trained in basic for the paper): ").strip()
+        checkpoint_root = resolve_checkpoint(value)
+        if checkpoint_root is not None:
+            return checkpoint_root, value or DEFAULT_CHECKPOINT
+        print(f"Invalid checkpoint. {value} is not a run, a trained checkpoint or a folder.")
+
+def get_max_days_input(checkpoint_name, checkpoint_path):
+    """
+    Days in each episode for testing a checkpoint: as it was trained if its name or settings say, otherwise ask
+    """
+    max_days = checkpoint_max_days(checkpoint_name, checkpoint_path)
+    if max_days is None:
+        return get_integer_input("How many days in each episode: ")
+    if days_in_name(checkpoint_name) is None:
+        print(f"Testing with {max_days} days in each episode, as the checkpoint was trained.")
+    return max_days
+
+def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split"):
+    """
+    checkpoint_path is the folder holding the checkpoints for this number of agents: training saves there, testing loads from it
+    (in a mixed society, from the folder of agent_type trained with baseline agents; see society_checkpoint_path)
+    """
+    #training outputs are named apart from testing outputs, so testing the same scenario doesn't clash with them
+    file_string = ("train_" if training else "")+scenario_file_string(scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix)+"_"+agent_type
+    if training:
+        checkpoint_path = society_checkpoint_path(checkpoint_path, society_mix, agent_type)
+    else:
+        checkpoint_path = loading_checkpoint_path(checkpoint_path, society_mix, agent_type)
     if scenario == "basic":
         model_inst = BasicHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays)
     elif scenario == "colours":
@@ -149,16 +164,18 @@ def create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berr
     elif scenario == "capabilities":
         model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays)
     else:
-        ValueError("Unknown argument: "+scenario)
+        raise ValueError("Unknown argument: "+scenario)
+    if training and society_mix != "homogeneous":
+        record_agent_types(checkpoint_path, model_inst.get_living_agents())
     run_simulation(model_inst,render,log_wandb,wandb_project)
 
-def run_all(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split"):
-    if society_mix == "heterogeneous":
-        agent_types = AGENT_TYPES[1:]
-    else:
-        agent_types = AGENT_TYPES
-    for agent_type in agent_types:
-        create_and_run_model(scenario,society_mix,run_name,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments)
+def agent_types_to_run(society_mix):
+    #in a mixed society half the agents are baseline, so baseline alone isn't run
+    return AGENT_TYPES[1:] if society_mix == "heterogeneous" else AGENT_TYPES
+
+def run_all(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split"):
+    for agent_type in agent_types_to_run(society_mix):
+        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments)
 
 def get_mixed_allotments_input(num_allotments):
     """
@@ -232,12 +249,6 @@ def write_data_input(data_type):
         write_data = False
     return write_data
 
-def extract_number(string):
-    match = re.match(r"(\d+)_days", string)
-    if match:
-        return int(match.group(1))
-    return None
-
 #########################################################################################
 
 parser = argparse.ArgumentParser(description="Program options")
@@ -254,27 +265,20 @@ args = parser.parse_args()
 if args.option not in ["test", "train", "graphs"]:
     print("Please choose 'test', 'train', or 'graphs'.")
 elif args.option == "test" or args.option == "train":
-    if args.option == "test":
-        scenario = get_input(f"What type of scenario do you want to run {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES)
-        seasons = get_bool(get_input("Do you want seasons, where each season is randomly normal, good (one more berry per agent in each group) or bad (one fewer)? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
-        season_length = get_season_length_input() if seasons else DEFAULT_SEASON_LENGTH
-        run_name = get_input(f"What run do you want to test (select 200_days to replicate results in the paper) {RUN_OPTIONS}: ", f"Invalid name of run. Please choose {RUN_OPTIONS}: ", RUN_OPTIONS)
-        society_mix = get_input(f"What mix of society do you want to test {SOCIETY_MIXES}: ", f"Invalid society mix. Please choose {SOCIETY_MIXES}: ", SOCIETY_MIXES)
-        max_episodes = MAX_EPISODES
-        training = False
-        if run_name != "current_run":
-            max_days = extract_number(run_name)
-        else:
-            max_days = get_integer_input("How many days in each episode: ")
-    else:
-        training = True
-        scenario = "basic"
-        seasons = False
-        season_length = DEFAULT_SEASON_LENGTH
-        run_name = "current_run"
-        society_mix = "homogeneous"
+    #the mode decides learning, exploration, saving and outputs; any scenario, with or without seasons, runs in either mode
+    training = args.option == "train"
+    mode = "train" if training else "test"
+    scenario = get_input(f"What type of scenario do you want to {mode} in {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES)
+    seasons = get_bool(get_input("Do you want seasons, where each season is randomly normal, good (one more berry per agent in each group) or bad (one fewer)? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+    season_length = get_season_length_input() if seasons else DEFAULT_SEASON_LENGTH
+    if training:
         max_episodes = 0
         max_days = get_integer_input("How many days in each episode: ")
+    else:
+        checkpoint_root, checkpoint_name = get_checkpoint_input()
+        max_episodes = MAX_EPISODES
+    #in a mixed society half the agents are baseline, and train or test alongside the other half
+    society_mix = get_input(f"What mix of society do you want to {mode} {SOCIETY_MIXES}: ", f"Invalid society mix. Please choose {SOCIETY_MIXES}: ", SOCIETY_MIXES)
     #########################################################################################
     types = AGENT_TYPES + ["all"]
     agent_type = get_input(f"What type of agent do you want to implement {types}: ", f"Invalid agent type. Please choose {types}: ", types)
@@ -300,9 +304,25 @@ elif args.option == "test" or args.option == "train":
     #########################################################################################
     write_data = write_data_input("data")
     #########################################################################################
+    if training:
+        #the delays allotments actually regrow with, so the name says which were used
+        delays = allotment_regrowth_delays
+        if scenario == "allotment" and delays is None:
+            delays = AllotmentHarvest.default_regrowth_delays(num_allocations)
+        checkpoint_path = training_checkpoint_path(training_checkpoint_name(scenario, seasons, season_length, num_allocations, delays, max_days, args.seed, society_mix, mixed_allotments), num_agents)
+    else:
+        checkpoint_path = checkpoint_root+str(num_agents)+"_agents/"
+        max_days = get_max_days_input(checkpoint_name, checkpoint_path)
+    #########################################################################################
     norms_module_type = NORMS_MODULE_TYPES[0]
-    if args.option == "train":
-        print("Model variables will be written into",run_name)
+    if training:
+        prepare_training_checkpoints(checkpoint_path, agent_types_to_run(society_mix) if agent_type == "all" else [agent_type],
+                                     {"scenario": scenario, "seasons": seasons, "season_length": season_length if seasons else None,
+                                      "num_allocations": num_allocations, "allotment_regrowth_delays": allotment_regrowth_delays,
+                                      "max_days": max_days, "seed": args.seed, "num_agents": num_agents, "society_mix": society_mix,
+                                      "mixed_allotments": mixed_allotments if scenario == "allotment" and society_mix != "homogeneous" else None},
+                                     society_mix)
+        print("Model variables will be written into",checkpoint_path)
         track_norms = False
         render = False
     else:
@@ -319,9 +339,9 @@ elif args.option == "test" or args.option == "train":
         log_wandb = False
         wandb_project = None
     if agent_type == "all":
-        run_all(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments)
+        run_all(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments)
     else:
-        create_and_run_model(scenario,society_mix,run_name,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments)
+        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments)
 #########################################################################################
 elif args.option == "graphs":
     graph_runs = ["current_run", "50_days", "200_days", "paper"]
@@ -333,8 +353,10 @@ elif args.option == "graphs":
     else:
         num_agents = int(get_input(f"How many agents {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
         seasons = get_bool(get_input("Did the run have seasons? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+        society_mix = get_input(f"What mix of society was it {SOCIETY_MIXES}: ", f"Invalid society mix. Please choose {SOCIETY_MIXES}: ", SOCIETY_MIXES)
         mixed_allotments = "split"
-        if scenario == "allotment":
-            separate = get_bool(get_input("Was it a mixed society with separate allotments for each agent type? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+        if scenario == "allotment" and society_mix == "heterogeneous":
+            separate = get_bool(get_input("Did each agent type have separate allotments? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
             mixed_allotments = "separate" if separate else "split"
-        generate_graphs(scenario,run_name,num_agents,seasons,mixed_allotments=mixed_allotments)
+        process_norms = get_bool(get_input("Did the run write rule-based norms to file? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+        generate_graphs(scenario,run_name,num_agents,seasons,mixed_allotments=mixed_allotments,society_mix=society_mix,process_norms=process_norms)

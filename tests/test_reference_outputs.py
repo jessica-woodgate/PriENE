@@ -11,14 +11,16 @@ TRAINED_CHECKPOINTS = "data/model_variables/200_days/4_agents/"
 TRAINED_CHECKPOINTS_ABS = os.path.abspath(TRAINED_CHECKPOINTS) + "/"
 
 # sha256 of the reports (read and rewritten by pandas) from a seeded run of each scenario, made with
-# the code before unequal starting health, seasons and allotment regrowth delays were options
+# the code before unequal starting health, seasons and allotment regrowth delays were options. The model
+# episode reports were remade when mean_berries, variance_health and gini_berries_consumed were corrected to
+# be over each episode's agent rows (and mean_health changed by rounding only); every other column is unchanged
 REFERENCE_REPORT_HASHES = {
     "agent_reports_allotment.csv": "a713b6e3f6f34ec27259436ab2f6ce437393a0247830e90454aa53b8f7a24cc1",
     "agent_reports_capabilities.csv": "4dc0236c5b50dfaf8cccff8e9c82f788bb43701247bd599de8c6e8a36a7748da",
     "agent_reports_colours.csv": "cc7e9e9f9e481b34d9f87a9fdb39cc1b1d581dfc096bcd849087e387e0bd0bd3",
-    "model_episode_reports_allotment.csv": "551d284d15a8276d0cf5d592e27d2737d14e401fb41bc9a93d4af3035ec44285",
-    "model_episode_reports_capabilities.csv": "66680a3af0792640d8a098d509eac606f924fe40298b199d46e5015f84030309",
-    "model_episode_reports_colours.csv": "f2ba7f29c1f5595b8ff5d098e827dae756046e004e12156697c261c76bb5be6d",
+    "model_episode_reports_allotment.csv": "9cb398d7df9fedb301975a73d79f779ac609ceff6cf2d8b7955c7024362ba719",
+    "model_episode_reports_capabilities.csv": "43f9053b174a990dabf31513519f29f5a9868e0ac07520e5c0dd2e6ba810ea31",
+    "model_episode_reports_colours.csv": "83398d068db0af0958376f0cec0b35342a28c5fdf5e6dfcecfdcfde6a5218467",
 }
 
 needs_trained_checkpoints = pytest.mark.skipif(not os.path.isdir(TRAINED_CHECKPOINTS), reason="needs the trained 200_days checkpoints")

@@ -1,4 +1,5 @@
 from ..dqn.dqn import DQN
+from src.harvest_exception import CheckpointExistsException
 import numpy as np
 import os
 
@@ -11,8 +12,11 @@ class DQNDecisionModule():
     Instance variables:
         agent_type, unique_id -- used only to build this agent's checkpoint file paths
         training -- boolean training or testing; gates whether learn() has any effect and whether
-            a fresh network is created vs one loaded from checkpoint_path (see _init_networks)
-        epsilon -- current exploration probability, decayed each learn() call
+            a fresh network is created (refusing a checkpoint_path that already holds one) vs one loaded
+            from checkpoint_path, which must have this agent's input and output sizes (see _init_networks)
+        start_epsilon -- exploration probability at the start of training (episode 1; 1.0 from HarvestModel, so agents start fully exploring)
+        epsilon -- current exploration probability, set each learn() call to start_epsilon*exp(-expl_decay*(episode-1)),
+            never below min_exploration_prob
         min_exploration_prob, expl_decay -- floor and decay rate for epsilon's exponential decay
         actions, n_actions -- this agent's action vocabulary and its size
         shared_replay_buffer -- experience buffer shared across agents (see DQN), or None for a
@@ -27,6 +31,7 @@ class DQNDecisionModule():
         self.agent_type = agent_type
         self.unique_id = unique_id
         self.training = training
+        self.start_epsilon = epsilon
         self.epsilon = epsilon
         self.min_exploration_prob = 0.01
         self.expl_decay = 0.001
@@ -50,18 +55,32 @@ class DQNDecisionModule():
         self.learn_step += 1
         if self.learn_step % self.replace_target_iter == 0:
             self.target_network.copy_weights(self.q_network)
-        self.epsilon = max(self.min_exploration_prob, np.exp(-self.expl_decay*episode))
+        #decays from the epsilon agents start with, which they keep for all of episode 1
+        self.epsilon = max(self.min_exploration_prob, self.start_epsilon*np.exp(-self.expl_decay*(episode-1)))
 
     def save_models(self):
         """
         Save q and target networks to file
         """
-        self.q_network.dqn.save(self.q_checkpoint_path)
-        self.target_network.dqn.save(self.target_checkpoint_path)
+        self._save(self.q_network, self.q_checkpoint_path)
+        self._save(self.target_network, self.target_checkpoint_path)
+
+    def _save(self, network, checkpoint_path):
+        #written beside the checkpoint and then moved over it, so a run stopped while saving leaves the last checkpoint whole
+        saving_path = checkpoint_path.replace(".keras", ".saving.keras")
+        network.dqn.save(saving_path)
+        os.replace(saving_path, checkpoint_path)
     
     def get_epsilon(self):
         return self.epsilon
-    
+
+    def start_episode(self):
+        """
+        Losses are recorded per episode, so get_mean_loss is the mean over the episode that has just ended
+        """
+        if self.training:
+            self.losses = list()
+
     def get_mean_loss(self):
         if len(self.losses) > 1:
             return np.mean(self.losses)
@@ -71,6 +90,10 @@ class DQNDecisionModule():
         self.q_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(self.unique_id)+"/q_model_variables.keras"
         self.target_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(self.unique_id)+"/target_model_variables.keras"
         if self.training:
+            #a training run saves every episode, so it must start somewhere no checkpoint has been saved
+            for path in [self.q_checkpoint_path, self.target_checkpoint_path]:
+                if os.path.exists(path):
+                    raise CheckpointExistsException(path)
             os.makedirs(os.path.dirname(self.q_checkpoint_path), exist_ok=True)
             os.makedirs(os.path.dirname(self.target_checkpoint_path), exist_ok=True)
         self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)

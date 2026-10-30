@@ -1,6 +1,5 @@
 import json
 import pandas as pd
-import networkx as nx
 
 class NormProcessing():
     """

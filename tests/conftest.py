@@ -93,8 +93,7 @@ def use_unequal_instant_allotments(monkeypatch):
 
 
 def make_training_model(tmp_path, agent_type, max_days=10, max_episodes=2, society_mix="homogeneous"):
-    """basic_harvest is the only scenario ever actually trained on (run.py's "train" CLI option
-    hardcodes scenario="basic") -- this mirrors that."""
+    """A training model in basic_harvest, where the paper's agents were trained (any scenario can train; see test_modes.py)."""
     checkpoint_path = str(tmp_path / "checkpoints") + "/"
     return _build(
         "basic", society_mix, NUM_AGENTS * 3, agent_type, True, checkpoint_path,
@@ -121,10 +120,9 @@ def _make_pretrained_checkpoint(tmp_path, agent_type, max_days=5):
 def make_scenario_model(tmp_path, scenario, agent_type, max_days=10, max_episodes=2, society_mix="homogeneous", track_norms=False,
                         norms_module_type="rule_based"):
     """
-    Builds a model for the given scenario/agent_type the way it is actually used in practice:
-    basic_harvest trains (training=True); colours/allotment/capabilities are test-only
-    (training=False), evaluating a policy pretrained on basic_harvest. run.py never trains on
-    colours/allotment/capabilities.
+    Builds a model for the given scenario/agent_type in the paper's workflow: basic_harvest trains
+    (training=True); colours/allotment/capabilities test (training=False) a policy pretrained on
+    basic_harvest. Every scenario can run in either mode; test_modes.py covers the other combinations.
     """
     num_start_berries = NUM_AGENTS * 3
     if scenario == "basic":

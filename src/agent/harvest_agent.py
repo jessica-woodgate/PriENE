@@ -6,7 +6,6 @@ from .modules.bayesian_norms_module import BayesianNormsModule
 from .modules.ethics_module import EthicsModule
 from src.harvest_exception import NumFeaturesException
 from src.harvest_exception import AgentTypeException
-from src.harvest_exception import ImpossibleNormException
 from src.harvest_exception import UnrecognisedNormsModule
 import numpy as np
 
@@ -184,6 +183,7 @@ class HarvestAgent(Agent):
         self.total_episode_reward = 0
         self.current_reward = 0
         self.moving_module.reset()
+        self.decision_module.start_episode()
         if self.track_norms:
             self.norms_module.reset()
     

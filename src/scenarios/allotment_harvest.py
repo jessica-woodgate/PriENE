@@ -59,12 +59,16 @@ class AllotmentHarvest(HarvestModel):
         berry.min_width, berry.max_width, berry.min_height, berry.max_height = self.allocations[holder]["allotment"]
 
     def _default_regrowth_delays(self):
+        return self.default_regrowth_delays(self.num_allotments)
+
+    @classmethod
+    def default_regrowth_delays(cls, num_allotments):
         """
         Regrowth delay of each allotment when none are given: SLOW_ALLOTMENT_DELAY in SLOW_ALLOTMENT (if there is one), 0 elsewhere
         """
-        delays = [0] * self.num_allotments
-        if self.num_allotments > self.SLOW_ALLOTMENT:
-            delays[self.SLOW_ALLOTMENT] = self.SLOW_ALLOTMENT_DELAY
+        delays = [0] * num_allotments
+        if num_allotments > cls.SLOW_ALLOTMENT:
+            delays[cls.SLOW_ALLOTMENT] = cls.SLOW_ALLOTMENT_DELAY
         return delays
 
     def _check_mixed_society(self):

@@ -49,7 +49,8 @@ class RenderPygame():
                 return False
         self.screen.fill(self.colour_map["black"])
         for a in modelInst.schedule.agents:
-            if hasattr(a, "off_grid") and a.off_grid:
+            #dead agents, and berries waiting to regrow, are off the grid
+            if (hasattr(a, "off_grid") and a.off_grid) or a.pos is None:
                 continue
             x = a.pos[0] * self.block_size
             y = a.pos[1] * self.block_size

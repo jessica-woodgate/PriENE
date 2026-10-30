@@ -45,6 +45,9 @@ class RandomDecisions:
     def get_epsilon(self):
         return 0.0
 
+    def start_episode(self):
+        pass
+
     def get_mean_loss(self):
         return 0
 

@@ -37,10 +37,12 @@ def test_harvest_model_gini_berries_consumed(values, expected_gini):
     assert HarvestModel._gini_berries_consumed(stub) == pytest.approx(expected_gini)
 
 
-def test_harvest_model_gini_returns_zero_when_no_living_agents():
+def test_harvest_model_gini_is_measured_when_no_agents_are_living():
+    # an episode can end with every agent dead; the berries they consumed are still unequally shared
     stub = make_model_stub([1, 2, 3])
+    living = make_model_stub([1, 2, 3])
     stub.living_agents = []
-    assert HarvestModel._gini_berries_consumed(stub) == 0
+    assert HarvestModel._gini_berries_consumed(stub) == pytest.approx(HarvestModel._gini_berries_consumed(living)) == pytest.approx(2 / 9)
 
 
 @pytest.mark.parametrize("values,expected_gini", GINI_CASES)

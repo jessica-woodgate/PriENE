@@ -4,7 +4,7 @@ from collections import Counter
 import pandas as pd
 import pytest
 
-from src.harvest_exception import BerryOffGrid, SeasonsException, SeasonsNotSupported
+from src.harvest_exception import BerryOffGrid, SeasonsException
 from src.harvest_model import HarvestModel
 from tests.conftest import NUM_AGENTS, TEST_SCENARIOS, _build, _make_pretrained_checkpoint, long_lived
 
@@ -261,10 +261,32 @@ def test_season_change_raises_if_a_berry_is_off_the_grid(in_tmp_dir, checkpoint_
         model._start_new_season()
 
 
-def test_seasons_with_basic_raise(in_tmp_dir):
-    with pytest.raises(SeasonsNotSupported):
-        _build("basic", "homogeneous", NUM_AGENTS * 3, "baseline", True, str(in_tmp_dir / "ckpt") + "/",
-               False, False, "basic", 2, 10, seasons=True)
+@pytest.mark.parametrize("training", [True, False])
+def test_basic_seasons_change_the_whole_societys_berries_by_num_agents(in_tmp_dir, checkpoint_path, training, monkeypatch):
+    # basic is one group of every agent holding every berry
+    force_qualities(monkeypatch, lambda self: {0: "normal", 1: "good", 2: "bad"}[self.season % 3])
+    path = str(in_tmp_dir / "fresh") + "/" if training else checkpoint_path
+    model = long_lived(_build("basic", "homogeneous", NUM_AGENTS * 3, "baseline", training, path, False, False, "basic", 2, 20,
+                              seed=42, seasons=True, season_length=SEASON_LENGTH))
+    assert list(model.allocations) == ["allocation_0"] and model.allocations["allocation_0"]["agent_ids"] == list(range(NUM_AGENTS))
+    totals = {"normal": NUM_AGENTS * 3, "good": NUM_AGENTS * 4, "bad": NUM_AGENTS * 2}
+    seen = set()
+
+    def check(m):
+        quality = m._current_season_quality()
+        seen.add(quality)
+        assert len(m.berries) == m.num_berries == totals[quality]
+        assert all(b.allocation_id == "allocation_0" and b.pos is not None and not b.foraged for b in m.berries)
+        for agent in m.get_living_agents():
+            assert m._seasonal_berry_target(agent) == totals[quality]
+    check(model)
+    run_episode(model, check)
+    # reset at the start of each episode: back to season 0 and the original berries
+    assert model.episode == 2 and model.season == 0 and model._current_season_quality() == "normal"
+    assert sorted(b.unique_id for b in model.berries) == sorted(b.unique_id for b in model.original_berries)
+    check(model)
+    run_episode(model, check)
+    assert seen == {"normal", "good", "bad"}
 
 
 @pytest.mark.parametrize("season_length", [0, -1, 2.5])

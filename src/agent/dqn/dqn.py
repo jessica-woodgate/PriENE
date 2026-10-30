@@ -1,5 +1,9 @@
 from .n_network import NNetwork
+from src.harvest_exception import CheckpointNotFoundException
+from src.harvest_exception import CheckpointMismatchException
+from src.checkpoints import recorded_agent_types
 import numpy as np
+import os
 import tensorflow as tf
 import keras
 from keras import losses
@@ -46,7 +50,20 @@ class DQN:
         if self.training:
             self.dqn = NNetwork(self.n_actions,self.n_features,self.hidden_units)
         else:
-            self.dqn = keras.models.load_model(self.checkpoint_path,compile=True, custom_objects={"NNetwork": NNetwork})
+            self.dqn = self._load(self.checkpoint_path)
+
+    def _load(self, checkpoint_path):
+        """
+        Load a saved network, checking it has this agent's input and output sizes (they depend only on the number of agents)
+        """
+        if not os.path.exists(checkpoint_path):
+            #<society folder>/<agent type>/agent_<id>/<network>.keras; agents trained together in a mixed society record their types there
+            society_path = os.path.dirname(os.path.dirname(os.path.dirname(checkpoint_path)))
+            raise CheckpointNotFoundException(checkpoint_path, recorded_agent_types(society_path+"/"))
+        dqn = keras.models.load_model(checkpoint_path,compile=True, custom_objects={"NNetwork": NNetwork})
+        if tuple(dqn.n_features) != tuple(self.n_features) or dqn.n_actions != self.n_actions:
+            raise CheckpointMismatchException(checkpoint_path, self.n_features[0], self.n_actions, tuple(dqn.n_features)[0], dqn.n_actions)
+        return dqn
     
     def train(self, TargetNet):
         """

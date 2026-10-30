@@ -38,7 +38,8 @@ class HarvestModel(Model):
         max_with -- width of grid
         max_height -- height of grid
         grid -- grid object
-        shared_replay_buffer -- replay buffer to share amongst agents to reduce training time
+        shared_replay_buffers -- dict mapping each agent type to the replay buffer its agents share to reduce training time; agents of
+            different types (in a mixed society) are rewarded differently, so they never learn from each other's experiences
         agent_id -- tracker for unique agent ids
         berry_id -- tracker for unique berry ids
         episode -- current episode
@@ -53,8 +54,8 @@ class HarvestModel(Model):
         emerged_norms -- all norms which emerge in current episode
         epsilon -- probability of exploration for agents (tracks when to end training)
         seed -- random seed for the run (None = unseeded)
-        allocations -- dict mapping each holder (an allocation key: a capability group, an allotment, or in colours a single agent) to its
-            agents and berry allocation (None for scenarios without allocations)
+        allocations -- dict mapping each holder (an allocation key: a capability group, an allotment, in colours a single agent, or in basic
+            the whole society) to its agents and berry allocation
         seasons -- boolean for every season, including the first of each episode, to get a quality drawn at random from SEASON_QUALITIES;
             in a good season each holder's target is its allocation plus one berry per agent in the holder, in a bad season minus one per
             agent (at least 0); allocations always stay with the same holder
@@ -87,7 +88,7 @@ class HarvestModel(Model):
         self.max_width = max_width
         self.max_height = max_height
         self.grid = MultiGrid(self.max_width, self.max_height, False)
-        self.shared_replay_buffer = {"s": [], "a": [], "r": [], "s_": [], "done": []}
+        self.shared_replay_buffers = {}
         self.agent_id = 0
         self.berry_id = 0
         self.episode = 1
@@ -102,7 +103,8 @@ class HarvestModel(Model):
         self.emerged_norms = {}
         self.previous_learned_norms = {}
         if self.training:
-            self.epsilon = 0.9
+            #agents start training fully exploring, and epsilon decays from there each episode
+            self.epsilon = 1.0
         else:
             self.epsilon = 0.0
         if seasons and (not isinstance(season_length, int) or season_length < 1):
@@ -143,7 +145,6 @@ class HarvestModel(Model):
                 self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.filepath+"_emerged_norms.json")
             else:
                 self._analyse_agent_norms()
-                #self._write_agent_norms_to_file()
         for a in self.schedule.agents:
             if a.agent_type != "berry":
                 a.finish_episode(self.day)
@@ -223,9 +224,6 @@ class HarvestModel(Model):
     def get_num_agents(self):
         return self.num_agents
     
-    def get_num_living_agents(self):
-        return len(self.living_agents)
-    
     def get_living_agents(self):
         return self.living_agents
 
@@ -269,7 +267,8 @@ class HarvestModel(Model):
         return self.num_agents // 2
 
     def _add_agent(self, i, agent_type, allotment, checkpoint_path, allocation_id=None):
-        a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.track_norms,shared_replay_buffer=self.shared_replay_buffer,allocation_id=allocation_id,norms_module_type=self.norms_module_type)
+        shared_replay_buffer = self.shared_replay_buffers.setdefault(agent_type, {"s": [], "a": [], "r": [], "s_": [], "done": []})
+        a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.track_norms,shared_replay_buffer=shared_replay_buffer,allocation_id=allocation_id,norms_module_type=self.norms_module_type)
         self.schedule.add(a)
         self._place_agent_in_allotment(a)
         if a.agent_type != "berry":
@@ -369,7 +368,13 @@ class HarvestModel(Model):
         """
         if self.allocations is None:
             return None
-        return self._season_targets()[agent.allocation_id]
+        return self._season_targets()[self._holder_of(agent)]
+
+    def _holder_of(self, agent):
+        """
+        The holder (allocation key) whose berries the agent forages; basic overrides this, since its agents aren't restricted to an allocation
+        """
+        return agent.allocation_id
 
     def _start_new_season(self):
         """
@@ -577,22 +582,23 @@ class HarvestModel(Model):
         return len(agent.norms_module.get_learned_behaviours())
 
     def _collect_model_episode_data(self):
-        row_index_list = self.agent_reporter.index[self.agent_reporter["episode"] == self.episode].tolist()
-        new_entry = pd.DataFrame({"episode": [self.episode], 
+        #every row of the agent reporter is added with index 0, so select this episode's rows by value, not by index
+        rows = self.agent_reporter[self.agent_reporter["episode"] == self.episode]
+        new_entry = pd.DataFrame({"episode": [self.episode],
                                "end_day": [self.day],
                                "epsilon": [self.epsilon],
                                "mean_reward": [self._mean_reward()],
                                "mean_loss": [self._mean_loss()],
-                               "max_berries": [self.agent_reporter["berries"].loc[row_index_list].max()],
-                               "mean_berries": [self.agent_reporter["berries"].iloc[row_index_list].mean(axis=0)],
-                               "max_berries_consumed": [self.agent_reporter["berries_consumed"].loc[row_index_list].max()],
-                               "mean_berries_consumed": [self.agent_reporter["berries_consumed"].loc[row_index_list].mean(axis=0)],
+                               "max_berries": [rows["berries"].max()],
+                               "mean_berries": [rows["berries"].mean(axis=0)],
+                               "max_berries_consumed": [rows["berries_consumed"].max()],
+                               "mean_berries_consumed": [rows["berries_consumed"].mean(axis=0)],
                                "gini_berries_consumed": [self._gini_berries_consumed()],
-                               "mean_berries_thrown": [self.agent_reporter["berries_thrown"].loc[row_index_list].mean(axis=0)],
-                               "max_health": [self.agent_reporter["health"].loc[row_index_list].max()],
-                               "mean_health": [self.agent_reporter["health"].loc[row_index_list].mean(axis=0)],
-                               "median_health": [self.agent_reporter["health"].loc[row_index_list].median()],
-                               "variance_health": [self.agent_reporter["health"].loc[row_index_list].var(axis=0)],
+                               "mean_berries_thrown": [rows["berries_thrown"].mean(axis=0)],
+                               "max_health": [rows["health"].max()],
+                               "mean_health": [rows["health"].mean(axis=0)],
+                               "median_health": [rows["health"].median()],
+                               "variance_health": [rows["health"].var(axis=0)],
                                "deceased": [self.num_agents - len(self.living_agents)],
                                "num_emerged_norms": [len(self.emerged_norms) if self.track_norms else None],
                                "seed": [self.seed]})
@@ -651,25 +657,6 @@ class HarvestModel(Model):
                          "num_learned_uncooperative_norms": sum(b["type"] == "prohibition" and b["action"] == "throw" for b in learned)})
             self.previous_learned_norms[agent.unique_id] = learned_ids
         pd.DataFrame(rows, columns=self._agent_norms_columns()).to_csv(self._agent_norms_csv_filename(), header=None, mode='a', index=False)
-
-    def _write_agent_norms_to_file(self):
-        """
-        Writes the norms each agent has learned by the end of this episode to that agent's own JSON file
-        (<filepath>_agent_<id>_norms.json), keyed by episode number
-        """
-        for agent in self.schedule.agents:
-            if agent.agent_type == "berry":
-                continue
-            learned_norms = {}
-            for b in agent.norms_module.get_learned_behaviours():
-                times_precondition_met, times_action_matched = agent.norms_module.behaviour_counts(b["precondition_key"], b["action_idx"], b["type"])
-                learned_norms[b["label"]] = {"type": b["type"],
-                                             "precondition": b["precondition"],
-                                             "action": b["action"],
-                                             "posterior": float(b["posterior"]),
-                                             "times_precondition_met": times_precondition_met,
-                                             "times_action_matched": times_action_matched}
-            self._append_norm_dict_to_file(learned_norms, "data/results/current_run/"+self.filepath+"_agent_"+str(agent.unique_id)+"_norms.json")
 
     def _agent_norms_csv_filename(self):
         return "data/results/current_run/agent_norms_"+self.filepath+".csv"
@@ -868,8 +855,7 @@ class HarvestModel(Model):
         return allocations.tolist()
 
     def _gini_berries_consumed(self):
-        if len(self.living_agents) == 0:
-            return 0
+        #over every agent, dead or alive, so an episode that ends with every agent dead still has its inequality measured
         berries_consumed = [a.berries_consumed for a in self.schedule.agents if a.agent_type != "berry"]
         x = sorted(berries_consumed)
         s = sum(x)

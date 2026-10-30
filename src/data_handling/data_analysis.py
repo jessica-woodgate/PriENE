@@ -1,8 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import json
-import csv
 import numpy as np
 from collections import Counter
 from src.data_handling.norm_processing import NormProcessing
@@ -31,8 +29,11 @@ class DataAnalysis():
         if end_episode_totals_dfs == None:
             end_episode_totals_dfs, agent_final_rows_dfs, normalised_df_list, self.best_aggregation = self._process_agent_dfs(agent_df_list, df_labels, write, get_normalised)
         else:
-            #if data has already been analysed
+            #if data has already been analysed, the best aggregation comes from the episode totals given
             agent_final_rows_dfs = agent_df_list
+            normalised_df_list = None
+            central_tendencies = pd.DataFrame([self._calculate_central_tendency(df, label) for df, label in zip(end_episode_totals_dfs, df_labels)])
+            self.best_aggregation = self._get_best_results(central_tendencies, "aggregations")
         if write:
             self._display_graphs(agent_final_rows_dfs, end_episode_totals_dfs, df_labels, normalised_df_list)
         #the season and regrowth columns are set by the run, not outcomes of it, so they aren't tested for significance;
@@ -90,7 +91,6 @@ class DataAnalysis():
             self._berries_consumed_results(normalised_sum_df_list, df_labels, self.filepath+"berries_consumed")
         self._display_end_episode(end_episode_df_list, df_labels)
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", self.filepath+"violin_end_day", "Violin Plot of Episode Length", "End Day")
-        #self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "total_berries", self.filepath+"violin_total_berries", "Violin Plot of Total Berries Consumed", "Berries Consumed")
 
     def _normalise_step_across_episodes(self, df, df_label, write):
         """
@@ -164,44 +164,32 @@ class DataAnalysis():
         return agent_end_episode_df
 
     def _days_left_to_live_results(self, sum_df_list, df_labels, filename):
-        days_left_to_live_tendency = {}
         max_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_max)
         self._display_dataframe(max_days_left_to_live, "Max Days Left To Live", "Days Left To Live", filename+"_max")
         min_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_min)
         self._display_dataframe(min_days_left_to_live, "Min Days Left To Live", "Days Left To Live", filename+"_min")
-        days_left_to_live_tendency["min_well_being"] = self._calculate_normalised_central_tendency(min_days_left_to_live, df_labels)
         total_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_total)
         self._display_dataframe(total_days_left_to_live, "Total Days Left To Live", "Days Left To Live", filename+"_total")
-        days_left_to_live_tendency["total_well_being"] = self._calculate_normalised_central_tendency(total_days_left_to_live, df_labels)
         gini_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_gini)
         self._display_dataframe(gini_days_left_to_live, "Gini Index of Days Left To Live", "Days Left To Live", filename+"_gini")
-        days_left_to_live_tendency["gini_well_being"] = self._calculate_normalised_central_tendency(gini_days_left_to_live, df_labels)
         max_days_left_to_live.to_csv(self.filepath+"max_days_left_to_live.csv")
         min_days_left_to_live.to_csv(self.filepath+"min_days_left_to_live.csv")
         gini_days_left_to_live.to_csv(self.filepath+"gini_days_left_to_live.csv")
         total_days_left_to_live.to_csv(self.filepath+"total_days_left_to_live.csv")
-        # with open(self.filepath+"tendency_well_being.json", "w") as f:
-        #     json.dump(days_left_to_live_tendency, f, indent=4)
 
     def _berries_consumed_results(self, sum_df_list, df_labels, filename):
-        berries_consumed_tendency = {}
         max_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_max)
         self._display_dataframe(max_berries_consumed, "Max Berries Consumed", "Berries Consumed", filename+"_max")
         min_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_min)
         self._display_dataframe(min_berries_consumed, "Min Berries Consumed", "Berries Consumed", filename+"_min")
-        berries_consumed_tendency["min_berries"] = self._calculate_normalised_central_tendency(min_berries_consumed, df_labels)
         total_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_total)
         self._display_dataframe(total_berries_consumed, "Total Berries Consumed", "Berries Consumed", filename+"_total")
-        berries_consumed_tendency["total_berries"] = self._calculate_normalised_central_tendency(total_berries_consumed, df_labels)
         gini_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_gini)
         self._display_dataframe(gini_berries_consumed, "Gini Index of Berries Consumed", "Berries Consumed", filename+"_gini")
-        berries_consumed_tendency["gini_berries"] = self._calculate_normalised_central_tendency(gini_berries_consumed, df_labels)
         max_berries_consumed.to_csv(self.filepath+"max_berries_consumed.csv")
         min_berries_consumed.to_csv(self.filepath+"min_berries_consumed.csv")
         gini_berries_consumed.to_csv(self.filepath+"gini_berries_consumed.csv")
         total_berries_consumed.to_csv(self.filepath+"total_berries_consumed.csv")
-        # with open(self.filepath+"tendency_berries_consumed.json", "w") as f:
-        #     json.dump(berries_consumed_tendency, f, indent=4)
 
     def _display_swarmplot(self, df_list, df_labels, column, filename):
         #combine the DataFrames and add labels
