@@ -1,4 +1,6 @@
 from src.harvest_exception import CheckpointExistsException
+import csv
+import glob
 import json
 import os
 import re
@@ -12,6 +14,8 @@ CHECKPOINTS_DIR = "data/model_variables/"
 TRAINED_DIR = CHECKPOINTS_DIR+"trained/"
 SETTINGS_FILE = "settings.json"
 AGENT_TYPES_FILE = "agent_types.json"
+#beside each agent's networks: the last episode they were saved after, so a stopped training run can be continued from the next
+PROGRESS_FILE = "progress.json"
 MIXED_SUFFIX = "_with_baseline"
 
 def training_checkpoint_name(scenario, seasons, season_length, num_allocations, allotment_regrowth_delays, max_days, seed,
@@ -49,6 +53,37 @@ def society_checkpoint_path(checkpoint_path, society_mix, agent_type):
         return checkpoint_path
     return checkpoint_path+agent_type+MIXED_SUFFIX+"/"
 
+def training_folder(checkpoint_path, society_mix, agent_type):
+    """
+    Folder a training run of agent_type saves every one of its agents into: <type>/ of a society of one type, or the mixed society's folder
+    """
+    if society_mix == "homogeneous":
+        return checkpoint_path+agent_type+"/"
+    return society_checkpoint_path(checkpoint_path, society_mix, agent_type)
+
+def record_progress(agent_path, episode):
+    #written beside it and moved into place, so a run stopped while recording leaves the last record whole
+    writing_path = agent_path+PROGRESS_FILE+".writing"
+    with open(writing_path, "w") as file:
+        json.dump({"episode": episode}, file)
+    os.replace(writing_path, agent_path+PROGRESS_FILE)
+
+def finished_episode(folder, report_path=None):
+    """
+    Last episode a stopped training run (saving into folder) finished: the last every agent saved its networks after, and that its report
+    has a row for, if it wrote one (runs saved before progress was recorded go by their report alone); None if neither says
+    """
+    episodes = []
+    for path in glob.glob(folder+"**/"+PROGRESS_FILE, recursive=True):
+        with open(path) as file:
+            episodes.append(json.load(file)["episode"])
+    if report_path is not None and os.path.exists(report_path):
+        with open(report_path) as file:
+            reported = [int(float(row["episode"])) for row in csv.DictReader(file)]
+        if reported:
+            episodes.append(reported[-1])
+    return min(episodes) if episodes else None
+
 def loading_checkpoint_path(checkpoint_path, society_mix, agent_type):
     """
     Folder a test run loads <type>/agent_<id> checkpoints from: for a mixed society, the agents trained together if checkpoint_path has
@@ -71,15 +106,13 @@ def recorded_agent_types(society_path):
     with open(path) as file:
         return json.load(file)
 
-def prepare_training_checkpoints(checkpoint_path, agent_types, settings, society_mix="homogeneous"):
+def prepare_training_checkpoints(checkpoint_path, agent_types, settings, society_mix="homogeneous", continuing=()):
     """
-    Check no agent type would overwrite a checkpoint before any training starts, and record the settings next to the checkpoints
-    (an existing record must match, so agent types trained separately share one set of settings)
+    Check no agent type would overwrite a checkpoint before any training starts (except the agent types in continuing, whose stopped runs
+    are being continued), and record the settings next to the checkpoints (an existing record must match, so agent types trained
+    separately, or a run and its continuation, share one set of settings)
     """
-    if society_mix == "homogeneous":
-        folders = [checkpoint_path+agent_type for agent_type in agent_types]
-    else:
-        folders = [society_checkpoint_path(checkpoint_path, society_mix, agent_type) for agent_type in agent_types]
+    folders = [training_folder(checkpoint_path, society_mix, agent_type) for agent_type in agent_types if agent_type not in continuing]
     existing = [folder for folder in folders if os.path.exists(folder)]
     if existing:
         raise CheckpointExistsException(", ".join(existing))

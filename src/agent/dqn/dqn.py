@@ -21,14 +21,14 @@ class DQN:
         actions -- possible actions
         n_actions -- number of possible actions (output of network)
         training -- boolean for training (learning) or testing (no learning)
-        checkpoint_path -- name of path to save and load model
+        checkpoint_path -- name of path to save and load model; a new network is created to train, unless continuing a training run
         experience -- buffer for experience history; shared or individual
         min_experiences -- minimum number of experiences before learning can happen
         max_experiences -- maximum size of experience replay buffer
         optimiser -- learning optimiser
         delta -- parameter for Huber loss
     """
-    def __init__(self,actions,n_features,training,checkpoint_path=None,shared_replay_buffer=None):
+    def __init__(self,actions,n_features,training,checkpoint_path=None,shared_replay_buffer=None,continuing=False):
         self.gamma = 0.95
         self.lr = 0.0001
         self.total_episode_reward = 0
@@ -47,7 +47,7 @@ class DQN:
         self.max_experiences = 100000
         self.optimiser = keras.optimizers.Adam(learning_rate=self.lr)
         self.delta = 1.0
-        if self.training:
+        if self.training and not continuing:
             self.dqn = NNetwork(self.n_actions,self.n_features,self.hidden_units)
         else:
             self.dqn = self._load(self.checkpoint_path)

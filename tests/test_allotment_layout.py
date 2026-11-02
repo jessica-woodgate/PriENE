@@ -30,7 +30,7 @@ LAYOUTS = [(n, k, width, height) for n in AGENT_COUNTS for k in allotment_counts
 
 class RandomDecisions:
     """Stands in for DQNDecisionModule: an untrained agent choosing actions uniformly at random, without building networks."""
-    def __init__(self, agent_type, unique_id, training, actions, n_features, checkpoint_path, epsilon, shared_replay_buffer=None):
+    def __init__(self, agent_type, unique_id, training, actions, n_features, checkpoint_path, epsilon, shared_replay_buffer=None, start_episode=1):
         self.actions = actions
 
     def choose_action(self, observation):
@@ -39,7 +39,7 @@ class RandomDecisions:
     def learn(self, *args):
         pass
 
-    def save_models(self):
+    def save_models(self, episode):
         pass
 
     def get_epsilon(self):

@@ -33,31 +33,33 @@ GRID = {
 def _build(scenario, society_mix, num_start_berries, agent_type, training, checkpoint_path,
            write_data, write_norms, filepath, max_episodes, max_days, seed=None,
            norms_module_type="rule_based", seasons=False, season_length=25,
-           num_allocations=NUM_ALLOCATIONS, allotment_regrowth_delays=None, mixed_allotments="split"):
+           num_allocations=NUM_ALLOCATIONS, allotment_regrowth_delays=None, mixed_allotments="split", start_episode=1):
     max_width, max_height = GRID[scenario]
     if scenario == "basic":
         return BasicHarvest(
             society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
             max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed, norms_module_type,
-            seasons, season_length, allotment_regrowth_delays,
+            seasons, season_length, allotment_regrowth_delays, start_episode=start_episode,
         )
     elif scenario == "colours":
         return ColoursHarvest(
             society_mix, NUM_AGENTS, num_start_berries, agent_type, max_width, max_height,
             max_episodes, max_days, training, checkpoint_path, write_data, write_norms, filepath, seed, norms_module_type,
-            seasons, season_length, allotment_regrowth_delays,
+            seasons, season_length, allotment_regrowth_delays, start_episode=start_episode,
         )
     elif scenario == "allotment":
         return AllotmentHarvest(
             society_mix, NUM_AGENTS, num_start_berries, num_allocations, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
             write_norms, filepath, seed, norms_module_type, seasons, season_length, allotment_regrowth_delays, mixed_allotments,
+            start_episode=start_episode,
         )
     elif scenario == "capabilities":
         return CapabilitiesHarvest(
             society_mix, NUM_AGENTS, num_start_berries, num_allocations, agent_type, max_width,
             max_height, max_episodes, max_days, training, checkpoint_path, write_data,
             write_norms, filepath, seed, norms_module_type, seasons, season_length, allotment_regrowth_delays,
+            start_episode=start_episode,
         )
     raise ValueError(f"unknown scenario {scenario}")
 

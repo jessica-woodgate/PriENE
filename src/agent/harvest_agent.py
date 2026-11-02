@@ -80,7 +80,8 @@ class HarvestAgent(Agent):
             self.allocation_id = self.unique_id
         else:
             self.allocation_id = allocation_id
-        self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer)
+        #a continued training run starts from a later episode (see HarvestModel)
+        self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer,model.episode)
         self.moving_module = MovingModule(self.unique_id, model, training, allotment, self.allocation_id, restrict_to_allocation)
         self.track_norms = track_norms
         self.norms_module_type = norms_module_type
@@ -168,7 +169,7 @@ class HarvestAgent(Agent):
         if self.off_grid == False:
             self.days_survived = end_day
         if self.training:
-            self.decision_module.save_models()
+            self.decision_module.save_models(self.model.episode)
 
     def reset(self):
         """

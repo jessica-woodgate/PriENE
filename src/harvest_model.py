@@ -42,7 +42,8 @@ class HarvestModel(Model):
             different types (in a mixed society) are rewarded differently, so they never learn from each other's experiences
         agent_id -- tracker for unique agent ids
         berry_id -- tracker for unique berry ids
-        episode -- current episode
+        episode -- current episode, starting from start_episode: 1, or the episode a stopped training run continues from (its agents then
+            load the networks it saved, and its report is continued)
         training -- boolean training or testing
         filepath -- file path for current run
         write_data -- boolean to write data to file
@@ -75,7 +76,7 @@ class HarvestModel(Model):
     #spawn key for the random stream that chooses which agents of a mixed society are baseline
     MIXED_SOCIETY_STREAM = 1
 
-    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None):
+    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,start_episode=1):
         super().__init__()
         self._set_seed(seed)
         self.num_agents = num_agents
@@ -94,7 +95,7 @@ class HarvestModel(Model):
         self.shared_replay_buffers = {}
         self.agent_id = 0
         self.berry_id = 0
-        self.episode = 1
+        self.episode = start_episode
         self.training = training
         self.filepath = filepath
         self.write_data = write_data
@@ -223,6 +224,19 @@ class HarvestModel(Model):
         keras.utils.set_random_seed(seed)
         tensorflow.config.experimental.enable_op_determinism()
         self.reset_randomizer(seed)
+
+    def reseed_for_continuing(self):
+        """
+        A continued training run is built from its seed, so its agents and their groups are the same as when it started; call this once it
+        is built to reseed every random stream from the seed and the episode it continues from, so it doesn't repeat the run's first episodes
+        """
+        if self.seed is None:
+            return
+        seed = int(np.random.SeedSequence([self.seed, self.episode]).generate_state(1)[0])
+        keras.utils.set_random_seed(seed)
+        self.reset_randomizer(seed)
+        if self.seasons:
+            self.season_rng = np.random.default_rng([self.seed, self.episode])
 
     def get_num_agents(self):
         return self.num_agents
@@ -557,13 +571,27 @@ class HarvestModel(Model):
                                "num_emerged_norms": [],
                                "seed": []})
         if self.write_data:
-            if exists("data/results/current_run/model_episode_reports_"+self.filepath+".csv"):
-                raise FileExistsException("data/results/current_run/model_episode_reports_"+self.filepath+".csv")
-            self.model_episode_reporter.to_csv("data/results/current_run/model_episode_reports_"+self.filepath+".csv", mode='a',index=False)
+            report_path = "data/results/current_run/model_episode_reports_"+self.filepath+".csv"
+            if self.training and self.episode > 1 and exists(report_path):
+                self._continue_report(report_path)
+            else:
+                if exists(report_path):
+                    raise FileExistsException(report_path)
+                self.model_episode_reporter.to_csv(report_path, mode='a',index=False)
         if self.track_norms and self.norms_module_type == "bayesian":
             if exists(self._agent_norms_csv_filename()):
                 raise FileExistsException(self._agent_norms_csv_filename())
             pd.DataFrame(columns=self._agent_norms_columns()).to_csv(self._agent_norms_csv_filename(), mode='a', index=False)
+
+    def _continue_report(self, report_path):
+        """
+        A continued training run carries on its report, without the episodes it is about to train again; written beside it and
+        moved over it, so stopping now leaves the report whole
+        """
+        reports = pd.read_csv(report_path)
+        writing_path = report_path+".writing"
+        reports[reports["episode"] < self.episode].to_csv(writing_path, index=False)
+        os.replace(writing_path, report_path)
 
     def _collect_agent_data(self, agent):
         new_entry = pd.DataFrame({"agent_id": [agent.unique_id],

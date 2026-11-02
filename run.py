@@ -7,10 +7,12 @@ from src.data_handling.render_pygame import RenderPygame
 from src.agent.harvest_agent import NORMS_MODULE_TYPES
 from src.checkpoints import RUN_OPTIONS, DEFAULT_CHECKPOINT
 from src.checkpoints import training_checkpoint_name, training_checkpoint_path, prepare_training_checkpoints
-from src.checkpoints import society_checkpoint_path, loading_checkpoint_path, record_agent_types
+from src.checkpoints import society_checkpoint_path, loading_checkpoint_path, record_agent_types, training_folder, finished_episode
 from src.checkpoints import resolve_checkpoint, trained_checkpoints, checkpoint_max_days, days_in_name
+from src.harvest_exception import CheckpointExistsException
 import pandas as pd
 import argparse
+import os
 import wandb
 import time
 
@@ -144,27 +146,56 @@ def get_max_days_input(checkpoint_name, checkpoint_path):
         print(f"Testing with {max_days} days in each episode, as the checkpoint was trained.")
     return max_days
 
-def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split"):
+def output_file_string(training, scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix, agent_type):
+    #training outputs are named apart from testing outputs, so testing the same scenario doesn't clash with them
+    return ("train_" if training else "")+scenario_file_string(scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix)+"_"+agent_type
+
+def get_continue_training_input(checkpoint_path, agent_types, society_mix, file_strings):
+    """
+    For each agent type whose training run has already saved into checkpoint_path, ask whether to continue it from the episode after the
+    last one it finished, since training never overwrites a run. Returns the episode each continued agent type starts from
+    file_strings -- each agent type's training output name, so its report is found
+    """
+    start_episodes = {}
+    for agent_type in agent_types:
+        folder = training_folder(checkpoint_path, society_mix, agent_type)
+        if not os.path.exists(folder):
+            continue
+        finished = finished_episode(folder, "data/results/current_run/model_episode_reports_"+file_strings[agent_type]+".csv")
+        if finished is None:
+            print(f"No episode of {agent_type}'s training in {folder} finished, so there is nothing to continue; move it to train again.")
+            raise CheckpointExistsException(folder)
+        continue_run = get_bool(get_input(f"{agent_type}'s training in {folder} stopped after episode {finished}. Do you want to continue it from episode {finished+1}? (y, n): ",
+                                          "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+        if not continue_run:
+            raise CheckpointExistsException(folder)
+        start_episodes[agent_type] = finished+1
+    return start_episodes
+
+def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episode=1):
     """
     checkpoint_path is the folder holding the checkpoints for this number of agents: training saves there, testing loads from it
     (in a mixed society, from the folder of agent_type trained with baseline agents; see society_checkpoint_path)
+    start_episode is 1, or the episode a stopped training run continues from
     """
-    #training outputs are named apart from testing outputs, so testing the same scenario doesn't clash with them
-    file_string = ("train_" if training else "")+scenario_file_string(scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix)+"_"+agent_type
+    file_string = output_file_string(training, scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix, agent_type)
     if training:
         checkpoint_path = society_checkpoint_path(checkpoint_path, society_mix, agent_type)
     else:
         checkpoint_path = loading_checkpoint_path(checkpoint_path, society_mix, agent_type)
     if scenario == "basic":
-        model_inst = BasicHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays)
+        model_inst = BasicHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode)
     elif scenario == "colours":
-        model_inst = ColoursHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays)
+        model_inst = ColoursHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments)
+        model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode=start_episode)
     elif scenario == "capabilities":
-        model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays)
+        model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode)
     else:
         raise ValueError("Unknown argument: "+scenario)
+    if start_episode > 1:
+        model_inst.reseed_for_continuing()
+        print(f"Continuing {agent_type}'s training from episode {start_episode}")
     if training and society_mix != "homogeneous":
         record_agent_types(checkpoint_path, model_inst.get_living_agents())
     run_simulation(model_inst,render,log_wandb,wandb_project)
@@ -173,9 +204,10 @@ def agent_types_to_run(society_mix):
     #in a mixed society half the agents are baseline, so baseline alone isn't run
     return AGENT_TYPES[1:] if society_mix == "heterogeneous" else AGENT_TYPES
 
-def run_all(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split"):
+def run_all(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episodes=None):
     for agent_type in agent_types_to_run(society_mix):
-        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments)
+        start_episode = start_episodes.get(agent_type, 1) if start_episodes else 1
+        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode)
 
 def get_mixed_allotments_input(num_allotments):
     """
@@ -315,13 +347,18 @@ elif args.option == "test" or args.option == "train":
         max_days = get_max_days_input(checkpoint_name, checkpoint_path)
     #########################################################################################
     norms_module_type = NORMS_MODULE_TYPES[0]
+    start_episodes = {}
     if training:
-        prepare_training_checkpoints(checkpoint_path, agent_types_to_run(society_mix) if agent_type == "all" else [agent_type],
+        training_types = agent_types_to_run(society_mix) if agent_type == "all" else [agent_type]
+        #a run that has already saved here can only be continued, never overwritten
+        start_episodes = get_continue_training_input(checkpoint_path, training_types, society_mix,
+                                                     {t: output_file_string(training, scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix, t) for t in training_types})
+        prepare_training_checkpoints(checkpoint_path, training_types,
                                      {"scenario": scenario, "seasons": seasons, "season_length": season_length if seasons else None,
                                       "num_allocations": num_allocations, "allotment_regrowth_delays": allotment_regrowth_delays,
                                       "max_days": max_days, "seed": args.seed, "num_agents": num_agents, "society_mix": society_mix,
                                       "mixed_allotments": mixed_allotments if scenario == "allotment" and society_mix != "homogeneous" else None},
-                                     society_mix)
+                                     society_mix, continuing=start_episodes)
         print("Model variables will be written into",checkpoint_path)
         track_norms = False
         render = False
@@ -339,9 +376,9 @@ elif args.option == "test" or args.option == "train":
         log_wandb = False
         wandb_project = None
     if agent_type == "all":
-        run_all(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments)
+        run_all(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episodes=start_episodes)
     else:
-        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments)
+        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episode=start_episodes.get(agent_type, 1))
 #########################################################################################
 elif args.option == "graphs":
     graph_runs = ["current_run", "50_days", "200_days", "paper"]

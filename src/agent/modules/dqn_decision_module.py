@@ -1,5 +1,6 @@
 from ..dqn.dqn import DQN
 from src.harvest_exception import CheckpointExistsException
+from src.checkpoints import record_progress
 import numpy as np
 import os
 
@@ -14,9 +15,10 @@ class DQNDecisionModule():
         training -- boolean training or testing; gates whether learn() has any effect and whether
             a fresh network is created (refusing a checkpoint_path that already holds one) vs one loaded
             from checkpoint_path, which must have this agent's input and output sizes (see _init_networks)
+        continuing -- boolean continuing a stopped training run from start_episode: its saved networks are loaded and trained further
         start_epsilon -- exploration probability at the start of training (episode 1; 1.0 from HarvestModel, so agents start fully exploring)
         epsilon -- current exploration probability, set each learn() call to start_epsilon*exp(-expl_decay*(episode-1)),
-            never below min_exploration_prob
+            never below min_exploration_prob (and so when continuing a run, from the episode it continues from)
         min_exploration_prob, expl_decay -- floor and decay rate for epsilon's exponential decay
         actions, n_actions -- this agent's action vocabulary and its size
         shared_replay_buffer -- experience buffer shared across agents (see DQN), or None for a
@@ -26,15 +28,16 @@ class DQNDecisionModule():
         q_network, target_network -- the two DQN instances (see DQN for why two networks are used)
         losses -- training losses recorded this episode (training mode only), used by get_mean_loss
     """
-    def __init__(self,agent_type,unique_id,training,actions,n_features,checkpoint_path,epsilon,shared_replay_buffer=None):
+    def __init__(self,agent_type,unique_id,training,actions,n_features,checkpoint_path,epsilon,shared_replay_buffer=None,start_episode=1):
         self.n_features = n_features
         self.agent_type = agent_type
         self.unique_id = unique_id
         self.training = training
+        self.continuing = training and start_episode > 1
         self.start_epsilon = epsilon
-        self.epsilon = epsilon
         self.min_exploration_prob = 0.01
         self.expl_decay = 0.001
+        self.epsilon = self._decayed_epsilon(start_episode) if self.continuing else epsilon
         self.total_episode_reward = 0
         self.actions = actions
         self.n_actions = len(actions)
@@ -55,15 +58,19 @@ class DQNDecisionModule():
         self.learn_step += 1
         if self.learn_step % self.replace_target_iter == 0:
             self.target_network.copy_weights(self.q_network)
-        #decays from the epsilon agents start with, which they keep for all of episode 1
-        self.epsilon = max(self.min_exploration_prob, self.start_epsilon*np.exp(-self.expl_decay*(episode-1)))
+        self.epsilon = self._decayed_epsilon(episode)
 
-    def save_models(self):
+    def _decayed_epsilon(self, episode):
+        #decays from the epsilon agents start with, which they keep for all of episode 1
+        return max(self.min_exploration_prob, self.start_epsilon*np.exp(-self.expl_decay*(episode-1)))
+
+    def save_models(self, episode):
         """
-        Save q and target networks to file
+        Save q and target networks to file, then record the episode they were saved after, so a stopped run can be continued from the next
         """
         self._save(self.q_network, self.q_checkpoint_path)
         self._save(self.target_network, self.target_checkpoint_path)
+        record_progress(os.path.dirname(self.q_checkpoint_path)+"/", episode)
 
     def _save(self, network, checkpoint_path):
         #written beside the checkpoint and then moved over it, so a run stopped while saving leaves the last checkpoint whole
@@ -89,15 +96,16 @@ class DQNDecisionModule():
     def _init_networks(self, checkpoint_path):
         self.q_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(self.unique_id)+"/q_model_variables.keras"
         self.target_checkpoint_path = checkpoint_path+self.agent_type+"/agent_"+str(self.unique_id)+"/target_model_variables.keras"
-        if self.training:
+        if self.training and not self.continuing:
             #a training run saves every episode, so it must start somewhere no checkpoint has been saved
             for path in [self.q_checkpoint_path, self.target_checkpoint_path]:
                 if os.path.exists(path):
                     raise CheckpointExistsException(path)
             os.makedirs(os.path.dirname(self.q_checkpoint_path), exist_ok=True)
             os.makedirs(os.path.dirname(self.target_checkpoint_path), exist_ok=True)
-        self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
-        self.target_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer)
+        #a continued run loads the networks it saved and trains them further (its replay buffer starts empty)
+        self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer,continuing=self.continuing)
+        self.target_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer,continuing=self.continuing)
         if self.training:
             inputs = np.zeros(self.n_features)
             self.q_network.dqn(np.atleast_2d(inputs.astype('float32')))
