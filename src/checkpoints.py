@@ -19,17 +19,22 @@ PROGRESS_FILE = "progress.json"
 MIXED_SUFFIX = "_with_baseline"
 
 def training_checkpoint_name(scenario, seasons, season_length, num_allocations, allotment_regrowth_delays, max_days, seed,
-                             society_mix="homogeneous", mixed_allotments="split"):
+                             society_mix="homogeneous", mixed_allotments="split", commons_parameters=None):
     """
     Name of a training run's checkpoint folder, from every setting that changes what is learned (the number of agents is the
     folder inside it), e.g. allotment_seasons25_2allotments_regrow0-2_200days_seed42, or with a mixed society
-    allotment_2allotments_regrow0-2_mixed-separate_200days_seed42
+    allotment_2allotments_regrow0-2_mixed-separate_200days_seed42, or commons_K48_r0.25_R024_200days_seed42
     allotment_regrowth_delays -- the delays the allotments regrow with (AllotmentHarvest.default_regrowth_delays when none are chosen);
         only used, and needed, for the allotment scenario
+    commons_parameters -- dict of the commons' carrying_capacity, growth_rate and initial_stock; only used, and needed, for the commons scenario
     """
     parts = [scenario]
     if seasons:
         parts.append(f"seasons{season_length}")
+    if scenario == "commons":
+        if commons_parameters is None:
+            raise ValueError("a commons checkpoint name needs the commons' carrying capacity, growth rate and initial stock")
+        parts += [f"K{commons_parameters['carrying_capacity']}", f"r{commons_parameters['growth_rate']}", f"R0{commons_parameters['initial_stock']}"]
     if scenario == "capabilities":
         parts.append(f"{num_allocations}capabilities")
     elif scenario == "allotment":

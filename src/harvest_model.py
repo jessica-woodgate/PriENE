@@ -132,6 +132,7 @@ class HarvestModel(Model):
         self.schedule.step()
         self.day += 1
         self._update_schedule()
+        self._end_of_step_dynamics()
         self.epsilon = self._mean_epsilon()
         if self.track_norms and self.norms_module_type == "rule_based":
             self._check_emerged_norms()
@@ -250,6 +251,32 @@ class HarvestModel(Model):
         """
         return True
 
+    def num_extra_observation_features(self):
+        """
+        Number of features a scenario adds to the end of every agent's observation (none by default)
+        """
+        return 0
+
+    def extra_observation_features(self, agent):
+        """
+        Features a scenario adds to the end of agent's observation, after its own and other agents' well-being, so the existing features
+        keep their indices (none by default)
+        """
+        return np.array([])
+
+    def extra_observation_feature_specs(self):
+        """
+        One spec per extra observation feature, so norms can use it as a precondition: name, thresholds (ascending) and labels (one
+        more than thresholds, for values below the first threshold up to values at or above the last); none by default
+        """
+        return []
+
+    def _end_of_step_dynamics(self):
+        """
+        Changes to the environment once every agent has acted and the schedule is updated, before the end of episode check (none by default)
+        """
+        pass
+
     def get_day(self):
         return self.day
     
@@ -317,8 +344,7 @@ class HarvestModel(Model):
         #every berry waiting to regrow is placed again below, so no timer carries over to the new episode
         self.regrowth_timers = {}
         self._clear_grid()
-        if self.seasons:
-            self._restore_original_berries()
+        self._restore_episode_state()
         for a in self.schedule.agents:
             if a.agent_type != "berry":
                 self._reset_agent(a)
@@ -349,6 +375,14 @@ class HarvestModel(Model):
                                "season_quality": [],
                                "seasonal_berry_target": [],
                                "allotment_regrowth_delay": []})
+
+    def _restore_episode_state(self):
+        """
+        Restore the scenario's state for a new episode, after the grid is cleared and before agents and berries are reset and placed:
+        by default, the berries each season started with
+        """
+        if self.seasons:
+            self._restore_original_berries()
 
     def _init_seasons(self):
         """
@@ -451,15 +485,15 @@ class HarvestModel(Model):
             excess = len(held) - targets[holder]
             if excess > 0:
                 for berry in self._choose_surplus_berries(held, excess):
-                    self._remove_season_berry(berry)
+                    self._remove_berry(berry)
             shortfalls[holder] = max(0, -excess)
         for holder, shortfall in shortfalls.items():
             for _ in range(shortfall):
                 self._add_season_berry(holder)
 
-    def _remove_season_berry(self, berry):
+    def _remove_berry(self, berry):
         """
-        Take a berry out of use for this season, keeping it to reuse; a berry waiting to regrow has its timer cancelled
+        Take a berry out of use (off the grid and out of the schedule), keeping it to reuse; a berry waiting to regrow has its timer cancelled
         """
         self.regrowth_timers.pop(berry, None)
         if berry.pos is not None:
@@ -471,7 +505,16 @@ class HarvestModel(Model):
 
     def _add_season_berry(self, holder):
         """
-        Give holder another berry, reusing a dormant one if there is one, placed at a random cell in its region
+        Give holder another berry, placed at a random cell in its region
+        """
+        def season_cell(berry):
+            #two draws per berry from season_rng whatever is on the grid, so the stream doesn't depend on agents' behaviour
+            return (int(self.season_rng.integers(berry.min_width, berry.max_width)), int(self.season_rng.integers(berry.min_height, berry.max_height)))
+        self._add_berry(holder, season_cell)
+
+    def _add_berry(self, holder, choose_cell):
+        """
+        Put another berry into use for holder, reusing a dormant one if there is one, at the cell choose_cell(berry) returns
         """
         if self.dormant_berries:
             berry = self.dormant_berries.pop(0)
@@ -480,11 +523,10 @@ class HarvestModel(Model):
             berry = self._new_berry([0, self.max_width, 0, self.max_height])
         berry.reset()
         self._set_berry_holder(berry, holder)
-        #two draws per berry from season_rng whatever is on the grid, so the stream doesn't depend on agents' behaviour
-        cell = (int(self.season_rng.integers(berry.min_width, berry.max_width)), int(self.season_rng.integers(berry.min_height, berry.max_height)))
-        self.grid.place_agent(berry, cell)
+        self.grid.place_agent(berry, choose_cell(berry))
         self.berries.append(berry)
         self.num_berries += 1
+        return berry
 
     def _set_berry_holder(self, berry, holder):
         """
@@ -571,17 +613,23 @@ class HarvestModel(Model):
                                "num_emerged_norms": [],
                                "seed": []})
         if self.write_data:
-            report_path = "data/results/current_run/model_episode_reports_"+self.filepath+".csv"
-            if self.training and self.episode > 1 and exists(report_path):
-                self._continue_report(report_path)
-            else:
-                if exists(report_path):
-                    raise FileExistsException(report_path)
-                self.model_episode_reporter.to_csv(report_path, mode='a',index=False)
+            self._start_report("data/results/current_run/model_episode_reports_"+self.filepath+".csv", list(self.model_episode_reporter.columns))
         if self.track_norms and self.norms_module_type == "bayesian":
             if exists(self._agent_norms_csv_filename()):
                 raise FileExistsException(self._agent_norms_csv_filename())
             pd.DataFrame(columns=self._agent_norms_columns()).to_csv(self._agent_norms_csv_filename(), mode='a', index=False)
+
+    def _start_report(self, report_path, columns):
+        """
+        Start a report written one episode (or step) at a time with its header, never overwriting one, unless a continued training run
+        is carrying on its report
+        """
+        if self.training and self.episode > 1 and exists(report_path):
+            self._continue_report(report_path)
+        else:
+            if exists(report_path):
+                raise FileExistsException(report_path)
+            pd.DataFrame(columns=columns).to_csv(report_path, mode='a', index=False)
 
     def _continue_report(self, report_path):
         """
@@ -772,17 +820,23 @@ class HarvestModel(Model):
         #check for dead agents & foraged berries
         for a in self.schedule.agents:
             if a.agent_type == "berry" and a.foraged == True:
-                if self.holder_regrowth_delays is None or self.holder_regrowth_delays[a.allocation_id] == 0:
-                    self._reset_berry(a, False)
-                elif a not in self.regrowth_timers:
-                    #off the grid until its allotment's delay has passed
-                    self.grid.remove_agent(a)
-                    self.regrowth_timers[a] = self.day + self.holder_regrowth_delays[a.allocation_id]
+                self._handle_foraged_berry(a)
             if a.agent_type != "berry":
                 if a.off_grid == False:
                     self._collect_agent_data(a)
                     if a.done == True:
                         self._remove_agent(a)
+
+    def _handle_foraged_berry(self, berry):
+        """
+        A berry foraged this step regrows straight away at a random cell, or, with an allotment regrowth delay, waits off the grid until
+        its allotment's delay has passed
+        """
+        if self.holder_regrowth_delays is None or self.holder_regrowth_delays[berry.allocation_id] == 0:
+            self._reset_berry(berry, False)
+        elif berry not in self.regrowth_timers:
+            self.grid.remove_agent(berry)
+            self.regrowth_timers[berry] = self.day + self.holder_regrowth_delays[berry.allocation_id]
 
     def _regrow_due_berries(self):
         """
@@ -798,7 +852,7 @@ class HarvestModel(Model):
                 berry.reset()
                 self._place_agent_in_allotment(berry)
             else:
-                self._remove_season_berry(berry)
+                self._remove_berry(berry)
 
     def _allotment_regrowth_delay(self, agent):
         """

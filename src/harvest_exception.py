@@ -195,10 +195,15 @@ class CheckpointMismatchException(HarvestException):
         self.checkpoint_actions = checkpoint_actions
 
     def __str__(self):
-        #agents observe 4 features of their own plus one per other agent, and have move, eat and one throw per other agent
+        #agents observe 4 features of their own plus one per other agent (plus any the scenario adds), and have move, eat and one throw per other agent
+        if self.checkpoint_actions == self.expected_actions:
+            #the same number of agents, so the scenarios observe different features (e.g. agents in the commons also observe its stock)
+            advice = "it was trained in a scenario whose agents observe different features (agents in the commons also observe its stock); test it in the scenario it was trained in"
+        else:
+            advice = "test with the number of agents it was trained with"
         return (f"Checkpoint {self.checkpoint_path} was trained with {self.checkpoint_actions - 1} agents ({self.checkpoint_features} inputs, "
                 f"{self.checkpoint_actions} actions), but this run has {self.expected_actions - 1} agents ({self.expected_features} inputs, "
-                f"{self.expected_actions} actions); test with the number of agents it was trained with")
+                f"{self.expected_actions} actions); {advice}")
 
 class SeasonsException(HarvestException):
     def __init__(self, reason):
@@ -224,6 +229,25 @@ class RegrowthDelaysNotSupported(HarvestException):
 
     def __str__(self):
         return (f"The {self.scenario} scenario has no allotments; allotment regrowth delays can only be used with the allotment scenario")
+
+class CommonsParameterException(HarvestException):
+    def __init__(self, reason):
+        super().__init__()
+        self.reason = reason
+
+    def __str__(self):
+        return (f"Can't set up the commons: {self.reason}")
+
+class CommonsGridException(HarvestException):
+    def __init__(self, carrying_capacity, num_agents, num_cells):
+        super().__init__()
+        self.carrying_capacity = carrying_capacity
+        self.num_agents = num_agents
+        self.num_cells = num_cells
+
+    def __str__(self):
+        return (f"The commons needs a free cell for every berry up to its carrying capacity and for every agent: carrying capacity "
+                f"{self.carrying_capacity} and {self.num_agents} agents need {self.carrying_capacity + self.num_agents} cells, but the grid has {self.num_cells}")
 
 class BerryOffGrid(HarvestException):
     def __init__(self, berry_id, day):

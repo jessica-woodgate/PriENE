@@ -116,7 +116,8 @@ class HarvestAgent(Agent):
         self.current_action = action
         if self.track_norms and self.norms_module_type == "rule_based":
             # rule-based norms are keyed on the state before acting
-            antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)])
+            antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)]
+                                                          + list(self.model.extra_observation_features(self)))
         if self.agent_type != "baseline":
             self.ethics_module.day = self.model.get_day()
             society_well_being = self.model.get_society_well_being(self, False, True)
@@ -139,12 +140,13 @@ class HarvestAgent(Agent):
     
     def observe(self):
         """
-        Agents observe their attributes, distance to nearest berry, well-being of other agents in society
+        Agents observe their attributes, distance to nearest berry, well-being of other agents in society, then any features the scenario adds
         """
         distance_to_berry = self.moving_module.get_distance_to_berry()
         observer_features = np.array([self.health, self.berries, self.days_left_to_live, distance_to_berry])
         agent_well_being = self.model.get_society_well_being(self, False, False)
         observation = np.append(observer_features, agent_well_being)
+        observation = np.append(observation, self.model.extra_observation_features(self))
         if len(observation) != self.n_features:
             raise NumFeaturesException(self.n_features, len(observation))
         return observation
@@ -193,10 +195,12 @@ class HarvestAgent(Agent):
     
     def _calculate_n_features(self):
         """
-        Get number of features in observation (agent's health, days left to live, distance to berry, well-being of other agents in society)
+        Get number of features in observation (agent's health, days left to live, distance to berry, well-being of other agents in society,
+        and any features the scenario adds)
         """
         n_features = 4
         n_features += self.model.get_num_agents() -1
+        n_features += self.model.num_extra_observation_features()
         return n_features
     
     def _generate_actions(self, unique_id, num_agents):
@@ -330,8 +334,8 @@ class HarvestAgent(Agent):
     def _antecedent_features(self):
         """
         Registers with NormsModule how to bucket this agent's state into a natural language
-        precondition string: berries and health as single scalar readings, and well-being (one
-        reading per other currently-observed agent) as a repeated feature.
+        precondition string: berries and health as single scalar readings, well-being (one
+        reading per other currently-observed agent) as a repeated feature, then any features the scenario adds.
         """
         return [
             {"boundaries": [self.low_berries_threshold, self.high_berries_threshold],
@@ -340,7 +344,7 @@ class HarvestAgent(Agent):
              "labels": ["low health", "medium health", "high health"]},
             {"boundaries": [self.low_days_left_threshold, self.high_days_left_threshold],
              "labels": ["low days", "medium days", "high days"], "repeated": True},
-        ]
+        ] + [{"boundaries": spec["thresholds"], "labels": spec["labels"]} for spec in self.model.extra_observation_feature_specs()]
 
     def _consequent_rules(self):
         """
@@ -389,6 +393,10 @@ class HarvestAgent(Agent):
                 "repeated":   True,
             },
         ]
+        #features the scenario adds come after the other agents' well-being in the observation
+        extra_start = 4 + n_others
+        feature_specs += [{"name": spec["name"], "index": extra_start + i, "thresholds": spec["thresholds"], "repeated": False}
+                          for i, spec in enumerate(self.model.extra_observation_feature_specs())]
 
         #max_predicates = len(self.actions) * 28 #predicates = num actions, num thresholds per feature
         max_predicates = 2

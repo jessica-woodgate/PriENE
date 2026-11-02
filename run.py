@@ -2,6 +2,7 @@ from src.scenarios.basic_harvest import BasicHarvest
 from src.scenarios.colours_harvest import ColoursHarvest
 from src.scenarios.allotment_harvest import AllotmentHarvest
 from src.scenarios.capabilities_harvest import CapabilitiesHarvest
+from src.scenarios.commons_harvest import CommonsHarvest
 from src.data_handling.data_analysis import DataAnalysis
 from src.data_handling.render_pygame import RenderPygame
 from src.agent.harvest_agent import NORMS_MODULE_TYPES
@@ -19,12 +20,17 @@ import time
 PRINCIPLES = ["baseline", "utilitarian", "maximin", "egalitarian"]
 AGGREGATIONS = ["average", "majoritarian", "optimist", "veto"]
 AGENT_TYPES = PRINCIPLES + AGGREGATIONS
-SCENARIO_TYPES = ["basic", "colours", "capabilities", "allotment"]
+SCENARIO_TYPES = ["basic", "colours", "capabilities", "allotment", "commons"]
 NUM_AGENTS_OPTIONS = ["2", "4", "6", "20", "50", "100"]
 MAX_EPISODES = 1000
 SOCIETY_MIXES = ["homogeneous", "heterogeneous"]
 DEFAULT_SEED = 42
 DEFAULT_SEASON_LENGTH = 25
+#the paper's settings, used when enter is pressed at a prompt: agents trained in basic (and tested in colours, capabilities and
+#allotment), 200 days, 4 agents, 2 allotments or capabilities, no seasons, societies of one type, every agent type, rule-based norms
+PAPER_DEFAULTS = {"train_scenario": "basic", "test_scenario": "colours", "seasons": "n", "max_days": 200, "society_mix": "homogeneous",
+                  "agent_type": "all", "num_agents": "4", "num_allocations": 2, "mixed_allotments": "split", "write_data": "y",
+                  "track_norms": "y", "norms_module_type": "rule_based", "render": "n", "graph_run": "paper"}
 #options that aren't flags, and why
 REMOVED_OPTIONS = {
     "--initial-healths": "unequal starting health was removed; every agent starts each episode with the default health",
@@ -141,7 +147,7 @@ def get_max_days_input(checkpoint_name, checkpoint_path):
     """
     max_days = checkpoint_max_days(checkpoint_name, checkpoint_path)
     if max_days is None:
-        return get_integer_input("How many days in each episode: ")
+        return get_integer_input("How many days in each episode: ", default=PAPER_DEFAULTS["max_days"])
     if days_in_name(checkpoint_name) is None:
         print(f"Testing with {max_days} days in each episode, as the checkpoint was trained.")
     return max_days
@@ -172,11 +178,12 @@ def get_continue_training_input(checkpoint_path, agent_types, society_mix, file_
         start_episodes[agent_type] = finished+1
     return start_episodes
 
-def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episode=1):
+def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episode=1,commons_parameters=None):
     """
     checkpoint_path is the folder holding the checkpoints for this number of agents: training saves there, testing loads from it
     (in a mixed society, from the folder of agent_type trained with baseline agents; see society_checkpoint_path)
     start_episode is 1, or the episode a stopped training run continues from
+    commons_parameters is the commons' carrying_capacity, growth_rate and initial_stock (commons only)
     """
     file_string = output_file_string(training, scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix, agent_type)
     if training:
@@ -191,6 +198,8 @@ def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_sta
         model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode=start_episode)
     elif scenario == "capabilities":
         model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode)
+    elif scenario == "commons":
+        model_inst = CommonsHarvest(society_mix,num_agents,commons_parameters["carrying_capacity"],commons_parameters["growth_rate"],agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode,initial_stock=commons_parameters["initial_stock"])
     else:
         raise ValueError("Unknown argument: "+scenario)
     if start_episode > 1:
@@ -204,10 +213,40 @@ def agent_types_to_run(society_mix):
     #in a mixed society half the agents are baseline, so baseline alone isn't run
     return AGENT_TYPES[1:] if society_mix == "heterogeneous" else AGENT_TYPES
 
-def run_all(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episodes=None):
+def run_all(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episodes=None,commons_parameters=None):
     for agent_type in agent_types_to_run(society_mix):
         start_episode = start_episodes.get(agent_type, 1) if start_episodes else 1
-        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode)
+        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode,commons_parameters)
+
+def get_commons_parameters_input(num_agents, num_cells):
+    """
+    Ask for the commons' carrying capacity K, growth rate r and initial stock R0; pressing enter uses each default
+    (CommonsHarvest.CARRYING_CAPACITY_PER_AGENT per agent, CommonsHarvest.DEFAULT_GROWTH_RATE, and K // 2)
+    """
+    max_capacity = num_cells - num_agents
+    default_capacity = min(CommonsHarvest.CARRYING_CAPACITY_PER_AGENT * num_agents, max_capacity)
+    carrying_capacity = get_number_input(f"What carrying capacity (most berries the commons holds) do you want? (at least 1 and at most {max_capacity}, so every berry and agent has a cell) Press enter for {default_capacity}: ",
+                                         int, default_capacity, 1, max_capacity)
+    growth_rate = get_number_input(f"What growth rate do you want? (more than 0) Press enter for {CommonsHarvest.DEFAULT_GROWTH_RATE}: ",
+                                   float, CommonsHarvest.DEFAULT_GROWTH_RATE, 0, None, exclusive_min=True)
+    initial_stock = get_number_input(f"How many berries should the commons start each episode with? (at least 1 and at most {carrying_capacity}) Press enter for {carrying_capacity // 2}: ",
+                                     int, max(1, carrying_capacity // 2), 1, carrying_capacity)
+    return {"carrying_capacity": carrying_capacity, "growth_rate": growth_rate, "initial_stock": initial_stock}
+
+def get_number_input(prompt, number_type, default, min_value, max_value, exclusive_min=False):
+    while True:
+        value = input(prompt).strip()
+        if value == "":
+            return default
+        try:
+            number = number_type(value)
+        except ValueError:
+            print(f"Invalid input. Please enter {'an integer' if number_type is int else 'a number'}.")
+            continue
+        if number < min_value or (exclusive_min and number == min_value) or (max_value is not None and number > max_value):
+            print("Invalid choice. Out of range.")
+            continue
+        return number
 
 def get_mixed_allotments_input(num_allotments):
     """
@@ -217,7 +256,7 @@ def get_mixed_allotments_input(num_allotments):
         print(f"With {num_allotments} allotments the agent types are split within the allotments (separate allotments need an even number).")
         return "split"
     return get_input("How should the two agent types share the allotments? split: each allotment has agents of both types; separate: each type has its own allotments ['split', 'separate']: ",
-                     "Invalid choice. Please choose ['split', 'separate']: ", ["split", "separate"])
+                     "Invalid choice. Please choose ['split', 'separate']: ", ["split", "separate"], PAPER_DEFAULTS["mixed_allotments"])
 
 def get_season_length_input():
     """
@@ -244,10 +283,21 @@ class RemovedOption(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         parser.error(f"{option_string} is not an option: {REMOVED_OPTIONS[option_string]}")
 
-def get_integer_input(prompt, error_string=None, max_value=None, min_value=None):
+def with_default(prompt, default):
+    """
+    The prompt, saying what pressing enter chooses (when there is a default)
+    """
+    if default is None:
+        return prompt
+    return prompt.rstrip().rstrip(":") + f" Press enter for {default}: "
+
+def get_integer_input(prompt, error_string=None, max_value=None, min_value=None, default=None):
     while True:
+        value = input(with_default(prompt, default)).strip()
+        if value == "" and default is not None:
+            return default
         try:
-            value = int(input(prompt))
+            value = int(value)
             if max_value != None and value > max_value:
                 print(error_string)
                 continue
@@ -258,10 +308,15 @@ def get_integer_input(prompt, error_string=None, max_value=None, min_value=None)
         except ValueError:
             print("Invalid input. Please enter an integer.")
 
-def get_input(input_string, error_string, valid_options):
-    variable = input(input_string)
+def get_input(input_string, error_string, valid_options, default=None):
+    """
+    Ask until one of valid_options is given; pressing enter chooses default, if there is one
+    """
+    variable = input(with_default(input_string, default)).strip()
     while variable not in valid_options:
-        variable = input(error_string)
+        if variable == "" and default is not None:
+            return default
+        variable = input(with_default(error_string, default)).strip()
     return variable
 
 def get_bool(input):
@@ -270,10 +325,8 @@ def get_bool(input):
     elif input == "n":
         return False
 
-def write_data_input(data_type):
-    write_data = input(f"Do you want to write {data_type} to file? (y, n): ")
-    while write_data not in ["y", "n"]:
-        write_data = input("Invalid choice. Please choose 'y' or 'n': ")
+def write_data_input(data_type, default=None):
+    write_data = get_input(f"Do you want to write {data_type} to file? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"], default)
     if write_data == "y":
         write_data = True
         print(f"{data_type} will be written into data/results/current_run.")
@@ -300,48 +353,55 @@ elif args.option == "test" or args.option == "train":
     #the mode decides learning, exploration, saving and outputs; any scenario, with or without seasons, runs in either mode
     training = args.option == "train"
     mode = "train" if training else "test"
-    scenario = get_input(f"What type of scenario do you want to {mode} in {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES)
-    seasons = get_bool(get_input("Do you want seasons, where each season is randomly normal, good (one more berry per agent in each group) or bad (one fewer)? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+    scenario = get_input(f"What type of scenario do you want to {mode} in {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES,
+                         PAPER_DEFAULTS["train_scenario" if training else "test_scenario"])
+    season_effect = "the commons regrows 1.5 times as fast" if scenario == "commons" else "one more berry per agent in each group"
+    season_bad = "half as fast" if scenario == "commons" else "one fewer"
+    seasons = get_bool(get_input(f"Do you want seasons, where each season is randomly normal, good ({season_effect}) or bad ({season_bad})? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"], PAPER_DEFAULTS["seasons"]))
     season_length = get_season_length_input() if seasons else DEFAULT_SEASON_LENGTH
     if training:
         max_episodes = 0
-        max_days = get_integer_input("How many days in each episode: ")
+        max_days = get_integer_input("How many days in each episode: ", "Invalid choice. Must be at least 1", min_value=1, default=PAPER_DEFAULTS["max_days"])
     else:
         checkpoint_root, checkpoint_name = get_checkpoint_input()
         max_episodes = MAX_EPISODES
     #in a mixed society half the agents are baseline, and train or test alongside the other half
-    society_mix = get_input(f"What mix of society do you want to {mode} {SOCIETY_MIXES}: ", f"Invalid society mix. Please choose {SOCIETY_MIXES}: ", SOCIETY_MIXES)
+    society_mix = get_input(f"What mix of society do you want to {mode} {SOCIETY_MIXES}: ", f"Invalid society mix. Please choose {SOCIETY_MIXES}: ", SOCIETY_MIXES, PAPER_DEFAULTS["society_mix"])
     #########################################################################################
     types = AGENT_TYPES + ["all"]
-    agent_type = get_input(f"What type of agent do you want to implement {types}: ", f"Invalid agent type. Please choose {types}: ", types)
+    agent_type = get_input(f"What type of agent do you want to implement {types}: ", f"Invalid agent type. Please choose {types}: ", types, PAPER_DEFAULTS["agent_type"])
     #########################################################################################
-    num_agents = int(get_input(f"How many agents do you want to implement (select 4 to replicate results in the paper) {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
+    num_agents = int(get_input(f"How many agents do you want to implement {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS, PAPER_DEFAULTS["num_agents"]))
     #########################################################################################
     #allotment uses its default regrowth delays (allotment 1 regrows slower than the others)
     allotment_regrowth_delays = None
     mixed_allotments = "split"
     if scenario == "allotment":
         MAX_WIDTH = num_agents * 4
-        num_allocations = get_integer_input(f"How many allotments do you want? (select 2 to replicate results in the paper) (must be more than 0 and less than {num_agents+1}): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1)
+        num_allocations = get_integer_input(f"How many allotments do you want? (must be more than 0 and less than {num_agents+1}): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1,
+                                            min(PAPER_DEFAULTS["num_allocations"], num_agents))
         if society_mix == "heterogeneous":
             mixed_allotments = get_mixed_allotments_input(num_allocations)
     elif scenario == "capabilities":
         MAX_WIDTH = num_agents * 2
-        num_allocations = get_integer_input(f"How many capabilities do you want? (must be more than 0 and less than {num_agents+1}) (select 2 to replicate results in the paper): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1)
+        num_allocations = get_integer_input(f"How many capabilities do you want? (must be more than 0 and less than {num_agents+1}): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1,
+                                            min(PAPER_DEFAULTS["num_allocations"], num_agents))
     else:
         MAX_WIDTH = num_agents * 2
         num_allocations = 1
     MAX_HEIGHT = num_agents * 2
     NUM_BERRIES = num_agents * 3
+    #the commons' stock is its own, so NUM_BERRIES isn't used
+    commons_parameters = get_commons_parameters_input(num_agents, MAX_WIDTH * MAX_HEIGHT) if scenario == "commons" else None
     #########################################################################################
-    write_data = write_data_input("data")
+    write_data = write_data_input("data", PAPER_DEFAULTS["write_data"])
     #########################################################################################
     if training:
         #the delays allotments actually regrow with, so the name says which were used
         delays = allotment_regrowth_delays
         if scenario == "allotment" and delays is None:
             delays = AllotmentHarvest.default_regrowth_delays(num_allocations)
-        checkpoint_path = training_checkpoint_path(training_checkpoint_name(scenario, seasons, season_length, num_allocations, delays, max_days, args.seed, society_mix, mixed_allotments), num_agents)
+        checkpoint_path = training_checkpoint_path(training_checkpoint_name(scenario, seasons, season_length, num_allocations, delays, max_days, args.seed, society_mix, mixed_allotments, commons_parameters), num_agents)
     else:
         checkpoint_path = checkpoint_root+str(num_agents)+"_agents/"
         max_days = get_max_days_input(checkpoint_name, checkpoint_path)
@@ -357,16 +417,18 @@ elif args.option == "test" or args.option == "train":
                                      {"scenario": scenario, "seasons": seasons, "season_length": season_length if seasons else None,
                                       "num_allocations": num_allocations, "allotment_regrowth_delays": allotment_regrowth_delays,
                                       "max_days": max_days, "seed": args.seed, "num_agents": num_agents, "society_mix": society_mix,
-                                      "mixed_allotments": mixed_allotments if scenario == "allotment" and society_mix != "homogeneous" else None},
+                                      "mixed_allotments": mixed_allotments if scenario == "allotment" and society_mix != "homogeneous" else None,
+                                      **({"commons_parameters": commons_parameters} if commons_parameters else {})},
                                      society_mix, continuing=start_episodes)
         print("Model variables will be written into",checkpoint_path)
         track_norms = False
         render = False
     else:
-        track_norms = write_data_input("norms")
+        track_norms = write_data_input("norms", PAPER_DEFAULTS["track_norms"])
         if track_norms:
-            norms_module_type = get_input(f"Which norms module do you want to use {NORMS_MODULE_TYPES}: ", f"Invalid norms module. Please choose {NORMS_MODULE_TYPES}: ", NORMS_MODULE_TYPES)
-        render = get_input("Do you want to render the simulation? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"])
+            norms_module_type = get_input(f"Which norms module do you want to use {NORMS_MODULE_TYPES}: ", f"Invalid norms module. Please choose {NORMS_MODULE_TYPES}: ", NORMS_MODULE_TYPES,
+                                          PAPER_DEFAULTS["norms_module_type"])
+        render = get_input("Do you want to render the simulation? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"], PAPER_DEFAULTS["render"])
         render = get_bool(render)
      #########################################################################################
     if args.log is not None:
@@ -376,24 +438,26 @@ elif args.option == "test" or args.option == "train":
         log_wandb = False
         wandb_project = None
     if agent_type == "all":
-        run_all(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episodes=start_episodes)
+        run_all(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episodes=start_episodes,commons_parameters=commons_parameters)
     else:
-        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episode=start_episodes.get(agent_type, 1))
+        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episode=start_episodes.get(agent_type, 1),commons_parameters=commons_parameters)
 #########################################################################################
 elif args.option == "graphs":
     graph_runs = ["current_run", "50_days", "200_days", "paper"]
-    run_name = get_input(f"What run do you want to generate graphs for (select paper to reproduce graphs in the paper) {graph_runs}: ", f"Invalid name of run. Please choose {graph_runs}: ", graph_runs)
-    scenario = get_input(f"What type of scenario do you want to generate graphs for {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES} ", SCENARIO_TYPES)
+    run_name = get_input(f"What run do you want to generate graphs for (paper reproduces the graphs in the paper) {graph_runs}: ", f"Invalid name of run. Please choose {graph_runs}: ", graph_runs,
+                         PAPER_DEFAULTS["graph_run"])
+    scenario = get_input(f"What type of scenario do you want to generate graphs for {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES} ", SCENARIO_TYPES,
+                         PAPER_DEFAULTS["test_scenario"])
     print("Graphs will be saved in data/results/current_run")
     if run_name == "paper":
         generate_paper_graphs(scenario)
     else:
-        num_agents = int(get_input(f"How many agents {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS))
-        seasons = get_bool(get_input("Did the run have seasons? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
-        society_mix = get_input(f"What mix of society was it {SOCIETY_MIXES}: ", f"Invalid society mix. Please choose {SOCIETY_MIXES}: ", SOCIETY_MIXES)
+        num_agents = int(get_input(f"How many agents {NUM_AGENTS_OPTIONS}: ", f"Invalid number of agents. Please choose {NUM_AGENTS_OPTIONS}: ", NUM_AGENTS_OPTIONS, PAPER_DEFAULTS["num_agents"]))
+        seasons = get_bool(get_input("Did the run have seasons? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"], PAPER_DEFAULTS["seasons"]))
+        society_mix = get_input(f"What mix of society was it {SOCIETY_MIXES}: ", f"Invalid society mix. Please choose {SOCIETY_MIXES}: ", SOCIETY_MIXES, PAPER_DEFAULTS["society_mix"])
         mixed_allotments = "split"
         if scenario == "allotment" and society_mix == "heterogeneous":
-            separate = get_bool(get_input("Did each agent type have separate allotments? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+            separate = get_bool(get_input("Did each agent type have separate allotments? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"], "n"))
             mixed_allotments = "separate" if separate else "split"
-        process_norms = get_bool(get_input("Did the run write rule-based norms to file? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"]))
+        process_norms = get_bool(get_input("Did the run write rule-based norms to file? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"], PAPER_DEFAULTS["track_norms"]))
         generate_graphs(scenario,run_name,num_agents,seasons,mixed_allotments=mixed_allotments,society_mix=society_mix,process_norms=process_norms)
