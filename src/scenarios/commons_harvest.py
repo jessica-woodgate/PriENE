@@ -3,6 +3,7 @@ from src.harvest_exception import RegrowthDelaysNotSupported
 from src.harvest_exception import CommonsParameterException
 from src.harvest_exception import CommonsGridException
 import numpy as np
+import os
 import pandas as pd
 
 class CommonsHarvest(HarvestModel):
@@ -17,7 +18,9 @@ class CommonsHarvest(HarvestModel):
         regrowth_rng -- generator for the rounding of regrowth and the cells berries regrow at, seeded from the seed and its own stream
             (COMMONS_REGROWTH_STREAM) so regrowth doesn't shift other random draws
         harvested_this_step -- berries foraged in the current step
-        commons_steps -- this episode's rows for commons_<filepath>.csv (written at the end of the episode)
+        commons_steps -- this episode's steps, each its stock, harvest, regrowth and growth rate at the end of the step: added to every
+            agent's row of the agent report (AGENT_REPORT_COLUMNS), and summarised at the end of the model episode report's rows
+            (EPISODE_SUMMARY_COLUMNS)
         collapse_day -- the first day this episode the stock was 0 (None if it hasn't collapsed); once collapsed, nothing regrows
     """
     COMMONS = "allocation_commons"
@@ -31,8 +34,11 @@ class CommonsHarvest(HarvestModel):
     #the stock (as a fraction of carrying capacity) as a norm precondition
     STOCK_FEATURE_SPEC = {"name": "stock", "thresholds": [0.25, 0.5, 0.75],
                           "labels": ["very low stock", "low stock", "high stock", "very high stock"]}
-    STEP_COLUMNS = ["episode", "day", "stock", "harvested", "regrown", "season", "season_quality", "growth_rate"]
-    EPISODE_COLUMNS = ["episode", "collapse_day", "mean_stock", "final_stock", "efficiency"]
+    #added to the end of the agent report (which already has the season and its quality): the stock after the step's foraging and
+    #regrowth, the berries every agent harvested and the commons regrew this step, and the growth rate
+    AGENT_REPORT_COLUMNS = ["stock", "harvested_this_step", "regrown_this_step", "growth_rate"]
+    #added to the end of the model episode report
+    EPISODE_SUMMARY_COLUMNS = ["collapse_day", "mean_stock", "final_stock", "efficiency"]
 
     def __init__(self,society_mix,num_agents,carrying_capacity,growth_rate,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,start_episode=1,initial_stock=None):
         if allotment_regrowth_delays is not None:
@@ -138,8 +144,7 @@ class CommonsHarvest(HarvestModel):
         stock = self.stock()
         if stock == 0 and self.collapse_day is None:
             self.collapse_day = self.day
-        self.commons_steps.append([self.episode, self.day, stock, self.harvested_this_step, regrown, self.season,
-                                   self._current_season_quality(), self.current_growth_rate])
+        self.commons_steps.append({"stock": stock, "harvested": self.harvested_this_step, "regrown": regrown, "growth_rate": self.current_growth_rate})
         self.harvested_this_step = 0
 
     def _apply_season_quality(self):
@@ -166,24 +171,54 @@ class CommonsHarvest(HarvestModel):
         self.collapse_day = None
 
     def _init_commons_reporters(self):
-        if self.write_data:
-            self._start_report(self._commons_steps_path(), self.STEP_COLUMNS)
-            self._start_report(self._commons_episodes_path(), self.EPISODE_COLUMNS)
+        if self.write_data and self.training and self.episode > 1:
+            self._merge_earlier_episode_summaries()
 
-    def _commons_steps_path(self):
-        return "data/results/current_run/commons_"+self.filepath+".csv"
+    def _model_episode_report_path(self):
+        return "data/results/current_run/model_episode_reports_"+self.filepath+".csv"
 
-    def _commons_episodes_path(self):
-        return "data/results/current_run/commons_episodes_"+self.filepath+".csv"
+    def _merge_earlier_episode_summaries(self):
+        """
+        Runs started before the episode summary was part of the model episode report wrote it to commons_episodes_<filepath>.csv: a
+        continued run fills those episodes' summaries into its report from there (the file is left as it is)
+        """
+        earlier_path = "data/results/current_run/commons_episodes_"+self.filepath+".csv"
+        report_path = self._model_episode_report_path()
+        if not (os.path.exists(earlier_path) and os.path.exists(report_path)):
+            return
+        reports = pd.read_csv(report_path)
+        earlier = pd.read_csv(earlier_path).set_index("episode")
+        missing = reports[self.EPISODE_SUMMARY_COLUMNS].isna().all(axis=1) & reports["episode"].isin(earlier.index)
+        if not missing.any():
+            return
+        for column in self.EPISODE_SUMMARY_COLUMNS:
+            reports.loc[missing, column] = reports.loc[missing, "episode"].map(earlier[column])
+        writing_path = report_path+".writing"
+        reports.to_csv(writing_path, index=False)
+        os.replace(writing_path, report_path)
 
-    def _collect_model_episode_data(self):
-        new_entry = super()._collect_model_episode_data()
-        if self.write_data:
-            stocks = [row[2] for row in self.commons_steps]
-            harvested = [row[3] for row in self.commons_steps]
-            #harvest per step as a fraction of the maximum sustainable yield, r * K / 4 (at stock K / 2, with the normal growth rate)
-            efficiency = np.mean(harvested) / (self.growth_rate * self.carrying_capacity / 4) if harvested else None
-            pd.DataFrame(self.commons_steps, columns=self.STEP_COLUMNS).to_csv(self._commons_steps_path(), header=None, mode='a', index=False)
-            pd.DataFrame([[self.episode, self.collapse_day, np.mean(stocks) if stocks else None, stocks[-1] if stocks else None, efficiency]],
-                         columns=self.EPISODE_COLUMNS).to_csv(self._commons_episodes_path(), header=None, mode='a', index=False)
-        return new_entry
+    def extra_agent_report_columns(self):
+        return self.AGENT_REPORT_COLUMNS
+
+    def extra_agent_report_values(self, agent):
+        """
+        This step's stock, harvest, regrowth and growth rate (the commons regrows before agents' rows are reported, so every row of a
+        step has the same values)
+        """
+        step = self.commons_steps[-1]
+        return {"stock": step["stock"], "harvested_this_step": step["harvested"], "regrown_this_step": step["regrown"], "growth_rate": step["growth_rate"]}
+
+    def extra_episode_report_columns(self):
+        return self.EPISODE_SUMMARY_COLUMNS
+
+    def extra_episode_report_values(self):
+        """
+        The episode's collapse day, mean and final stock, and efficiency: harvest per step as a fraction of the maximum sustainable
+        yield, r * K / 4 (at stock K / 2, with the normal growth rate)
+        """
+        stocks = [step["stock"] for step in self.commons_steps]
+        harvested = [step["harvested"] for step in self.commons_steps]
+        return {"collapse_day": self.collapse_day,
+                "mean_stock": np.mean(stocks) if stocks else None,
+                "final_stock": stocks[-1] if stocks else None,
+                "efficiency": np.mean(harvested) / (self.growth_rate * self.carrying_capacity / 4) if harvested else None}

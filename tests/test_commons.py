@@ -136,7 +136,7 @@ def test_nothing_regrows_once_the_commons_has_collapsed(model):
     for _ in range(3):
         model.step()
     assert model.stock() == 0 and model.collapse_day == 1
-    assert [row[4] for row in model.commons_steps] == [0, 0, 0]
+    assert [step["regrown"] for step in model.commons_steps] == [0, 0, 0]
 
 
 def test_foraged_berries_leave_the_stock_and_are_reused_when_it_regrows(model):
@@ -150,7 +150,7 @@ def test_foraged_berries_leave_the_stock_and_are_reused_when_it_regrows(model):
     model._end_of_step_dynamics()
     # regrowth reuses dormant berries before making new ones
     assert berry in model.berries and berry.pos is not None and not berry.foraged
-    assert model.berry_id == made + max(0, model.commons_steps[-1][4] - 1)
+    assert model.berry_id == made + max(0, model.commons_steps[-1]["regrown"] - 1)
 
 
 def test_regrowth_has_its_own_random_stream(in_tmp_dir):
@@ -251,24 +251,49 @@ def test_regrowth_delays_are_not_supported(in_tmp_dir):
 
 # ── outputs ───────────────────────────────────────────────────────
 
-def test_commons_reports_one_row_per_step_and_per_episode(in_tmp_dir):
+def test_training_summarises_each_episode_in_the_model_episode_report_without_a_step_file(in_tmp_dir, basic_checkpoint):
     model = build(str(in_tmp_dir / "checkpoints") + "/", seasons=True, max_days=6, write_data=True)
     while model.episode <= 2:
         model.step()
-    steps = pd.read_csv("data/results/current_run/commons_commons.csv")
-    episodes = pd.read_csv("data/results/current_run/commons_episodes_commons.csv")
-    assert list(steps.columns) == CommonsHarvest.STEP_COLUMNS and list(episodes.columns) == CommonsHarvest.EPISODE_COLUMNS
+    episodes = pd.read_csv("data/results/current_run/model_episode_reports_commons.csv")
+    # the model episode report's usual columns, then the commons summary
+    other = _build("basic", "homogeneous", NUM_AGENTS * 3, "baseline", False, basic_checkpoint, False, False, "basic", 1, 5, seed=42)
+    assert list(episodes.columns) == list(other.model_episode_reporter.columns) + CommonsHarvest.EPISODE_SUMMARY_COLUMNS
+    assert "collapse_day" not in other.model_episode_reporter.columns
     assert list(episodes["episode"]) == [1, 2]
-    for episode, rows in steps.groupby("episode"):
+    assert sorted(os.listdir("data/results/current_run")) == ["model_episode_reports_commons.csv"]
+
+
+def test_testing_reports_each_step_in_the_agent_report(in_tmp_dir, basic_checkpoint):
+    checkpoint_path = str(in_tmp_dir / "checkpoints") + "/"
+    trained = build(checkpoint_path, max_days=6)
+    while trained.episode <= 1:
+        trained.step()
+    model = build(checkpoint_path, training=False, seasons=True, max_days=6, write_data=True, filepath="tested")
+    while model.episode <= 2:
+        model.step()
+    agent_reports = pd.read_csv("data/results/current_run/agent_reports_tested.csv")
+    episodes = pd.read_csv("data/results/current_run/model_episode_reports_tested.csv")
+    # the agent report's usual columns, then the step's commons values
+    other = _build("basic", "homogeneous", NUM_AGENTS * 3, "baseline", False, basic_checkpoint, False, False, "basic", 1, 5, seed=42)
+    assert list(agent_reports.columns) == list(other.agent_reporter.columns) + CommonsHarvest.AGENT_REPORT_COLUMNS
+    assert "stock" not in other.agent_reporter.columns
+    assert sorted(os.listdir("data/results/current_run")) == ["agent_reports_tested.csv", "model_episode_reports_tested.csv"]
+    commons_columns = CommonsHarvest.AGENT_REPORT_COLUMNS + ["season", "season_quality"]
+    for episode, rows in agent_reports.groupby("episode"):
+        # every agent's row of a step has the same commons values
+        steps = rows.groupby("day")[commons_columns].nunique(dropna=False)
+        assert (steps == 1).all().all()
+        steps = rows.groupby("day")[commons_columns].first()
+        assert list(steps.index) == list(range(1, len(steps) + 1))
         report = episodes[episodes["episode"] == episode].iloc[0]
-        assert list(rows["day"]) == list(range(1, len(rows) + 1))
-        assert report["mean_stock"] == pytest.approx(rows["stock"].mean())
-        assert report["final_stock"] == rows["stock"].iloc[-1]
-        assert report["efficiency"] == pytest.approx(rows["harvested"].mean() / (R * K / 4))
-        assert ((rows["growth_rate"] / R).round(6).isin([0.5, 1.0, 1.5])).all()
-    # the other reports keep their columns
-    model_report = pd.read_csv("data/results/current_run/model_episode_reports_commons.csv")
-    assert "stock" not in model_report.columns
+        assert report["mean_stock"] == pytest.approx(steps["stock"].mean())
+        assert report["final_stock"] == steps["stock"].iloc[-1]
+        assert report["efficiency"] == pytest.approx(steps["harvested_this_step"].mean() / (R * K / 4))
+        assert (steps["stock"] <= K).all()
+        assert ((steps["growth_rate"] / R).round(6) == steps["season_quality"].map(CommonsHarvest.GROWTH_RATE_MULTIPLIERS)).all()
+        # the stock changes by what was regrown less what was harvested
+        assert (steps["stock"].diff().iloc[1:] == (steps["regrown_this_step"] - steps["harvested_this_step"]).iloc[1:]).all()
 
 
 def test_a_continued_commons_run_carries_on_its_reports(in_tmp_dir):
@@ -282,8 +307,29 @@ def test_a_continued_commons_run_carries_on_its_reports(in_tmp_dir):
     continued.reseed_for_continuing()
     while continued.episode <= 3:
         continued.step()
-    for path in ["commons_commons.csv", "commons_episodes_commons.csv", "model_episode_reports_commons.csv"]:
-        assert sorted(set(pd.read_csv("data/results/current_run/" + path)["episode"])) == [1, 2, 3]
+    assert list(pd.read_csv("data/results/current_run/model_episode_reports_commons.csv")["episode"]) == [1, 2, 3]
+    assert pd.read_csv("data/results/current_run/model_episode_reports_commons.csv")[CommonsHarvest.EPISODE_SUMMARY_COLUMNS[1:]].notna().all().all()
+
+
+def test_a_run_from_before_the_summary_was_in_the_report_continues_with_its_summaries_filled_in(in_tmp_dir):
+    checkpoint_path = str(in_tmp_dir / "checkpoints") + "/"
+    model = build(checkpoint_path, max_days=6, write_data=True)
+    while model.episode <= 2:
+        model.step()
+    # as an earlier run wrote them: the model episode report without the summary, which was in commons_episodes_<file>.csv
+    report_path = "data/results/current_run/model_episode_reports_commons.csv"
+    report = pd.read_csv(report_path)
+    summaries = report[["episode"] + CommonsHarvest.EPISODE_SUMMARY_COLUMNS]
+    report.drop(columns=CommonsHarvest.EPISODE_SUMMARY_COLUMNS).to_csv(report_path, index=False)
+    summaries.to_csv("data/results/current_run/commons_episodes_commons.csv", index=False)
+    continued = build(checkpoint_path, max_days=6, write_data=True, start_episode=3)
+    continued.reseed_for_continuing()
+    while continued.episode <= 3:
+        continued.step()
+    report = pd.read_csv(report_path)
+    assert list(report["episode"]) == [1, 2, 3]
+    pd.testing.assert_frame_equal(report[["episode"] + CommonsHarvest.EPISODE_SUMMARY_COLUMNS].iloc[:2], summaries, check_dtype=False)
+    assert report[CommonsHarvest.EPISODE_SUMMARY_COLUMNS[1:]].iloc[2].notna().all()
 
 
 # ── short runs in every combination ───────────────────────────────
@@ -303,4 +349,4 @@ def test_commons_trains_and_tests_with_or_without_seasons_and_mixed_societies(in
     assert {a.agent_type for a in agents(tested)} == ({"utilitarian", "baseline"} if society_mix != "homogeneous" else {"utilitarian"})
     while tested.episode <= 2:
         tested.step()
-    assert len(pd.read_csv("data/results/current_run/commons_episodes_commons.csv")) == 2
+    assert len(pd.read_csv("data/results/current_run/model_episode_reports_commons.csv")) == 2

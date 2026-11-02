@@ -93,7 +93,20 @@ def generate_graphs(scenario, run_name, num_agents, seasons=False, allotment_reg
         dfs.append(df)
     data_analysis.proccess_and_display_data(dfs, principles, AGGREGATIONS, scenario, norms_filepath, write=True, get_normalised=False, process_norms=process_norms)
 
+def format_duration(seconds):
+    """
+    A duration as hours, minutes and seconds, e.g. 3h 05m 12s (or 5m 12s, or 12s)
+    """
+    hours, remainder = divmod(int(round(seconds)), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    if hours:
+        return f"{hours}h {minutes:02d}m {seconds:02d}s"
+    if minutes:
+        return f"{minutes}m {seconds:02d}s"
+    return f"{seconds}s"
+
 def run_simulation(model_inst, render, log_wandb, wandb_project):
+    start_time = time.time()
     if log_wandb:
         wandb.init(project=wandb_project)
     if render:
@@ -109,7 +122,8 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
                 break
     model_inst.finish_episode(collect_data=False)
     num_episodes = model_inst.episode
-    print(f"simulation finished time: {time.time()}")
+    end_time = time.time()
+    print(f"Simulation finished at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))}, after {format_duration(end_time - start_time)}")
     return num_episodes
 
 def scenario_file_string(scenario, seasons, allotment_regrowth_delays=None, mixed_allotments="split", society_mix="homogeneous"):

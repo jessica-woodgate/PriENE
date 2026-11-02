@@ -132,7 +132,6 @@ class HarvestModel(Model):
         self.schedule.step()
         self.day += 1
         self._update_schedule()
-        self._end_of_step_dynamics()
         self.epsilon = self._mean_epsilon()
         if self.track_norms and self.norms_module_type == "rule_based":
             self._check_emerged_norms()
@@ -271,9 +270,34 @@ class HarvestModel(Model):
         """
         return []
 
+    def extra_agent_report_columns(self):
+        """
+        Columns a scenario adds to the end of the agent report, one row per agent per step (none by default)
+        """
+        return []
+
+    def extra_agent_report_values(self, agent):
+        """
+        This step's value for each of extra_agent_report_columns in agent's row, by column
+        """
+        return {}
+
+    def extra_episode_report_columns(self):
+        """
+        Columns a scenario adds to the end of the model episode report (none by default)
+        """
+        return []
+
+    def extra_episode_report_values(self):
+        """
+        This episode's value for each of extra_episode_report_columns, by column
+        """
+        return {}
+
     def _end_of_step_dynamics(self):
         """
-        Changes to the environment once every agent has acted and the schedule is updated, before the end of episode check (none by default)
+        Changes to the environment once every agent has acted and this step's foraged berries are handled, before agents' rows are
+        reported and the end of episode check (none by default)
         """
         pass
 
@@ -358,23 +382,7 @@ class HarvestModel(Model):
             raise NumBerriesException(self.num_berries, num_berries)
         if self.seasons:
             self._start_season_quality()
-        self.agent_reporter = pd.DataFrame({"agent_id": [],
-                               "agent_type": [],
-                               "episode": [],
-                               "day": [],
-                               "berries": [],
-                               "berries_consumed": [],
-                               "berries_thrown": [],
-                               "health": [],
-                               "days_left_to_live": [],
-                               "total_days_left_to_live": [],
-                               "action": [],
-                               "reward": [],
-                               "num_norms": [],
-                               "season": [],
-                               "season_quality": [],
-                               "seasonal_berry_target": [],
-                               "allotment_regrowth_delay": []})
+        self.agent_reporter = self._empty_agent_reporter()
 
     def _restore_episode_state(self):
         """
@@ -571,9 +579,8 @@ class HarvestModel(Model):
         berry.reset()
         self._place_agent_in_allotment(berry)
         
-    def _init_reporters(self):
-        os.makedirs("data/results/current_run", exist_ok=True)
-        self.agent_reporter = pd.DataFrame({"agent_id": [],
+    def _empty_agent_reporter(self):
+        agent_reporter = pd.DataFrame({"agent_id": [],
                                "agent_type": [],
                                "episode": [],
                                "day": [],
@@ -590,6 +597,13 @@ class HarvestModel(Model):
                                "season_quality": [],
                                "seasonal_berry_target": [],
                                "allotment_regrowth_delay": []})
+        for column in self.extra_agent_report_columns():
+            agent_reporter[column] = []
+        return agent_reporter
+
+    def _init_reporters(self):
+        os.makedirs("data/results/current_run", exist_ok=True)
+        self.agent_reporter = self._empty_agent_reporter()
         if self.write_data and not self.training:
            if exists("data/results/current_run/agent_reports_"+self.filepath+".csv"):
                raise FileExistsException("data/results/current_run/agent_reports_"+self.filepath+".csv")
@@ -612,6 +626,8 @@ class HarvestModel(Model):
                                "deceased": [],
                                "num_emerged_norms": [],
                                "seed": []})
+        for column in self.extra_episode_report_columns():
+            self.model_episode_reporter[column] = []
         if self.write_data:
             self._start_report("data/results/current_run/model_episode_reports_"+self.filepath+".csv", list(self.model_episode_reporter.columns))
         if self.track_norms and self.norms_module_type == "bayesian":
@@ -625,20 +641,23 @@ class HarvestModel(Model):
         is carrying on its report
         """
         if self.training and self.episode > 1 and exists(report_path):
-            self._continue_report(report_path)
+            self._continue_report(report_path, columns)
         else:
             if exists(report_path):
                 raise FileExistsException(report_path)
             pd.DataFrame(columns=columns).to_csv(report_path, mode='a', index=False)
 
-    def _continue_report(self, report_path):
+    def _continue_report(self, report_path, columns=None):
         """
-        A continued training run carries on its report, without the episodes it is about to train again; written beside it and
-        moved over it, so stopping now leaves the report whole
+        A continued training run carries on its report, without the episodes it is about to train again, and with the report's current
+        columns (empty in earlier rows for any it didn't have); written beside it and moved over it, so stopping now leaves the report whole
         """
         reports = pd.read_csv(report_path)
+        reports = reports[reports["episode"] < self.episode]
+        if columns is not None and list(reports.columns) != list(columns):
+            reports = reports.reindex(columns=columns)
         writing_path = report_path+".writing"
-        reports[reports["episode"] < self.episode].to_csv(writing_path, index=False)
+        reports.to_csv(writing_path, index=False)
         os.replace(writing_path, report_path)
 
     def _collect_agent_data(self, agent):
@@ -658,7 +677,8 @@ class HarvestModel(Model):
                                "season": [self.season],
                                "season_quality": [self._current_season_quality()],
                                "seasonal_berry_target": [self._seasonal_berry_target(agent)],
-                               "allotment_regrowth_delay": [self._allotment_regrowth_delay(agent)]})
+                               "allotment_regrowth_delay": [self._allotment_regrowth_delay(agent)],
+                               **{column: [value] for column, value in self.extra_agent_report_values(agent).items()}})
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry])
         if self.write_data and not self.training:
            new_entry.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
@@ -694,7 +714,8 @@ class HarvestModel(Model):
                                "variance_health": [rows["health"].var(axis=0)],
                                "deceased": [self.num_agents - len(self.living_agents)],
                                "num_emerged_norms": [len(self.emerged_norms) if self.track_norms else None],
-                               "seed": [self.seed]})
+                               "seed": [self.seed],
+                               **{column: [value] for column, value in self.extra_episode_report_values().items()}})
         if self.write_data:
             new_entry.to_csv("data/results/current_run/model_episode_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
         return new_entry
@@ -817,10 +838,13 @@ class HarvestModel(Model):
     def _update_schedule(self):
         if self.regrowth_timers:
             self._regrow_due_berries()
-        #check for dead agents & foraged berries
-        for a in self.schedule.agents:
+        scheduled = self.schedule.agents
+        #foraged berries, then the step's end-of-step changes, so every agent's row sees the whole step; then dead agents
+        for a in scheduled:
             if a.agent_type == "berry" and a.foraged == True:
                 self._handle_foraged_berry(a)
+        self._end_of_step_dynamics()
+        for a in scheduled:
             if a.agent_type != "berry":
                 if a.off_grid == False:
                     self._collect_agent_data(a)
