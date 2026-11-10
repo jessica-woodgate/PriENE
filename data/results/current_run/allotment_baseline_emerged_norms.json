@@ -868,5 +868,5940 @@
                 "last_day_held": 200
             }
         }
+    ],
+    "7": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.0,
+                "numerosity": 8,
+                "fitness": 6.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 8,
+                "days_held": 193,
+                "reward": 3.0,
+                "numerosity": 27,
+                "fitness": 222.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 8,
+                "days_held": 193,
+                "reward": 5,
+                "numerosity": 5,
+                "fitness": 16.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 16,
+                "days_held": 185,
+                "reward": 1.0,
+                "numerosity": 10,
+                "fitness": 5.550000000000001,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 17,
+                "days_held": 184,
+                "reward": 1.0,
+                "numerosity": 4,
+                "fitness": 6.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,low health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 28,
+                "days_held": 173,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 14.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 151,
+                "days_held": 50,
+                "reward": 3.5,
+                "numerosity": 57,
+                "fitness": 1636.0500000000002,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 156,
+                "days_held": 45,
+                "reward": 7.5,
+                "numerosity": 46,
+                "fitness": 2737.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "8": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.5,
+                "numerosity": 17,
+                "fitness": 30.6,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 17,
+                "days_held": 184,
+                "reward": 1.0,
+                "numerosity": 10,
+                "fitness": 27.299999999999997,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 19,
+                "days_held": 182,
+                "reward": 2.0,
+                "numerosity": 25,
+                "fitness": 125.39999999999999,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,low days,THEN,eat": {
+                "first_day_held": 20,
+                "days_held": 181,
+                "reward": 6,
+                "numerosity": 6,
+                "fitness": 64.8,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 23,
+                "days_held": 178,
+                "reward": 3.0,
+                "numerosity": 16,
+                "fitness": 142.2,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 26,
+                "days_held": 175,
+                "reward": 1.5,
+                "numerosity": 13,
+                "fitness": 37.95,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,high days,THEN,move": {
+                "first_day_held": 79,
+                "days_held": 122,
+                "reward": 6.0,
+                "numerosity": 40,
+                "fitness": 2675.7,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,medium days,THEN,move": {
+                "first_day_held": 99,
+                "days_held": 102,
+                "reward": 4.0,
+                "numerosity": 50,
+                "fitness": 2468.7,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,high days,THEN,move": {
+                "first_day_held": 100,
+                "days_held": 101,
+                "reward": 6.0,
+                "numerosity": 62,
+                "fitness": 4641.6,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 111,
+                "days_held": 90,
+                "reward": 9.0,
+                "numerosity": 80,
+                "fitness": 5108.4,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,medium days,THEN,move": {
+                "first_day_held": 114,
+                "days_held": 87,
+                "reward": 5.5,
+                "numerosity": 67,
+                "fitness": 4090.5,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,medium days,THEN,move": {
+                "first_day_held": 143,
+                "days_held": 58,
+                "reward": 3.0,
+                "numerosity": 32,
+                "fitness": 1014.3,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,high days,THEN,move": {
+                "first_day_held": 144,
+                "days_held": 57,
+                "reward": 3.5,
+                "numerosity": 36,
+                "fitness": 811.4999999999999,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "9": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 2.0,
+                "numerosity": 18,
+                "fitness": 957.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 9,
+                "days_held": 192,
+                "reward": 3.5,
+                "numerosity": 25,
+                "fitness": 1297.8000000000002,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 24,
+                "days_held": 177,
+                "reward": 3.0,
+                "numerosity": 25,
+                "fitness": 997.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 26,
+                "days_held": 175,
+                "reward": 0.5,
+                "numerosity": 25,
+                "fitness": 99.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 29,
+                "days_held": 172,
+                "reward": 1.0,
+                "numerosity": 22,
+                "fitness": 286.8,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 35,
+                "days_held": 166,
+                "reward": 1.0,
+                "numerosity": 16,
+                "fitness": 163.65,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 38,
+                "days_held": 163,
+                "reward": 2.0,
+                "numerosity": 18,
+                "fitness": 662.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 48,
+                "days_held": 153,
+                "reward": 1.5,
+                "numerosity": 14,
+                "fitness": 216.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,low days,low days,THEN,eat": {
+                "first_day_held": 59,
+                "days_held": 142,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 28.799999999999997,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,low days,THEN,eat": {
+                "first_day_held": 62,
+                "days_held": 139,
+                "reward": 5,
+                "numerosity": 5,
+                "fitness": 168.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,medium days,THEN,eat": {
+                "first_day_held": 86,
+                "days_held": 115,
+                "reward": 5,
+                "numerosity": 5,
+                "fitness": 369.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 98,
+                "days_held": 103,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,THEN,move": {
+                "first_day_held": 121,
+                "days_held": 80,
+                "reward": 0.5,
+                "numerosity": 8,
+                "fitness": 4.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 122,
+                "days_held": 79,
+                "reward": 1.0,
+                "numerosity": 5,
+                "fitness": 3.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,THEN,eat": {
+                "first_day_held": 127,
+                "days_held": 74,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,low days,medium days,THEN,eat": {
+                "first_day_held": 128,
+                "days_held": 73,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 67.5,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,THEN,move": {
+                "first_day_held": 129,
+                "days_held": 72,
+                "reward": 5.5,
+                "numerosity": 23,
+                "fitness": 493.8,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,THEN,eat": {
+                "first_day_held": 131,
+                "days_held": 70,
+                "reward": 11,
+                "numerosity": 11,
+                "fitness": 444.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,THEN,move": {
+                "first_day_held": 143,
+                "days_held": 58,
+                "reward": 4.5,
+                "numerosity": 44,
+                "fitness": 1305.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,THEN,eat": {
+                "first_day_held": 162,
+                "days_held": 39,
+                "reward": 10,
+                "numerosity": 10,
+                "fitness": 657.5999999999999,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 176,
+                "days_held": 25,
+                "reward": 8.5,
+                "numerosity": 40,
+                "fitness": 1555.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 180,
+                "days_held": 21,
+                "reward": 12,
+                "numerosity": 12,
+                "fitness": 556.8,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "10": [
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 4,
+                "days_held": 197,
+                "reward": 0.5,
+                "numerosity": 10,
+                "fitness": 13.95,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 10,
+                "days_held": 191,
+                "reward": 2.0,
+                "numerosity": 12,
+                "fitness": 163.05,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 13,
+                "days_held": 188,
+                "reward": 1.0,
+                "numerosity": 14,
+                "fitness": 111.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 18,
+                "days_held": 183,
+                "reward": 0.5,
+                "numerosity": 6,
+                "fitness": 12.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 19,
+                "days_held": 182,
+                "reward": 0.5,
+                "numerosity": 12,
+                "fitness": 1.35,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 28,
+                "days_held": 173,
+                "reward": 0.5,
+                "numerosity": 5,
+                "fitness": 10.8,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 38,
+                "days_held": 163,
+                "reward": 0.5,
+                "numerosity": 6,
+                "fitness": 8.1,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 52,
+                "days_held": 149,
+                "reward": 3.0,
+                "numerosity": 19,
+                "fitness": 94.5,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+                "first_day_held": 54,
+                "days_held": 147,
+                "reward": 6,
+                "numerosity": 6,
+                "fitness": 51.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,low health,medium days,medium days,low days,THEN,eat": {
+                "first_day_held": 80,
+                "days_held": 121,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 8.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,low days,medium days,THEN,eat": {
+                "first_day_held": 80,
+                "days_held": 121,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,low days,THEN,eat": {
+                "first_day_held": 80,
+                "days_held": 121,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 31.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 80,
+                "days_held": 121,
+                "reward": 0.5,
+                "numerosity": 4,
+                "fitness": 6.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,THEN,move": {
+                "first_day_held": 80,
+                "days_held": 121,
+                "reward": 0.5,
+                "numerosity": 3,
+                "fitness": 0.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,THEN,move": {
+                "first_day_held": 80,
+                "days_held": 121,
+                "reward": 2.0,
+                "numerosity": 15,
+                "fitness": 204.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 80,
+                "days_held": 121,
+                "reward": 1.0,
+                "numerosity": 7,
+                "fitness": 19.8,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,THEN,eat": {
+                "first_day_held": 80,
+                "days_held": 121,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 3.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,THEN,move": {
+                "first_day_held": 84,
+                "days_held": 117,
+                "reward": 6.5,
+                "numerosity": 48,
+                "fitness": 6405.75,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 127,
+                "days_held": 74,
+                "reward": 17.5,
+                "numerosity": 117,
+                "fitness": 28343.25,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 128,
+                "days_held": 73,
+                "reward": 33,
+                "numerosity": 32,
+                "fitness": 15744.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "11": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 0.5,
+                "numerosity": 7,
+                "fitness": 3.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 9,
+                "days_held": 192,
+                "reward": 0.5,
+                "numerosity": 5,
+                "fitness": 0.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 14,
+                "days_held": 187,
+                "reward": 0,
+                "numerosity": 4,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 3.5,
+                "numerosity": 22,
+                "fitness": 301.5,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 16,
+                "days_held": 185,
+                "reward": 12,
+                "numerosity": 12,
+                "fitness": 523.8,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 18,
+                "days_held": 183,
+                "reward": 0.5,
+                "numerosity": 4,
+                "fitness": 0.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 83,
+                "days_held": 118,
+                "reward": 2.0,
+                "numerosity": 5,
+                "fitness": 14.1,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 0.5,
+                "numerosity": 3,
+                "fitness": 1.5,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,low health,low days,low days,medium days,THEN,eat": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 1.0,
+                "numerosity": 10,
+                "fitness": 61.5,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 2.0,
+                "numerosity": 14,
+                "fitness": 141.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 8,
+                "numerosity": 8,
+                "fitness": 396.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 1.0,
+                "numerosity": 9,
+                "fitness": 28.05,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 4.0,
+                "numerosity": 29,
+                "fitness": 1558.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,low days,low days,medium days,THEN,eat": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 14.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 0.5,
+                "numerosity": 9,
+                "fitness": 3.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,medium days,low days,THEN,eat": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 45.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 0,
+                "numerosity": 9,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 0.5,
+                "numerosity": 4,
+                "fitness": 8.1,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 3.0,
+                "numerosity": 32,
+                "fitness": 525.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,low days,THEN,eat": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 24.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,medium days,THEN,eat": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,low days,medium days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 1.0,
+                "numerosity": 8,
+                "fitness": 61.5,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,low days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 1.5,
+                "numerosity": 7,
+                "fitness": 61.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,low days,medium days,THEN,eat": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 42.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,low days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 0.5,
+                "numerosity": 11,
+                "fitness": 56.7,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 1.0,
+                "numerosity": 9,
+                "fitness": 43.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,THEN,eat": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 16.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 1.5,
+                "numerosity": 6,
+                "fitness": 10.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,low days,high days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 1.5,
+                "numerosity": 15,
+                "fitness": 89.1,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,low days,THEN,eat": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 22.8,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,low days,high days,THEN,eat": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 12.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 167,
+                "days_held": 34,
+                "reward": 10.0,
+                "numerosity": 52,
+                "fitness": 2622.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 168,
+                "days_held": 33,
+                "reward": 19,
+                "numerosity": 18,
+                "fitness": 1651.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "12": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.0,
+                "numerosity": 8,
+                "fitness": 23.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 8,
+                "days_held": 193,
+                "reward": 0,
+                "numerosity": 3,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 0.5,
+                "numerosity": 4,
+                "fitness": 0.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,THEN,move": {
+                "first_day_held": 24,
+                "days_held": 177,
+                "reward": 0.5,
+                "numerosity": 3,
+                "fitness": 0.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 25,
+                "days_held": 176,
+                "reward": 6.0,
+                "numerosity": 33,
+                "fitness": 1210.5,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+                "first_day_held": 25,
+                "days_held": 176,
+                "reward": 13,
+                "numerosity": 13,
+                "fitness": 939.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,low days,THEN,move": {
+                "first_day_held": 152,
+                "days_held": 49,
+                "reward": 1.5,
+                "numerosity": 16,
+                "fitness": 319.79999999999995,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,THEN,move": {
+                "first_day_held": 152,
+                "days_held": 49,
+                "reward": 8.5,
+                "numerosity": 86,
+                "fitness": 15315.300000000001,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,medium days,THEN,eat": {
+                "first_day_held": 152,
+                "days_held": 49,
+                "reward": 15,
+                "numerosity": 15,
+                "fitness": 4468.8,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 187,
+                "days_held": 14,
+                "reward": 6.0,
+                "numerosity": 38,
+                "fitness": 2747.25,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 199,
+                "days_held": 2,
+                "reward": 9,
+                "numerosity": 9,
+                "fitness": 710.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "13": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.0,
+                "numerosity": 9,
+                "fitness": 4.5,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 7,
+                "days_held": 194,
+                "reward": 8.0,
+                "numerosity": 47,
+                "fitness": 910.2,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 11,
+                "days_held": 190,
+                "reward": 1.0,
+                "numerosity": 6,
+                "fitness": 1.8,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 17,
+                "days_held": 184,
+                "reward": 1.5,
+                "numerosity": 19,
+                "fitness": 19.5,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 18,
+                "days_held": 183,
+                "reward": 1.0,
+                "numerosity": 6,
+                "fitness": 3.0,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 14,
+                "numerosity": 14,
+                "fitness": 353.7,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,medium days,THEN,move": {
+                "first_day_held": 137,
+                "days_held": 64,
+                "reward": 1.5,
+                "numerosity": 34,
+                "fitness": 301.5,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,high days,THEN,move": {
+                "first_day_held": 140,
+                "days_held": 61,
+                "reward": 8.0,
+                "numerosity": 44,
+                "fitness": 1687.2,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,high days,THEN,eat": {
+                "first_day_held": 157,
+                "days_held": 44,
+                "reward": 12,
+                "numerosity": 12,
+                "fitness": 458.1,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,high days,THEN,eat": {
+                "first_day_held": 161,
+                "days_held": 40,
+                "reward": 12,
+                "numerosity": 12,
+                "fitness": 359.7,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,high days,THEN,move": {
+                "first_day_held": 163,
+                "days_held": 38,
+                "reward": 8.0,
+                "numerosity": 61,
+                "fitness": 2874.3,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,high days,THEN,move": {
+                "first_day_held": 172,
+                "days_held": 29,
+                "reward": 9.0,
+                "numerosity": 39,
+                "fitness": 2823.0,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "14": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 0.5,
+                "numerosity": 4,
+                "fitness": 0.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 4,
+                "days_held": 197,
+                "reward": 4.5,
+                "numerosity": 47,
+                "fitness": 634.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 11,
+                "days_held": 190,
+                "reward": 1.5,
+                "numerosity": 11,
+                "fitness": 153.9,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 11,
+                "days_held": 190,
+                "reward": 2.0,
+                "numerosity": 19,
+                "fitness": 137.7,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,low days,THEN,eat": {
+                "first_day_held": 11,
+                "days_held": 190,
+                "reward": 6,
+                "numerosity": 6,
+                "fitness": 91.19999999999999,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 13,
+                "days_held": 188,
+                "reward": 3.0,
+                "numerosity": 16,
+                "fitness": 217.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 16,
+                "days_held": 185,
+                "reward": 11,
+                "numerosity": 11,
+                "fitness": 370.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 34,
+                "days_held": 167,
+                "reward": 2.5,
+                "numerosity": 18,
+                "fitness": 228.15,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 87,
+                "days_held": 114,
+                "reward": 10.5,
+                "numerosity": 74,
+                "fitness": 2739.6,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+                "first_day_held": 91,
+                "days_held": 110,
+                "reward": 23,
+                "numerosity": 23,
+                "fitness": 1754.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,THEN,move": {
+                "first_day_held": 101,
+                "days_held": 100,
+                "reward": 1.5,
+                "numerosity": 16,
+                "fitness": 71.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,THEN,move": {
+                "first_day_held": 126,
+                "days_held": 75,
+                "reward": 7.0,
+                "numerosity": 46,
+                "fitness": 917.0999999999999,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,medium days,THEN,eat": {
+                "first_day_held": 132,
+                "days_held": 69,
+                "reward": 13,
+                "numerosity": 13,
+                "fitness": 369.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 140,
+                "days_held": 61,
+                "reward": 3.5,
+                "numerosity": 27,
+                "fitness": 714.15,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 144,
+                "days_held": 57,
+                "reward": 3.5,
+                "numerosity": 22,
+                "fitness": 602.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 145,
+                "days_held": 56,
+                "reward": 12.5,
+                "numerosity": 94,
+                "fitness": 6357.9,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 150,
+                "days_held": 51,
+                "reward": 23,
+                "numerosity": 23,
+                "fitness": 2143.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "15": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 0.5,
+                "numerosity": 16,
+                "fitness": 15.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 0.5,
+                "numerosity": 3,
+                "fitness": 0.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 0.5,
+                "numerosity": 3,
+                "fitness": 0.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 0.5,
+                "numerosity": 3,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 1.0,
+                "numerosity": 7,
+                "fitness": 3.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,THEN,move": {
+                "first_day_held": 24,
+                "days_held": 177,
+                "reward": 6.5,
+                "numerosity": 43,
+                "fitness": 2196.15,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,THEN,move": {
+                "first_day_held": 24,
+                "days_held": 177,
+                "reward": 1.0,
+                "numerosity": 6,
+                "fitness": 6.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,THEN,eat": {
+                "first_day_held": 26,
+                "days_held": 175,
+                "reward": 17,
+                "numerosity": 17,
+                "fitness": 1731.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,THEN,move": {
+                "first_day_held": 65,
+                "days_held": 136,
+                "reward": 4.0,
+                "numerosity": 37,
+                "fitness": 1488.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 78,
+                "days_held": 123,
+                "reward": 29.0,
+                "numerosity": 187,
+                "fitness": 99968.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 79,
+                "days_held": 122,
+                "reward": 53,
+                "numerosity": 53,
+                "fitness": 50444.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "16": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 6,
+                "days_held": 195,
+                "reward": 1.0,
+                "numerosity": 10,
+                "fitness": 37.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 8,
+                "days_held": 193,
+                "reward": 1.0,
+                "numerosity": 9,
+                "fitness": 14.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 9,
+                "days_held": 192,
+                "reward": 0,
+                "numerosity": 4,
+                "fitness": 0.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 10,
+                "days_held": 191,
+                "reward": 0.5,
+                "numerosity": 8,
+                "fitness": 19.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 20,
+                "days_held": 181,
+                "reward": 1.5,
+                "numerosity": 7,
+                "fitness": 9.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 23,
+                "days_held": 178,
+                "reward": 1.0,
+                "numerosity": 5,
+                "fitness": 5.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 28,
+                "days_held": 173,
+                "reward": 2.0,
+                "numerosity": 20,
+                "fitness": 130.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 35,
+                "days_held": 166,
+                "reward": 6,
+                "numerosity": 6,
+                "fitness": 26.400000000000002,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,medium days,THEN,move": {
+                "first_day_held": 78,
+                "days_held": 123,
+                "reward": 3.0,
+                "numerosity": 36,
+                "fitness": 1285.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,high days,THEN,move": {
+                "first_day_held": 79,
+                "days_held": 122,
+                "reward": 3.0,
+                "numerosity": 28,
+                "fitness": 1044.6,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,medium days,THEN,move": {
+                "first_day_held": 83,
+                "days_held": 118,
+                "reward": 3.5,
+                "numerosity": 28,
+                "fitness": 1322.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,high days,THEN,move": {
+                "first_day_held": 91,
+                "days_held": 110,
+                "reward": 2.0,
+                "numerosity": 21,
+                "fitness": 315.45,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,medium days,THEN,move": {
+                "first_day_held": 95,
+                "days_held": 106,
+                "reward": 2.0,
+                "numerosity": 15,
+                "fitness": 216.45,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,medium days,THEN,eat": {
+                "first_day_held": 146,
+                "days_held": 55,
+                "reward": 8,
+                "numerosity": 8,
+                "fitness": 198.29999999999998,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,high days,THEN,move": {
+                "first_day_held": 146,
+                "days_held": 55,
+                "reward": 1.5,
+                "numerosity": 15,
+                "fitness": 37.35,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 189,
+                "days_held": 12,
+                "reward": 3.0,
+                "numerosity": 33,
+                "fitness": 753.6,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 191,
+                "days_held": 10,
+                "reward": 7.5,
+                "numerosity": 43,
+                "fitness": 1834.05,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 198,
+                "days_held": 3,
+                "reward": 2.0,
+                "numerosity": 20,
+                "fitness": 290.7,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "17": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 0.5,
+                "numerosity": 14,
+                "fitness": 13.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,low health,low days,low days,low days,THEN,move": {
+                "first_day_held": 6,
+                "days_held": 195,
+                "reward": 1.5,
+                "numerosity": 3,
+                "fitness": 3.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,low health,low days,low days,low days,THEN,eat": {
+                "first_day_held": 9,
+                "days_held": 192,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 7.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 0.5,
+                "numerosity": 3,
+                "fitness": 0.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,low days,medium days,THEN,eat": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 0,
+                "numerosity": 5,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 0.5,
+                "numerosity": 3,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,THEN,move": {
+                "first_day_held": 24,
+                "days_held": 177,
+                "reward": 8.0,
+                "numerosity": 54,
+                "fitness": 3513.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,THEN,eat": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 16,
+                "numerosity": 16,
+                "fitness": 1658.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 103,
+                "days_held": 98,
+                "reward": 21.5,
+                "numerosity": 138,
+                "fitness": 47805.15,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 107,
+                "days_held": 94,
+                "reward": 42,
+                "numerosity": 42,
+                "fitness": 25826.1,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,throw": {
+                "first_day_held": 189,
+                "days_held": 12,
+                "reward": -0.5999999999999999,
+                "numerosity": 8,
+                "fitness": -11.16,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "18": [
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 13,
+                "days_held": 188,
+                "reward": 1.5,
+                "numerosity": 15,
+                "fitness": 50.85,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 16,
+                "days_held": 185,
+                "reward": 1.5,
+                "numerosity": 11,
+                "fitness": 56.7,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 1.5,
+                "numerosity": 9,
+                "fitness": 22.799999999999997,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 0.5,
+                "numerosity": 6,
+                "fitness": 2.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 0.5,
+                "numerosity": 10,
+                "fitness": 14.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 72,
+                "days_held": 129,
+                "reward": 11.0,
+                "numerosity": 80,
+                "fitness": 9753.6,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 78,
+                "days_held": 123,
+                "reward": 8.0,
+                "numerosity": 72,
+                "fitness": 7000.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,THEN,move": {
+                "first_day_held": 80,
+                "days_held": 121,
+                "reward": 4.5,
+                "numerosity": 39,
+                "fitness": 1566.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,THEN,eat": {
+                "first_day_held": 82,
+                "days_held": 119,
+                "reward": 20,
+                "numerosity": 20,
+                "fitness": 4452.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,THEN,eat": {
+                "first_day_held": 88,
+                "days_held": 113,
+                "reward": 16,
+                "numerosity": 16,
+                "fitness": 2085.9,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 145,
+                "days_held": 56,
+                "reward": 19.5,
+                "numerosity": 165,
+                "fitness": 42340.35,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 146,
+                "days_held": 55,
+                "reward": 38,
+                "numerosity": 36,
+                "fitness": 14917.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "19": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.0,
+                "numerosity": 8,
+                "fitness": 4.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 7,
+                "days_held": 194,
+                "reward": 0,
+                "numerosity": 7,
+                "fitness": 0.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 9,
+                "days_held": 192,
+                "reward": 1.5,
+                "numerosity": 13,
+                "fitness": 36.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 10,
+                "days_held": 191,
+                "reward": 1.0,
+                "numerosity": 3,
+                "fitness": 0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 33,
+                "days_held": 168,
+                "reward": 1.0,
+                "numerosity": 7,
+                "fitness": 4.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 33,
+                "days_held": 168,
+                "reward": 2.5,
+                "numerosity": 13,
+                "fitness": 91.65,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,medium days,THEN,eat": {
+                "first_day_held": 33,
+                "days_held": 168,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 6.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,THEN,move": {
+                "first_day_held": 65,
+                "days_held": 136,
+                "reward": 12.0,
+                "numerosity": 111,
+                "fitness": 14359.199999999999,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,medium days,THEN,eat": {
+                "first_day_held": 89,
+                "days_held": 112,
+                "reward": 19,
+                "numerosity": 19,
+                "fitness": 3372.8999999999996,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 91,
+                "days_held": 110,
+                "reward": 5.5,
+                "numerosity": 50,
+                "fitness": 3577.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 96,
+                "days_held": 105,
+                "reward": 6.0,
+                "numerosity": 60,
+                "fitness": 5100.299999999999,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 181,
+                "days_held": 20,
+                "reward": 11.5,
+                "numerosity": 55,
+                "fitness": 2501.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 181,
+                "days_held": 20,
+                "reward": 21,
+                "numerosity": 20,
+                "fitness": 1041.3000000000002,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "20": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.0,
+                "numerosity": 11,
+                "fitness": 6.300000000000001,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 3.5,
+                "numerosity": 41,
+                "fitness": 946.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 29,
+                "days_held": 172,
+                "reward": 3.5,
+                "numerosity": 35,
+                "fitness": 612.45,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+                "first_day_held": 32,
+                "days_held": 169,
+                "reward": 8,
+                "numerosity": 8,
+                "fitness": 354.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,THEN,move": {
+                "first_day_held": 37,
+                "days_held": 164,
+                "reward": 5.0,
+                "numerosity": 36,
+                "fitness": 826.1999999999999,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,THEN,eat": {
+                "first_day_held": 61,
+                "days_held": 140,
+                "reward": 8,
+                "numerosity": 8,
+                "fitness": 197.7,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 97,
+                "days_held": 104,
+                "reward": 6.5,
+                "numerosity": 55,
+                "fitness": 2278.65,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 98,
+                "days_held": 103,
+                "reward": 5.0,
+                "numerosity": 48,
+                "fitness": 1822.8000000000002,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 109,
+                "days_held": 92,
+                "reward": 20.5,
+                "numerosity": 134,
+                "fitness": 28270.350000000002,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,THEN,move": {
+                "first_day_held": 117,
+                "days_held": 84,
+                "reward": 4.0,
+                "numerosity": 25,
+                "fitness": 2081.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,THEN,eat": {
+                "first_day_held": 129,
+                "days_held": 72,
+                "reward": 11,
+                "numerosity": 11,
+                "fitness": 485.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 145,
+                "days_held": 56,
+                "reward": 40,
+                "numerosity": 38,
+                "fitness": 12292.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "21": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.5,
+                "numerosity": 10,
+                "fitness": 56.7,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 11,
+                "days_held": 190,
+                "reward": 0,
+                "numerosity": 4,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 0.5,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 0.5,
+                "numerosity": 4,
+                "fitness": 2.7,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 0,
+                "numerosity": 3,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,THEN,eat": {
+                "first_day_held": 45,
+                "days_held": 156,
+                "reward": 6,
+                "numerosity": 6,
+                "fitness": 82.5,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,THEN,move": {
+                "first_day_held": 53,
+                "days_held": 148,
+                "reward": 5.0,
+                "numerosity": 42,
+                "fitness": 1512.45,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,THEN,eat": {
+                "first_day_held": 59,
+                "days_held": 142,
+                "reward": 8,
+                "numerosity": 8,
+                "fitness": 211.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 62,
+                "days_held": 139,
+                "reward": 28.5,
+                "numerosity": 189,
+                "fitness": 110909.25,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 66,
+                "days_held": 135,
+                "reward": 58,
+                "numerosity": 57,
+                "fitness": 65189.100000000006,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "22": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.0,
+                "numerosity": 16,
+                "fitness": 11.55,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 16,
+                "days_held": 185,
+                "reward": 6.5,
+                "numerosity": 46,
+                "fitness": 3090.1499999999996,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 26,
+                "days_held": 175,
+                "reward": 3.5,
+                "numerosity": 32,
+                "fitness": 1023.75,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,low days,THEN,eat": {
+                "first_day_held": 31,
+                "days_held": 170,
+                "reward": 9,
+                "numerosity": 9,
+                "fitness": 549.9,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 53,
+                "days_held": 148,
+                "reward": 1.5,
+                "numerosity": 17,
+                "fitness": 134.1,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 55,
+                "days_held": 146,
+                "reward": 1.5,
+                "numerosity": 11,
+                "fitness": 62.55,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 57,
+                "days_held": 144,
+                "reward": 2.5,
+                "numerosity": 27,
+                "fitness": 395.54999999999995,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 58,
+                "days_held": 143,
+                "reward": 1.5,
+                "numerosity": 15,
+                "fitness": 76.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 99,
+                "days_held": 102,
+                "reward": 2.5,
+                "numerosity": 16,
+                "fitness": 368.7,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,low days,medium days,THEN,eat": {
+                "first_day_held": 128,
+                "days_held": 73,
+                "reward": 8,
+                "numerosity": 8,
+                "fitness": 443.7,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,medium days,THEN,eat": {
+                "first_day_held": 128,
+                "days_held": 73,
+                "reward": 10,
+                "numerosity": 10,
+                "fitness": 621.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 128,
+                "days_held": 73,
+                "reward": 1.0,
+                "numerosity": 12,
+                "fitness": 77.7,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,THEN,move": {
+                "first_day_held": 129,
+                "days_held": 72,
+                "reward": 10.0,
+                "numerosity": 74,
+                "fitness": 6912.45,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 133,
+                "days_held": 68,
+                "reward": 5.5,
+                "numerosity": 30,
+                "fitness": 1746.8999999999999,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 140,
+                "days_held": 61,
+                "reward": 3.0,
+                "numerosity": 36,
+                "fitness": 747.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,medium days,THEN,eat": {
+                "first_day_held": 147,
+                "days_held": 54,
+                "reward": 20,
+                "numerosity": 20,
+                "fitness": 3461.7,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,THEN,eat": {
+                "first_day_held": 150,
+                "days_held": 51,
+                "reward": 8,
+                "numerosity": 8,
+                "fitness": 260.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 156,
+                "days_held": 45,
+                "reward": 0.5,
+                "numerosity": 7,
+                "fitness": 0.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,THEN,eat": {
+                "first_day_held": 156,
+                "days_held": 45,
+                "reward": 6,
+                "numerosity": 6,
+                "fitness": 268.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "23": [
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 7,
+                "days_held": 194,
+                "reward": 2.0,
+                "numerosity": 10,
+                "fitness": 55.800000000000004,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 9,
+                "days_held": 192,
+                "reward": 3.0,
+                "numerosity": 16,
+                "fitness": 80.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 16,
+                "days_held": 185,
+                "reward": 6,
+                "numerosity": 6,
+                "fitness": 27.6,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 19,
+                "days_held": 182,
+                "reward": 2.0,
+                "numerosity": 12,
+                "fitness": 33.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 44,
+                "days_held": 157,
+                "reward": 0.5,
+                "numerosity": 12,
+                "fitness": 16.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 45,
+                "days_held": 156,
+                "reward": 10.5,
+                "numerosity": 84,
+                "fitness": 5745.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,low days,THEN,eat": {
+                "first_day_held": 47,
+                "days_held": 154,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 22.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,THEN,move": {
+                "first_day_held": 48,
+                "days_held": 153,
+                "reward": 1.0,
+                "numerosity": 11,
+                "fitness": 24.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+                "first_day_held": 55,
+                "days_held": 146,
+                "reward": 19,
+                "numerosity": 19,
+                "fitness": 1356.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,THEN,move": {
+                "first_day_held": 96,
+                "days_held": 105,
+                "reward": 10.0,
+                "numerosity": 73,
+                "fitness": 11034.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,THEN,eat": {
+                "first_day_held": 109,
+                "days_held": 92,
+                "reward": 17,
+                "numerosity": 16,
+                "fitness": 2519.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 110,
+                "days_held": 91,
+                "reward": 7.0,
+                "numerosity": 61,
+                "fitness": 4220.099999999999,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 134,
+                "days_held": 67,
+                "reward": 8.0,
+                "numerosity": 50,
+                "fitness": 3816.75,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,THEN,eat": {
+                "first_day_held": 142,
+                "days_held": 59,
+                "reward": 15,
+                "numerosity": 15,
+                "fitness": 1589.3999999999999,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 157,
+                "days_held": 44,
+                "reward": 12.0,
+                "numerosity": 104,
+                "fitness": 10022.1,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 167,
+                "days_held": 34,
+                "reward": 18,
+                "numerosity": 18,
+                "fitness": 1436.1,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "24": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 38,
+                "reward": 1.0,
+                "numerosity": 12,
+                "fitness": 14.4,
+                "adoption": 2,
+                "last_day_held": 38
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,THEN,move": {
+                "first_day_held": 14,
+                "days_held": 25,
+                "reward": 1.0,
+                "numerosity": 9,
+                "fitness": 24.75,
+                "adoption": 2,
+                "last_day_held": 38
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 18,
+                "reward": 1.5,
+                "numerosity": 12,
+                "fitness": 26.4,
+                "adoption": 2,
+                "last_day_held": 38
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,THEN,move": {
+                "first_day_held": 33,
+                "days_held": 6,
+                "reward": 1.5,
+                "numerosity": 13,
+                "fitness": 57.6,
+                "adoption": 2,
+                "last_day_held": 38
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,THEN,eat": {
+                "first_day_held": 33,
+                "days_held": 6,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 6.0,
+                "adoption": 2,
+                "last_day_held": 38
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,low days,THEN,eat": {
+                "first_day_held": 33,
+                "days_held": 6,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 18.9,
+                "adoption": 2,
+                "last_day_held": 38
+            }
+        }
+    ],
+    "25": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 2.0,
+                "numerosity": 20,
+                "fitness": 67.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 14,
+                "days_held": 187,
+                "reward": 0,
+                "numerosity": 4,
+                "fitness": 0.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 19,
+                "days_held": 182,
+                "reward": 0.5,
+                "numerosity": 6,
+                "fitness": 3.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 0.5,
+                "numerosity": 5,
+                "fitness": 1.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 0.5,
+                "numerosity": 8,
+                "fitness": 2.25,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,low days,low days,THEN,eat": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 33,
+                "days_held": 168,
+                "reward": 5.5,
+                "numerosity": 41,
+                "fitness": 732.75,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 34,
+                "days_held": 167,
+                "reward": 1.5,
+                "numerosity": 11,
+                "fitness": 18.75,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,THEN,move": {
+                "first_day_held": 40,
+                "days_held": 161,
+                "reward": 1.5,
+                "numerosity": 8,
+                "fitness": 11.100000000000001,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+                "first_day_held": 42,
+                "days_held": 159,
+                "reward": 12,
+                "numerosity": 12,
+                "fitness": 222.9,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,THEN,eat": {
+                "first_day_held": 85,
+                "days_held": 116,
+                "reward": 5,
+                "numerosity": 5,
+                "fitness": 49.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 85,
+                "days_held": 116,
+                "reward": 4.5,
+                "numerosity": 36,
+                "fitness": 658.05,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,THEN,eat": {
+                "first_day_held": 91,
+                "days_held": 110,
+                "reward": 10,
+                "numerosity": 10,
+                "fitness": 343.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 92,
+                "days_held": 109,
+                "reward": 3.0,
+                "numerosity": 30,
+                "fitness": 311.85,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 98,
+                "days_held": 103,
+                "reward": 30.5,
+                "numerosity": 197,
+                "fitness": 64651.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 117,
+                "days_held": 84,
+                "reward": 58,
+                "numerosity": 57,
+                "fitness": 28317.6,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "26": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 2.0,
+                "numerosity": 10,
+                "fitness": 96.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 14,
+                "days_held": 187,
+                "reward": 0,
+                "numerosity": 5,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 20,
+                "days_held": 181,
+                "reward": 0.5,
+                "numerosity": 8,
+                "fitness": 9.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,THEN,move": {
+                "first_day_held": 28,
+                "days_held": 173,
+                "reward": 1.5,
+                "numerosity": 13,
+                "fitness": 36.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 34,
+                "days_held": 167,
+                "reward": 0.5,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 35,
+                "days_held": 166,
+                "reward": 2.0,
+                "numerosity": 10,
+                "fitness": 39.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,low days,THEN,eat": {
+                "first_day_held": 45,
+                "days_held": 156,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 27.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,THEN,eat": {
+                "first_day_held": 45,
+                "days_held": 156,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 2.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,THEN,move": {
+                "first_day_held": 49,
+                "days_held": 152,
+                "reward": 2.0,
+                "numerosity": 9,
+                "fitness": 15.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,THEN,eat": {
+                "first_day_held": 51,
+                "days_held": 150,
+                "reward": 5,
+                "numerosity": 5,
+                "fitness": 26.099999999999998,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,THEN,move": {
+                "first_day_held": 53,
+                "days_held": 148,
+                "reward": 4.5,
+                "numerosity": 30,
+                "fitness": 585.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,THEN,eat": {
+                "first_day_held": 60,
+                "days_held": 141,
+                "reward": 8,
+                "numerosity": 8,
+                "fitness": 203.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 77,
+                "days_held": 124,
+                "reward": 54,
+                "numerosity": 54,
+                "fitness": 53533.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 78,
+                "days_held": 123,
+                "reward": 27.0,
+                "numerosity": 151,
+                "fitness": 78257.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "27": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 0.5,
+                "numerosity": 5,
+                "fitness": 3.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 4,
+                "days_held": 197,
+                "reward": 9.0,
+                "numerosity": 47,
+                "fitness": 2103.6000000000004,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 10,
+                "days_held": 191,
+                "reward": 1.5,
+                "numerosity": 9,
+                "fitness": 15.6,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 1.0,
+                "numerosity": 7,
+                "fitness": 11.7,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 0.5,
+                "numerosity": 4,
+                "fitness": 0.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 18,
+                "days_held": 183,
+                "reward": 0,
+                "numerosity": 7,
+                "fitness": 0.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 22,
+                "days_held": 179,
+                "reward": 20,
+                "numerosity": 20,
+                "fitness": 1776.6000000000001,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 36,
+                "days_held": 165,
+                "reward": 7.0,
+                "numerosity": 61,
+                "fitness": 1922.7000000000003,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,medium days,THEN,move": {
+                "first_day_held": 146,
+                "days_held": 55,
+                "reward": 1.0,
+                "numerosity": 17,
+                "fitness": 143.25,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 159,
+                "days_held": 42,
+                "reward": 0.5,
+                "numerosity": 9,
+                "fitness": 9.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 160,
+                "days_held": 41,
+                "reward": 2.5,
+                "numerosity": 20,
+                "fitness": 109.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 162,
+                "days_held": 39,
+                "reward": 16.5,
+                "numerosity": 97,
+                "fitness": 7426.799999999999,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 26,
+                "numerosity": 26,
+                "fitness": 2667.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "28": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 0.5,
+                "numerosity": 3,
+                "fitness": 0.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 14,
+                "days_held": 187,
+                "reward": 4.5,
+                "numerosity": 33,
+                "fitness": 665.25,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 16,
+                "days_held": 185,
+                "reward": 2.0,
+                "numerosity": 11,
+                "fitness": 156.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 8,
+                "numerosity": 8,
+                "fitness": 152.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 38,
+                "days_held": 163,
+                "reward": 2.0,
+                "numerosity": 12,
+                "fitness": 108.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 56,
+                "days_held": 145,
+                "reward": 0.5,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,low days,medium days,THEN,eat": {
+                "first_day_held": 56,
+                "days_held": 145,
+                "reward": 5,
+                "numerosity": 5,
+                "fitness": 155.7,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 56,
+                "days_held": 145,
+                "reward": 1.0,
+                "numerosity": 11,
+                "fitness": 24.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,medium days,THEN,eat": {
+                "first_day_held": 56,
+                "days_held": 145,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 7.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,low days,THEN,eat": {
+                "first_day_held": 56,
+                "days_held": 145,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 51.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 57,
+                "days_held": 144,
+                "reward": 0,
+                "numerosity": 8,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 59,
+                "days_held": 142,
+                "reward": 0.5,
+                "numerosity": 4,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 86,
+                "days_held": 115,
+                "reward": 0,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 86,
+                "days_held": 115,
+                "reward": 0,
+                "numerosity": 4,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 86,
+                "days_held": 115,
+                "reward": 0,
+                "numerosity": 3,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 157,
+                "days_held": 44,
+                "reward": 10.5,
+                "numerosity": 55,
+                "fitness": 4214.1,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 162,
+                "days_held": 39,
+                "reward": 20,
+                "numerosity": 20,
+                "fitness": 2971.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "29": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.0,
+                "numerosity": 5,
+                "fitness": 6.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 4,
+                "days_held": 197,
+                "reward": 0.5,
+                "numerosity": 5,
+                "fitness": 3.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 0,
+                "numerosity": 6,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 2.5,
+                "numerosity": 12,
+                "fitness": 64.8,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 0.5,
+                "numerosity": 7,
+                "fitness": 5.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,medium days,THEN,eat": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,low days,medium days,THEN,eat": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 28,
+                "days_held": 173,
+                "reward": 2.0,
+                "numerosity": 20,
+                "fitness": 114.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+                "first_day_held": 33,
+                "days_held": 168,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 6.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 42,
+                "days_held": 159,
+                "reward": 1.0,
+                "numerosity": 15,
+                "fitness": 51.900000000000006,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,THEN,move": {
+                "first_day_held": 47,
+                "days_held": 154,
+                "reward": 2.0,
+                "numerosity": 19,
+                "fitness": 165.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 68,
+                "days_held": 133,
+                "reward": 0.5,
+                "numerosity": 4,
+                "fitness": 0.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,THEN,eat": {
+                "first_day_held": 68,
+                "days_held": 133,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,THEN,move": {
+                "first_day_held": 112,
+                "days_held": 89,
+                "reward": 7.0,
+                "numerosity": 49,
+                "fitness": 2669.25,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,THEN,eat": {
+                "first_day_held": 119,
+                "days_held": 82,
+                "reward": 12,
+                "numerosity": 12,
+                "fitness": 940.8000000000001,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 134,
+                "days_held": 67,
+                "reward": 17.0,
+                "numerosity": 104,
+                "fitness": 19470.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 136,
+                "days_held": 65,
+                "reward": 34,
+                "numerosity": 33,
+                "fitness": 11118.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "30": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 0.5,
+                "numerosity": 5,
+                "fitness": 2.25,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 7,
+                "days_held": 194,
+                "reward": 2.0,
+                "numerosity": 8,
+                "fitness": 66.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 9,
+                "days_held": 192,
+                "reward": 3.5,
+                "numerosity": 24,
+                "fitness": 111.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 16,
+                "days_held": 185,
+                "reward": 6,
+                "numerosity": 6,
+                "fitness": 22.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 25,
+                "days_held": 176,
+                "reward": 1.0,
+                "numerosity": 10,
+                "fitness": 25.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 26,
+                "days_held": 175,
+                "reward": 0.5,
+                "numerosity": 5,
+                "fitness": 1.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 35,
+                "days_held": 166,
+                "reward": 1.5,
+                "numerosity": 8,
+                "fitness": 31.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,THEN,move": {
+                "first_day_held": 83,
+                "days_held": 118,
+                "reward": 6.5,
+                "numerosity": 55,
+                "fitness": 1910.25,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,THEN,eat": {
+                "first_day_held": 84,
+                "days_held": 117,
+                "reward": 16,
+                "numerosity": 16,
+                "fitness": 4324.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 85,
+                "days_held": 116,
+                "reward": 13.0,
+                "numerosity": 71,
+                "fitness": 14431.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,THEN,eat": {
+                "first_day_held": 92,
+                "days_held": 109,
+                "reward": 24,
+                "numerosity": 24,
+                "fitness": 8102.099999999999,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 94,
+                "days_held": 107,
+                "reward": 7.5,
+                "numerosity": 62,
+                "fitness": 8668.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 95,
+                "days_held": 106,
+                "reward": 14.5,
+                "numerosity": 124,
+                "fitness": 21597.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 99,
+                "days_held": 102,
+                "reward": 22,
+                "numerosity": 22,
+                "fitness": 3568.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "31": [
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 4,
+                "days_held": 197,
+                "reward": 0.5,
+                "numerosity": 5,
+                "fitness": 0.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 6,
+                "days_held": 195,
+                "reward": 0.5,
+                "numerosity": 6,
+                "fitness": 3.9,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,low days,medium days,THEN,eat": {
+                "first_day_held": 7,
+                "days_held": 194,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 10,
+                "days_held": 191,
+                "reward": 0.5,
+                "numerosity": 8,
+                "fitness": 0.6,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 12,
+                "days_held": 189,
+                "reward": 0,
+                "numerosity": 7,
+                "fitness": 0.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 13,
+                "days_held": 188,
+                "reward": 0.5,
+                "numerosity": 6,
+                "fitness": 3.15,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 14,
+                "days_held": 187,
+                "reward": 1.0,
+                "numerosity": 5,
+                "fitness": 7.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 1.0,
+                "numerosity": 6,
+                "fitness": 6.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 1.0,
+                "numerosity": 7,
+                "fitness": 8.55,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,THEN,move": {
+                "first_day_held": 24,
+                "days_held": 177,
+                "reward": 1.0,
+                "numerosity": 14,
+                "fitness": 21.6,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,low health,low days,low days,THEN,eat": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 5,
+                "numerosity": 5,
+                "fitness": 16.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 32,
+                "days_held": 169,
+                "reward": 2.5,
+                "numerosity": 11,
+                "fitness": 48.75,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 39,
+                "days_held": 162,
+                "reward": 11.5,
+                "numerosity": 78,
+                "fitness": 5483.7,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+                "first_day_held": 58,
+                "days_held": 143,
+                "reward": 20,
+                "numerosity": 20,
+                "fitness": 1478.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,low days,THEN,eat": {
+                "first_day_held": 82,
+                "days_held": 119,
+                "reward": 7,
+                "numerosity": 7,
+                "fitness": 67.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,THEN,move": {
+                "first_day_held": 95,
+                "days_held": 106,
+                "reward": 10.0,
+                "numerosity": 90,
+                "fitness": 14135.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,medium days,THEN,eat": {
+                "first_day_held": 96,
+                "days_held": 105,
+                "reward": 22,
+                "numerosity": 22,
+                "fitness": 3717.2999999999997,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 104,
+                "days_held": 97,
+                "reward": 6.5,
+                "numerosity": 45,
+                "fitness": 2716.65,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 108,
+                "days_held": 93,
+                "reward": 4.5,
+                "numerosity": 45,
+                "fitness": 2376.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,THEN,eat": {
+                "first_day_held": 120,
+                "days_held": 81,
+                "reward": 10,
+                "numerosity": 10,
+                "fitness": 612.9,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,THEN,eat": {
+                "first_day_held": 128,
+                "days_held": 73,
+                "reward": 12,
+                "numerosity": 12,
+                "fitness": 1326.9,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 133,
+                "days_held": 68,
+                "reward": 15.0,
+                "numerosity": 108,
+                "fitness": 15724.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 145,
+                "days_held": 56,
+                "reward": 23,
+                "numerosity": 23,
+                "fitness": 3662.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "32": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.0,
+                "numerosity": 5,
+                "fitness": 21.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 6,
+                "days_held": 195,
+                "reward": 1.5,
+                "numerosity": 7,
+                "fitness": 20.1,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 0.5,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 16,
+                "days_held": 185,
+                "reward": 0,
+                "numerosity": 3,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 0.5,
+                "numerosity": 5,
+                "fitness": 8.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,low days,THEN,eat": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 14.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 21,
+                "days_held": 180,
+                "reward": 0,
+                "numerosity": 3,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,THEN,move": {
+                "first_day_held": 43,
+                "days_held": 158,
+                "reward": 5.0,
+                "numerosity": 37,
+                "fitness": 1035.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,THEN,eat": {
+                "first_day_held": 47,
+                "days_held": 154,
+                "reward": 15,
+                "numerosity": 15,
+                "fitness": 1285.1999999999998,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,THEN,move": {
+                "first_day_held": 66,
+                "days_held": 135,
+                "reward": 8.0,
+                "numerosity": 60,
+                "fitness": 5190.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,THEN,eat": {
+                "first_day_held": 84,
+                "days_held": 117,
+                "reward": 11,
+                "numerosity": 11,
+                "fitness": 1006.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 102,
+                "days_held": 99,
+                "reward": 23.5,
+                "numerosity": 149,
+                "fitness": 55773.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 110,
+                "days_held": 91,
+                "reward": 43,
+                "numerosity": 43,
+                "fitness": 26637.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "33": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 0.5,
+                "numerosity": 4,
+                "fitness": 0.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 10,
+                "days_held": 191,
+                "reward": 1.0,
+                "numerosity": 5,
+                "fitness": 3.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 13,
+                "days_held": 188,
+                "reward": 0.5,
+                "numerosity": 9,
+                "fitness": 25.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 5.5,
+                "numerosity": 41,
+                "fitness": 2398.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 19,
+                "days_held": 182,
+                "reward": 12,
+                "numerosity": 12,
+                "fitness": 989.1,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 164,
+                "days_held": 37,
+                "reward": 2.5,
+                "numerosity": 26,
+                "fitness": 247.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 179,
+                "days_held": 22,
+                "reward": 6.0,
+                "numerosity": 38,
+                "fitness": 1596.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 181,
+                "days_held": 20,
+                "reward": 5.5,
+                "numerosity": 30,
+                "fitness": 380.09999999999997,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,THEN,eat": {
+                "first_day_held": 195,
+                "days_held": 6,
+                "reward": 6,
+                "numerosity": 6,
+                "fitness": 187.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 196,
+                "days_held": 5,
+                "reward": 12,
+                "numerosity": 12,
+                "fitness": 279.9,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "34": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.0,
+                "numerosity": 9,
+                "fitness": 9.75,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 3,
+                "days_held": 198,
+                "reward": 1.0,
+                "numerosity": 10,
+                "fitness": 10.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 0.5,
+                "numerosity": 6,
+                "fitness": 2.25,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 16,
+                "days_held": 185,
+                "reward": 6.0,
+                "numerosity": 39,
+                "fitness": 885.45,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+                "first_day_held": 23,
+                "days_held": 178,
+                "reward": 13,
+                "numerosity": 13,
+                "fitness": 675.3000000000001,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 65,
+                "days_held": 136,
+                "reward": 7.5,
+                "numerosity": 56,
+                "fitness": 6375.15,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,THEN,move": {
+                "first_day_held": 68,
+                "days_held": 133,
+                "reward": 4.5,
+                "numerosity": 34,
+                "fitness": 1822.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,THEN,eat": {
+                "first_day_held": 74,
+                "days_held": 127,
+                "reward": 17,
+                "numerosity": 15,
+                "fitness": 3496.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,THEN,eat": {
+                "first_day_held": 84,
+                "days_held": 117,
+                "reward": 13,
+                "numerosity": 13,
+                "fitness": 3039.6,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 92,
+                "days_held": 109,
+                "reward": 22.5,
+                "numerosity": 184,
+                "fitness": 39131.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 92,
+                "days_held": 109,
+                "reward": 45,
+                "numerosity": 45,
+                "fitness": 16361.099999999999,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 174,
+                "days_held": 27,
+                "reward": 7.0,
+                "numerosity": 57,
+                "fitness": 10551.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "35": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.0,
+                "numerosity": 7,
+                "fitness": 4.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 8,
+                "days_held": 193,
+                "reward": 0.5,
+                "numerosity": 6,
+                "fitness": 5.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 17,
+                "days_held": 184,
+                "reward": 2.0,
+                "numerosity": 14,
+                "fitness": 47.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 20,
+                "days_held": 181,
+                "reward": 2.0,
+                "numerosity": 12,
+                "fitness": 83.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,low days,THEN,eat": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 6,
+                "numerosity": 6,
+                "fitness": 49.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 1.0,
+                "numerosity": 10,
+                "fitness": 13.799999999999999,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 29,
+                "days_held": 172,
+                "reward": 3.5,
+                "numerosity": 25,
+                "fitness": 111.6,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+                "first_day_held": 30,
+                "days_held": 171,
+                "reward": 7,
+                "numerosity": 7,
+                "fitness": 38.7,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 61,
+                "days_held": 140,
+                "reward": 7.0,
+                "numerosity": 59,
+                "fitness": 5756.25,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 70,
+                "days_held": 131,
+                "reward": 18.5,
+                "numerosity": 167,
+                "fitness": 24479.7,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 76,
+                "days_held": 125,
+                "reward": 38,
+                "numerosity": 38,
+                "fitness": 9154.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 81,
+                "days_held": 120,
+                "reward": 9.5,
+                "numerosity": 75,
+                "fitness": 9915.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,THEN,eat": {
+                "first_day_held": 145,
+                "days_held": 56,
+                "reward": 16,
+                "numerosity": 16,
+                "fitness": 1005.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "36": [
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 3,
+                "days_held": 198,
+                "reward": 0.5,
+                "numerosity": 13,
+                "fitness": 22.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 5,
+                "days_held": 196,
+                "reward": 4.0,
+                "numerosity": 30,
+                "fitness": 523.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 14,
+                "days_held": 187,
+                "reward": 1.5,
+                "numerosity": 16,
+                "fitness": 89.1,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 1.0,
+                "numerosity": 17,
+                "fitness": 27.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 23,
+                "days_held": 178,
+                "reward": 3.0,
+                "numerosity": 32,
+                "fitness": 423.9,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 51,
+                "days_held": 150,
+                "reward": 1.0,
+                "numerosity": 8,
+                "fitness": 42.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 51,
+                "days_held": 150,
+                "reward": 1.0,
+                "numerosity": 5,
+                "fitness": 3.6,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,medium days,THEN,eat": {
+                "first_day_held": 51,
+                "days_held": 150,
+                "reward": 5,
+                "numerosity": 5,
+                "fitness": 18.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,low days,medium days,THEN,eat": {
+                "first_day_held": 51,
+                "days_held": 150,
+                "reward": 5,
+                "numerosity": 5,
+                "fitness": 22.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,low days,THEN,eat": {
+                "first_day_held": 51,
+                "days_held": 150,
+                "reward": 5,
+                "numerosity": 5,
+                "fitness": 26.400000000000002,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 55,
+                "days_held": 146,
+                "reward": 6.5,
+                "numerosity": 35,
+                "fitness": 536.1,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,THEN,eat": {
+                "first_day_held": 55,
+                "days_held": 146,
+                "reward": 17,
+                "numerosity": 17,
+                "fitness": 529.5,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,THEN,move": {
+                "first_day_held": 72,
+                "days_held": 129,
+                "reward": 5.5,
+                "numerosity": 47,
+                "fitness": 4624.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 85,
+                "days_held": 116,
+                "reward": 13.0,
+                "numerosity": 72,
+                "fitness": 10761.9,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 90,
+                "days_held": 111,
+                "reward": 10.0,
+                "numerosity": 95,
+                "fitness": 11859.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,THEN,eat": {
+                "first_day_held": 95,
+                "days_held": 106,
+                "reward": 22,
+                "numerosity": 22,
+                "fitness": 4540.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,THEN,eat": {
+                "first_day_held": 109,
+                "days_held": 92,
+                "reward": 22,
+                "numerosity": 21,
+                "fitness": 5561.1,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 115,
+                "days_held": 86,
+                "reward": 19,
+                "numerosity": 19,
+                "fitness": 3809.3999999999996,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 116,
+                "days_held": 85,
+                "reward": 11.5,
+                "numerosity": 98,
+                "fitness": 12569.55,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "37": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 2.0,
+                "numerosity": 13,
+                "fitness": 108.9,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 12,
+                "days_held": 189,
+                "reward": 1.0,
+                "numerosity": 15,
+                "fitness": 76.95,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 0.5,
+                "numerosity": 3,
+                "fitness": 3.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 28,
+                "days_held": 173,
+                "reward": 0.5,
+                "numerosity": 6,
+                "fitness": 7.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 30,
+                "days_held": 171,
+                "reward": 3.0,
+                "numerosity": 10,
+                "fitness": 124.8,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 39,
+                "days_held": 162,
+                "reward": 0,
+                "numerosity": 4,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,low days,THEN,eat": {
+                "first_day_held": 39,
+                "days_held": 162,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 62.1,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 44,
+                "days_held": 157,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,low days,low days,THEN,eat": {
+                "first_day_held": 44,
+                "days_held": 157,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,low days,low days,THEN,eat": {
+                "first_day_held": 44,
+                "days_held": 157,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,THEN,move": {
+                "first_day_held": 49,
+                "days_held": 152,
+                "reward": 2.5,
+                "numerosity": 19,
+                "fitness": 183.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,THEN,eat": {
+                "first_day_held": 52,
+                "days_held": 149,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 24.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 91,
+                "days_held": 110,
+                "reward": 24.0,
+                "numerosity": 147,
+                "fitness": 64152.75,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 92,
+                "days_held": 109,
+                "reward": 48,
+                "numerosity": 47,
+                "fitness": 37181.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "38": [
+        {
+            "IF,no berries,medium health,low days,medium days,low days,THEN,move": {
+                "first_day_held": 6,
+                "days_held": 195,
+                "reward": 0.5,
+                "numerosity": 7,
+                "fitness": 8.25,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 1.0,
+                "numerosity": 10,
+                "fitness": 25.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,THEN,move": {
+                "first_day_held": 24,
+                "days_held": 177,
+                "reward": 2.5,
+                "numerosity": 20,
+                "fitness": 456.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,THEN,move": {
+                "first_day_held": 37,
+                "days_held": 164,
+                "reward": 3.5,
+                "numerosity": 21,
+                "fitness": 338.1,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,THEN,move": {
+                "first_day_held": 46,
+                "days_held": 155,
+                "reward": 1.0,
+                "numerosity": 18,
+                "fitness": 79.2,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,THEN,move": {
+                "first_day_held": 52,
+                "days_held": 149,
+                "reward": 0,
+                "numerosity": 3,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,low health,medium days,low days,THEN,eat": {
+                "first_day_held": 59,
+                "days_held": 142,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 62,
+                "days_held": 139,
+                "reward": 0,
+                "numerosity": 6,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,THEN,eat": {
+                "first_day_held": 62,
+                "days_held": 139,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 59.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,low days,THEN,eat": {
+                "first_day_held": 62,
+                "days_held": 139,
+                "reward": 3,
+                "numerosity": 3,
+                "fitness": 9.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,THEN,move": {
+                "first_day_held": 67,
+                "days_held": 134,
+                "reward": 5.5,
+                "numerosity": 38,
+                "fitness": 2304.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,THEN,eat": {
+                "first_day_held": 74,
+                "days_held": 127,
+                "reward": 10,
+                "numerosity": 10,
+                "fitness": 1166.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,THEN,move": {
+                "first_day_held": 112,
+                "days_held": 89,
+                "reward": 5.0,
+                "numerosity": 45,
+                "fitness": 4212.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 139,
+                "days_held": 62,
+                "reward": 16.5,
+                "numerosity": 99,
+                "fitness": 18470.25,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 146,
+                "days_held": 55,
+                "reward": 28,
+                "numerosity": 28,
+                "fitness": 7361.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "39": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 0.5,
+                "numerosity": 6,
+                "fitness": 0.3,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 5,
+                "days_held": 196,
+                "reward": 3.0,
+                "numerosity": 31,
+                "fitness": 192.6,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 7,
+                "days_held": 194,
+                "reward": 0.5,
+                "numerosity": 6,
+                "fitness": 0.3,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 10,
+                "days_held": 191,
+                "reward": 2.0,
+                "numerosity": 21,
+                "fitness": 76.80000000000001,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,low days,medium days,THEN,move": {
+                "first_day_held": 12,
+                "days_held": 189,
+                "reward": 2.0,
+                "numerosity": 25,
+                "fitness": 153.3,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 6,
+                "numerosity": 6,
+                "fitness": 31.2,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 20,
+                "days_held": 181,
+                "reward": 4.5,
+                "numerosity": 23,
+                "fitness": 279.3,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,high days,THEN,move": {
+                "first_day_held": 76,
+                "days_held": 125,
+                "reward": 4.5,
+                "numerosity": 40,
+                "fitness": 707.55,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,medium days,THEN,move": {
+                "first_day_held": 84,
+                "days_held": 117,
+                "reward": 3.0,
+                "numerosity": 28,
+                "fitness": 273.0,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,medium days,THEN,move": {
+                "first_day_held": 85,
+                "days_held": 116,
+                "reward": 1.5,
+                "numerosity": 24,
+                "fitness": 96.6,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,high days,THEN,move": {
+                "first_day_held": 91,
+                "days_held": 110,
+                "reward": 11.0,
+                "numerosity": 83,
+                "fitness": 7618.050000000001,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,medium days,high days,THEN,eat": {
+                "first_day_held": 92,
+                "days_held": 109,
+                "reward": 6,
+                "numerosity": 6,
+                "fitness": 43.2,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,high days,THEN,move": {
+                "first_day_held": 97,
+                "days_held": 104,
+                "reward": 2.0,
+                "numerosity": 15,
+                "fitness": 140.4,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,high days,THEN,eat": {
+                "first_day_held": 112,
+                "days_held": 89,
+                "reward": 17,
+                "numerosity": 17,
+                "fitness": 2893.8,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,medium days,THEN,move": {
+                "first_day_held": 116,
+                "days_held": 85,
+                "reward": 7.5,
+                "numerosity": 63,
+                "fitness": 4575.0,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,high days,THEN,move": {
+                "first_day_held": 116,
+                "days_held": 85,
+                "reward": 12.5,
+                "numerosity": 67,
+                "fitness": 7537.65,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,high days,THEN,eat": {
+                "first_day_held": 136,
+                "days_held": 65,
+                "reward": 17,
+                "numerosity": 17,
+                "fitness": 1703.4,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "40": [
+        {
+            "IF,no berries,medium health,medium days,low days,low days,THEN,move": {
+                "first_day_held": 3,
+                "days_held": 198,
+                "reward": 1.0,
+                "numerosity": 7,
+                "fitness": 3.6,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 6,
+                "days_held": 195,
+                "reward": 1.5,
+                "numerosity": 9,
+                "fitness": 6.75,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 9,
+                "days_held": 192,
+                "reward": 12.0,
+                "numerosity": 89,
+                "fitness": 2880.9,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 12,
+                "days_held": 189,
+                "reward": 27,
+                "numerosity": 27,
+                "fitness": 1827.6,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 42,
+                "days_held": 159,
+                "reward": 5.0,
+                "numerosity": 38,
+                "fitness": 1999.5,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,medium days,THEN,move": {
+                "first_day_held": 75,
+                "days_held": 126,
+                "reward": 2.0,
+                "numerosity": 20,
+                "fitness": 82.35,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,medium days,THEN,move": {
+                "first_day_held": 76,
+                "days_held": 125,
+                "reward": 1.5,
+                "numerosity": 24,
+                "fitness": 102.9,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,medium days,high days,THEN,move": {
+                "first_day_held": 78,
+                "days_held": 123,
+                "reward": 3.0,
+                "numerosity": 20,
+                "fitness": 155.7,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,high days,THEN,move": {
+                "first_day_held": 79,
+                "days_held": 122,
+                "reward": 5.0,
+                "numerosity": 33,
+                "fitness": 2012.3999999999999,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,high days,THEN,eat": {
+                "first_day_held": 88,
+                "days_held": 113,
+                "reward": 10,
+                "numerosity": 10,
+                "fitness": 757.2,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,high days,THEN,move": {
+                "first_day_held": 92,
+                "days_held": 109,
+                "reward": 27.0,
+                "numerosity": 216,
+                "fitness": 46423.95,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,medium days,THEN,move": {
+                "first_day_held": 93,
+                "days_held": 108,
+                "reward": 3.0,
+                "numerosity": 33,
+                "fitness": 1098.0,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,high days,THEN,move": {
+                "first_day_held": 99,
+                "days_held": 102,
+                "reward": 8.5,
+                "numerosity": 34,
+                "fitness": 2579.4,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,high days,THEN,eat": {
+                "first_day_held": 116,
+                "days_held": 85,
+                "reward": 55,
+                "numerosity": 55,
+                "fitness": 19906.199999999997,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,high days,THEN,eat": {
+                "first_day_held": 178,
+                "days_held": 23,
+                "reward": 13,
+                "numerosity": 13,
+                "fitness": 1380.0,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,medium days,THEN,eat": {
+                "first_day_held": 180,
+                "days_held": 21,
+                "reward": 11,
+                "numerosity": 11,
+                "fitness": 157.2,
+                "adoption": 4,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "41": [
+        {
+            "IF,no berries,medium health,medium days,medium days,medium days,THEN,move": {
+                "first_day_held": 9,
+                "days_held": 192,
+                "reward": 3.0,
+                "numerosity": 21,
+                "fitness": 137.4,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,medium days,THEN,move": {
+                "first_day_held": 18,
+                "days_held": 183,
+                "reward": 1.5,
+                "numerosity": 7,
+                "fitness": 24.299999999999997,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 20,
+                "days_held": 181,
+                "reward": 0.5,
+                "numerosity": 9,
+                "fitness": 0.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,medium days,medium days,THEN,eat": {
+                "first_day_held": 34,
+                "days_held": 167,
+                "reward": 4,
+                "numerosity": 4,
+                "fitness": 25.2,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,medium days,high days,THEN,move": {
+                "first_day_held": 112,
+                "days_held": 89,
+                "reward": 7.0,
+                "numerosity": 66,
+                "fitness": 4956.9,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,medium days,THEN,move": {
+                "first_day_held": 113,
+                "days_held": 88,
+                "reward": 3.5,
+                "numerosity": 46,
+                "fitness": 1861.1999999999998,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,medium days,THEN,eat": {
+                "first_day_held": 131,
+                "days_held": 70,
+                "reward": 14,
+                "numerosity": 14,
+                "fitness": 994.8,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,medium days,high days,THEN,eat": {
+                "first_day_held": 149,
+                "days_held": 52,
+                "reward": 8,
+                "numerosity": 8,
+                "fitness": 744.0,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,high days,THEN,eat": {
+                "first_day_held": 154,
+                "days_held": 47,
+                "reward": 28,
+                "numerosity": 27,
+                "fitness": 3627.3,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,high days,THEN,move": {
+                "first_day_held": 162,
+                "days_held": 39,
+                "reward": 16.0,
+                "numerosity": 76,
+                "fitness": 10017.45,
+                "adoption": 3,
+                "last_day_held": 200
+            }
+        }
+    ],
+    "42": [
+        {
+            "IF,no berries,medium health,low days,low days,low days,THEN,move": {
+                "first_day_held": 1,
+                "days_held": 200,
+                "reward": 1.0,
+                "numerosity": 21,
+                "fitness": 112.5,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,medium days,medium days,THEN,move": {
+                "first_day_held": 15,
+                "days_held": 186,
+                "reward": 0.5,
+                "numerosity": 3,
+                "fitness": 0.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,low health,low days,low days,low days,THEN,eat": {
+                "first_day_held": 27,
+                "days_held": 174,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,low health,low days,low days,THEN,move": {
+                "first_day_held": 28,
+                "days_held": 173,
+                "reward": 0.5,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,medium days,low days,THEN,move": {
+                "first_day_held": 32,
+                "days_held": 169,
+                "reward": 0,
+                "numerosity": 3,
+                "fitness": 0.0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,low days,medium days,medium days,THEN,eat": {
+                "first_day_held": 32,
+                "days_held": 169,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,low health,low days,low days,THEN,eat": {
+                "first_day_held": 32,
+                "days_held": 169,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,low days,THEN,move": {
+                "first_day_held": 32,
+                "days_held": 169,
+                "reward": 0.5,
+                "numerosity": 5,
+                "fitness": 0.3,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,medium days,THEN,move": {
+                "first_day_held": 34,
+                "days_held": 167,
+                "reward": 5.5,
+                "numerosity": 33,
+                "fitness": 728.1,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,medium health,low days,THEN,move": {
+                "first_day_held": 35,
+                "days_held": 166,
+                "reward": 0.5,
+                "numerosity": 9,
+                "fitness": 14.7,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,low health,medium days,THEN,eat": {
+                "first_day_held": 47,
+                "days_held": 154,
+                "reward": 2,
+                "numerosity": 2,
+                "fitness": 0,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,medium health,medium days,THEN,eat": {
+                "first_day_held": 52,
+                "days_held": 149,
+                "reward": 9,
+                "numerosity": 9,
+                "fitness": 261.6,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,no berries,high health,high days,THEN,move": {
+                "first_day_held": 131,
+                "days_held": 70,
+                "reward": 12.0,
+                "numerosity": 93,
+                "fitness": 21362.4,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        },
+        {
+            "IF,medium berries,high health,high days,THEN,eat": {
+                "first_day_held": 132,
+                "days_held": 69,
+                "reward": 19,
+                "numerosity": 18,
+                "fitness": 7235.1,
+                "adoption": 2,
+                "last_day_held": 200
+            }
+        }
     ]
 }
