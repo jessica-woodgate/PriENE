@@ -15,14 +15,16 @@ TRAINED_CHECKPOINTS_ABS = os.path.abspath(TRAINED_CHECKPOINTS) + "/"
 # episode reports were remade when mean_berries, variance_health and gini_berries_consumed were corrected to
 # be over each episode's agent rows (and mean_health changed by rounding only); every other column is unchanged.
 # Both were remade again when the ethics sanction started seeing every action's effect (e.g. foraging): in test
-# mode that changes only the utilitarian agents' reward and mean_reward, not what they do
+# mode that changes only the utilitarian agents' reward and mean_reward, not what they do. And again when well-being was
+# rounded before the sanction measures it, so float error no longer gives a false sanction: one step's reward in each
+# scenario changes by 0.4 (and so mean_reward); every other column is unchanged
 REFERENCE_REPORT_HASHES = {
-    "agent_reports_allotment.csv": "a5e40482821314d08e36348f6f64732ef38d69a599383a63f02739d4d775ba9d",
-    "agent_reports_capabilities.csv": "b8a365e999c2afda23556bbc32ba9610028b012cd7303d9afccc80890169677b",
-    "agent_reports_colours.csv": "20dfc065d514e8569df21fed98f7df9cec43e9ab1302d29ac65a97809aacf5d5",
-    "model_episode_reports_allotment.csv": "e32a6075f091c038d7a6597924946c7a02cf054b504f635a20232ac92f9087f9",
-    "model_episode_reports_capabilities.csv": "9c5b31768c2a480b279b938dfc07e7c0db8b88fb963e81ec658c6a26b6532900",
-    "model_episode_reports_colours.csv": "d9bf3dea5d2cfff00be55ba315644c15acdf3b57337c4880fb890a0d0b76afa8",
+    "agent_reports_allotment.csv": "f4e12f39f2947a72c95b7ac8fb4260bc70a93626cbc78b9663d1a910a12ebd1a",
+    "agent_reports_capabilities.csv": "1c4140124f29fe230a48105deabc07c61ed53770453ad011dcafaf2523e3c14e",
+    "agent_reports_colours.csv": "ffe83d49865dfd1f1dc4b18c06ce0edbeb4e3600730310690452b2ddef27eff8",
+    "model_episode_reports_allotment.csv": "91d46994133c8b52a18a929e16ca1dfc3902420fb6c8d124e7d42ecf895d4cef",
+    "model_episode_reports_capabilities.csv": "c1ccc1de3cff0db008a353058bf8072a9c64e62896d99c94ec138749216dd609",
+    "model_episode_reports_colours.csv": "a3a7c5cd5088fc590c5d741faad4601a81080d7f517c49e216755e9f4416d990",
 }
 
 needs_trained_checkpoints = pytest.mark.skipif(not os.path.isdir(TRAINED_CHECKPOINTS), reason="needs the trained 200_days checkpoints")

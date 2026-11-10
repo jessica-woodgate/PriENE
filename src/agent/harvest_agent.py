@@ -248,6 +248,9 @@ class HarvestAgent(Agent):
             if a.unique_id == benefactor_id:
                 if a.agent_type == "berry":
                     raise AgentTypeException("agent to throw to", "berry")
+                if a.done:
+                    #died earlier this step (it leaves living_agents at the end of the step): no living benefactor
+                    return self.rewards["no_benefactor"]
                 if not self.model.can_throw_to(self, a):
                     #out of reach (e.g. in another allotment) is treated the same as no living benefactor
                     return self.rewards["no_benefactor"]

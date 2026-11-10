@@ -13,6 +13,9 @@ class EthicsModule():
     """
     PRINCIPLES = ["egalitarian", "maximin", "utilitarian"]
     AGGREGATIONS = ["veto", "optimist", "majoritarian", "average"]
+    #well-being (days left to live) is rounded before it is measured: health changes by floats (0.1, 0.6), so a value that should be
+    #unchanged by an action (e.g. eating, or society's total after a throw) can differ by ~1e-12, which an exact comparison would sanction
+    WELL_BEING_DECIMALS = 6
 
     def __init__(self,sanction,principle):
         if principle not in self.PRINCIPLES + self.AGGREGATIONS:
@@ -27,12 +30,13 @@ class EthicsModule():
         """
         Updates social welfare before agent acts: measure of well-being and number of minimums (Algorithm 1 Line 1)
         """
-        self._calculate_social_welfare(society_well_being)
-    
+        self._calculate_social_welfare(self._rounded(society_well_being))
+
     def get_sanction(self, society_well_being):
         """
         Obtain sanction from principle comparing current society well-being with previous well-being (Algorithm 1 Lines 3-8)
         """
+        society_well_being = self._rounded(society_well_being)
         if self.principle == "egalitarian":
             return [self._egalitarian_sanction(self.measure_of_well_being, society_well_being)]
         elif self.principle == "maximin":
@@ -41,6 +45,9 @@ class EthicsModule():
             return [self._utilitarian_sanction(self.measure_of_well_being, society_well_being)]
         else:
             return self._combined_sanction(society_well_being)
+
+    def _rounded(self, society_well_being):
+        return np.round(np.asarray(society_well_being, dtype=float), self.WELL_BEING_DECIMALS)
 
     def _calculate_social_welfare(self, society_well_being):
         if self.principle == "egalitarian":

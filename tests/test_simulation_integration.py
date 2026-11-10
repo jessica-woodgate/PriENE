@@ -116,3 +116,26 @@ def test_berries_can_only_be_thrown_within_an_allotment(tmp_path, scenario, reac
         assert reward == thrower.rewards["no_benefactor"]
         assert thrower.berries == 1
         assert agents[2].health == other_allotment_health
+
+
+def test_a_berry_cannot_be_thrown_to_an_agent_that_died_earlier_in_the_step(tmp_path):
+    """
+    Regression test: an agent that dies stays in living_agents until the end of the step, and a berry thrown to it was accepted
+    (rewarded as a throw, and lost)
+    """
+    model = make_scenario_model(tmp_path, "basic", "baseline")
+    agents = {a.unique_id: a for a in model.get_living_agents()}
+    thrower, dead = agents[0], agents[1]
+    thrower.berries = 2
+    thrower.health = thrower.low_health_threshold
+    dead.done = True
+    dead.health = 0
+    assert dead in model.get_living_agents()
+
+    assert thrower._throw(1) == thrower.rewards["no_benefactor"]
+    assert thrower.berries == 2
+    assert thrower.berries_thrown == 0
+    assert dead.health == 0
+    assert dead.berries_consumed == 0
+    #a living agent can still be thrown to
+    assert thrower._throw(2) == thrower.rewards["throw"]
