@@ -148,6 +148,7 @@ def test_allocations_stay_with_their_groups_changed_by_group_size(in_tmp_dir, ch
     model = build(checkpoint_path, scenario, num_allocations=num_allocations)
     groups_and_bounds = agent_groups_and_bounds(model)
     original = {holder: data["berry_allocation"] for holder, data in model.allocations.items()}
+    num_original = len(model.original_berries)
 
     def check(m):
         quality = m._current_season_quality()
@@ -159,6 +160,10 @@ def test_allocations_stay_with_their_groups_changed_by_group_size(in_tmp_dir, ch
         assert berries_per_holder(m) == targets
         assert len(m.berries) == m.num_berries == sum(targets.values())
         assert_berries_in_their_holders_region(m)
+        # berry objects are reused across seasons and episodes, never made beyond a good season's extra num_agents
+        in_use = m.berries + m.dormant_berries
+        assert len(in_use) <= num_original + NUM_AGENTS
+        assert len({b.unique_id for b in in_use}) == len(in_use)
     run_episode(model, check)
     run_episode(model, check)
 
@@ -214,16 +219,6 @@ def test_bad_season_removes_uncollected_berries_from_each_group_and_not_carried_
     assert len(model.berries) + len(model.dormant_berries) == total_objects
 
 
-@pytest.mark.parametrize("scenario", TEST_SCENARIOS)
-def test_berry_objects_are_reused_across_seasons_and_episodes(in_tmp_dir, checkpoint_path, scenario):
-    model = build(checkpoint_path, scenario, max_episodes=3)
-    original = len(model.original_berries)
-    while model.episode <= 3:
-        model.step()
-        assert len(model.berries) + len(model.dormant_berries) <= original + NUM_AGENTS
-        assert len({b.unique_id for b in model.berries + model.dormant_berries}) == len(model.berries) + len(model.dormant_berries)
-
-
 def test_bad_season_clamps_a_group_at_zero(in_tmp_dir, checkpoint_path, monkeypatch):
     monkeypatch.setattr(HarvestModel, "_generate_resource_allocations", lambda self, num_agents: [6, 4, 2, 0])
     force_quality_sequence(monkeypatch, "normal", "good", "normal", "bad")
@@ -237,8 +232,9 @@ def test_bad_season_clamps_a_group_at_zero(in_tmp_dir, checkpoint_path, monkeypa
     assert len(model.berries) == total - 3
 
 
-@pytest.mark.parametrize("scenario", TEST_SCENARIOS)
-def test_two_agent_types_with_the_same_seed_get_the_same_seasons(in_tmp_dir, checkpoint_path, utilitarian_checkpoint_path, scenario):
+@pytest.mark.parametrize("scenario,kwargs", [(scenario, {}) for scenario in TEST_SCENARIOS]
+                         + [("allotment", {"allotment_regrowth_delays": [1, 3]})], ids=TEST_SCENARIOS + ["allotment-delays"])
+def test_two_agent_types_with_the_same_seed_get_the_same_seasons(in_tmp_dir, checkpoint_path, utilitarian_checkpoint_path, scenario, kwargs):
     def boundaries(model):
         recorded = []
         while model.episode <= 2:
@@ -247,8 +243,8 @@ def test_two_agent_types_with_the_same_seed_get_the_same_seasons(in_tmp_dir, che
                 recorded.append((model.episode, model.day, model._current_season_quality(),
                                  sorted((b.unique_id, b.allocation_id) for b in model.berries)))
         return recorded
-    baseline = boundaries(build(checkpoint_path, scenario))
-    utilitarian = boundaries(build(utilitarian_checkpoint_path, scenario, agent_type="utilitarian"))
+    baseline = boundaries(build(checkpoint_path, scenario, **kwargs))
+    utilitarian = boundaries(build(utilitarian_checkpoint_path, scenario, agent_type="utilitarian", **kwargs))
     assert len(baseline) == 2 * (20 // SEASON_LENGTH)
     assert baseline == utilitarian
 
@@ -307,16 +303,6 @@ def test_seasons_off_keeps_one_season_with_the_original_allocations(in_tmp_dir, 
     check(model)
     run_episode(model, check)
     assert model.season_rng is None
-
-
-@pytest.mark.parametrize("scenario", TEST_SCENARIOS)
-def test_observation_and_actions_match_with_seasons_on_and_off(in_tmp_dir, checkpoint_path, scenario):
-    on_model = build(checkpoint_path, scenario)
-    off_model = build(checkpoint_path, scenario, seasons=False)
-    on_model._start_new_season()
-    for on_agent, off_agent in zip(agents(on_model), agents(off_model)):
-        assert on_agent.observe().shape == off_agent.observe().shape
-        assert on_agent.actions == off_agent.actions
 
 
 @needs_trained_checkpoints

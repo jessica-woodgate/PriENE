@@ -37,6 +37,11 @@ def test_every_scenario_runs_with_each_norms_module(in_tmp_dir, scenario, norms_
                                 track_norms=True, norms_module_type=norms_module_type)
     assert all(isinstance(a.norms_module, MODULE_CLASSES[norms_module_type]) for a in harvest_agents(model))
     run_episodes(model, 2)
+    if norms_module_type == "bayesian":
+        df = pd.read_csv(f"data/results/current_run/agent_norms_test_{scenario}_utilitarian.csv")
+        assert len(df) == 2 * model.num_agents
+        # agents' norm bases are reset each episode, so check observations via what was recorded
+        assert (df["num_observed_behaviours"] > 0).all()
 
 
 @pytest.mark.parametrize("agent_type", ["baseline", "utilitarian"])

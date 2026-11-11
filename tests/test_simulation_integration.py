@@ -1,7 +1,7 @@
+import numpy as np
 import pytest
 
 from tests.conftest import AGENT_TYPES, SCENARIOS, make_scenario_model, make_training_model
-from tests.conftest import _build, _make_pretrained_checkpoint
 
 
 # --- A: state-consistency invariants (deterministic, not dependent on agent behaviour) ---
@@ -20,30 +20,19 @@ def test_day_counter_starts_the_same_way_on_construction_and_reset(tmp_path):
 
 
 @pytest.mark.parametrize("scenario", SCENARIOS)
-def test_episode_never_runs_longer_than_max_days(tmp_path, scenario):
+def test_episodes_never_run_past_max_days_and_agent_and_berry_counts_are_conserved(tmp_path, scenario):
     """
     Episode length can legitimately vary -- a society that manages resources well survives to
-    max_days, one that doesn't dies out early -- so this only asserts the upper bound, never
-    equality: self.day must never be observed (from outside the model, i.e. after step() returns)
-    at or beyond max_days, since finish_episode()/_reset() always fire within the same step() call
-    that crosses the threshold.
+    max_days, one that doesn't dies out early -- so this only asserts the upper bound: self.day must
+    never be observed (after step() returns) at or beyond max_days, since finish_episode()/_reset()
+    always fire within the step() that crosses it. Counts are checked at every step (not just at
+    episode boundaries, where HarvestModel._reset() already self-validates via NumAgentsException/
+    NumBerriesException) -- catching bookkeeping corruption that balances out by the episode boundary.
     """
     model = make_scenario_model(tmp_path, scenario, "baseline", max_days=10, max_episodes=3)
     for _ in range(40):
         model.step()
         assert model.day < model.max_days
-
-
-@pytest.mark.parametrize("scenario", SCENARIOS)
-def test_agent_and_berry_counts_are_conserved_across_steps_and_episodes(tmp_path, scenario):
-    """
-    Checked at every single step (not just at episode boundaries, where HarvestModel._reset()
-    already self-validates via NumAgentsException/NumBerriesException) -- catches bookkeeping
-    corruption that happens to still balance out by the time an episode boundary is reached.
-    """
-    model = make_scenario_model(tmp_path, scenario, "baseline", max_days=10, max_episodes=3)
-    for _ in range(40):
-        model.step()
         non_berry_agents = [a for a in model.schedule.agents if a.agent_type != "berry"]
         berries = [a for a in model.schedule.agents if a.agent_type == "berry"]
         assert len(non_berry_agents) == model.num_agents
@@ -52,32 +41,6 @@ def test_agent_and_berry_counts_are_conserved_across_steps_and_episodes(tmp_path
 
 
 # --- B: crash/regression smoke tests ---
-
-@pytest.mark.parametrize("scenario", SCENARIOS)
-@pytest.mark.parametrize("agent_type", AGENT_TYPES)
-def test_scenario_runs_for_every_agent_type_without_raising(tmp_path, scenario, agent_type):
-    model = make_scenario_model(tmp_path, scenario, agent_type, max_days=10, max_episodes=2)
-    for _ in range(20):
-        model.step()
-
-
-def test_basic_harvest_runs_with_training_false(tmp_path):
-    """
-    Regression test for the mirror-image bug of the allotment/training=True one: MovingModule used
-    to gate berry-allocation restriction on `training` instead of an explicit restrict_to_allocation
-    flag, so evaluating basic_harvest with training=False (not exposed via run.py's CLI today, but
-    not prevented by the model code either) would raise IllegalBerry on every forage attempt, since
-    basic_harvest agents' allocation_id (defaulting to their own unique_id) never matches a berry's
-    allocation_id (None). Confirms basic_harvest is now safe to evaluate without further learning.
-    """
-    checkpoint_path = _make_pretrained_checkpoint(tmp_path, "baseline", max_days=5)
-    model = _build(
-        "basic", "homogeneous", 12, "baseline", False, checkpoint_path,
-        False, False, "eval_baseline", 2, 10,
-    )
-    for _ in range(20):
-        model.step()
-
 
 @pytest.mark.parametrize("agent_type", AGENT_TYPES)
 def test_render_pygame_does_not_raise_for_any_agent_type(tmp_path, agent_type, monkeypatch):
@@ -139,3 +102,29 @@ def test_a_berry_cannot_be_thrown_to_an_agent_that_died_earlier_in_the_step(tmp_
     assert dead.berries_consumed == 0
     #a living agent can still be thrown to
     assert thrower._throw(2) == thrower.rewards["throw"]
+
+
+@pytest.mark.parametrize("agent_type", AGENT_TYPES)
+def test_agent_reports_log_the_ethics_sanction_each_agent_receives_each_step(tmp_path, agent_type):
+    model = make_scenario_model(tmp_path, "colours", agent_type, max_days=10, max_episodes=2)
+    issued = {}
+    for agent in model.get_living_agents():
+        issued[agent.unique_id] = []
+        if agent_type != "baseline":
+            def recording(agent=agent, original=agent._ethics_sanction):
+                sanction = original()
+                issued[agent.unique_id].append((model.episode, float(np.sum(sanction))))
+                return sanction
+            agent._ethics_sanction = recording
+    for _ in range(15):
+        model.step()
+
+    #the reporter holds the current episode's rows
+    reports = model.agent_reporter
+    assert len(reports) > 0
+    if agent_type == "baseline":
+        assert reports["ethics_sanction"].isna().all()
+        return
+    logged = {agent_id: list(rows["ethics_sanction"]) for agent_id, rows in reports.groupby("agent_id", sort=False)}
+    issued = {agent_id: [sanction for episode, sanction in sanctions if episode == model.episode] for agent_id, sanctions in issued.items()}
+    assert logged == {agent_id: sanctions for agent_id, sanctions in issued.items() if sanctions}

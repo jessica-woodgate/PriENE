@@ -121,23 +121,6 @@ def test_average_aggregation_value():
     assert em._average_aggregation([0.4, -0.4, 0]) == pytest.approx([0.0])
 
 
-def test_average_aggregation_returns_a_single_element_list():
-    """
-    Regression test: average_aggregation used to return a bare np.mean(...) scalar instead of a
-    single-element list like the other three aggregations. That only avoided crashing because
-    `list + numpy.float64` happens to trigger numpy's broadcasting __radd__ fallback, whereas
-    `list + float(...)` (a plain python float) raises TypeError -- one innocent-looking refactor
-    away from breaking every "average" agent run. Now it's consistent with veto/optimist/majoritarian.
-    """
-    em = EthicsModule(sanction=0.4, principle="average")
-    result = em._average_aggregation([0.4, 0.4, 0.4])
-    assert isinstance(result, list)
-    assert len(result) == 1
-    reward_vector = [0.5]
-    combined = reward_vector + result
-    assert combined == pytest.approx([0.5, 0.4])
-
-
 @pytest.mark.parametrize("principle", ["veto", "optimist", "majoritarian", "average"])
 def test_combined_sanction_returns_single_element_list(principle):
     em = EthicsModule(sanction=0.4, principle=principle)

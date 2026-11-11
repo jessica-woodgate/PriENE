@@ -100,26 +100,9 @@ def test_harvest_specs_generate_expected_number_of_candidates():
     """
     module = make_module(HARVEST_SPECS, max_predicates=2)
     assert len(module._build_predicates()) == 31
-    assert len(list(module.iter_behaviours())) == 2652
-
-
-def test_total_behaviours_match_old_structure():
-    """
-    One behaviour_base entry per precondition must still expose preconditions x actions x 2 behaviours --
-    the old one-entry-per-behaviour len(behaviour_base) of 2652 for the harvest specs.
-    """
-    module = make_module(HARVEST_SPECS, max_predicates=2)
-    predicates = module._build_predicates()
-    n_singles = sum(len(e["predicates"]) == 1 for e in module.behaviour_base.values())
-    n_pairs = sum(len(e["predicates"]) == 2 for e in module.behaviour_base.values())
-    n_behaviours = len(list(module.iter_behaviours()))
-    print(f"\n{len(predicates)} predicates (4 scalar features x 4 bins + 3 other-agent well-being x 5 bins)"
-          f"\n{len(module.behaviour_base)} preconditions = {n_singles} single predicates + {n_pairs} pairs"
-          f" (C({len(predicates)},2) = {len(predicates) * (len(predicates) - 1) // 2} minus same-feature pairs)"
-          f"\n{len(ACTIONS)} actions x 2 types (prohibition, commitment)"
-          f"\n{len(module.behaviour_base)} x {len(ACTIONS)} x 2 = {n_behaviours} behaviours")
-    assert (len(predicates), n_singles, n_pairs) == (31, 31, 411)
-    assert n_behaviours == len(module.behaviour_base) * len(ACTIONS) * 2 == 2652
+    sizes = [len(entry["predicates"]) for entry in module.behaviour_base.values()]
+    assert (sizes.count(1), sizes.count(2)) == (31, 411)
+    assert len(list(module.iter_behaviours())) == len(module.behaviour_base) * len(ACTIONS) * 2 == 2652
 
 
 def test_behaviour_base_entries():

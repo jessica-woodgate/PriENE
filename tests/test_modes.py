@@ -78,9 +78,9 @@ def test_every_scenario_runs_in_either_mode_with_or_without_seasons(in_tmp_dir, 
         assert model.epsilon == 0 and all(agent.get_epsilon() == 0 for agent in agents(model))
 
 
-@pytest.mark.parametrize("scenario", SCENARIOS)
-def test_training_updates_the_networks_and_decays_epsilon(in_tmp_dir, scenario):
-    model = build(scenario, True, str(in_tmp_dir / "checkpoints") + "/", max_days=30, max_episodes=3, health=5.0)
+def test_training_updates_the_networks_and_decays_epsilon(in_tmp_dir):
+    # learning doesn't depend on the scenario, and test_every_scenario_runs_in_either_mode_with_or_without_seasons trains in each
+    model = build("basic", True, str(in_tmp_dir / "checkpoints") + "/", max_days=30, max_episodes=3, health=5.0)
     assert model.epsilon == 1.0
     before = network_weights(model)
     epsilons = {}
@@ -142,10 +142,12 @@ def test_a_checkpoint_trained_in_any_scenario_tests_in_every_scenario(in_tmp_dir
     assert model.episode == 2
 
 
-def test_observations_and_actions_are_the_same_in_every_scenario_with_or_without_seasons(in_tmp_dir, basic_checkpoint):
+def test_observations_and_actions_are_the_same_in_every_scenario_with_or_without_seasons_or_delays(in_tmp_dir, basic_checkpoint):
     shapes = set()
-    for scenario, seasons in itertools.product(SCENARIOS, [False, True]):
-        model = build(scenario, False, basic_checkpoint, seasons=seasons)
+    settings = [(scenario, seasons, {}) for scenario, seasons in itertools.product(SCENARIOS, [False, True])]
+    settings.append(("allotment", False, {"allotment_regrowth_delays": [2, 5]}))
+    for scenario, seasons, kwargs in settings:
+        model = build(scenario, False, basic_checkpoint, seasons=seasons, **kwargs)
         model.step()
         shapes.add(tuple((agent.observe().shape, tuple(agent.actions), agent.decision_module.n_features) for agent in agents(model)))
     assert len(shapes) == 1

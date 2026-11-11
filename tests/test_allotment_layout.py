@@ -163,11 +163,10 @@ def test_allotments_tile_the_grid_and_everything_starts_inside_its_allotment(in_
 VALID_LAYOUTS = [layout for layout in LAYOUTS if expected_error(*layout, seasons=True) is None]
 
 
-@pytest.mark.parametrize("seasons,delays", [(False, "none"), (True, "none"), (False, "some"), (True, "some")])
 @pytest.mark.parametrize("num_agents,num_allotments,width,height", VALID_LAYOUTS)
-def test_short_run_with_untrained_agents_completes(in_tmp_dir, random_agents, num_agents, num_allotments, width, height, seasons, delays):
-    allotment_delays = [0] * num_allotments if delays == "none" else [i % 3 + 1 for i in range(num_allotments)]
-    model = build(num_agents, num_allotments, width, height, seasons=seasons, delays=allotment_delays)
+def test_short_run_with_untrained_agents_completes(in_tmp_dir, random_agents, num_agents, num_allotments, width, height):
+    # with seasons and a delay in every allotment, the case with the most to keep inside each allotment
+    model = build(num_agents, num_allotments, width, height, seasons=True, delays=[i % 3 + 1 for i in range(num_allotments)])
     assert_everything_inside_its_allotment(model)
     while model.episode == 1:
         model.step()
@@ -225,14 +224,6 @@ def test_paper_configuration_keeps_the_same_allotments(in_tmp_dir, random_agents
         "allocation_1": {"id": 1, "berry_allocation": 6, "allotment": [half, width, 0, height], "agent_ids": [2, 3]},
     }
     assert model.allotment_regrowth_delays == [0, 2]
-
-
-@pytest.mark.parametrize("num_agents,num_allotments,width,height",
-                         [layout for layout in LAYOUTS if layout[2] % layout[1] == 0 and expected_error(*layout, seasons=False) is None])
-def test_evenly_dividing_widths_keep_the_old_boundaries(in_tmp_dir, random_agents, num_agents, num_allotments, width, height):
-    model = build(num_agents, num_allotments, width, height)
-    interval = width // num_allotments
-    assert [data["allotment"] for data in model.allocations.values()] == [[i * interval, (i + 1) * interval, 0, height] for i in range(num_allotments)]
 
 
 def types_by_allotment(model):

@@ -16,11 +16,6 @@ def checkpoint_path(tmp_path_factory):
     return _make_pretrained_checkpoint(tmp_path_factory.mktemp("regrowth_delays"), "baseline")
 
 
-@pytest.fixture(scope="module")
-def utilitarian_checkpoint_path(tmp_path_factory):
-    return _make_pretrained_checkpoint(tmp_path_factory.mktemp("regrowth_delays_utilitarian"), "utilitarian")
-
-
 @pytest.fixture
 def in_tmp_dir(tmp_path, monkeypatch):
     """HarvestModel writes to the relative path data/results/current_run -- keep that inside tmp_path."""
@@ -147,26 +142,16 @@ def test_berries_waiting_to_regrow_count_towards_their_allotment(in_tmp_dir, che
 
 
 @pytest.mark.parametrize("seasons", [False, True])
-def test_all_timers_are_reset_at_the_start_of_every_episode(in_tmp_dir, checkpoint_path, seasons):
-    model = build(checkpoint_path, [5, 7], seasons=seasons, max_episodes=3)
-    for episode in [1, 2]:
-        run_episode(model)
-        # nothing waits across the episode boundary: every berry is back on the grid, uncollected
-        assert model.episode == episode + 1 and model.day == 0
-        assert model.regrowth_timers == {}
-        assert all(not b.foraged and b.pos is not None for b in model.berries)
-        assert len(model.berries) == model.num_berries == sum(1 for a in model.schedule.agents if a.agent_type == "berry")
-        assert_every_berry_on_the_grid_or_waiting(model)
-
-
-def test_reset_clears_timers_that_are_waiting_at_the_end_of_an_episode(in_tmp_dir, checkpoint_path):
-    model = build(checkpoint_path, [9, 9])
+def test_reset_clears_timers_that_are_waiting_at_the_end_of_an_episode(in_tmp_dir, checkpoint_path, seasons):
+    model = build(checkpoint_path, [9, 9], seasons=seasons)
     model.step()
     forage_without_agents_acting(model, model.berries[:4])
     assert len(model.regrowth_timers) == 4
     model.finish_episode()
+    # nothing waits across the episode boundary: every berry is back on the grid, uncollected
     assert model.episode == 2 and model.regrowth_timers == {}
     assert all(not b.foraged and b.pos is not None for b in model.berries)
+    assert len(model.berries) == model.num_berries == sum(1 for a in model.schedule.agents if a.agent_type == "berry")
     assert_every_berry_on_the_grid_or_waiting(model)
 
 
@@ -226,32 +211,6 @@ def test_seasons_keep_allotments_at_their_targets(in_tmp_dir, checkpoint_path):
         run_episode(model, check)
         if model.episode <= 3:
             check(model)
-
-
-def test_two_agent_types_with_the_same_seed_get_the_same_seasons(in_tmp_dir, checkpoint_path, utilitarian_checkpoint_path):
-    def boundaries(model):
-        recorded = []
-        while model.episode <= 2:
-            model.step()
-            if model.day > 0 and model.day % SEASON_LENGTH == 0:
-                recorded.append((model.episode, model.day, model._current_season_quality(),
-                                 Counter(b.allocation_id for b in model.berries)))
-        return recorded
-    baseline = boundaries(build(checkpoint_path, [1, 3], seasons=True))
-    utilitarian = boundaries(build(utilitarian_checkpoint_path, [1, 3], seasons=True, agent_type="utilitarian"))
-    assert len(baseline) == 2 * (MAX_DAYS // SEASON_LENGTH)
-    assert baseline == utilitarian
-
-
-def test_observation_and_actions_match_with_and_without_delays(in_tmp_dir, checkpoint_path):
-    on_model = build(checkpoint_path, [2, 5])
-    off_model = build(checkpoint_path, [0, 0])
-    for model in [on_model, off_model]:
-        for _ in range(3):
-            model.step()
-    for on_agent, off_agent in zip(on_model.living_agents, off_model.living_agents):
-        assert on_agent.observe().shape == off_agent.observe().shape
-        assert on_agent.actions == off_agent.actions
 
 
 def test_berry_allocations_and_placement_match_with_and_without_delays(in_tmp_dir, checkpoint_path):

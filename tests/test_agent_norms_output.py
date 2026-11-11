@@ -6,7 +6,7 @@ import pytest
 
 from src.agent.modules.bayesian_norms_module import TYPE_COLUMNS, BayesianNormsModule
 from src.harvest_exception import FileExistsException
-from tests.conftest import SCENARIOS, _build, make_scenario_model
+from tests.conftest import _build
 
 CSV_COLUMNS = [
     "episode", "agent_id", "agent_type", "end_day", "num_learned_norms", "num_learned_prohibitions",
@@ -151,19 +151,7 @@ def test_agent_passes_norm_actions_to_module(in_tmp_dir, monkeypatch):
     assert sum(a.norms_module.action_counts.sum() for a in harvest_agents(model)) == len(received)
 
 
-# --- integration ---
-
-@pytest.mark.parametrize("scenario", SCENARIOS)
-def test_scenario_runs_with_norm_tracking(in_tmp_dir, scenario):
-    model = make_scenario_model(in_tmp_dir, scenario, "utilitarian", max_days=5, max_episodes=2, track_norms=True,
-                                norms_module_type="bayesian")
-    while model.episode <= 2:
-        model.step()
-    df = pd.read_csv(f"data/results/current_run/agent_norms_test_{scenario}_utilitarian.csv")
-    assert len(df) == 2 * model.num_agents
-    # agents' norm bases are reset each episode, so check observations via what was recorded
-    assert (df["num_observed_behaviours"] > 0).all()
-
+# --- integration (each scenario's run with norm tracking is in test_norms_module_switching.py) ---
 
 TRAINED_CHECKPOINTS = "data/model_variables/200_days/4_agents/"
 # absolute, since in_tmp_dir changes the working directory before the model is built

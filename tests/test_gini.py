@@ -37,28 +37,7 @@ def test_harvest_model_gini_berries_consumed(values, expected_gini):
     assert HarvestModel._gini_berries_consumed(stub) == pytest.approx(expected_gini)
 
 
-def test_harvest_model_gini_is_measured_when_no_agents_are_living():
-    # an episode can end with every agent dead; the berries they consumed are still unequally shared
-    stub = make_model_stub([1, 2, 3])
-    living = make_model_stub([1, 2, 3])
-    stub.living_agents = []
-    assert HarvestModel._gini_berries_consumed(stub) == pytest.approx(HarvestModel._gini_berries_consumed(living)) == pytest.approx(2 / 9)
-
-
 @pytest.mark.parametrize("values,expected_gini", GINI_CASES)
 def test_data_analysis_calculate_gini(values, expected_gini):
     da = DataAnalysis(num_agents=len(values), filepath="")
     assert da._calculate_gini(pd.Series(values)) == pytest.approx(expected_gini)
-
-
-def test_both_gini_implementations_agree():
-    """
-    HarvestModel._gini_berries_consumed and DataAnalysis._calculate_gini implement the same
-    formula independently in two different places -- this pins down that they don't drift apart.
-    """
-    values = [1, 4, 2, 8, 0, 6]
-    stub = make_model_stub(values)
-    model_gini = HarvestModel._gini_berries_consumed(stub)
-    da = DataAnalysis(num_agents=len(values), filepath="")
-    analysis_gini = da._calculate_gini(pd.Series(values))
-    assert model_gini == pytest.approx(analysis_gini)

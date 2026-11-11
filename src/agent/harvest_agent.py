@@ -48,6 +48,8 @@ class HarvestAgent(Agent):
         super().__init__(unique_id,model)
         self.done = False
         self.current_reward = 0
+        #the ethics sanction this step's action received (already part of current_reward); None for "baseline", which has none
+        self.current_sanction = None
         self.total_episode_reward = 0
         self.training = training
         self.agent_type = agent_type
@@ -128,7 +130,9 @@ class HarvestAgent(Agent):
         self.days_left_to_live = self.get_days_left_to_live()
         next_state = self.observe()
         if self.agent_type != "baseline":
-            reward_vector = reward_vector + self._ethics_sanction()
+            sanction = self._ethics_sanction()
+            self.current_sanction = float(np.sum(sanction))
+            reward_vector = reward_vector + sanction
         done, reward_vector = self._update_attributes(reward_vector)
         if self.track_norms:
             if self.norms_module_type == "rule_based":
@@ -188,6 +192,7 @@ class HarvestAgent(Agent):
         self.done = False
         self.total_episode_reward = 0
         self.current_reward = 0
+        self.current_sanction = None
         self.moving_module.reset()
         self.decision_module.start_episode()
         if self.track_norms:
