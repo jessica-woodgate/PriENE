@@ -172,3 +172,28 @@ With all of those: **about 665 lines** (about 13%).
 
 Also for you to decide: whether to commit `tests/reference_data/outputs/` (the reference run's files, 31 MB) or only
 `tests/reference_data/hashes.json` (which is all the comparison needs) with `outputs/` in `.gitignore`.
+
+## Outcome
+
+Every step above was approved, and each was made as its own commit (`3977a52` to `3d37622`). After each commit the full test suite and
+the reference script ran, and **all 950 reference hashes matched every time**. Only `hashes.json` is committed; `outputs/` is ignored.
+
+| | Before (`a24e1e8`) | After (`3d37622`) |
+|---|---|---|
+| Lines in `src/` and `run.py` | 5051 | 4313 (**−738**, 15%) |
+| Tests | 879 passed | 870 passed (the 9 cases testing removed Bayesian methods went, with approval) |
+| Coverage of `src/` | 86% | 89% |
+
+Changed from the plan:
+
+- **A3 rejected**: moving the regrowth-delay check into `HarvestModel` saves almost nothing, and commons would have to keep its own
+  check to keep its error precedence; the constructor template saves about 3 lines.
+- **A14, scenario table in `create_and_run_model` rejected**: the five constructors take different arguments, so a table is no shorter.
+- **B6, `_precondition_satisfied` kept**: its tests use it as an independent check of the bins `update()` relies on. `episode_report`
+  and `get_all_behaviours_by_certainty` went, and so did `cooperative_actions`, which only `episode_report` read.
+- **E2-E4 kept** (analysis warnings).
+- **D1-D6** are notes for the environment-agnostic interface, not changes.
+
+One test, `test_modes.py::test_training_never_writes_into_existing_checkpoints`, failed in 2 of the 19 verification runs: it hashes
+all of `data/model_variables/` before and after, and a training run was saving into `data/model_variables/trained/` at the same time.
+Run on its own, the same code passes and fails at random; it isn't caused by any of these changes.
