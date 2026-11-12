@@ -1,6 +1,5 @@
 from src.harvest_model import HarvestModel
 from src.harvest_exception import NumBerriesException
-from src.harvest_exception import NumAgentsException
 from src.harvest_exception import RegrowthDelaysNotSupported
 
 class CapabilitiesHarvest(HarvestModel):
@@ -45,18 +44,3 @@ class CapabilitiesHarvest(HarvestModel):
         if self.num_berries != self.num_start_berries:
             raise NumBerriesException(self.num_start_berries, self.num_berries)
         return berries
-    
-    def _init_agents(self, society_mix, agent_type, checkpoint_path):
-        self.living_agents = []
-        allotment = [0,self.max_width,0,self.max_height]
-        #every agent is in the capability group that lists its id, given afresh each episode; in a mixed society the baseline agents are
-        #chosen from the seed
-        self._choose_agent_types(society_mix)
-        self._assign_agents_to_allocations()
-        for id in range(self.num_agents):
-            allocation_id = self._get_allocation_id(id)
-            self._add_agent(id, self._agent_type_of(id, agent_type), allotment, checkpoint_path, allocation_id=allocation_id)
-        self.num_living_agents = len(self.living_agents)
-        self.berry_id = self.num_living_agents + 1
-        if self.num_living_agents != self.num_agents:
-            raise NumAgentsException(self.num_agents, self.num_living_agents)

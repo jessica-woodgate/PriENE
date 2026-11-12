@@ -1,6 +1,5 @@
 from src.harvest_model import HarvestModel
 from src.harvest_exception import NumBerriesException
-from src.harvest_exception import NumAgentsException
 from src.harvest_exception import NumAllotmentsException
 from src.harvest_exception import AllotmentWidthException
 from src.harvest_exception import AllotmentCapacityException
@@ -165,18 +164,8 @@ class AllotmentHarvest(HarvestModel):
         agent.min_width, agent.max_width, agent.min_height, agent.max_height = allotment
         agent.moving_module.min_width, agent.moving_module.max_width, agent.moving_module.min_height, agent.moving_module.max_height = allotment
 
-    def _init_agents(self, society_mix, agent_type, checkpoint_path):
-        self.living_agents = []
-        self._choose_agent_types(society_mix)
-        self._assign_agents_to_allocations()
-        for id in range(self.num_agents):
-            allocation_id = self._get_allocation_id(id)
-            allotment = self.allocations[allocation_id]["allotment"]
-            self._add_agent(id, self._agent_type_of(id, agent_type), allotment, checkpoint_path, allocation_id=allocation_id)
-        self.num_living_agents = len(self.living_agents)
-        self.berry_id = self.num_living_agents + 1
-        if self.num_living_agents != self.num_agents:
-            raise NumAgentsException(self.num_agents, self.num_living_agents)
+    def _allocation_region(self, allocation_id):
+        return self.allocations[allocation_id]["allotment"]
 
     def _choose_baseline_ids(self, rng):
         """

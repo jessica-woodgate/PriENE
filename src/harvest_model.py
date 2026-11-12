@@ -310,13 +310,27 @@ class HarvestModel(Model):
         raise NotImplementedError
     
     def _init_agents(self, society_mix, agent_type, checkpoint_path):
+        """
+        Agents in id order, each placed as it is made; in scenarios with allocations (SHUFFLES_ALLOCATIONS) each agent is given one, whose
+        berries it forages, in its region of the grid (see _allocation_region); in a mixed society the baseline agents are chosen from the seed
+        """
         self.living_agents = []
-        allotment = [0,self.max_width,0,self.max_height]
         self._choose_agent_types(society_mix)
+        if self.SHUFFLES_ALLOCATIONS:
+            self._assign_agents_to_allocations()
         for i in range(self.num_agents):
-            self._add_agent(i, self._agent_type_of(i, agent_type), allotment, checkpoint_path)
-        assert self.num_agents == len(self.living_agents)
+            allocation_id = self._get_allocation_id(i) if self.SHUFFLES_ALLOCATIONS else None
+            self._add_agent(i, self._agent_type_of(i, agent_type), self._allocation_region(allocation_id), checkpoint_path, allocation_id=allocation_id)
+        if len(self.living_agents) != self.num_agents:
+            raise NumAgentsException(self.num_agents, len(self.living_agents))
         self.berry_id = len(self.living_agents) + 1
+
+    def _allocation_region(self, allocation_id):
+        """
+        The part of the grid an allocation's agents and berries are in, as [min_width, max_width, min_height, max_height]: the whole grid,
+        unless the scenario has allotments
+        """
+        return [0, self.max_width, 0, self.max_height]
 
     def _choose_agent_types(self, society_mix):
         """

@@ -45,14 +45,3 @@ class ColoursHarvest(HarvestModel):
         if self.num_berries != self.num_start_berries:
             raise NumBerriesException(self.num_start_berries, self.num_berries)
         return berries
-    
-    def _init_agents(self, society_mix, agent_type, checkpoint_path):
-        self.living_agents = []
-        allotment = [0,self.max_width,0,self.max_height]
-        #every agent has its own colour, given afresh each episode; in a mixed society the baseline agents are chosen from the seed
-        self._choose_agent_types(society_mix)
-        self._assign_agents_to_allocations()
-        for i in range(self.num_agents):
-            self._add_agent(i, self._agent_type_of(i, agent_type), allotment, checkpoint_path, allocation_id=self._get_allocation_id(i))
-        assert self.num_agents == len(self.living_agents)
-        self.berry_id = len(self.living_agents) + 1
