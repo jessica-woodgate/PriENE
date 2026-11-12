@@ -1,3 +1,4 @@
+from src.harvest_model import HarvestModel
 from src.scenarios.basic_harvest import BasicHarvest
 from src.scenarios.colours_harvest import ColoursHarvest
 from src.scenarios.allotment_harvest import AllotmentHarvest
@@ -92,6 +93,17 @@ def use_unequal_instant_allotments(monkeypatch):
         return allocations
     monkeypatch.setattr(AllotmentHarvest, "_assign_allocations", assign_unequal_allocations)
     monkeypatch.setattr(AllotmentHarvest, "_default_regrowth_delays", lambda self: [0] * self.num_allotments)
+
+
+def use_fixed_allocations(monkeypatch):
+    """
+    Every agent keeps the allocation (colour, capability group or allotment) it is first given, as before agents were put in
+    allocations afresh each episode: agent i holds colour i, and capability groups and allotments hold consecutive ids
+    """
+    def keep_groups(self):
+        return [list(data["agent_ids"]) for data in self.allocations.values()]
+    monkeypatch.setattr(HarvestModel, "_episode_groups", keep_groups)
+    monkeypatch.setattr(AllotmentHarvest, "_episode_groups", keep_groups)
 
 
 def make_training_model(tmp_path, agent_type, max_days=10, max_episodes=2, society_mix="homogeneous"):

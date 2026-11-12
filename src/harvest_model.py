@@ -20,6 +20,7 @@ from .harvest_exception import UnrecognisedNormsModule
 from .harvest_exception import SeasonsException
 from .harvest_exception import BerryOffGrid
 from .harvest_exception import MixedSocietyException
+from .harvest_exception import NoAllocationException
 from os.path import exists
 from abc import abstractmethod
 
@@ -75,6 +76,10 @@ class HarvestModel(Model):
     SEASON_QUALITY_CHANGE = {"normal": 0, "good": 1, "bad": -1}
     #spawn key for the random stream that chooses which agents of a mixed society are baseline
     MIXED_SOCIETY_STREAM = 1
+    #spawn key for the random stream that puts agents in allocations each episode (commons uses 2)
+    ALLOCATION_MEMBERSHIP_STREAM = 3
+    #whether agents are put in allocations afresh each episode (see _episode_groups): scenarios with more than one allocation
+    SHUFFLES_ALLOCATIONS = False
 
     def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,start_episode=1):
         super().__init__()
@@ -387,10 +392,53 @@ class HarvestModel(Model):
     def _restore_episode_state(self):
         """
         Restore the scenario's state for a new episode, after the grid is cleared and before agents and berries are reset and placed:
-        by default, the berries each season started with
+        by default, the berries each season started with; and with SHUFFLES_ALLOCATIONS, agents are put in allocations afresh
         """
         if self.seasons:
             self._restore_original_berries()
+        if self.SHUFFLES_ALLOCATIONS:
+            self._assign_agents_to_allocations()
+            for agent in self.schedule.agents:
+                if agent.agent_type != "berry":
+                    self._move_to_allocation(agent, self._get_allocation_id(agent.unique_id))
+
+    def _allocation_membership_rng(self):
+        #from the seed and the episode, in a stream of its own, so it shifts no other random draws, every agent type gets the same groups
+        #in the same episode, and a continued run gets the groups the run it continues would have had
+        return np.random.default_rng(None if self.seed is None else [self.seed, self.ALLOCATION_MEMBERSHIP_STREAM, self.episode])
+
+    def _episode_groups(self):
+        """
+        Agent ids in each allocation this episode: every agent is shuffled among the allocations, each keeping its number of agents, so no
+        agent has the same allocation (and its resources) every episode
+        """
+        order = [int(agent_id) for agent_id in self._allocation_membership_rng().permutation(self.num_agents)]
+        return self._split_into_groups(order, [len(data["agent_ids"]) for data in self.allocations.values()])
+
+    def _split_into_groups(self, ids, sizes):
+        groups = []
+        start = 0
+        for size in sizes:
+            groups.append(ids[start:start + size])
+            start += size
+        return groups
+
+    def _assign_agents_to_allocations(self):
+        for allocation_data, group in zip(self.allocations.values(), self._episode_groups()):
+            allocation_data["agent_ids"] = group
+
+    def _get_allocation_id(self, agent_id):
+        for allocation_id, allocation_data in self.allocations.items():
+            if agent_id in allocation_data["agent_ids"]:
+                return allocation_id
+        raise NoAllocationException(agent_id)
+
+    def _move_to_allocation(self, agent, allocation_id):
+        """
+        An agent moving allocation forages only its new allocation's berries (scenarios with allotments also change its bounds)
+        """
+        agent.allocation_id = allocation_id
+        agent.moving_module.allocation_id = allocation_id
 
     def _init_seasons(self):
         """
@@ -591,6 +639,7 @@ class HarvestModel(Model):
                                "days_left_to_live": [],
                                "total_days_left_to_live": [],
                                "action": [],
+                               "thrown_to": [],
                                "reward": [],
                                "ethics_sanction": [],
                                "num_norms": [],
@@ -673,6 +722,7 @@ class HarvestModel(Model):
                                "days_left_to_live": [agent.days_left_to_live],
                                "total_days_left_to_live": [agent.total_days_left_to_live],
                                "action": [agent.current_action],
+                               "thrown_to": [agent.current_thrown_to],
                                "reward": [agent.current_reward],
                                "ethics_sanction": [agent.current_sanction],
                                "num_norms": [self._num_agent_norms(agent)],

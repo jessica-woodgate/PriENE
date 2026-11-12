@@ -223,14 +223,17 @@ def test_berry_allocations_and_placement_match_with_and_without_delays(in_tmp_di
 
 def test_output_records_each_agents_allotment_delay(in_tmp_dir, checkpoint_path):
     model = long_lived(_build("allotment", "homogeneous", NUM_AGENTS * 3, "baseline", False, checkpoint_path, True, False,
-                              "allotment_regrow2-5", 1, 10, seed=42, allotment_regrowth_delays=[2, 5]))
-    while model.episode <= 1:
-        model.step()
+                              "allotment_regrow2-5", 2, 10, seed=42, allotment_regrowth_delays=[2, 5]))
+    expected = {}
+    while model.episode <= 2:
+        # agents change allotment between episodes, so the delay each agent's rows record is its allotment's that episode
+        expected[model.episode] = {agent_id: [2, 5][model.allocations[model._get_allocation_id(agent_id)]["id"]] for agent_id in range(NUM_AGENTS)}
+        episode = model.episode
+        while model.episode == episode:
+            model.step()
     reports = pd.read_csv("data/results/current_run/agent_reports_allotment_regrow2-5.csv")
-    for agent_id in range(NUM_AGENTS):
-        holder = model._get_allocation_id(agent_id)
-        expected = [2, 5][model.allocations[holder]["id"]]
-        assert (reports.loc[reports["agent_id"] == agent_id, "allotment_regrowth_delay"] == expected).all()
+    for (episode, agent_id), rows in reports.groupby(["episode", "agent_id"]):
+        assert (rows["allotment_regrowth_delay"] == expected[episode][agent_id]).all()
 
 
 @pytest.mark.parametrize("delays", [[0], [0, 1, 2], [], [0, -1], [-2, 0], [0, 1.5], [True, 0], ["1", 0]])

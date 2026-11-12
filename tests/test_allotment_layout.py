@@ -146,8 +146,9 @@ def test_allotments_tile_the_grid_and_everything_starts_inside_its_allotment(in_
     assert all(previous[1] == following[0] for previous, following in zip(allotments, allotments[1:]))
     cells = Counter((x, y) for a in allotments for x in range(a[0], a[1]) for y in range(a[2], a[3]))
     assert len(cells) == width * height and set(cells.values()) == {1}
-    # every agent is in exactly one allotment
-    assert [data["agent_ids"] for data in model.allocations.values()] == expected_groups(num_agents, num_allotments)
+    # every agent is in exactly one allotment, which is shuffled each episode but always holds the same number of agents
+    assert [len(data["agent_ids"]) for data in model.allocations.values()] == [len(g) for g in expected_groups(num_agents, num_allotments)]
+    assert sorted(agent_id for data in model.allocations.values() for agent_id in data["agent_ids"]) == list(range(num_agents))
     assert [a.allocation_id for a in agents(model)] == [model._get_allocation_id(i) for i in range(num_agents)]
     # berries: an equal split of the society's total, which is num_start_berries
     assert model.num_start_berries == TOTAL_BERRIES[num_agents]
@@ -219,10 +220,11 @@ def test_paper_configuration_keeps_the_same_allotments(in_tmp_dir, random_agents
     # run.py's allotment grid for 4 agents is 16x8; boundaries are what max_width // num_allotments gave before
     model = build(4, 2, width, height)
     half = width // 2
-    assert model.allocations == {
-        "allocation_0": {"id": 0, "berry_allocation": 6, "allotment": [0, half, 0, height], "agent_ids": [0, 1]},
-        "allocation_1": {"id": 1, "berry_allocation": 6, "allotment": [half, width, 0, height], "agent_ids": [2, 3]},
+    assert {holder: {key: value for key, value in data.items() if key != "agent_ids"} for holder, data in model.allocations.items()} == {
+        "allocation_0": {"id": 0, "berry_allocation": 6, "allotment": [0, half, 0, height]},
+        "allocation_1": {"id": 1, "berry_allocation": 6, "allotment": [half, width, 0, height]},
     }
+    assert [len(data["agent_ids"]) for data in model.allocations.values()] == [2, 2]
     assert model.allotment_regrowth_delays == [0, 2]
 
 
@@ -233,7 +235,7 @@ def types_by_allotment(model):
 @pytest.mark.parametrize("num_agents,num_allotments", [(4, 2), (6, 2), (6, 3), (8, 4), (20, 10), (4, 4)])
 def test_split_mixed_allotments_alternate_agent_types(in_tmp_dir, random_agents, num_agents, num_allotments):
     model = build(num_agents, num_allotments, 4 * num_agents, 2 * num_agents, society_mix="heterogeneous")
-    assert [data["agent_ids"] for data in model.allocations.values()] == expected_groups(num_agents, num_allotments)
+    assert [len(data["agent_ids"]) for data in model.allocations.values()] == [len(g) for g in expected_groups(num_agents, num_allotments)]
     # the even or the odd ids are baseline, chosen from the seed
     types = [a.agent_type for a in agents(model)]
     assert types in [["utilitarian" if i % 2 == parity else "baseline" for i in range(num_agents)] for parity in [0, 1]]
@@ -252,14 +254,57 @@ def test_split_mixed_allotments_alternate_agent_types(in_tmp_dir, random_agents,
 ])
 def test_separate_mixed_allotments_give_each_agent_type_half_the_allotments(in_tmp_dir, random_agents, num_agents, num_allotments, groups):
     model = build(num_agents, num_allotments, 4 * num_agents, 2 * num_agents, society_mix="heterogeneous", mixed_allotments="separate")
-    assert [data["agent_ids"] for data in model.allocations.values()] == groups
-    types = list(types_by_allotment(model).values())
+    held = [data["agent_ids"] for data in model.allocations.values()]
     half = num_allotments // 2
+    # the lower half of ids are shuffled among the first half of the allotments, and the upper half among the rest
+    assert [len(ids) for ids in held] == [len(ids) for ids in groups]
+    assert sorted(i for ids in held[:half] for i in ids) == sorted(i for ids in groups[:half] for i in ids)
+    types = list(types_by_allotment(model).values())
     # the seed chooses which half of the allotments the baseline agents have
     first, second = ("baseline", "utilitarian") if set(types[0]) == {"baseline"} else ("utilitarian", "baseline")
     assert all(set(t) == {first} for t in types[:half])
     assert all(set(t) == {second} for t in types[half:])
     assert sum(len(t) for t in types) == num_agents
+
+
+@pytest.mark.parametrize("society_mix,mixed_allotments", [("homogeneous", "split"), ("heterogeneous", "split"), ("heterogeneous", "separate")])
+def test_agents_are_put_in_allotments_afresh_each_episode_keeping_the_layout(in_tmp_dir, random_agents, society_mix, mixed_allotments):
+    model = build(8, 4, 32, 16, society_mix=society_mix, mixed_allotments=mixed_allotments, max_episodes=8)
+    types = {a.unique_id: a.agent_type for a in agents(model)}
+    groupings = []
+    while model.episode <= 8:
+        held = [data["agent_ids"] for data in model.allocations.values()]
+        groupings.append(tuple(map(tuple, held)))
+        # the same number of agents in each allotment, every agent in the allotment that lists it, with its bounds
+        assert [len(ids) for ids in held] == [2, 2, 2, 2]
+        assert sorted(i for ids in held for i in ids) == list(range(8))
+        assert_everything_inside_its_allotment(model)
+        for a in agents(model):
+            assert a.unique_id in model.allocations[a.allocation_id]["agent_ids"] and a.moving_module.allocation_id == a.allocation_id
+        type_sets = [{types[i] for i in ids} for ids in held]
+        if mixed_allotments == "split" and society_mix != "homogeneous":
+            assert all(t == {"utilitarian", "baseline"} for t in type_sets)
+        elif mixed_allotments == "separate":
+            assert type_sets[0] == type_sets[1] != type_sets[2] == type_sets[3]
+            assert {i for ids in held[:2] for i in ids} == {0, 1, 2, 3}
+        episode = model.episode
+        while model.episode == episode:
+            model.step()
+    # the mix of agents in each allotment changes from episode to episode
+    assert len(set(groupings)) > 1
+
+
+def test_the_groups_each_episode_come_from_the_seed_and_the_episode(in_tmp_dir, random_agents):
+    def groups(model):
+        return [list(data["agent_ids"]) for data in model.allocations.values()]
+    first, again, other_seed = build(8, 4, 32, 16), build(8, 4, 32, 16), build(8, 4, 32, 16)
+    other_seed.seed = 7
+    assert groups(first) == groups(again)
+    # the same draw whichever episode is built, e.g. a continued run, and whatever else has been drawn
+    first.episode = again.episode = other_seed.episode = 5
+    np.random.random()
+    assert first._episode_groups() == again._episode_groups() != other_seed._episode_groups()
+    assert first._episode_groups() != groups(first)
 
 
 def test_mixed_allotments_are_ignored_for_a_homogeneous_society(in_tmp_dir, random_agents):
@@ -297,7 +342,7 @@ def test_mixed_society_agents_are_in_the_groups_that_list_them(in_tmp_dir, rando
     model = _build(scenario, "heterogeneous", NUM_AGENTS * 3, "utilitarian", False, str(in_tmp_dir) + "/", False, False, scenario, 1, 10)
     members = Counter(a.allocation_id for a in agents(model))
     for holder, data in model.allocations.items():
-        assert [a.unique_id for a in agents(model) if a.allocation_id == holder] == data["agent_ids"]
+        assert [a.unique_id for a in agents(model) if a.allocation_id == holder] == sorted(data["agent_ids"])
         assert members[holder] == len(data["agent_ids"])
     # half the agents are baseline, chosen from the seed
     assert Counter(a.agent_type for a in agents(model)) == {"utilitarian": NUM_AGENTS // 2, "baseline": NUM_AGENTS // 2}

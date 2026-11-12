@@ -1,7 +1,6 @@
 from src.harvest_model import HarvestModel
 from src.harvest_exception import NumBerriesException
 from src.harvest_exception import NumAgentsException
-from src.harvest_exception import NoAllocationException
 from src.harvest_exception import RegrowthDelaysNotSupported
 
 class CapabilitiesHarvest(HarvestModel):
@@ -9,9 +8,11 @@ class CapabilitiesHarvest(HarvestModel):
     Capabilities harvest scenario agents have only access to specific berries: some agents are tall, and can access berries on trees; some agents are small and can access berries on the ground
     Instance variables:
         num_start_berries -- the number of berries initiated at the beginning of an episode
-        allocations -- dictionary of agent ids and the berries assigned to that agent
+        allocations -- dictionary of capability groups, the berries of each, and the agent ids in it (agents are put in groups afresh each episode)
         berries -- list of active berry objects
     """
+    SHUFFLES_ALLOCATIONS = True
+
     def __init__(self,society_mix,num_agents,num_start_berries,num_capabilities,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,start_episode=1):
         if allotment_regrowth_delays is not None:
             raise RegrowthDelaysNotSupported("capabilities")
@@ -56,8 +57,10 @@ class CapabilitiesHarvest(HarvestModel):
     def _init_agents(self, society_mix, agent_type, checkpoint_path):
         self.living_agents = []
         allotment = [0,self.max_width,0,self.max_height]
-        #every agent is in the capability group that lists its id; in a mixed society the baseline agents are chosen from the seed
+        #every agent is in the capability group that lists its id, given afresh each episode; in a mixed society the baseline agents are
+        #chosen from the seed
         self._choose_agent_types(society_mix)
+        self._assign_agents_to_allocations()
         for id in range(self.num_agents):
             allocation_id = self._get_allocation_id(id)
             self._add_agent(id, self._agent_type_of(id, agent_type), allotment, checkpoint_path, allocation_id=allocation_id)
@@ -65,9 +68,3 @@ class CapabilitiesHarvest(HarvestModel):
         self.berry_id = self.num_living_agents + 1
         if self.num_living_agents != self.num_agents:
             raise NumAgentsException(self.num_agents, self.num_living_agents)
-    
-    def _get_allocation_id(self, agent_id):
-        for allocation_id, allocation_data in self.allocations.items():
-            if agent_id in allocation_data["agent_ids"]:
-                return allocation_id
-        raise NoAllocationException(agent_id)

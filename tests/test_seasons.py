@@ -69,6 +69,10 @@ def assert_berries_in_their_holders_region(model):
     for b in model.berries:
         region = model.allocations[b.allocation_id].get("allotment", [0, model.max_width, 0, model.max_height])
         assert [b.min_width, b.max_width, b.min_height, b.max_height] == region
+        if b in model.regrowth_timers:
+            #foraged in an allotment with a regrowth delay: off the grid until it regrows
+            assert b.pos is None and b.foraged
+            continue
         assert region[0] <= b.pos[0] < region[1] and region[2] <= b.pos[1] < region[3]
         assert b in model.schedule.agents and not b.foraged
 
@@ -82,6 +86,15 @@ def force_quality_sequence(monkeypatch, *qualities):
     """Seasons get qualities in order, the first being season 0 at construction."""
     sequence = iter(qualities)
     force_qualities(monkeypatch, lambda self: next(sequence))
+
+
+def run_recording_holders(model, last_episode):
+    """Runs to the end of last_episode, returning each episode's allocation of every agent (given afresh each episode)."""
+    holders = {}
+    while model.episode <= last_episode:
+        holders.setdefault(model.episode, {a.unique_id: a.allocation_id for a in agents(model)})
+        model.step()
+    return holders
 
 
 def run_episode(model, check=None):
@@ -146,15 +159,16 @@ def test_first_season_of_each_episode_gets_its_quality_from_the_original_berries
 def test_allocations_stay_with_their_groups_changed_by_group_size(in_tmp_dir, checkpoint_path, scenario, num_allocations):
     # with 3 allocations capability groups and allotments have 2, 1 and 1 agents; colours are always groups of one
     model = build(checkpoint_path, scenario, num_allocations=num_allocations)
-    groups_and_bounds = agent_groups_and_bounds(model)
+    groups_and_bounds = {1: agent_groups_and_bounds(model)}
     original = {holder: data["berry_allocation"] for holder, data in model.allocations.items()}
     num_original = len(model.original_berries)
 
     def check(m):
         quality = m._current_season_quality()
-        # each group's target comes from its own allocation (never cumulative), and groups never change their members or bounds;
-        # berry objects a bad season makes dormant can be reused by any group in a later good season
-        assert agent_groups_and_bounds(m) == groups_and_bounds
+        # each group's target comes from its own allocation (never cumulative), and groups never change their members or bounds within
+        # an episode (agents are put in allocations afresh each episode); berry objects a bad season makes dormant can be reused by
+        # any group in a later good season
+        assert agent_groups_and_bounds(m) == groups_and_bounds.setdefault(m.episode, agent_groups_and_bounds(m))
         targets = {holder: max(0, original[holder] + CHANGE[quality] * group_size(m, holder)) for holder in m.allocations}
         assert m._season_targets() == targets
         assert berries_per_holder(m) == targets
@@ -240,8 +254,11 @@ def test_two_agent_types_with_the_same_seed_get_the_same_seasons(in_tmp_dir, che
         while model.episode <= 2:
             model.step()
             if model.day > 0 and model.day % SEASON_LENGTH == 0:
-                recorded.append((model.episode, model.day, model._current_season_quality(),
-                                 sorted((b.unique_id, b.allocation_id) for b in model.berries)))
+                # with regrowth delays (allotment's default has one) which berry objects a season removes or reuses depends on which
+                # are waiting to regrow, so only each allotment's number of berries is the same
+                berries = (Counter(b.allocation_id for b in model.berries) if scenario == "allotment"
+                           else sorted((b.unique_id, b.allocation_id) for b in model.berries))
+                recorded.append((model.episode, model.day, model._current_season_quality(), berries))
         return recorded
     baseline = boundaries(build(checkpoint_path, scenario, **kwargs))
     utilitarian = boundaries(build(utilitarian_checkpoint_path, scenario, agent_type="utilitarian", **kwargs))
@@ -310,19 +327,16 @@ def test_seasons_off_keeps_one_season_with_the_original_allocations(in_tmp_dir, 
 def test_trained_run_with_seasons_writes_the_season_columns(in_tmp_dir, scenario):
     model = long_lived(_build(scenario, "homogeneous", NUM_AGENTS * 3, "utilitarian", False, TRAINED_CHECKPOINTS_ABS,
                               True, False, f"{scenario}_seasons", 2, 20, seed=42, seasons=True, season_length=SEASON_LENGTH))
-    while model.episode <= 2:
-        model.step()
+    holders = run_recording_holders(model, 2)
     reports = pd.read_csv(f"data/results/current_run/agent_reports_{scenario}_seasons.csv")
     assert "initial_health" not in reports and "seasonal_berry_allocation" not in reports
     # rows for day d are written before the season change on day d
     assert (reports["season"] == (reports["day"] - 1) // SEASON_LENGTH).all()
     assert (reports.groupby(["episode", "season"])["season_quality"].nunique() == 1).all()
-    group_of = {a.unique_id: a.allocation_id for a in agents(model)}
-    allocation = {a.unique_id: model.allocations[a.allocation_id]["berry_allocation"] for a in agents(model)}
-    size = {a.unique_id: group_size(model, a.allocation_id) for a in agents(model)}
-    change = reports["season_quality"].map(CHANGE) * reports["agent_id"].map(size)
-    assert (reports["seasonal_berry_target"] == (reports["agent_id"].map(allocation) + change).clip(lower=0)).all()
-    reports["group"] = reports["agent_id"].map(group_of)
+    reports["group"] = [holders[episode][agent_id] for episode, agent_id in zip(reports["episode"], reports["agent_id"])]
+    allocation = reports["group"].map({holder: data["berry_allocation"] for holder, data in model.allocations.items()})
+    change = reports["season_quality"].map(CHANGE) * reports["group"].map({holder: group_size(model, holder) for holder in model.allocations})
+    assert (reports["seasonal_berry_target"] == (allocation + change).clip(lower=0)).all()
     assert (reports.groupby(["episode", "day", "group"])["seasonal_berry_target"].nunique() == 1).all()
     assert set(reports["season_quality"]) == {"normal", "good", "bad"}
 
@@ -332,10 +346,9 @@ def test_trained_run_with_seasons_writes_the_season_columns(in_tmp_dir, scenario
 def test_season_columns_without_seasons(in_tmp_dir, scenario):
     model = _build(scenario, "homogeneous", NUM_AGENTS * 3, "utilitarian", False, TRAINED_CHECKPOINTS_ABS,
                    True, False, scenario, 1, 20, seed=42)
-    while model.episode <= 1:
-        model.step()
+    holders = run_recording_holders(model, 1)
     reports = pd.read_csv(f"data/results/current_run/agent_reports_{scenario}.csv")
     assert (reports["season"] == 0).all()
     assert reports["season_quality"].isna().all()
-    allocation = {a.unique_id: model.allocations[a.allocation_id]["berry_allocation"] for a in agents(model)}
-    assert (reports["seasonal_berry_target"] == reports["agent_id"].map(allocation)).all()
+    allocation = [model.allocations[holders[1][agent_id]]["berry_allocation"] for agent_id in reports["agent_id"]]
+    assert (reports["seasonal_berry_target"] == allocation).all()

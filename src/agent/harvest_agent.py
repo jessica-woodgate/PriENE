@@ -50,6 +50,8 @@ class HarvestAgent(Agent):
         self.current_reward = 0
         #the ethics sanction this step's action received (already part of current_reward); None for "baseline", which has none
         self.current_sanction = None
+        #id of the agent this step's action threw a berry to; None if it didn't throw one (or the throw failed)
+        self.current_thrown_to = None
         self.total_episode_reward = 0
         self.training = training
         self.agent_type = agent_type
@@ -116,6 +118,7 @@ class HarvestAgent(Agent):
         """
         done = False
         self.current_action = action
+        self.current_thrown_to = None
         if self.track_norms and self.norms_module_type == "rule_based":
             # rule-based norms are keyed on the state before acting
             antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)]
@@ -193,6 +196,7 @@ class HarvestAgent(Agent):
         self.total_episode_reward = 0
         self.current_reward = 0
         self.current_sanction = None
+        self.current_thrown_to = None
         self.moving_module.reset()
         self.decision_module.start_episode()
         if self.track_norms:
@@ -264,6 +268,7 @@ class HarvestAgent(Agent):
                 a.days_left_to_live = a.get_days_left_to_live()
                 self.berries -= 1
                 self.berries_thrown += 1
+                self.current_thrown_to = a.unique_id
                 self.days_left_to_live = self.get_days_left_to_live()
                 return self.rewards["throw"]
         return self.rewards["no_benefactor"]

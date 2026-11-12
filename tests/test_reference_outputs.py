@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import pytest
 
-from tests.conftest import NUM_AGENTS, TEST_SCENARIOS, _build, use_unequal_instant_allotments
+from tests.conftest import NUM_AGENTS, TEST_SCENARIOS, _build, use_fixed_allocations, use_unequal_instant_allotments
 
 TRAINED_CHECKPOINTS = "data/model_variables/200_days/4_agents/"
 # absolute, since in_tmp_dir changes the working directory before the model is built
@@ -39,7 +39,7 @@ def in_tmp_dir(tmp_path, monkeypatch):
 
 def report_hash(path):
     # columns added since the reference outputs were made
-    df = pd.read_csv(path).drop(columns=["ethics_sanction", "season", "season_quality", "seasonal_berry_target", "allotment_regrowth_delay"],
+    df = pd.read_csv(path).drop(columns=["thrown_to", "ethics_sanction", "season", "season_quality", "seasonal_berry_target", "allotment_regrowth_delay"],
                                 errors="ignore")
     return hashlib.sha256(df.to_csv(index=False).encode()).hexdigest()
 
@@ -47,8 +47,10 @@ def report_hash(path):
 @needs_trained_checkpoints
 @pytest.mark.parametrize("scenario", TEST_SCENARIOS)
 def test_options_off_reproduce_reference_outputs(in_tmp_dir, scenario, monkeypatch):
-    # the references predate allotments' equal split and slower allotment, so allotment is run as it was then
+    # the references predate allotments' equal split and slower allotment, and agents being given allocations afresh each episode,
+    # so they are run as they were then
     use_unequal_instant_allotments(monkeypatch)
+    use_fixed_allocations(monkeypatch)
     model = _build(scenario, "homogeneous", NUM_AGENTS * 3, "utilitarian", False, TRAINED_CHECKPOINTS_ABS,
                    True, False, scenario, 2, 20, seed=42)
     while model.episode <= 2:

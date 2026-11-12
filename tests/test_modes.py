@@ -373,7 +373,11 @@ def test_the_baseline_agents_are_chosen_from_the_seed(in_tmp_dir, layout):
 
 
 @pytest.mark.parametrize("layout", MIXED_LAYOUTS)
-def test_choosing_baseline_agents_draws_nothing_from_the_other_random_streams(in_tmp_dir, layout):
+def test_choosing_baseline_agents_draws_nothing_from_the_other_random_streams(in_tmp_dir, layout, monkeypatch):
+    # a mixed society shuffles each type among its own places in the allotments, which a homogeneous one doesn't, so both keep the
+    # layout's groups here (the shuffle has its own stream, see test_allotment_layout.py)
+    monkeypatch.setattr(AllotmentHarvest, "_episode_groups", AllotmentHarvest._agent_groups)
+
     def start(model):
         return sorted((b.unique_id, b.pos) for b in model.berries) + [(a.unique_id, a.pos) for a in agents(model)]
     scenario = layout.split("-")[0]

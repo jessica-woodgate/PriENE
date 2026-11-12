@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pytest
 
 from tests.conftest import AGENT_TYPES, SCENARIOS, make_scenario_model, make_training_model
@@ -60,25 +61,70 @@ def test_render_pygame_does_not_raise_for_any_agent_type(tmp_path, agent_type, m
 @pytest.mark.parametrize("scenario, reachable", [("allotment", False), ("capabilities", True)])
 def test_berries_can_only_be_thrown_within_an_allotment(tmp_path, scenario, reachable):
     """
-    Agents 0,1 share allocation_0 and agents 2,3 share allocation_1. In allotment a berry thrown
+    Two agents share allocation_0 and two share allocation_1. In allotment a berry thrown
     to the other allotment is out of reach; in capabilities every agent shares the grid.
     """
     model = make_scenario_model(tmp_path, scenario, "baseline")
     agents = {a.unique_id: a for a in model.get_living_agents()}
-    thrower = agents[0]
+    (thrower_id, same_id), (other_id, _) = [data["agent_ids"] for data in model.allocations.values()]
+    thrower = agents[thrower_id]
     thrower.berries = 2
     thrower.health = thrower.low_health_threshold
 
-    assert thrower._throw(1) == thrower.rewards["throw"]
-    other_allotment_health = agents[2].health
-    reward = thrower._throw(2)
+    assert thrower._throw(same_id) == thrower.rewards["throw"]
+    other_allotment_health = agents[other_id].health
+    reward = thrower._throw(other_id)
     if reachable:
         assert reward == thrower.rewards["throw"]
         assert thrower.berries == 0
     else:
         assert reward == thrower.rewards["no_benefactor"]
         assert thrower.berries == 1
-        assert agents[2].health == other_allotment_health
+        assert agents[other_id].health == other_allotment_health
+
+
+@pytest.mark.parametrize("scenario", ["colours", "capabilities", "allotment"])
+def test_agents_are_given_allocations_afresh_each_episode(tmp_path, scenario):
+    model = make_scenario_model(tmp_path, scenario, "baseline", max_days=3, max_episodes=8)
+    sizes = [len(data["agent_ids"]) for data in model.allocations.values()]
+    resources = {holder: data["berry_allocation"] for holder, data in model.allocations.items()}
+    groupings = []
+    while model.episode <= 8:
+        held = [sorted(data["agent_ids"]) for data in model.allocations.values()]
+        groupings.append(tuple(map(tuple, held)))
+        # each allocation keeps its berries and its number of agents; only which agents hold it changes
+        assert [len(ids) for ids in held] == sizes
+        assert {holder: data["berry_allocation"] for holder, data in model.allocations.items()} == resources
+        assert sorted(i for ids in held for i in ids) == list(range(model.num_agents))
+        for agent in model.get_living_agents():
+            assert agent.unique_id in model.allocations[agent.allocation_id]["agent_ids"]
+            assert agent.moving_module.allocation_id == agent.allocation_id
+        episode = model.episode
+        while model.episode == episode:
+            model.step()
+    # no agent has the same allocation every episode
+    assert all(len({grouping[i] for grouping in groupings}) > 1 for i in range(len(sizes)))
+
+
+def test_agent_reports_record_who_a_berry_was_thrown_to(tmp_path):
+    model = make_scenario_model(tmp_path, "colours", "utilitarian")
+    agents = {a.unique_id: a for a in model.get_living_agents()}
+    thrower = agents[0]
+    throw_to_2 = thrower.actions.index("throw_2")
+
+    def report_row(berries):
+        thrower.berries = berries
+        thrower.health = thrower.low_health_threshold
+        thrower.perform_transition(throw_to_2, thrower.observe())
+        model._collect_agent_data(thrower)
+        return model.agent_reporter.iloc[-1]
+    row = report_row(berries=1)
+    assert row["thrown_to"] == 2 and row["action"] == throw_to_2 and agents[2].berries_consumed == 1
+    # a throw without a berry gives nothing, so it records no one; nor does any other action
+    assert pd.isna(report_row(berries=0)["thrown_to"])
+    thrower.perform_transition(thrower.actions.index("eat"), thrower.observe())
+    model._collect_agent_data(thrower)
+    assert pd.isna(model.agent_reporter.iloc[-1]["thrown_to"])
 
 
 def test_a_berry_cannot_be_thrown_to_an_agent_that_died_earlier_in_the_step(tmp_path):

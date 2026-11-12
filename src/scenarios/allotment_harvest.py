@@ -5,7 +5,6 @@ from src.harvest_exception import NumAllotmentsException
 from src.harvest_exception import AllotmentWidthException
 from src.harvest_exception import AllotmentCapacityException
 from src.harvest_exception import MixedSocietyException
-from src.harvest_exception import NoAllocationException
 from src.harvest_exception import RegrowthDelaysException
 
 class AllotmentHarvest(HarvestModel):
@@ -26,6 +25,7 @@ class AllotmentHarvest(HarvestModel):
     #both types; "separate": each type shares half of the allotments. Which ids are baseline (the even or odd ones, or which half of the
     #allotments) is chosen from the seed, so neither type always gets the extra place in an odd-sized allotment or the slower allotments
     MIXED_ALLOTMENT_LAYOUTS = ["split", "separate"]
+    SHUFFLES_ALLOCATIONS = True
 
     def __init__(self,society_mix,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,mixed_allotments="split",start_episode=1):
         super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode)
@@ -97,9 +97,9 @@ class AllotmentHarvest(HarvestModel):
 
     def _agent_groups(self):
         """
-        Agent ids in each allotment: consecutive ids, with any agents left over going to the first allotments; with separate allotments
-        for a mixed society, the lower half of ids share the first half of the allotments and the upper half the rest (one half is
-        baseline, see _choose_baseline_ids)
+        The layout of agent ids in the allotments, before they are shuffled each episode (see _episode_groups): consecutive ids, with any
+        agents left over going to the first allotments; with separate allotments for a mixed society, the lower half of ids share the
+        first half of the allotments and the upper half the rest (one half is baseline, see _choose_baseline_ids)
         """
         if self.society_mix != "homogeneous" and self.mixed_allotments == "separate":
             half_pop = self.num_agents // 2
@@ -157,9 +157,35 @@ class AllotmentHarvest(HarvestModel):
             raise NumBerriesException(self.num_start_berries, self.num_berries)
         return berries
 
+    def _episode_groups(self):
+        """
+        Agent ids in each allotment this episode: the layout's groups (see _agent_groups) with each agent type's ids shuffled among the
+        places that type has, so the mix of agents in each allotment changes from episode to episode while a mixed society keeps its
+        layout (see HarvestModel._allocation_membership_rng for the random stream)
+        """
+        rng = self._allocation_membership_rng()
+        groups = self._agent_groups()
+        places = [agent_id for group in groups for agent_id in group]
+        shuffled = list(places)
+        for baseline in [False, True]:
+            positions = [p for p, agent_id in enumerate(places) if (agent_id in self.baseline_ids) == baseline]
+            for p, agent_id in zip(positions, rng.permutation([places[p] for p in positions])):
+                shuffled[p] = int(agent_id)
+        return self._split_into_groups(shuffled, [len(group) for group in groups])
+
+    def _move_to_allocation(self, agent, allocation_id):
+        """
+        An agent moving allotment also takes its new allotment's bounds, before it is placed
+        """
+        super()._move_to_allocation(agent, allocation_id)
+        allotment = self.allocations[allocation_id]["allotment"]
+        agent.min_width, agent.max_width, agent.min_height, agent.max_height = allotment
+        agent.moving_module.min_width, agent.moving_module.max_width, agent.moving_module.min_height, agent.moving_module.max_height = allotment
+
     def _init_agents(self, society_mix, agent_type, checkpoint_path):
         self.living_agents = []
         self._choose_agent_types(society_mix)
+        self._assign_agents_to_allocations()
         for id in range(self.num_agents):
             allocation_id = self._get_allocation_id(id)
             allotment = self.allocations[allocation_id]["allotment"]
@@ -180,12 +206,6 @@ class AllotmentHarvest(HarvestModel):
             return {agent_id for agent_id in range(self.num_agents) if agent_id % 2 == parity}
         upper = bool(rng.integers(2))
         return set(range(half_pop, self.num_agents)) if upper else set(range(half_pop))
-
-    def _get_allocation_id(self, agent_id):
-        for allocation_id, allocation_data in self.allocations.items():
-            if agent_id in allocation_data["agent_ids"]:
-                return allocation_id
-        raise NoAllocationException(agent_id)
 
     def can_throw_to(self, thrower, benefactor):
         """
