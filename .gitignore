@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 .DS_Store
 .claude/settings.local.json
+.coverage
+#the reference run's output files (tests/reference_outputs.py compares against hashes.json alone)
+tests/reference_data/outputs/
