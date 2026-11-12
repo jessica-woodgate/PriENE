@@ -44,10 +44,7 @@ class MovingModule():
             self.nearest_berry_coordinates = self._find_nearest_berry_coordinates(current_pos)
             if self.nearest_berry_coordinates == None:
                 return False
-            if self.restrict_to_allocation:
-                self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates, self.allocation_id)
-            else:
-                self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates)
+            self.nearest_berry = self.model.get_uneaten_berry_by_coords(self.nearest_berry_coordinates, self._berry_allocation())
             self.path = self._find_path_to_berry(current_pos,self.nearest_berry.pos)
             self.path_step = 0
         return True
@@ -87,32 +84,23 @@ class MovingModule():
             return 0
         return len(self.path) - self.path_step
     
+    def _berry_allocation(self):
+        """The allocation whose berries this agent looks for: its own if it is restricted to it, otherwise any (None)"""
+        return self.allocation_id if self.restrict_to_allocation else None
+
+    #standard convention: north/south change y (+1/-1), east/west change x (+1/-1)
+    DIRECTIONS = {"north": (0, 1), "south": (0, -1), "east": (1, 0), "west": (-1, 0)}
+
     def _move(self, current_pos, action):
         """
-        Standard convention: north/south change y (+1/-1), east/west change x (+1/-1)
+        The cell one step in direction action, which must be within this agent's bounds along the axis it moves
         """
         x, y = current_pos
-        if action == "north":
-            if (y + 1) < self.max_height:
-                y += 1
-            else:
-                raise OutOfBounds(self.agent_id, (x,y+1))
-        elif action == "south":
-            if (y - 1) >= self.min_height:
-                y -= 1
-            else:
-                raise OutOfBounds(self.agent_id, (x,y-1))
-        elif action == "east":
-            if (x + 1) < self.max_width:
-                x += 1
-            else:
-                raise OutOfBounds(self.agent_id, (x+1,y))
-        elif action == "west":
-            if (x - 1) >= self.min_width:
-                x -= 1
-            else:
-                raise OutOfBounds(self.agent_id, (x-1,y))
-        return (x, y)
+        dx, dy = self.DIRECTIONS.get(action, (0, 0))
+        new_x, new_y = x + dx, y + dy
+        if (dx and not self.min_width <= new_x < self.max_width) or (dy and not self.min_height <= new_y < self.max_height):
+            raise OutOfBounds(self.agent_id, (new_x, new_y))
+        return (new_x, new_y)
     
     def _forage(self, cell):
         #check if there is a berry at current location
@@ -132,10 +120,7 @@ class MovingModule():
         return math.sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
 
     def _find_nearest_berry_coordinates(self, agent_coordinates):
-        if self.restrict_to_allocation:
-            uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self.allocation_id)
-        else:
-            uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates()
+        uneaten_berries_coordinates = self.model.get_uneaten_berries_coordinates(self._berry_allocation())
         if not uneaten_berries_coordinates:
             return None
         #Use the key parameter of min to find the index of the minimum distance

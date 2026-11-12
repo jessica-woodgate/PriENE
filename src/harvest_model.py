@@ -177,45 +177,33 @@ class HarvestModel(Model):
 
     def get_uneaten_berries_coordinates(self, allocation_id=None):
         """
-        Get the coordinates of uneaten berries
+        Get the coordinates of uneaten berries (of one allocation, or of any if allocation_id is None)
         """
-        berries_coordinates = []
-        for b in self.berries:
-            if b.foraged == False:
-                if allocation_id==None:
-                    berries_coordinates.append(b.pos)
-                else:
-                    if b.allocation_id == allocation_id:
-                        berries_coordinates.append(b.pos)
-        return berries_coordinates
+        return [b.pos for b in self.berries if not b.foraged and (allocation_id is None or b.allocation_id == allocation_id)]
     
     def get_uneaten_berry_by_coords(self, coords, allocation_id=None):
         """
-        Get an uneaten berry by its coordinates
+        Get an uneaten berry by its coordinates (of one allocation, or of any if allocation_id is None)
         """
         for b in self.berries:
-            if b.pos == coords and b.foraged == False:
-                if allocation_id == None:
-                    return b
-                elif b.allocation_id == allocation_id:
-                    return b
+            if b.pos == coords and not b.foraged and (allocation_id is None or b.allocation_id == allocation_id):
+                return b
         raise NoBerriesException(coordinates=coords)
     
     def get_society_well_being(self, observer, norms_observation, ethics_observation):
         """
         Get the well-being of a society; iterates over all agents in the society, excluding the observer if the agent is observing
         """
-        society_well_being = np.array([])
+        society_well_being = []
         for a in self.schedule.agents:
             if (not ethics_observation and (a.unique_id == observer.unique_id)) or a.agent_type == "berry":
                 continue
             elif a.done == False:
-                society_well_being = np.append(society_well_being, a.days_left_to_live)
-            elif a.done == True and (norms_observation or ethics_observation):
-                continue
-            else:
-                society_well_being = np.append(society_well_being, 0)
-        return society_well_being
+                society_well_being.append(a.days_left_to_live)
+            elif not (norms_observation or ethics_observation):
+                #a dead agent is seen with no days left to live, except by norms and ethics, which leave it out
+                society_well_being.append(0)
+        return np.array(society_well_being, dtype=float)
     
     def _set_seed(self, seed):
         """
