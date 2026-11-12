@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from collections import Counter
-from src.data_handling.norm_processing import NormProcessing
+from src.data_handling.norm_processing import NormProcessing, central_tendency
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
@@ -220,14 +220,12 @@ class DataAnalysis():
         plt.close()
     
     def _display_end_episode(self, df_list, df_labels):
-        self._display_violin_plot_df_list(df_list, df_labels, "gini_days_survived", self.filepath+"gini_days_survived", "Violin Plot of Gini Days Survived", "Days Survived")
-        self._display_violin_plot_df_list(df_list, df_labels, "min_days_survived", self.filepath+"min_days_survived", "Violin Plot of Min Days Survived", "Days Survived")
-        self._display_violin_plot_df_list(df_list, df_labels, "max_days_survived", self.filepath+"max_days_survived", "Violin Plot of Max Days Survived", "Days Survived")
-        self._display_violin_plot_df_list(df_list, df_labels, "total_days_survived", self.filepath+"total_days_survived", "Violin Plot of Total Days Survived", "Days Survived")
-        self._display_violin_plot_df_list(df_list, df_labels, "gini_berries", self.filepath+"gini_berries", "Violin Plot of Gini Berries Eaten", "Berries Eaten")
-        self._display_violin_plot_df_list(df_list, df_labels, "min_berries", self.filepath+"min_berries", "Violin Plot of Min Berries Eaten", "Berries Eaten")
-        self._display_violin_plot_df_list(df_list, df_labels, "max_berries", self.filepath+"max_berries", "Violin Plot of Max Berries Eaten", "Berries Eaten")
-        self._display_violin_plot_df_list(df_list, df_labels, "total_berries", self.filepath+"total_berries", "Violin Plot of Total Berries Eaten", "Berries Eaten")
+        for statistic in ["Gini", "Min", "Max", "Total"]:
+            self._display_violin_plot_df_list(df_list, df_labels, statistic.lower()+"_days_survived", self.filepath+statistic.lower()+"_days_survived",
+                                              "Violin Plot of "+statistic+" Days Survived", "Days Survived")
+        for statistic in ["Gini", "Min", "Max", "Total"]:
+            self._display_violin_plot_df_list(df_list, df_labels, statistic.lower()+"_berries", self.filepath+statistic.lower()+"_berries",
+                                              "Violin Plot of "+statistic+" Berries Eaten", "Berries Eaten")
 
     def _display_violin_plot_df_list(self, df_list, df_labels, column, filename, title, y_label):
         fig, ax = plt.subplots()
@@ -294,45 +292,11 @@ class DataAnalysis():
             return df
 
     def _calculate_central_tendency(self, df, df_label):
-        #each "_summary" field below is (mean + median) - stdev: a single composite score that
-        #rewards a metric being centrally high while penalising it being spread out/inconsistent
-        #across episodes, used by _get_best_results to rank societies on metrics where "more
-        #consistently high" should beat "occasionally very high but volatile"
-        central_tendency = {"df_label": df_label,
-                            "gini_days_mean": df["gini_days_survived"].mean(),
-                            "gini_days_median": df["gini_days_survived"].median(),
-                            "gini_days_stdev": df["gini_days_survived"].std(),
-                            "gini_days_summary": (df["gini_days_survived"].mean() + df["gini_days_survived"].median()) - df["gini_days_survived"].std(),
-                            "gini_berries_mean": df["gini_berries"].mean(),
-                            "gini_berries_median": df["gini_berries"].median(),
-                            "gini_berries_stdev": df["gini_berries"].std(),
-                            "gini_berries_summary": (df["gini_berries"].mean() + df["gini_berries"].median()) - df["gini_berries"].std(),
-                            "min_days_mean": df["min_days_survived"].mean(),
-                            "min_days_median": df["min_days_survived"].median(),
-                            "min_days_stdev": df["min_days_survived"].std(),
-                            "min_days_summary": (df["min_days_survived"].mean() + df["min_days_survived"].median()) - df["min_days_survived"].std(),
-                            "min_berries_mean": df["min_berries"].mean(),
-                            "min_berries_median": df["min_berries"].median(),
-                            "min_berries_stdev": df["min_berries"].std(),
-                            "min_berries_summary": (df["min_berries"].mean() + df["min_berries"].median()) - df["min_berries"].std(),
-                            "max_days_mean": df["max_days_survived"].mean(),
-                            "max_days_median": df["max_days_survived"].median(),
-                            "max_days_stdev": df["max_days_survived"].std(),
-                            "max_days_summary": (df["max_days_survived"].mean() + df["max_days_survived"].median()) - df["max_days_survived"].std(),
-                            "max_berries_mean": df["max_berries"].mean(),
-                            "max_berries_median": df["max_berries"].median(),
-                            "max_berries_stdev": df["max_berries"].std(),
-                            "max_berries_summary": (df["max_berries"].mean() + df["max_berries"].median()) - df["max_berries"].std(),
-                            "total_days_mean": df["total_days_survived"].mean(),
-                            "total_days_median": df["total_days_survived"].median(),
-                            "total_days_stdev": df["total_days_survived"].std(),
-                            "total_days_summary": (df["total_days_survived"].mean() + df["total_days_survived"].median()) - df["total_days_survived"].std(),
-                            "total_berries_mean": df["total_berries"].mean(),
-                            "total_berries_median": df["total_berries"].median(),
-                            "total_berries_stdev": df["total_berries"].std(),
-                            "total_berries_summary": (df["total_berries"].mean() + df["total_berries"].median()) - df["total_berries"].std(),
-                            }
-        return central_tendency
+        #(name, column) of each metric; see norm_processing.central_tendency for the "_summary" score
+        return central_tendency(df, df_label, [("gini_days", "gini_days_survived"), ("gini_berries", "gini_berries"),
+                                               ("min_days", "min_days_survived"), ("min_berries", "min_berries"),
+                                               ("max_days", "max_days_survived"), ("max_berries", "max_berries"),
+                                               ("total_days", "total_days_survived"), ("total_berries", "total_berries")])
     
     def _get_best_results(self, df, run_type, best_aggregation=None):
         best_results = []

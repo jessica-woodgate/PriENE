@@ -259,31 +259,20 @@ class NormProcessing():
         return output
     
     def _calculate_norms_central_tendency(self, df, df_label):
-        #each "_summary" field is (mean + median) - stdev, see DataAnalysis._calculate_central_tendency
-        central_tendency = {"df_label": df_label,
-                            "total_norms_mean": df["total_norms"].mean(),
-                            "total_norms_median": df["total_norms"].median(),
-                            "total_norms_stdev": df["total_norms"].std(),
-                            "total_norms_summary": (df["total_norms"].mean() + df["total_norms"].median()) - df["total_norms"].std(),
-                            "cooperative_norms_mean": df["cooperative_norms"].mean(),
-                            "cooperative_norms_median": df["cooperative_norms"].median(),
-                            "cooperative_norms_stdev": df["cooperative_norms"].std(),
-                            "cooperative_norms_summary": (df["cooperative_norms"].mean() + df["cooperative_norms"].median()) - df["cooperative_norms"].std(),
-                            "proportion_mean": df["proportion"].mean(),
-                            "proportion_median": df["proportion"].median(),
-                            "proportion_stdev": df["proportion"].std(),
-                            "proportion_summary": (df["proportion"].mean() + df["proportion"].median()) - df["proportion"].std(),
-                            "reward_mean": df["reward"].mean(),
-                            "reward_median": df["reward"].median(),
-                            "reward_stdev": df["reward"].std(),
-                            "reward_summary": (df["reward"].mean() + df["reward"].median()) - df["reward"].std(),
-                            "numerosity_mean": df["numerosity"].mean(),
-                            "numerosity_median": df["numerosity"].median(),
-                            "numerosity_stdev": df["numerosity"].std(),
-                            "numerosity_summary": (df["numerosity"].mean() + df["numerosity"].median()) - df["numerosity"].std(),
-                            "fitness_mean": df["fitness"].mean(),
-                            "fitness_median": df["fitness"].median(),
-                            "fitness_stdev": df["fitness"].std(),
-                            "fitness_summary": (df["fitness"].mean() + df["fitness"].median()) - df["fitness"].std()
-                            }
-        return central_tendency
+        columns = ["total_norms", "cooperative_norms", "proportion", "reward", "numerosity", "fitness"]
+        return central_tendency(df, df_label, [(column, column) for column in columns])
+
+def central_tendency(df, df_label, metrics):
+    """
+    {"df_label": df_label}, then for each (name, column) of metrics the column's mean, median and standard deviation across episodes, and
+    its "_summary": (mean + median) - stdev, a single composite score that rewards a metric being centrally high while penalising it being
+    spread out/inconsistent across episodes, used by DataAnalysis._get_best_results to rank societies on metrics where "more consistently
+    high" should beat "occasionally very high but volatile"
+    """
+    tendency = {"df_label": df_label}
+    for name, column in metrics:
+        tendency[name+"_mean"] = df[column].mean()
+        tendency[name+"_median"] = df[column].median()
+        tendency[name+"_stdev"] = df[column].std()
+        tendency[name+"_summary"] = (df[column].mean() + df[column].median()) - df[column].std()
+    return tendency
