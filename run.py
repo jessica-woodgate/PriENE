@@ -55,7 +55,7 @@ def generate_paper_graphs(scenario):
     #every agent type, in the order of the labels (principles + aggregations) the analysis gives them
     agent_end_episode_dfs = [pd.read_csv(agents_filepath+agent_type+".csv") for agent_type in AGENT_TYPES]
     end_episode_totals_dfs = [pd.read_csv(episodes_filepath+agent_type+".csv") for agent_type in AGENT_TYPES]
-    data_analysis.proccess_and_display_data(agent_end_episode_dfs, PRINCIPLES, AGGREGATIONS, scenario, end_episode_totals_dfs=end_episode_totals_dfs, write=True, get_normalised=False, process_norms=False)
+    data_analysis.proccess_and_display_data(agent_end_episode_dfs, PRINCIPLES, AGGREGATIONS, scenario, end_episode_totals_dfs=end_episode_totals_dfs, write=True, process_norms=False)
 
 def generate_graphs(scenario, run_name, num_agents, seasons=False, allotment_regrowth_delays=None, mixed_allotments="split", society_mix="homogeneous", process_norms=True):
     """
@@ -85,7 +85,7 @@ def generate_graphs(scenario, run_name, num_agents, seasons=False, allotment_reg
     for file in files:
         df = pd.read_csv(file)
         dfs.append(df)
-    data_analysis.proccess_and_display_data(dfs, principles, AGGREGATIONS, scenario, norms_filepath, write=True, get_normalised=False, process_norms=process_norms)
+    data_analysis.proccess_and_display_data(dfs, principles, AGGREGATIONS, scenario, norms_filepath, write=True, process_norms=process_norms)
 
 def format_duration(seconds):
     """

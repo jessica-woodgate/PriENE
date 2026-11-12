@@ -19,22 +19,21 @@ class DataAnalysis():
         self.num_agents = num_agents
         self.filepath = filepath
 
-    def proccess_and_display_data(self, agent_df_list, principles, aggregations, scenario, norms_filepath=None, end_episode_totals_dfs=None, write=True, get_normalised=False, process_norms=True):
+    def proccess_and_display_data(self, agent_df_list, principles, aggregations, scenario, norms_filepath=None, end_episode_totals_dfs=None, write=True, process_norms=True):
         df_labels = principles + aggregations
         self.write = write
         self.principles = principles
         self.aggregations = aggregations
         #if need to analyse data
         if end_episode_totals_dfs == None:
-            end_episode_totals_dfs, agent_final_rows_dfs, normalised_df_list, self.best_aggregation = self._process_agent_dfs(agent_df_list, df_labels, write, get_normalised)
+            end_episode_totals_dfs, agent_final_rows_dfs, self.best_aggregation = self._process_agent_dfs(agent_df_list, df_labels, write)
         else:
             #if data has already been analysed, the best aggregation comes from the episode totals given
             agent_final_rows_dfs = agent_df_list
-            normalised_df_list = None
             central_tendencies = pd.DataFrame([self._calculate_central_tendency(df, label) for df, label in zip(end_episode_totals_dfs, df_labels)])
             self.best_aggregation = self._get_best_results(central_tendencies, "aggregations")
         if write:
-            self._display_graphs(agent_final_rows_dfs, end_episode_totals_dfs, df_labels, normalised_df_list)
+            self._display_graphs(agent_final_rows_dfs, end_episode_totals_dfs, df_labels)
         #the season and regrowth columns are set by the run, not outcomes of it, so they aren't tested for significance;
         #initial_health and seasonal_berry_allocation are only in results from before those options were removed
         exclude_list = ["agent_id", "episode", "action", "season", "season_quality", "seasonal_berry_target", "allotment_regrowth_delay",
@@ -57,15 +56,10 @@ class DataAnalysis():
             self._display_norm_data(cooperative_norm_dfs, df_labels, self.filepath+"cooperative_norms")
             self._write_dictionary_to_file(norms_tendencies,self.filepath+"norms_tendencies.csv")
 
-    def _process_agent_dfs(self, agent_df_list, df_labels, write, get_normalised):
+    def _process_agent_dfs(self, agent_df_list, df_labels, write):
         end_episode_totals_df_list = []
         end_episode_central_tendencies = []
         agent_end_episode_df_list = []
-        if get_normalised:
-            normalised_df_list = []
-            write_normalised = True
-        else:
-            normalised_df_list = None
         for i, df in enumerate(agent_df_list):
             agent_end_episode = self._agent_end_episode_dataframes(df, df_labels[i], write)
             agent_end_episode_df_list.append(agent_end_episode)
@@ -76,45 +70,15 @@ class DataAnalysis():
             central_tendency["episode_length_median"] = agent_end_episode["day"].median()
             central_tendency["episode_length_stdev"] = agent_end_episode["day"].std()
             end_episode_central_tendencies.append(central_tendency)
-            if get_normalised:
-                normalised_df_list.append(self._normalise_step_across_episodes(df, df_labels[i], write_normalised))
         central_tendencies = self._write_dictionary_to_file(end_episode_central_tendencies,self.filepath+"central_tendencies.csv")
         best_aggregation = self._get_best_results(central_tendencies, "aggregations")
         self._get_best_results(central_tendencies, "principles", best_aggregation)
         self._get_best_results(central_tendencies, "all")
-        return end_episode_totals_df_list, agent_end_episode_df_list, normalised_df_list, best_aggregation
-    
-    def _display_graphs(self, agent_end_episode_list, end_episode_df_list, df_labels, normalised_sum_df_list=None):
-        if normalised_sum_df_list != None:
-            self._days_left_to_live_results(normalised_sum_df_list, df_labels, self.filepath+"days_left_to_live")
-            self._berries_consumed_results(normalised_sum_df_list, df_labels, self.filepath+"berries_consumed")
+        return end_episode_totals_df_list, agent_end_episode_df_list, best_aggregation
+
+    def _display_graphs(self, agent_end_episode_list, end_episode_df_list, df_labels):
         self._display_end_episode(end_episode_df_list, df_labels)
         self._display_violin_plot_df_list(agent_end_episode_list, df_labels, "day", self.filepath+"violin_end_day", "Violin Plot of Episode Length", "End Day")
-
-    def _normalise_step_across_episodes(self, df, df_label, write):
-        """
-        normalises results for each step in each episode by how frequently the step occurred
-        final df has one row for each step for the length of one episode
-        writes each normalised sum df to file
-        returns list of dfs
-        """
-        df = df.drop(["episode", "action", "reward"], axis=1)
-        df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-        #Calculate counts for each (step, agent_id) combination
-        count_df = df.groupby(["day", "agent_id"]).size().reset_index(name="count")
-        count_df['count'] = count_df['count']
-        #Sum and normalise by count
-        sum_df = df.groupby(["day", "agent_id"]).sum().reset_index()
-        sum_df = sum_df.astype(float)
-        to_divide_columns = list(sum_df.columns)
-        to_divide_columns.remove("day")
-        to_divide_columns.remove("agent_id")
-        sum_df.loc[:, to_divide_columns] = sum_df.loc[:, to_divide_columns]
-        sum_df.loc[:, to_divide_columns] = sum_df.loc[:, to_divide_columns].divide(count_df["count"], axis=0)
-        sum_df["count"] = count_df["count"]
-        if write:
-            sum_df.to_csv(self.filepath+"normalised_sum_df_"+df_label+".csv")
-        return sum_df
 
     def _end_episode_totals(self, df, df_label, write):
         """
@@ -161,34 +125,6 @@ class DataAnalysis():
         if write:
             agent_end_episode_df.to_csv(self.filepath+"agent_end_episode_df_"+df_label+".csv",index=False)
         return agent_end_episode_df
-
-    def _days_left_to_live_results(self, sum_df_list, df_labels, filename):
-        max_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_max)
-        self._display_dataframe(max_days_left_to_live, "Max Days Left To Live", "Days Left To Live", filename+"_max")
-        min_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_min)
-        self._display_dataframe(min_days_left_to_live, "Min Days Left To Live", "Days Left To Live", filename+"_min")
-        total_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_total)
-        self._display_dataframe(total_days_left_to_live, "Total Days Left To Live", "Days Left To Live", filename+"_total")
-        gini_days_left_to_live = self._calculate_column_across_episode(sum_df_list, df_labels, "days_left_to_live", self._calculate_gini)
-        self._display_dataframe(gini_days_left_to_live, "Gini Index of Days Left To Live", "Days Left To Live", filename+"_gini")
-        max_days_left_to_live.to_csv(self.filepath+"max_days_left_to_live.csv")
-        min_days_left_to_live.to_csv(self.filepath+"min_days_left_to_live.csv")
-        gini_days_left_to_live.to_csv(self.filepath+"gini_days_left_to_live.csv")
-        total_days_left_to_live.to_csv(self.filepath+"total_days_left_to_live.csv")
-
-    def _berries_consumed_results(self, sum_df_list, df_labels, filename):
-        max_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_max)
-        self._display_dataframe(max_berries_consumed, "Max Berries Consumed", "Berries Consumed", filename+"_max")
-        min_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_min)
-        self._display_dataframe(min_berries_consumed, "Min Berries Consumed", "Berries Consumed", filename+"_min")
-        total_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_total)
-        self._display_dataframe(total_berries_consumed, "Total Berries Consumed", "Berries Consumed", filename+"_total")
-        gini_berries_consumed = self._calculate_column_across_episode(sum_df_list, df_labels, "berries_consumed", self._calculate_gini)
-        self._display_dataframe(gini_berries_consumed, "Gini Index of Berries Consumed", "Berries Consumed", filename+"_gini")
-        max_berries_consumed.to_csv(self.filepath+"max_berries_consumed.csv")
-        min_berries_consumed.to_csv(self.filepath+"min_berries_consumed.csv")
-        gini_berries_consumed.to_csv(self.filepath+"gini_berries_consumed.csv")
-        total_berries_consumed.to_csv(self.filepath+"total_berries_consumed.csv")
 
     def _display_swarmplot(self, df_list, df_labels, column, filename):
         #combine the DataFrames and add labels
@@ -246,27 +182,11 @@ class DataAnalysis():
         plt.title(title)
         plt.savefig(str(filename).split()[0])
         plt.close(fig)
-    
-    def _display_dataframe(self, df, title, y_label, filename):
-        sns.set_palette("colorblind")
-        ax = sns.lineplot(data=df)
-        ax.set_xlabel("day")
-        ax.set_ylabel(y_label)
-        ax.legend(title="Societies", loc="upper left")
-        plt.title(title)
-        plt.savefig(str(filename).split()[0])
-        plt.close()
 
     def _write_dictionary_to_file(self, dictionary, filepath):
         df = pd.DataFrame(dictionary)
         df.to_csv(filepath, index=False)
         return df
-
-    def _calculate_max(self, series):
-        return series.max()
-
-    def _calculate_min(self, series):
-        return series.min()
 
     def _calculate_gini(self, series):
         #sort series in ascending order
@@ -278,18 +198,6 @@ class DataAnalysis():
         #for each element xi, compute xi * (N - i); divide by num agents * sum
         B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * s)
         return 1 + (1 / N) - 2 * B
-    
-    def _calculate_total(self, series):
-        return series.sum()
-    
-    def _calculate_column_across_episode(self, df_list, df_labels, column, calculation):
-            data = []
-            for df in df_list:
-                series = df.groupby("day")[column].apply(calculation)
-                data.append(series)
-            df = pd.DataFrame(data).T
-            df.columns = df_labels
-            return df
 
     def _calculate_central_tendency(self, df, df_label):
         #(name, column) of each metric; see norm_processing.central_tendency for the "_summary" score
