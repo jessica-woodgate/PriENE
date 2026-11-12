@@ -1030,32 +1030,22 @@ class HarvestModel(Model):
         return 1 + (1 / N) - 2 * B
     
     def _mean_loss(self):
-        m = 0
-        if self.training:
-            for agent in self.schedule.agents:
-                if agent.agent_type != "berry":
-                    m += agent.get_mean_loss()
-            if m == 0:
-                return 0
-            m /= self.num_agents
-        return m
-    
+        return self._mean_over_agents(lambda agent: agent.get_mean_loss()) if self.training else 0
+
     def _mean_reward(self):
-        m = 0
-        for agent in self.schedule.agents:
-            if agent.agent_type != "berry":
-                m += agent.total_episode_reward
-        if m == 0:
-            return 0
-        m /= self.num_agents
-        return m
-    
+        return self._mean_over_agents(lambda agent: agent.total_episode_reward)
+
     def _mean_epsilon(self):
+        return self._mean_over_agents(lambda agent: agent.get_epsilon())
+
+    def _mean_over_agents(self, value):
+        """
+        Mean of value(agent) over every agent, dead or alive (summed in schedule order); 0 when they sum to 0
+        """
         m = 0
         for agent in self.schedule.agents:
             if agent.agent_type != "berry":
-                m += agent.get_epsilon()
+                m += value(agent)
         if m == 0:
             return 0
-        m /= self.num_agents
-        return m
+        return m / self.num_agents
