@@ -484,90 +484,7 @@ def test_large_epsilon_does_not_invert_evidence(epsilon):
     assert "berries>=1 THEN NOT move" not in learned
 
 
-# --- episode_report ---
-
-REPORT_COLUMNS = [
-    "behaviour_id", "precondition", "action", "type", "is_cooperative", "n_precon_met",
-    "n_action_matched", "rate", "exhibited", "posterior",
-]
-
-
-def report_row(rows, action):
-    """The row for this action ("eat" / "NOT eat"), for the single-predicate spec."""
-    [row] = [r for r in rows if r["action"] == action]
-    return row
-
-
-def test_episode_report_only_includes_behaviours_observed_this_episode():
-    module = make_module()
-    for action in [EAT, EAT, MOVE]:
-        module.update(PRECONDITION_MET, action)
-    rows = module.episode_report()
-    assert len(rows) == len(ACTIONS) * 2  # berries<1 bin only: 3 actions x 2 types
-    assert {r["precondition"] for r in rows} == {NO_BERRIES}
-    assert all(list(r) == REPORT_COLUMNS for r in rows)
-
-
-def test_episode_report_values():
-    module = make_module(cooperative_actions=["throw"])
-    for action in [EAT, EAT, MOVE]:
-        module.update(PRECONDITION_MET, action)
-    rows = module.episode_report()
-    eat = report_row(rows, "eat")
-    assert eat["behaviour_id"] == module.behaviour_id(behaviour(module, "commitment", "eat")) == "commitment|eat|berries<1"
-    assert (eat["n_precon_met"], eat["n_action_matched"]) == (3, 2)
-    assert eat["rate"] == pytest.approx(2 / 3)
-    assert eat["posterior"] == pytest.approx(module.posterior(behaviour(module, "commitment", "eat")))
-    not_eat = report_row(rows, "NOT eat")  # consistent only when not eating
-    assert (not_eat["n_precon_met"], not_eat["n_action_matched"]) == (3, 1)
-    assert [r["action"] for r in rows if r["is_cooperative"]] == ["throw"]  # not "NOT throw"
-
-
-def test_episode_report_type_and_cooperative_flags():
-    """Every row's type matches its "NOT " prefix; only commitments to throw are cooperative --
-    NOT throw is never cooperative, even when the agent consistently avoids throwing."""
-    module = make_module(cooperative_actions=["throw"])
-    for _ in range(10):
-        module.update(PRECONDITION_MET, EAT)  # consistent with NOT throw every step
-    rows = module.episode_report()
-    for row in rows:
-        assert row["type"] == ("prohibition" if row["action"].startswith("NOT ") else "commitment")
-    not_throw = report_row(rows, "NOT throw")
-    assert not_throw["rate"] == 1.0
-    assert not_throw["is_cooperative"] is False
-    assert report_row(rows, "throw")["is_cooperative"] is True
-
-
-def test_episode_report_preconditions_are_joined_with_and():
-    spec = [
-        {"name": "berries", "index": 0, "thresholds": [1]},
-        {"name": "distance", "index": 1, "thresholds": [5]},
-    ]
-    module = make_module(spec, max_predicates=2)
-    module.update(np.array([0, 6]), EAT)
-    assert "berries<1 AND distance>=5" in {r["precondition"] for r in module.episode_report()}
-
-
-@pytest.mark.parametrize("steps,action,expected", [
-    (5, EAT, False),   # n_precon_met must exceed min_observations, not equal it
-    (6, EAT, True),
-    (6, MOVE, False),  # rate 0: never ate
-])
-def test_episode_report_exhibited(steps, action, expected):
-    module = make_module(min_observations=5)
-    for _ in range(steps):
-        module.update(PRECONDITION_MET, action)
-    assert report_row(module.episode_report(), "eat")["exhibited"] is expected
-
-
-def test_episode_report_is_empty_after_reset():
-    module = make_module()
-    module.update(PRECONDITION_MET, EAT)
-    module.reset()
-    assert module.episode_report() == []
-
-
-# --- get_learned_behaviours / get_all_behaviours_by_certainty ---
+# --- get_learned_behaviours ---
 
 def test_learned_behaviours_require_min_observations():
     module = make_module(min_observations=5)
@@ -585,13 +502,4 @@ def test_learned_behaviours_sorted_by_posterior_descending():
     run_policy(module, eat_ninety_percent, move_ninety_percent, 100)
     assert len(module.get_learned_behaviours()) > 1
     posteriors = [b["posterior"] for b in module.get_learned_behaviours()]
-    assert posteriors == sorted(posteriors, reverse=True)
-
-
-def test_all_behaviours_by_certainty_returns_every_behaviour_sorted():
-    module = make_module()
-    run_policy(module, eat_ninety_percent, move_ninety_percent, 50)
-    ordered = module.get_all_behaviours_by_certainty()
-    assert len(ordered) == len(module.behaviour_base) * len(ACTIONS) * 2
-    posteriors = [b["posterior"] for b in ordered]
     assert posteriors == sorted(posteriors, reverse=True)

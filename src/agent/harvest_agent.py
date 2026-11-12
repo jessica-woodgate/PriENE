@@ -365,6 +365,5 @@ class HarvestAgent(Agent):
             feature_specs=feature_specs,
             actions=norm_actions,
             max_predicates=max_predicates,
-            action_name_to_index=action_name_to_index,
-            cooperative_actions=["throw"]
+            action_name_to_index=action_name_to_index
         )

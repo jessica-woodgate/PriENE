@@ -46,8 +46,6 @@ class BayesianNormsModule():
                                 precondition must be met before it can be
                                 considered learned (default 5)
         epsilon              -- exploration probability for agent's action selection
-        cooperative_actions  -- set of action names whose commitments count as
-                                cooperative in episode_report() (e.g. {"throw"})
         action_counts        -- number of times the agent has taken each action, over
                                 every update (not reset per episode: the policy, and so
                                 its action frequencies, don't change between episodes)
@@ -75,8 +73,7 @@ class BayesianNormsModule():
         learned_threshold=0.95,
         min_observations=5,
         action_name_to_index=None,
-        epsilon=0.1,
-        cooperative_actions=None
+        epsilon=0.1
     ):
         self.feature_specs = feature_specs
         self.actions = actions
@@ -86,7 +83,6 @@ class BayesianNormsModule():
         self.learned_threshold = learned_threshold
         self.min_observations = min_observations
         self.epsilon = epsilon
-        self.cooperative_actions = set(cooperative_actions or [])
         self.action_counts = np.zeros(len(actions))
         self.behaviour_base = {}
 
@@ -219,56 +215,6 @@ class BayesianNormsModule():
             )
         return sorted(learned, key=lambda b: b["posterior"], reverse=True)
 
-    def get_all_behaviours_by_certainty(self):
-        """
-        Return all behaviours that have been observed, sorted by posterior descending.
-        Useful for inspecting the full learned/not-learned spectrum.
-        """
-        observed = [self.behaviour_dict(view) for view in self.iter_behaviours()]
-        return sorted(observed, key=lambda b: b["posterior"], reverse=True)
-
-    def episode_report(self):
-        """
-        One row per behaviour whose precondition was met at least once this
-        episode. Call at the end of each episode, before reset() clears the counts.
-
-        Columns:
-            behaviour_id     -- behaviour_id(), "type|action|sorted precondition"
-            precondition     -- predicate names joined with " AND "
-            action           -- the action, prefixed "NOT " for prohibitions
-            type             -- "commitment" or "prohibition"
-            is_cooperative   -- commitment to take one of cooperative_actions
-                                (prohibitions, e.g. NOT throw, are never cooperative)
-            n_precon_met     -- steps this episode where the precondition held
-            n_action_matched -- of those, steps where the agent acted consistently
-                                (took the committed / avoided the prohibited action)
-            rate             -- n_action_matched / n_precon_met
-            exhibited        -- rate > 0 and n_precon_met > min_observations, i.e.
-                                seen often enough for the rate to mean something
-            posterior        -- P(behaviour learned) at the end of the episode
-        """
-        rows = []
-        for key, entry in self.behaviour_base.items():
-            if entry["action_counts"].sum() == 0:
-                continue
-            for view in self._entry_behaviours(key):
-                n_precon_met, n_action_matched = self.behaviour_counts(*view)
-                action = self._action_names[view.action_idx]
-                rate = n_action_matched / n_precon_met
-                rows.append({
-                    "behaviour_id":     self.behaviour_id(view),
-                    "precondition":     " AND ".join(entry["precondition"]),
-                    "action":           action if view.type == "commitment" else f"NOT {action}",
-                    "type":             view.type,
-                    "is_cooperative":   view.type == "commitment" and action in self.cooperative_actions,
-                    "n_precon_met":     n_precon_met,
-                    "n_action_matched": n_action_matched,
-                    "rate":             rate,
-                    "exhibited":        rate > 0 and n_precon_met > self.min_observations,
-                    "posterior":        float(self.posterior(view)),
-                })
-        return rows
-
     def _initialise(self):
         """
         Build one behaviour_base entry per candidate precondition, with zeroed action
@@ -290,8 +236,6 @@ class BayesianNormsModule():
                 "action_counts": np.zeros(n_actions, dtype=int),
                 "posteriors":    np.full((n_actions, 2), self.prior, dtype=float),
             }
-
-        return self
 
     def _entry_behaviours(self, precondition_key):
         """BehaviourViews of one precondition: each action, prohibition before commitment."""
