@@ -77,6 +77,14 @@ class HarvestModel(Model):
     ALLOCATION_MEMBERSHIP_STREAM = 3
     #whether agents are put in allocations afresh each episode (see _episode_groups): scenarios with more than one allocation
     SHUFFLES_ALLOCATIONS = False
+    #columns of the agent report (one row per agent per step) and the model episode report (one row per episode), in order, before any
+    #a scenario adds; each row's values are listed in the same order in _collect_agent_data and _collect_model_episode_data
+    AGENT_REPORT_FIELDS = ["agent_id", "agent_type", "episode", "day", "berries", "berries_consumed", "berries_thrown", "health",
+                           "days_left_to_live", "total_days_left_to_live", "action", "thrown_to", "reward", "ethics_sanction", "num_norms",
+                           "season", "season_quality", "seasonal_berry_target", "allotment_regrowth_delay"]
+    EPISODE_REPORT_FIELDS = ["episode", "end_day", "epsilon", "mean_reward", "mean_loss", "max_berries", "mean_berries", "max_berries_consumed",
+                             "mean_berries_consumed", "gini_berries_consumed", "mean_berries_thrown", "max_health", "mean_health",
+                             "median_health", "variance_health", "deceased", "num_emerged_norms", "seed"]
 
     def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,start_episode=1):
         super().__init__()
@@ -659,25 +667,7 @@ class HarvestModel(Model):
         self._place_agent_in_allotment(berry)
         
     def _empty_agent_reporter(self):
-        agent_reporter = pd.DataFrame({"agent_id": [],
-                               "agent_type": [],
-                               "episode": [],
-                               "day": [],
-                               "berries": [],
-                               "berries_consumed": [],
-                               "berries_thrown": [],
-                               "health": [],
-                               "days_left_to_live": [],
-                               "total_days_left_to_live": [],
-                               "action": [],
-                               "thrown_to": [],
-                               "reward": [],
-                               "ethics_sanction": [],
-                               "num_norms": [],
-                               "season": [],
-                               "season_quality": [],
-                               "seasonal_berry_target": [],
-                               "allotment_regrowth_delay": []})
+        agent_reporter = pd.DataFrame({column: [] for column in self.AGENT_REPORT_FIELDS})
         for column in self.extra_agent_report_columns():
             agent_reporter[column] = []
         return agent_reporter
@@ -689,24 +679,7 @@ class HarvestModel(Model):
            if exists("data/results/current_run/agent_reports_"+self.filepath+".csv"):
                raise FileExistsException("data/results/current_run/agent_reports_"+self.filepath+".csv")
            self.agent_reporter.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", mode='a',index=False)
-        self.model_episode_reporter = pd.DataFrame({"episode": [], 
-                               "end_day": [],
-                               "epsilon": [],
-                               "mean_reward": [],
-                               "mean_loss": [],
-                               "max_berries": [],
-                               "mean_berries": [],
-                               "max_berries_consumed": [],
-                               "mean_berries_consumed": [],
-                               "gini_berries_consumed": [],
-                               "mean_berries_thrown": [],
-                               "max_health": [],
-                               "mean_health": [],
-                               "median_health": [],
-                               "variance_health": [],
-                               "deceased": [],
-                               "num_emerged_norms": [],
-                               "seed": []})
+        self.model_episode_reporter = pd.DataFrame({column: [] for column in self.EPISODE_REPORT_FIELDS})
         for column in self.extra_episode_report_columns():
             self.model_episode_reporter[column] = []
         if self.write_data:
@@ -741,27 +714,18 @@ class HarvestModel(Model):
         reports.to_csv(writing_path, index=False)
         os.replace(writing_path, report_path)
 
+    def _report_row(self, fields, values, extra_values):
+        """One report row: each field's value, then each column a scenario adds"""
+        return pd.DataFrame({**{column: [value] for column, value in zip(fields, values, strict=True)},
+                             **{column: [value] for column, value in extra_values.items()}})
+
     def _collect_agent_data(self, agent):
-        new_entry = pd.DataFrame({"agent_id": [agent.unique_id],
-                               "agent_type": [agent.agent_type],
-                               "episode": [self.episode],
-                               "day": [self.day],
-                               "berries": [agent.berries],
-                               "berries_consumed": [agent.berries_consumed],
-                               "berries_thrown": [agent.berries_thrown],
-                               "health": [agent.health],
-                               "days_left_to_live": [agent.days_left_to_live],
-                               "total_days_left_to_live": [agent.total_days_left_to_live],
-                               "action": [agent.current_action],
-                               "thrown_to": [agent.current_thrown_to],
-                               "reward": [agent.current_reward],
-                               "ethics_sanction": [agent.current_sanction],
-                               "num_norms": [self._num_agent_norms(agent)],
-                               "season": [self.season],
-                               "season_quality": [self._current_season_quality()],
-                               "seasonal_berry_target": [self._seasonal_berry_target(agent)],
-                               "allotment_regrowth_delay": [self._allotment_regrowth_delay(agent)],
-                               **{column: [value] for column, value in self.extra_agent_report_values(agent).items()}})
+        #in the order of AGENT_REPORT_FIELDS
+        values = [agent.unique_id, agent.agent_type, self.episode, self.day, agent.berries, agent.berries_consumed, agent.berries_thrown,
+                  agent.health, agent.days_left_to_live, agent.total_days_left_to_live, agent.current_action, agent.current_thrown_to,
+                  agent.current_reward, agent.current_sanction, self._num_agent_norms(agent), self.season, self._current_season_quality(),
+                  self._seasonal_berry_target(agent), self._allotment_regrowth_delay(agent)]
+        new_entry = self._report_row(self.AGENT_REPORT_FIELDS, values, self.extra_agent_report_values(agent))
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry])
         if self.write_data and not self.training:
            new_entry.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
@@ -780,25 +744,13 @@ class HarvestModel(Model):
     def _collect_model_episode_data(self):
         #every row of the agent reporter is added with index 0, so select this episode's rows by value, not by index
         rows = self.agent_reporter[self.agent_reporter["episode"] == self.episode]
-        new_entry = pd.DataFrame({"episode": [self.episode],
-                               "end_day": [self.day],
-                               "epsilon": [self.epsilon],
-                               "mean_reward": [self._mean_reward()],
-                               "mean_loss": [self._mean_loss()],
-                               "max_berries": [rows["berries"].max()],
-                               "mean_berries": [rows["berries"].mean(axis=0)],
-                               "max_berries_consumed": [rows["berries_consumed"].max()],
-                               "mean_berries_consumed": [rows["berries_consumed"].mean(axis=0)],
-                               "gini_berries_consumed": [self._gini_berries_consumed()],
-                               "mean_berries_thrown": [rows["berries_thrown"].mean(axis=0)],
-                               "max_health": [rows["health"].max()],
-                               "mean_health": [rows["health"].mean(axis=0)],
-                               "median_health": [rows["health"].median()],
-                               "variance_health": [rows["health"].var(axis=0)],
-                               "deceased": [self.num_agents - len(self.living_agents)],
-                               "num_emerged_norms": [len(self.emerged_norms) if self.track_norms else None],
-                               "seed": [self.seed],
-                               **{column: [value] for column, value in self.extra_episode_report_values().items()}})
+        #in the order of EPISODE_REPORT_FIELDS
+        values = [self.episode, self.day, self.epsilon, self._mean_reward(), self._mean_loss(), rows["berries"].max(), rows["berries"].mean(axis=0),
+                  rows["berries_consumed"].max(), rows["berries_consumed"].mean(axis=0), self._gini_berries_consumed(),
+                  rows["berries_thrown"].mean(axis=0), rows["health"].max(), rows["health"].mean(axis=0), rows["health"].median(),
+                  rows["health"].var(axis=0), self.num_agents - len(self.living_agents), len(self.emerged_norms) if self.track_norms else None,
+                  self.seed]
+        new_entry = self._report_row(self.EPISODE_REPORT_FIELDS, values, self.extra_episode_report_values())
         if self.write_data:
             new_entry.to_csv("data/results/current_run/model_episode_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
         return new_entry
