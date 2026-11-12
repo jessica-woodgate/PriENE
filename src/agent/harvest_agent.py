@@ -293,31 +293,12 @@ class HarvestAgent(Agent):
         return done, reward_vector
 
     def _baseline_rewards(self):
-        rewards = {"death": -1,
-                   "no_berries": -0.2,
-                   "no_benefactor": -0.2,
-                   "insufficient_health": -0.2,
-                   "neutral_reward": 0,
-                   "throw": 0.5,
-                   "forage": 0.5,
-                   "eat": 1,
-                   "survive": 1
-                   }
-        return rewards
-    
+        return {"death": -1, "no_berries": -0.2, "no_benefactor": -0.2, "insufficient_health": -0.2, "neutral_reward": 0,
+                "throw": 0.5, "forage": 0.5, "eat": 1, "survive": 1}
+
     def _ethics_rewards(self):
-        rewards = {"death": -1,
-                   "no_berries": -0.1,
-                   "no_benefactor": -0.1,
-                   "insufficient_health": -0.1,
-                   "neutral_reward": 0,
-                   "sanction": 0.4,
-                   "throw": 0.5,
-                   "forage": 0.5,
-                   "eat": 0.8,
-                   "survive": 1
-                   }
-        return rewards
+        #the baseline's, with smaller penalties and reward for eating, and the sanction the ethics module gives
+        return {**self._baseline_rewards(), "no_berries": -0.1, "no_benefactor": -0.1, "insufficient_health": -0.1, "eat": 0.8, "sanction": 0.4}
 
     # ── Norms ───────────────────────────────────────────────────
 

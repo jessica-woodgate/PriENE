@@ -83,15 +83,9 @@ class EthicsModule():
         egalitarian = self._egalitarian_sanction(self.measure_of_well_being["egalitarian"], society_well_being)
         maximin = self._maximin_sanction(self.measure_of_well_being["maximin_min"], self.measure_of_well_being["maximin_num_mins"], society_well_being)
         utilitarian = self._utilitarian_sanction(self.measure_of_well_being["utilitarian"], society_well_being)
-        if self.principle == "veto":
-            combined_sanction = self._veto_aggregation([egalitarian, maximin, utilitarian])
-        elif self.principle == "optimist":
-            combined_sanction = self._optimist_aggregation([egalitarian, maximin, utilitarian])
-        elif self.principle == "majoritarian":
-            combined_sanction = self._majoritarian_aggregation([egalitarian, maximin, utilitarian])
-        elif self.principle == "average":
-            combined_sanction = self._average_aggregation([egalitarian, maximin, utilitarian])
-        return combined_sanction
+        aggregate = {"veto": self._veto_aggregation, "optimist": self._optimist_aggregation, "majoritarian": self._majoritarian_aggregation,
+                     "average": self._average_aggregation}[self.principle]
+        return aggregate([egalitarian, maximin, utilitarian])
     
     def _average_aggregation(self, sanction_list):
         return [np.mean(sanction_list)]
