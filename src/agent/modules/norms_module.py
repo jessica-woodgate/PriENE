@@ -111,7 +111,6 @@ class NormsModule():
 
     def _clip_behaviour_base(self, day, episode):
         if len(self.behaviour_base.keys()) > self.max_norms:
-            print(f"agent {self.agent_id} clipping behaviour base, length is {len(self.behaviour_base.keys())} in episode {episode} day {day}")
             for metadata in self.behaviour_base.values():
                 self._update_norm_fitness(metadata)
             assessed_base = self._assess(self.behaviour_base)
