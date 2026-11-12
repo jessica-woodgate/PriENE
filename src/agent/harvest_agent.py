@@ -342,44 +342,13 @@ class HarvestAgent(Agent):
         n_others = n_agents - 1
         other_wellbeing_indices = list(range(4, 4 + n_others))
 
-        feature_specs = [
-            {
-                "name":       "health",
-                "index":      0,
-                "thresholds": [1, 5, 10],
-                "repeated":   False,
-            },
-            {
-                "name":       "berries",
-                "index":      1,
-                "thresholds": [1, 2, 3],
-                "repeated":   False,
-            },
-            {
-                "name":       "self_wellbeing",
-                "index":      2,
-                "thresholds": [10, 50, 100],
-                "repeated":   False,
-            },
-            {
-                "name":       "distance",
-                "index":      3,
-                "thresholds": [1, 2, 3],
-                "repeated":   False,
-            },
-            {
-                "name":       "other_wellbeing",
-                "index":      other_wellbeing_indices,
-                "thresholds": [0.1, 10, 50, 100],
-                "repeated":   True,
-            },
-        ]
-        #features the scenario adds come after the other agents' well-being in the observation
-        extra_start = 4 + n_others
-        feature_specs += [{"name": spec["name"], "index": extra_start + i, "thresholds": spec["thresholds"], "repeated": False}
-                          for i, spec in enumerate(self.model.extra_observation_feature_specs())]
-
-        #max_predicates = len(self.actions) * 28 #predicates = num actions, num thresholds per feature
+        #(name, observation index, thresholds): the agent's own features, then other agents' well-being (one reading each, so repeated),
+        #then any features the scenario adds, which come after the other agents' well-being in the observation
+        own_features = [("health", 0, [1, 5, 10]), ("berries", 1, [1, 2, 3]), ("self_wellbeing", 2, [10, 50, 100]), ("distance", 3, [1, 2, 3])]
+        extra_features = [(spec["name"], 4 + n_others + i, spec["thresholds"]) for i, spec in enumerate(self.model.extra_observation_feature_specs())]
+        feature_specs = [{"name": name, "index": index, "thresholds": thresholds, "repeated": False} for name, index, thresholds in own_features]
+        feature_specs.append({"name": "other_wellbeing", "index": other_wellbeing_indices, "thresholds": [0.1, 10, 50, 100], "repeated": True})
+        feature_specs += [{"name": name, "index": index, "thresholds": thresholds, "repeated": False} for name, index, thresholds in extra_features]
         max_predicates = 2
 
         # norms are about whether an agent shares at all, not who it shares with: every throw_X
