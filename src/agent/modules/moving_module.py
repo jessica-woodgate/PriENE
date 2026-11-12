@@ -10,8 +10,7 @@ class MovingModule():
     Moving module searches for berries, finds paths to nearest berries, returns coordinates for agent to move to, and handles foraging
     Instance variables:
         agent_id -- unique id of agent
-        training -- boolean to indicate if training or testing (only affects DQN learning; kept for interface consistency but not used to gate berry access -- see restrict_to_allocation)
-        restrict_to_allocation -- whether berry search/foraging is restricted to this agent's own allocation_id (true for scenarios that partition berries, e.g. colours/allotment/capabilities; false for basic_harvest); independent of training so evaluating a policy without further learning doesn't silently change berry access
+        restrict_to_allocation -- whether berry search/foraging is restricted to this agent's own allocation_id (true for scenarios that partition berries, e.g. colours/allotment/capabilities; false for basic_harvest); independent of training or testing, so evaluating a policy without further learning doesn't change berry access
         max_width -- width of grid agent has access to
         max_height -- height of grid agent has access to
         path -- current path to nearest berry
@@ -19,11 +18,10 @@ class MovingModule():
         nearest_berry -- the nearest berry agent
         nearest_berry_coordinates -- coordinates of the nearest berry
     """
-    def __init__(self, agent_id, model, training, allotment, allocation_id, restrict_to_allocation):
+    def __init__(self, agent_id, model, allotment, allocation_id, restrict_to_allocation):
         self.agent_id = agent_id
         self.allocation_id = allocation_id
         self.model = model
-        self.training = training
         self.restrict_to_allocation = restrict_to_allocation
         self.min_width = allotment[0]
         self.max_width = allotment[1]

@@ -81,7 +81,7 @@ class HarvestAgent(Agent):
         self.allocation_id = self.unique_id if allocation_id is None else allocation_id
         #a continued training run starts from a later episode (see HarvestModel)
         self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer,model.episode)
-        self.moving_module = MovingModule(self.unique_id, model, training, allotment, self.allocation_id, restrict_to_allocation)
+        self.moving_module = MovingModule(self.unique_id, model, allotment, self.allocation_id, restrict_to_allocation)
         self.track_norms = track_norms
         self.norms_module_type = norms_module_type
         if self.track_norms:

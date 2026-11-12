@@ -11,7 +11,6 @@ def make_module(min_width=0, max_width=10, min_height=0, max_height=10):
     return MovingModule(
         agent_id=1,
         model=None,
-        training=True,
         allotment=[min_width, max_width, min_height, max_height],
         allocation_id=None,
         restrict_to_allocation=False,
@@ -119,11 +118,11 @@ def test_get_distance_to_berry_with_path():
 
 # --- restrict_to_allocation: berry-access restriction is independent of training ---
 
-def _make_module_with_berry(allocation_id, berry_allocation_id, restrict_to_allocation, training=False):
+def _make_module_with_berry(allocation_id, berry_allocation_id, restrict_to_allocation):
     berry = types.SimpleNamespace(agent_type="berry", unique_id=5, allocation_id=berry_allocation_id, foraged=False)
     fake_model = types.SimpleNamespace(get_cell_contents=lambda cell: [berry])
     mm = MovingModule(
-        agent_id=1, model=fake_model, training=training, allotment=[0, 10, 0, 10],
+        agent_id=1, model=fake_model, allotment=[0, 10, 0, 10],
         allocation_id=allocation_id, restrict_to_allocation=restrict_to_allocation,
     )
     mm.nearest_berry = berry
@@ -151,6 +150,6 @@ def test_forage_succeeds_regardless_of_allocation_when_unrestricted():
     forage any berry regardless of an allocation mismatch.
     """
     mm, berry = _make_module_with_berry(allocation_id="allocation_1", berry_allocation_id="allocation_0",
-                                         restrict_to_allocation=False, training=False)
+                                         restrict_to_allocation=False)
     assert mm._forage((0, 0)) is True
     assert berry.foraged is True
