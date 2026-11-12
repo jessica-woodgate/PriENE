@@ -21,18 +21,6 @@ class BasicHarvest(HarvestModel):
         self.berries = self._init_berries()
         self._init_seasons()
 
-    def _init_berries(self):
-        berries = []
-        self.num_berries = 0
-        allotment = [0,self.max_width,0,self.max_height]
-        for i in range(self.num_start_berries):
-            #labelled as the society's, but agents aren't restricted to an allocation, so any agent can forage any berry
-            b = self._new_berry(allotment, self.allocations[self.SOCIETY]["id"])
-            self._place_agent_in_allotment(b)
-            self.num_berries += 1
-            berries.append(b)
-        assert(self.num_berries == self.num_start_berries)
-        return berries
-
     def _holder_of(self, agent):
+        #berries are labelled as the society's, but agents aren't restricted to an allocation, so any agent can forage any berry
         return self.SOCIETY

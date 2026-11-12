@@ -1,5 +1,4 @@
 from src.harvest_model import HarvestModel
-from src.harvest_exception import NumBerriesException
 from src.harvest_exception import NumAllotmentsException
 from src.harvest_exception import AllotmentWidthException
 from src.harvest_exception import AllotmentCapacityException
@@ -125,19 +124,6 @@ class AllotmentHarvest(HarvestModel):
             needed = len(data["agent_ids"]) + most_berries
             if cells < needed:
                 raise AllotmentCapacityException(data["id"], data["allotment"], cells, len(data["agent_ids"]), most_berries)
-
-    def _init_berries(self):
-        self.num_berries = 0
-        berries = []
-        for allocation_data in self.allocations.values():
-            for i in range(allocation_data["berry_allocation"]):
-                b = self._new_berry(allocation_data["allotment"],allocation_data["id"])
-                self._place_agent_in_allotment(b)
-                self.num_berries += 1
-                berries.append(b)
-        if self.num_berries != self.num_start_berries:
-            raise NumBerriesException(self.num_start_berries, self.num_berries)
-        return berries
 
     def _episode_groups(self):
         """

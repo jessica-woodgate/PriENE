@@ -1,5 +1,4 @@
 from src.harvest_model import HarvestModel
-from src.harvest_exception import NumBerriesException
 from src.harvest_exception import RegrowthDelaysNotSupported
 
 class CapabilitiesHarvest(HarvestModel):
@@ -29,18 +28,3 @@ class CapabilitiesHarvest(HarvestModel):
         for i, agent_ids in enumerate(self._consecutive_groups(range(self.num_agents), self.num_capabilities)):
             allocations["allocation_"+str(i)] = {"id": i, "berry_allocation": sum(resources[agent_id] for agent_id in agent_ids), "agent_ids": agent_ids}
         return allocations
-
-    def _init_berries(self):
-        berries = []
-        self.num_berries = 0
-        allotment = [0,self.max_width,0,self.max_height]
-        for allocation_data in self.allocations.values():
-            berry_allocation = allocation_data["berry_allocation"]
-            for i in range(berry_allocation):
-                b = self._new_berry(allotment,allocation_data["id"])
-                self._place_agent_in_allotment(b)
-                self.num_berries += 1
-                berries.append(b)
-        if self.num_berries != self.num_start_berries:
-            raise NumBerriesException(self.num_start_berries, self.num_berries)
-        return berries

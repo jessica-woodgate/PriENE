@@ -1,5 +1,4 @@
 from src.harvest_model import HarvestModel
-from src.harvest_exception import NumBerriesException
 from src.harvest_exception import RegrowthDelaysNotSupported
 
 class ColoursHarvest(HarvestModel):
@@ -30,18 +29,3 @@ class ColoursHarvest(HarvestModel):
             #each colour is a group of one agent, so seasons change each colour by one berry
             allocations[key] = {"id": i, "berry_allocation": resources[i], "agent_ids": [i]}
         return allocations
-
-    def _init_berries(self):
-        berries = []
-        self.num_berries = 0
-        allotment = [0,self.max_width,0,self.max_height]
-        for allocation_data in self.allocations.values():
-            berry_allocation = allocation_data["berry_allocation"]
-            for i in range(berry_allocation):
-                b = self._new_berry(allotment,allocation_data["id"])
-                self._place_agent_in_allotment(b)
-                self.num_berries += 1
-                berries.append(b)
-        if self.num_berries != self.num_start_berries:
-            raise NumBerriesException(self.num_start_berries, self.num_berries)
-        return berries

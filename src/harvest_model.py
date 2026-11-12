@@ -307,7 +307,20 @@ class HarvestModel(Model):
         return self.max_days
     
     def _init_berries(self):
-        raise NotImplementedError
+        """
+        Each allocation's berries in turn, each placed as it is made, in its allocation's region of the grid (the commons makes its own)
+        """
+        berries = []
+        self.num_berries = 0
+        for allocation_id, allocation_data in self.allocations.items():
+            for _ in range(allocation_data["berry_allocation"]):
+                b = self._new_berry(self._allocation_region(allocation_id), allocation_data["id"])
+                self._place_agent_in_allotment(b)
+                self.num_berries += 1
+                berries.append(b)
+        if self.num_berries != self.num_start_berries:
+            raise NumBerriesException(self.num_start_berries, self.num_berries)
+        return berries
     
     def _init_agents(self, society_mix, agent_type, checkpoint_path):
         """
