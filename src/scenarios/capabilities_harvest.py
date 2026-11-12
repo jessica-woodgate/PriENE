@@ -27,16 +27,8 @@ class CapabilitiesHarvest(HarvestModel):
     def _assign_allocations(self):
         resources = self._generate_resource_allocations(self.num_agents)
         allocations = {}
-        group_size = self.num_agents // self.num_capabilities
-        remainder = self.num_agents % self.num_capabilities
-        start_index = 0
-        for i in range(self.num_capabilities):
-            end_index = start_index + group_size + (1 if i < remainder else 0)
-            current_resource = sum(resources[start_index:end_index])
-            agent_ids = list(range(start_index, end_index))
-            start_index = end_index
-            key = "allocation_"+str(i)
-            allocations[key] = {"id": i, "berry_allocation": current_resource, "agent_ids": agent_ids}
+        for i, agent_ids in enumerate(self._consecutive_groups(range(self.num_agents), self.num_capabilities)):
+            allocations["allocation_"+str(i)] = {"id": i, "berry_allocation": sum(resources[agent_id] for agent_id in agent_ids), "agent_ids": agent_ids}
         return allocations
 
     def _init_berries(self):

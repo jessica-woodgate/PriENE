@@ -77,8 +77,7 @@ class AllotmentHarvest(HarvestModel):
             raise MixedSocietyException(f"mixed_allotments must be one of {self.MIXED_ALLOTMENT_LAYOUTS}, got {self.mixed_allotments}")
         if self.society_mix == "homogeneous":
             return
-        if self.num_agents % 2 != 0:
-            raise MixedSocietyException(f"half the agents are baseline, so the number of agents must be even, got {self.num_agents}")
+        self._half_population()
         if self.mixed_allotments == "separate" and self.num_allotments % 2 != 0:
             raise MixedSocietyException(f"with separate allotments each agent type has half of them, so the number of allotments must be even, got {self.num_allotments}")
 
@@ -86,13 +85,11 @@ class AllotmentHarvest(HarvestModel):
         """
         [start, end) columns of each allotment, tiling the whole grid; when max_width doesn't divide evenly, the first allotments are one column wider
         """
-        width, extra = divmod(self.max_width, self.num_allotments)
         columns = []
         start = 0
-        for i in range(self.num_allotments):
-            end = start + width + (1 if i < extra else 0)
-            columns.append((start, end))
-            start = end
+        for width in self._even_sizes(self.max_width, self.num_allotments):
+            columns.append((start, start + width))
+            start += width
         return columns
 
     def _agent_groups(self):
@@ -107,29 +104,15 @@ class AllotmentHarvest(HarvestModel):
             return self._consecutive_groups(range(half_pop), half_allotments) + self._consecutive_groups(range(half_pop, self.num_agents), half_allotments)
         return self._consecutive_groups(range(self.num_agents), self.num_allotments)
 
-    def _consecutive_groups(self, ids, num_groups):
-        ids = list(ids)
-        group_size, remainder = divmod(len(ids), num_groups)
-        groups = []
-        start = 0
-        for i in range(num_groups):
-            end = start + group_size + (1 if i < remainder else 0)
-            groups.append(ids[start:end])
-            start = end
-        return groups
-
     def _assign_allocations(self, columns):
         """
         Every allotment gets an equal share of the society's berries (the same total as the other scenarios); when the total
         doesn't divide evenly, the first allotments get one more
         """
-        total = sum(self._generate_resource_allocations(self.num_agents))
-        share, extra = divmod(total, self.num_allotments)
+        shares = self._even_sizes(sum(self._generate_resource_allocations(self.num_agents)), self.num_allotments)
         allocations = {}
-        for i, ((start, end), agent_ids) in enumerate(zip(columns, self._agent_groups())):
-            current_resource = share + (1 if i < extra else 0)
-            key = "allocation_"+str(i)
-            allocations[key] = {"id": i, "berry_allocation": current_resource, "allotment":[start,end,0,self.max_height], "agent_ids": agent_ids}
+        for i, ((start, end), agent_ids, share) in enumerate(zip(columns, self._agent_groups(), shares)):
+            allocations["allocation_"+str(i)] = {"id": i, "berry_allocation": share, "allotment":[start,end,0,self.max_height], "agent_ids": agent_ids}
         return allocations
 
     def _check_capacity(self):

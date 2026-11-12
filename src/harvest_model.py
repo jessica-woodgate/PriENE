@@ -405,6 +405,20 @@ class HarvestModel(Model):
         order = [int(agent_id) for agent_id in self._allocation_membership_rng().permutation(self.num_agents)]
         return self._split_into_groups(order, [len(data["agent_ids"]) for data in self.allocations.values()])
 
+    def _even_sizes(self, total, num_parts):
+        """
+        num_parts sizes summing to total, as equal as they can be: the first ones are one bigger when total doesn't divide evenly
+        """
+        size, extra = divmod(total, num_parts)
+        return [size + (1 if i < extra else 0) for i in range(num_parts)]
+
+    def _consecutive_groups(self, ids, num_groups):
+        """
+        ids split, in order, into num_groups groups as equal in size as they can be (the first ones bigger)
+        """
+        ids = list(ids)
+        return self._split_into_groups(ids, self._even_sizes(len(ids), num_groups))
+
     def _split_into_groups(self, ids, sizes):
         groups = []
         start = 0
