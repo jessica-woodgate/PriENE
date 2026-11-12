@@ -52,15 +52,9 @@ def generate_paper_graphs(scenario):
     data_analysis = DataAnalysis(num_agents, writing_filepath)
     agents_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_end_episode_df_"
     episodes_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/end_episode_totals_"
-    agent_end_episode_files = [agents_filepath+"baseline.csv",agents_filepath+"utilitarian.csv",agents_filepath+"maximin.csv",agents_filepath+"egalitarian.csv",agents_filepath+"average.csv",agents_filepath+"majoritarian.csv",agents_filepath+"optimist.csv",agents_filepath+"veto.csv"]
-    end_episode_totals_files = [episodes_filepath+"baseline.csv",episodes_filepath+"utilitarian.csv",episodes_filepath+"maximin.csv",episodes_filepath+"egalitarian.csv",episodes_filepath+"average.csv",episodes_filepath+"majoritarian.csv",episodes_filepath+"optimist.csv",episodes_filepath+"veto.csv"]
-    agent_end_episode_dfs = []
-    end_episode_totals_dfs = []
-    for i, file in enumerate(agent_end_episode_files):
-        df = pd.read_csv(file)
-        agent_end_episode_dfs.append(df)
-        df = pd.read_csv(end_episode_totals_files[i])
-        end_episode_totals_dfs.append(df)
+    #every agent type, in the order of the labels (principles + aggregations) the analysis gives them
+    agent_end_episode_dfs = [pd.read_csv(agents_filepath+agent_type+".csv") for agent_type in AGENT_TYPES]
+    end_episode_totals_dfs = [pd.read_csv(episodes_filepath+agent_type+".csv") for agent_type in AGENT_TYPES]
     data_analysis.proccess_and_display_data(agent_end_episode_dfs, PRINCIPLES, AGGREGATIONS, scenario, end_episode_totals_dfs=end_episode_totals_dfs, write=True, get_normalised=False, process_norms=False)
 
 def generate_graphs(scenario, run_name, num_agents, seasons=False, allotment_regrowth_delays=None, mixed_allotments="split", society_mix="homogeneous", process_norms=True):

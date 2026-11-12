@@ -100,8 +100,8 @@ class DQNDecisionModule():
             for path in [self.q_checkpoint_path, self.target_checkpoint_path]:
                 if os.path.exists(path):
                     raise CheckpointExistsException(path)
+            #both networks are saved in the agent's folder
             os.makedirs(os.path.dirname(self.q_checkpoint_path), exist_ok=True)
-            os.makedirs(os.path.dirname(self.target_checkpoint_path), exist_ok=True)
         #a continued run loads the networks it saved and trains them further (its replay buffer starts empty)
         self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer,continuing=self.continuing)
         self.target_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer,continuing=self.continuing)

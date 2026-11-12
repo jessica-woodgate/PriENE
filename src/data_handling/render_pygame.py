@@ -50,11 +50,10 @@ class RenderPygame():
                 continue
             x = a.pos[0] * self.block_size
             y = a.pos[1] * self.block_size
+            colour = self.colour_map[self.agent_colours[str(a.agent_type)]]
             if a.agent_type == "berry":
-                colour = self.colour_map[self.agent_colours[str(a.agent_type)]]
                 self.draw_berry(self.screen, colour, x, y)
             else:
-                colour = self.colour_map[self.agent_colours[str(a.agent_type)]]
                 self.draw_agent(self.screen, colour, x, y)
         pygame.display.flip()
         return True
