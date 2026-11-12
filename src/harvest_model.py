@@ -818,10 +818,15 @@ class HarvestModel(Model):
         for agent in self.schedule.agents:
             if agent.agent_type != "berry" and not agent.off_grid:
                 for norm_name, norm_value in agent.norms_module.behaviour_base.items():
-                    society_norms_snapshot = self._add_agent_behaviour_to_snapshot(norm_name, norm_value, society_norms_snapshot)
-        society_norms_snapshot = {norm: norm_value for norm, norm_value in society_norms_snapshot.items() if norm_value["adoption"] >= emergence_threshold}
-        for norm_name, norm_value in society_norms_snapshot.items():
-            self._update_episode_emerged_norm(norm_name, norm_value)
+                    #the society's totals at this step: reward, numerosity (times used by individual agents) and fitness summed over agents,
+                    #and adoption, the number of agents with the behaviour in their behaviour base
+                    totals = society_norms_snapshot.setdefault(norm_name, {"reward": 0, "numerosity": 0, "fitness": 0, "adoption": 0})
+                    for key in ["reward", "numerosity", "fitness"]:
+                        totals[key] += norm_value[key]
+                    totals["adoption"] += 1
+        for norm_name, totals in society_norms_snapshot.items():
+            if totals["adoption"] >= emergence_threshold:
+                self._update_episode_emerged_norm(norm_name, totals)
 
     def _update_episode_emerged_norm(self, norm_name, norm_value):
         """
@@ -829,35 +834,13 @@ class HarvestModel(Model):
         bases already hold running totals for the episode) and track when the norm was held: 
         first and last day above the emergence threshold, and number of days held
         """
-        norm = self.emerged_norms.get(norm_name)
-        if norm is None:
-            norm = {"first_day_held": self.day, "days_held": 0}
-            self.emerged_norms[norm_name] = norm
-        norm["reward"] = norm_value["reward"]
-        norm["numerosity"] = norm_value["numerosity"]
-        norm["fitness"] = norm_value["fitness"]
-        #number of living agents with the norm in their behaviour base on the last day it was held
-        norm["adoption"] = norm_value["adoption"]
+        norm = self.emerged_norms.setdefault(norm_name, {"first_day_held": self.day, "days_held": 0})
+        #adoption: the number of living agents with the norm in their behaviour base on the last day it was held
+        for key in ["reward", "numerosity", "fitness", "adoption"]:
+            norm[key] = norm_value[key]
         norm["last_day_held"] = self.day
         norm["days_held"] += 1
 
-    def _add_agent_behaviour_to_snapshot(self, norm_name, norm_value, society_norms_snapshot):
-        """
-        Add one agent's totals for a behaviour to the society's totals at this step
-        """
-        if norm_name not in society_norms_snapshot.keys():
-            society_norms_snapshot[norm_name] = {"reward": 0,
-                                        "numerosity": 0,
-                                        "fitness": 0,
-                                        "adoption": 0}
-        society_norms_snapshot[norm_name]["reward"] += norm_value["reward"]
-        #number times it has been used by individual agents
-        society_norms_snapshot[norm_name]["numerosity"] += norm_value["numerosity"]
-        society_norms_snapshot[norm_name]["fitness"] += norm_value["fitness"]
-        #number of agents in the society with it in their behaviour base
-        society_norms_snapshot[norm_name]["adoption"] += 1
-        return society_norms_snapshot
-    
     def _update_schedule(self):
         if self.regrowth_timers:
             self._regrow_due_berries()
