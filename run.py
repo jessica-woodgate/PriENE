@@ -361,9 +361,8 @@ for removed_option in REMOVED_OPTIONS:
     parser.add_argument(removed_option, action=RemovedOption, nargs="*", help=argparse.SUPPRESS)
 args = parser.parse_args()
 
-if args.option not in ["test", "train", "graphs"]:
-    print("Please choose 'test', 'train', or 'graphs'.")
-elif args.option == "test" or args.option == "train":
+#argparse only accepts test, train or graphs
+if args.option == "test" or args.option == "train":
     #the mode decides learning, exploration, saving and outputs; any scenario, with or without seasons, runs in either mode
     training = args.option == "train"
     mode = "train" if training else "test"

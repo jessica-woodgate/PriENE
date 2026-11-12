@@ -6,7 +6,6 @@ from .modules.bayesian_norms_module import BayesianNormsModule
 from .modules.ethics_module import EthicsModule
 from src.harvest_exception import NumFeaturesException
 from src.harvest_exception import AgentTypeException
-from src.harvest_exception import UnrecognisedNormsModule
 import numpy as np
 
 # norm bases an agent can track its behaviour with (see _build_norms_module); the first is the default
@@ -69,7 +68,6 @@ class HarvestAgent(Agent):
         self.berries = 0
         self.berries_consumed = 0
         self.berries_thrown = 0
-        self.days_survived = 0
         self.days_left_to_live = self.get_days_left_to_live()
         self.total_days_left_to_live = self.days_left_to_live
         self.max_days = self.model.get_max_days()
@@ -80,10 +78,7 @@ class HarvestAgent(Agent):
         self.min_height = allotment[2]
         self.max_height = allotment[3]
         restrict_to_allocation = allocation_id is not None
-        if allocation_id == None:
-            self.allocation_id = self.unique_id
-        else:
-            self.allocation_id = allocation_id
+        self.allocation_id = self.unique_id if allocation_id is None else allocation_id
         #a continued training run starts from a later episode (see HarvestModel)
         self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer,model.episode)
         self.moving_module = MovingModule(self.unique_id, model, training, allotment, self.allocation_id, restrict_to_allocation)
@@ -116,7 +111,6 @@ class HarvestAgent(Agent):
         Updates attributes and passess to Norms Module
         Returns reward, next state, done to DQN for learning
         """
-        done = False
         self.current_action = action
         self.current_thrown_to = None
         if self.track_norms and self.norms_module_type == "rule_based":
@@ -124,7 +118,6 @@ class HarvestAgent(Agent):
             antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)]
                                                           + list(self.model.extra_observation_features(self)))
         if self.agent_type != "baseline":
-            self.ethics_module.day = self.model.get_day()
             society_well_being = self.model.get_society_well_being(self, False, True)
             self.ethics_module.update_ethics_state(society_well_being)
         reward_vector = [self._perform_action(action)]
@@ -174,9 +167,7 @@ class HarvestAgent(Agent):
     def get_mean_loss(self):
         return self.decision_module.get_mean_loss()
     
-    def finish_episode(self, end_day):
-        if self.off_grid == False:
-            self.days_survived = end_day
+    def finish_episode(self):
         if self.training:
             self.decision_module.save_models(self.model.episode)
 
@@ -187,11 +178,9 @@ class HarvestAgent(Agent):
         self.berries = 0
         self.berries_consumed = 0
         self.berries_thrown = 0
-        self.max_berries = 0
         self.health = self.start_health
         self.days_left_to_live = self.get_days_left_to_live()
         self.total_days_left_to_live = self.days_left_to_live
-        self.days_survived = 0
         self.done = False
         self.total_episode_reward = 0
         self.current_reward = 0
@@ -296,7 +285,6 @@ class HarvestAgent(Agent):
         if self.health <= 0:
             #environment class checks for dead agents to remove at the end of each step
             done = True
-            self.days_survived = day
             self.health = 0
             reward_vector[0] += self.rewards["death"]
         if day == self.max_days - 1:
@@ -340,9 +328,8 @@ class HarvestAgent(Agent):
         """
         if self.norms_module_type == "bayesian":
             return self._build_bayesian_norms_module(self.model.get_num_agents())
-        if self.norms_module_type == "rule_based":
-            return NormsModule(self.unique_id, self._antecedent_features(), self._consequent_rules())
-        raise UnrecognisedNormsModule(self.norms_module_type, NORMS_MODULE_TYPES)
+        #HarvestModel rejects any other type before agents are built
+        return NormsModule(self.unique_id, self._antecedent_features(), self._consequent_rules())
 
     def _antecedent_features(self):
         """

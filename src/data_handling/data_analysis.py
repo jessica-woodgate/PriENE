@@ -4,7 +4,6 @@ import seaborn as sns
 import numpy as np
 from collections import Counter
 from src.data_handling.norm_processing import NormProcessing
-import scipy.stats as stats
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from statsmodels.stats.multicomp import pairwise_tukeyhsd

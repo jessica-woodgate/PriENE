@@ -101,8 +101,7 @@ class NormsModule():
             
     def _update_behaviours_age(self):
         for value in self.behaviour_base.values():
-            if "age" in value:
-                value["age"] += 1
+            value["age"] += 1
     
     def _update_norm_fitness(self, norm):
         if norm["age"] != 0:

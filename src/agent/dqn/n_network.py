@@ -6,7 +6,7 @@ from keras.saving import register_keras_serializable
 @register_keras_serializable(package="Custom")
 class NNetwork(keras.Model):
     """
-    MONNetwork handles the network
+    NNetwork handles the network
     Instance variables:
         n_features -- number of features for input (size of observation)
         hidden_units -- number of hidden units

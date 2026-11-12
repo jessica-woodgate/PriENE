@@ -14,7 +14,6 @@ class DQN:
     Instance variables:
         gamma -- discount factor of future rewards
         lr -- learning rate
-        total_episode_reward -- total reward received in current episode
         batch_size -- size of batch of experiences for training
         hidden_units -- number of hidden units in networks
         n_features -- number of input features for network (length of observation)
@@ -31,7 +30,6 @@ class DQN:
     def __init__(self,actions,n_features,training,checkpoint_path=None,shared_replay_buffer=None,continuing=False):
         self.gamma = 0.95
         self.lr = 0.0001
-        self.total_episode_reward = 0
         self.batch_size = 64
         self.hidden_units = 128
         self.n_features = n_features

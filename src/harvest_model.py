@@ -22,7 +22,6 @@ from .harvest_exception import BerryOffGrid
 from .harvest_exception import MixedSocietyException
 from .harvest_exception import NoAllocationException
 from os.path import exists
-from abc import abstractmethod
 
 class HarvestModel(Model):
     """
@@ -30,18 +29,16 @@ class HarvestModel(Model):
     Instance variables:
         num_agents -- number of agents at beginning of each episode
         num_berries -- number of berries in use (at the beginning of each episode, and throughout unless a good or bad season changes it)
-        end_day -- last day of episode
         day -- current day
         max_days -- max days in a single episode
-        max_episode -- maximum number of episodes (for testing; training runs until epsilon is min epsilon)
+        max_episodes -- maximum number of episodes (for testing; training runs until epsilon is min epsilon)
         min_epsilon -- minimum epsilon to end training
         schedule -- schedule of agents
-        max_with -- width of grid
+        max_width -- width of grid
         max_height -- height of grid
         grid -- grid object
         shared_replay_buffers -- dict mapping each agent type to the replay buffer its agents share to reduce training time; agents of
             different types (in a mixed society) are rewarded differently, so they never learn from each other's experiences
-        agent_id -- tracker for unique agent ids
         berry_id -- tracker for unique berry ids
         episode -- current episode, starting from start_episode: 1, or the episode a stopped training run continues from (its agents then
             load the networks it saved, and its report is continued)
@@ -88,7 +85,6 @@ class HarvestModel(Model):
         if self.num_agents <= 0:
             raise NumAgentsException(">0", 0)
         self.num_berries = 0
-        self.end_day = 0
         self.day = 0
         self.max_days = max_days
         self.max_episodes = max_episodes
@@ -98,7 +94,6 @@ class HarvestModel(Model):
         self.max_height = max_height
         self.grid = MultiGrid(self.max_width, self.max_height, False)
         self.shared_replay_buffers = {}
-        self.agent_id = 0
         self.berry_id = 0
         self.episode = start_episode
         self.training = training
@@ -147,7 +142,6 @@ class HarvestModel(Model):
             self._start_new_season()
 
     def finish_episode(self, collect_data=True):
-        self.end_day = self.day
         if self.track_norms and collect_data:
             # record norms before agents' finish_episode(), so any end-of-episode norm update (e.g. decay) is excluded
             if self.norms_module_type == "rule_based":
@@ -156,7 +150,7 @@ class HarvestModel(Model):
                 self._analyse_agent_norms()
         for a in self.schedule.agents:
             if a.agent_type != "berry":
-                a.finish_episode(self.day)
+                a.finish_episode()
         if collect_data:
             self._collect_model_episode_data()
         self._reset()
@@ -312,7 +306,6 @@ class HarvestModel(Model):
     def get_max_days(self):
         return self.max_days
     
-    @abstractmethod
     def _init_berries(self):
         raise NotImplementedError
     
@@ -358,9 +351,7 @@ class HarvestModel(Model):
         a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.track_norms,shared_replay_buffer=shared_replay_buffer,allocation_id=allocation_id,norms_module_type=self.norms_module_type)
         self.schedule.add(a)
         self._place_agent_in_allotment(a)
-        if a.agent_type != "berry":
-            self.agent_id += 1
-            self.living_agents.append(a)
+        self.living_agents.append(a)
 
     def _reset(self):
         self.living_agents = []
@@ -369,7 +360,6 @@ class HarvestModel(Model):
         num_agents = 0
         num_berries = 0
         self.episode += 1
-        self.total_episode_reward = 0
         #every berry waiting to regrow is placed again below, so no timer carries over to the new episode
         self.regrowth_timers = {}
         self._clear_grid()
@@ -979,8 +969,7 @@ class HarvestModel(Model):
         of resources across the society (used by colours/allotment/capabilities scenarios; never
         called by basic_harvest). For num_agents in {2,4,6,20}, returns a hand-picked, hardcoded
         inequality pattern -- these are the exact, reproducible configurations behind the paper's
-        published results (matching run.py's "select N to replicate results in the paper" prompts),
-        not arbitrary sample data. For any other agent count, falls back to _generate_zipf_distribution
+        published results, not arbitrary sample data. For any other agent count, falls back to _generate_zipf_distribution
         to generate an equivalently-shaped inequality programmatically.
         Side effect: overwrites self.num_start_berries with sum(resources) -- the num_start_berries
         passed into the model's constructor does NOT directly control the final berry count for

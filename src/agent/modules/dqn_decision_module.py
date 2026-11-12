@@ -38,7 +38,6 @@ class DQNDecisionModule():
         self.min_exploration_prob = 0.01
         self.expl_decay = 0.001
         self.epsilon = self._decayed_epsilon(start_episode) if self.continuing else epsilon
-        self.total_episode_reward = 0
         self.actions = actions
         self.n_actions = len(actions)
         self.shared_replay_buffer = shared_replay_buffer

@@ -7,7 +7,6 @@ class EthicsModule():
     Instance variables:
         sanction -- amount of reward to return to agent
         principle -- normative ethics principle
-        society_well_being -- list of well-being for each living agent
         measure_of_well_being -- metric to evaluate well-being before and after acting (minimum experience)
         number_of_minimums -- number of agents which have minimum experience
     """
@@ -22,7 +21,6 @@ class EthicsModule():
             raise UnrecognisedPrinciple(principle)
         self.sanction = sanction
         self.principle = principle
-        self.society_well_being = None
         self.measure_of_well_being = None
         self.number_of_minimums = None
 

@@ -5,8 +5,8 @@ class Berry(Agent):
     Berry object can be foraged by agents; in testing scenarios, a berry can be allocated to a specifc agent or specific part of the grid
     Instance variables:
         agent_type -- type of agent (berry)
-        allocated_agent_id -- id of agent allocated to (None for training)
-        min/max width/height -- dimensions of grid berry can be assigned to (whole grid for training)
+        allocation_id -- the holder (allocation key) the berry belongs to (None for a berry not yet given to one)
+        min/max width/height -- the region of the grid the berry is placed in (the whole grid unless it is in an allotment)
     """
     def __init__(self,unique_id,model,allotment,allocation_id=None):
         super().__init__(unique_id, model)

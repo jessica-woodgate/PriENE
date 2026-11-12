@@ -25,9 +25,7 @@ class RenderPygame():
             "optimist": "yellow",
             "veto": "green",
             "berry": "purple",
-            "all_principles": "white"
         }
-        self.running = True
         self.screen = self.init_pygame()
 
     def init_pygame(self):
@@ -35,7 +33,6 @@ class RenderPygame():
         width, height = self.max_width * self.block_size, self.max_height * self.block_size
         screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption('Harvest Model')
-        pygame.time.Clock()
         return screen
 
     def render_pygame(self, modelInst):
@@ -44,7 +41,6 @@ class RenderPygame():
         """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.running = False
                 pygame.quit()
                 return False
         self.screen.fill(self.colour_map["black"])
