@@ -8,9 +8,6 @@ class NormProcessing():
     episodes, and central-tendency summaries used by DataAnalysis for graphing and significance
     testing. See process_norms for the overall pipeline.
     """
-    def __init__(self):
-        pass
-    
     def process_norms(self, df_labels, scenario, norms_filepath, write_filepath):
         episode_norm_dfs = []
         cooperative_dfs = []
@@ -33,10 +30,6 @@ class NormProcessing():
         merged_norms = self._merge_norms(norm_data, output_file)
         #looks at all the merged norms and collects data for the cooperative norms
         cooperative_norms = self._get_cooperative_norms(merged_norms, output_file)
-        #_generalise_norms (norms tree + rule generalisation) is a parked feature, not dead code --
-        #disabled here pending a decision on whether to keep or remove it (see _generalise_norms)
-        #self._generalise_norms(merged_norms.keys(), output_file)
-        #self._generalise_norms(merged_norms.keys(), output_file, cooperative_norms=True)
         return episode_norm_data, cooperative_norms
     
     def _count_norms(self, data, output_file):
@@ -160,104 +153,6 @@ class NormProcessing():
         merged_norm["sum_first_day_held"] += norm_data["first_day_held"]
         merged_norm["sum_last_day_held"] += norm_data["last_day_held"]
 
-    def _generalise_norms(self, norms, output_file, cooperative_norms=False):
-        """
-        Generalises a set of norms (rules) by merging redundant or overly specific rules 
-        into more general ones, and outputs the resulting simplified rule set.
-        The function identifies cases where two rules have the same action, but one rule 
-        has a subset of the other's conditions (i.e. it is more general). The more 
-        specific rule is removed, keeping only the general rule.
-        Steps:
-            1. Parse each norm into a mapping from condition tuples to actions.
-            2. Identify rules that can be generalised by dropping redundant conditions 
-            when a simpler version exists with the same action.
-            3. Merge rules accordingly and remove duplicates.
-            4. Convert the merged rule set back into a list of textual rules.
-            5. Generate and save a norms tree representation to the specified output file.
-
-        Args:
-            norms (list[str]): 
-                A list of rule strings, where each rule follows the format 
-                "IF condition1,condition2,... THEN action".
-            output_file (str): 
-                Path to the output file where the generalised norms or tree representation 
-                will be written.
-        """
-        rule_dict = {}
-        for rule in norms:
-            conditions, action = rule.split("THEN")
-            if cooperative_norms:
-                action = action.strip().lower()
-                if "throw" not in action:
-                    continue
-            conditions = conditions.split(",")[1:]
-            rule_dict[tuple(conditions)] = action.strip()
-        def merge_rules(rule_dict):
-            merged_rules = {}
-            for conditions, action in rule_dict.items():
-                if conditions in merged_rules:
-                    continue
-                generalised_conditions = []
-                for i in range(len(conditions)):
-                    shorter_conditions = conditions[:i] + conditions[i+1:]
-                    if tuple(shorter_conditions) in rule_dict and rule_dict[tuple(shorter_conditions)] == action:
-                        generalised_conditions = shorter_conditions
-                        break
-                if generalised_conditions:
-                    merged_rules[tuple(generalised_conditions)] = action
-                else:
-                    merged_rules[conditions] = action
-            return merged_rules
-        merged_rules = merge_rules(rule_dict)
-        merged_rules = self._convert_to_rule_list(merged_rules)
-        if cooperative_norms:
-            output_file += "_cooperative"
-        self._generate_norms_tree(merged_rules, output_file)
-    
-    def _convert_to_rule_list(self, data):
-        rule_list = []
-        for conditions, action in data.items():
-            rule = ["IF"]
-            rule.extend(conditions[:-1])
-            rule.append("THEN")
-            rule.append(action.strip(","))
-            rule_string = ", ".join(rule)
-            rule_list.append(rule_string)
-        return rule_list
-        
-    def _generate_norms_tree(self, data, output_file):
-        tree = {}
-        for norm in data:
-            conditions = norm.split("IF")[1].split(",")[:-2]
-            conditions = conditions[1:]
-            current_node = tree
-            for condition in conditions:
-                if condition not in current_node:
-                    current_node[condition] = {}
-                if isinstance(current_node[condition], list):
-                    new_node = {}
-                    for item in current_node[condition]:
-                        new_node[item] = {}
-                    current_node[condition] = new_node
-                current_node = current_node[condition]
-            consequent = norm.split("THEN")[1].strip(",")
-            if isinstance(current_node, list):
-                current_node.append(consequent)
-            else:
-                current_node[condition] = [consequent]
-        with open(output_file+"_tree.txt", 'w') as f:
-            f.write(self._print_tree(tree, indent="  "))
-
-    def _print_tree(self, node, indent=""):
-        output = ""
-        for key, value in node.items():
-            if isinstance(value, dict):
-                output += f"{indent}{key}\n"
-                output += self._print_tree(value, indent + "  ")
-            else:
-                output += f"{indent}{key}: {value}\n"
-        return output
-    
     def _calculate_norms_central_tendency(self, df, df_label):
         columns = ["total_norms", "cooperative_norms", "proportion", "reward", "numerosity", "fitness"]
         return central_tendency(df, df_label, [(column, column) for column in columns])
