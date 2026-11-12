@@ -241,18 +241,22 @@ def get_commons_parameters_input(num_agents, num_cells):
                                      int, max(1, carrying_capacity // 2), 1, carrying_capacity)
     return {"carrying_capacity": carrying_capacity, "growth_rate": growth_rate, "initial_stock": initial_stock}
 
-def get_number_input(prompt, number_type, default, min_value, max_value, exclusive_min=False):
+def get_number_input(prompt, number_type, default, min_value, max_value, exclusive_min=False, out_of_range="Invalid choice. Out of range."):
+    """
+    Ask until a number_type at least min_value (more than it, if exclusive_min) and at most max_value is given (None: no bound),
+    printing out_of_range for one outside them; pressing enter chooses default, if there is one
+    """
     while True:
         value = input(prompt).strip()
-        if value == "":
+        if value == "" and default is not None:
             return default
         try:
             number = number_type(value)
         except ValueError:
             print(f"Invalid input. Please enter {'an integer' if number_type is int else 'a number'}.")
             continue
-        if number < min_value or (exclusive_min and number == min_value) or (max_value is not None and number > max_value):
-            print("Invalid choice. Out of range.")
+        if (min_value is not None and (number < min_value or (exclusive_min and number == min_value))) or (max_value is not None and number > max_value):
+            print(out_of_range)
             continue
         return number
 
@@ -265,24 +269,6 @@ def get_mixed_allotments_input(num_allotments):
         return "split"
     return get_input("How should the two agent types share the allotments? split: each allotment has agents of both types; separate: each type has its own allotments ['split', 'separate']: ",
                      "Invalid choice. Please choose ['split', 'separate']: ", ["split", "separate"], PAPER_DEFAULTS["mixed_allotments"])
-
-def get_season_length_input():
-    """
-    Ask for the number of days in each season; pressing enter uses DEFAULT_SEASON_LENGTH
-    """
-    while True:
-        value = input(f"How many days in each season? Press enter for the default {DEFAULT_SEASON_LENGTH}: ").strip()
-        if value == "":
-            return DEFAULT_SEASON_LENGTH
-        try:
-            season_length = int(value)
-        except ValueError:
-            print("Invalid input. Please enter an integer.")
-            continue
-        if season_length < 1:
-            print("Invalid choice. Must be at least 1.")
-            continue
-        return season_length
 
 class RemovedOption(argparse.Action):
     """
@@ -300,21 +286,7 @@ def with_default(prompt, default):
     return prompt.rstrip().rstrip(":") + f" Press enter for {default}: "
 
 def get_integer_input(prompt, error_string=None, max_value=None, min_value=None, default=None):
-    while True:
-        value = input(with_default(prompt, default)).strip()
-        if value == "" and default is not None:
-            return default
-        try:
-            value = int(value)
-            if max_value != None and value > max_value:
-                print(error_string)
-                continue
-            if min_value != None and value < min_value:
-                print(error_string)
-                continue
-            return value
-        except ValueError:
-            print("Invalid input. Please enter an integer.")
+    return get_number_input(with_default(prompt, default), int, default, min_value, max_value, out_of_range=error_string)
 
 def get_input(input_string, error_string, valid_options, default=None):
     """
@@ -365,7 +337,10 @@ if args.option == "test" or args.option == "train":
     season_effect = "the commons regrows 1.5 times as fast" if scenario == "commons" else "one more berry per agent in each group"
     season_bad = "half as fast" if scenario == "commons" else "one fewer"
     seasons = get_bool(get_input(f"Do you want seasons, where each season is randomly normal, good ({season_effect}) or bad ({season_bad})? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"], PAPER_DEFAULTS["seasons"]))
-    season_length = get_season_length_input() if seasons else DEFAULT_SEASON_LENGTH
+    season_length = DEFAULT_SEASON_LENGTH
+    if seasons:
+        season_length = get_number_input(f"How many days in each season? Press enter for the default {DEFAULT_SEASON_LENGTH}: ", int, DEFAULT_SEASON_LENGTH,
+                                         1, None, out_of_range="Invalid choice. Must be at least 1.")
     if training:
         max_episodes = 0
         max_days = get_integer_input("How many days in each episode: ", "Invalid choice. Must be at least 1", min_value=1, default=PAPER_DEFAULTS["max_days"])
