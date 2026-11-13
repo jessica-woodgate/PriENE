@@ -1,0 +1,18 @@
+# Pilot of step B (docs/fruit_market_sweep.md, stage 3): the whole pipeline end to end on a tiny sweep, not a result.
+# python -m src.sweep.run configs/sweeps/fruit_market_pilot_B.yaml --workers 2
+# python -m src.sweep.summarise configs/sweeps/fruit_market_pilot_B.yaml
+name: fruit_market_pilot_B
+scenario: fruit_market
+step: pilot_B
+agent_types: [utilitarian, veto]
+seeds: [1, 2]
+episodes: 3
+epsilon_floor_fraction: 0.7
+search:
+  method: list
+  include_base: false
+configurations:
+  - {sanction: 1.0}
+  - {sanction: 6.0}
+early_stopping: {episode: 2, window: 2, min_reward: null, max_action_share: 0.95}
+selection: {rule: step_b, last_episodes: 2}
