@@ -1,12 +1,10 @@
-from mesa import Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
 import pandas as pd
 import numpy as np
-import json
 import os
-import tensorflow
 from tensorflow import keras
+from .society_model import SocietyModel
 from .agent.harvest_agent import HarvestAgent
 from .agent.harvest_agent import NORMS_MODULE_TYPES
 from .berry import Berry
@@ -19,11 +17,10 @@ from .harvest_exception import NumBerriesException
 from .harvest_exception import UnrecognisedNormsModule
 from .harvest_exception import SeasonsException
 from .harvest_exception import BerryOffGrid
-from .harvest_exception import MixedSocietyException
 from .harvest_exception import NoAllocationException
 from os.path import exists
 
-class HarvestModel(Model):
+class HarvestModel(SocietyModel):
     """
     Harvest model handles the environment, stepping agents, and data collection
     Instance variables:
@@ -71,8 +68,6 @@ class HarvestModel(Model):
     """
     SEASON_QUALITIES = ["normal", "good", "bad"]
     SEASON_QUALITY_CHANGE = {"normal": 0, "good": 1, "bad": -1}
-    #spawn key for the random stream that chooses which agents of a mixed society are baseline
-    MIXED_SOCIETY_STREAM = 1
     #spawn key for the random stream that puts agents in allocations each episode (commons uses 2)
     ALLOCATION_MEMBERSHIP_STREAM = 3
     #whether agents are put in allocations afresh each episode (see _episode_groups): scenarios with more than one allocation
@@ -204,21 +199,6 @@ class HarvestModel(Model):
                 #a dead agent is seen with no days left to live, except by norms and ethics, which leave it out
                 society_well_being.append(0)
         return np.array(society_well_being, dtype=float)
-    
-    def _set_seed(self, seed):
-        """
-        Seeds every source of randomness so a run can be reproduced: python's random module, numpy's
-        global RNG (grid placement, resource allocations, DQN replay sampling and exploration),
-        tensorflow (network weight initialisation), and mesa's own model RNG (RandomActivation's
-        agent ordering). Must run before any agents are created. Op determinism is process-wide and
-        stays on for any later models in the same process. seed=None leaves the run unseeded.
-        """
-        self.seed = seed
-        if seed is None:
-            return
-        keras.utils.set_random_seed(seed)
-        tensorflow.config.experimental.enable_op_determinism()
-        self.reset_randomizer(seed)
 
     def reseed_for_continuing(self):
         """
@@ -233,9 +213,6 @@ class HarvestModel(Model):
         if self.seasons:
             self.season_rng = np.random.default_rng([self.seed, self.episode])
 
-    def get_num_agents(self):
-        return self.num_agents
-    
     def get_living_agents(self):
         return self.living_agents
 
@@ -340,34 +317,6 @@ class HarvestModel(Model):
         unless the scenario has allotments
         """
         return [0, self.max_width, 0, self.max_height]
-
-    def _choose_agent_types(self, society_mix):
-        """
-        Choose which agents are baseline: none in a homogeneous society; in a mixed society, half the agents, chosen from the seed (see
-        _choose_baseline_ids), since agent ids decide resources in some scenarios and neither type should always get the better ones
-        """
-        self.baseline_ids = set() if society_mix == "homogeneous" else self._choose_baseline_ids(self._mixed_society_rng())
-
-    def _mixed_society_rng(self):
-        #its own stream from the seed, so choosing the baseline agents doesn't shift any other random draws
-        return np.random.default_rng(None if self.seed is None else [self.seed, self.MIXED_SOCIETY_STREAM])
-
-    def _choose_baseline_ids(self, rng):
-        """
-        A random half of the agent ids (scenarios with layouts that must keep both types together or apart override this)
-        """
-        return {int(agent_id) for agent_id in rng.choice(self.num_agents, self._half_population(), replace=False)}
-
-    def _agent_type_of(self, agent_id, agent_type):
-        return "baseline" if agent_id in self.baseline_ids else agent_type
-
-    def _half_population(self):
-        """
-        Size of each half of a mixed society (agent_type and baseline), which needs an even number of agents
-        """
-        if self.num_agents % 2 != 0:
-            raise MixedSocietyException(f"half the agents are baseline, so the number of agents must be even, got {self.num_agents}")
-        return self.num_agents // 2
 
     def _add_agent(self, i, agent_type, allotment, checkpoint_path, allocation_id=None):
         shared_replay_buffer = self.shared_replay_buffers.setdefault(agent_type, {"s": [], "a": [], "r": [], "s_": [], "done": []})
@@ -677,36 +626,6 @@ class HarvestModel(Model):
                 raise FileExistsException(self._agent_norms_csv_filename())
             pd.DataFrame(columns=self._agent_norms_columns()).to_csv(self._agent_norms_csv_filename(), mode='a', index=False)
 
-    def _start_report(self, report_path, columns):
-        """
-        Start a report written one episode (or step) at a time with its header, never overwriting one, unless a continued training run
-        is carrying on its report
-        """
-        if self.training and self.episode > 1 and exists(report_path):
-            self._continue_report(report_path, columns)
-        else:
-            if exists(report_path):
-                raise FileExistsException(report_path)
-            pd.DataFrame(columns=columns).to_csv(report_path, mode='a', index=False)
-
-    def _continue_report(self, report_path, columns=None):
-        """
-        A continued training run carries on its report, without the episodes it is about to train again, and with the report's current
-        columns (empty in earlier rows for any it didn't have); written beside it and moved over it, so stopping now leaves the report whole
-        """
-        reports = pd.read_csv(report_path)
-        reports = reports[reports["episode"] < self.episode]
-        if columns is not None and list(reports.columns) != list(columns):
-            reports = reports.reindex(columns=columns)
-        writing_path = report_path+".writing"
-        reports.to_csv(writing_path, index=False)
-        os.replace(writing_path, report_path)
-
-    def _report_row(self, fields, values, extra_values):
-        """One report row: each field's value, then each column a scenario adds"""
-        return pd.DataFrame({**{column: [value] for column, value in zip(fields, values, strict=True)},
-                             **{column: [value] for column, value in extra_values.items()}})
-
     def _collect_agent_data(self, agent):
         #in the order of AGENT_REPORT_FIELDS
         values = [agent.unique_id, agent.agent_type, self.episode, self.day, agent.berries, agent.berries_consumed, agent.berries_thrown,
@@ -717,17 +636,6 @@ class HarvestModel(Model):
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry])
         if self.write_data and not self.training:
            new_entry.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
-    
-    def _num_agent_norms(self, agent):
-        """
-        Size of an agent's norm base: behaviours in its behaviour base (rule-based), or behaviours
-        it has learned (Bayesian, whose candidate set is fixed). None if norms aren't tracked.
-        """
-        if not self.track_norms:
-            return None
-        if self.norms_module_type == "rule_based":
-            return len(agent.norms_module.behaviour_base)
-        return len(agent.norms_module.get_learned_behaviours())
 
     def _collect_model_episode_data(self):
         #every row of the agent reporter is added with index 0, so select this episode's rows by value, not by index
@@ -742,104 +650,6 @@ class HarvestModel(Model):
         if self.write_data:
             new_entry.to_csv("data/results/current_run/model_episode_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
         return new_entry
-
-    def _append_norm_dict_to_file(self, norm_dictionary, filename):
-        """
-        Persists the current episode's emerged norms into filename, keyed by episode number
-        Rewrites the whole file from a full in-memory dict each call so the file on disk is always valid,
-        complete JSON, rather than relying on the run reaching its final episode to write a closing brace
-        """
-        if exists(filename):
-            with open(filename, "r") as file:
-                try:
-                    all_episodes = json.load(file)
-                except json.JSONDecodeError:
-                    print(f"Warning: {filename} was not valid JSON (likely left over from an interrupted run); starting a new norms file")
-                    all_episodes = {}
-        else:
-            all_episodes = {}
-        norm_list = [{key: value} for key, value in norm_dictionary.items()]
-        all_episodes[str(self.episode)] = norm_list
-        with open(filename, "w") as file:
-            json.dump(all_episodes, file, indent=4)
-
-    def _analyse_agent_norms(self):
-        """
-        Collects one row per agent summarising the norms it has learned by the end of this episode and
-        appends them to agent_norms_<filepath>.csv. Gained/lost compare against the behaviours the same
-        agent had learned at the end of the previous episode (posteriors decay between episodes, so
-        behaviours can be lost as well as gained). Cooperative norms are learned commitments to throw a
-        berry to another agent ("IF ... THEN throw"); uncooperative norms are learned prohibitions on
-        throwing ("IF ... THEN NOT throw"). Agents' throw_X actions are collapsed to "throw" for norms.
-        """
-        rows = []
-        for agent in self.schedule.agents:
-            if agent.agent_type == "berry":
-                continue
-            learned = agent.norms_module.get_learned_behaviours()
-            learned_ids = {b["id"] for b in learned}
-            previous_ids = self.previous_learned_norms.get(agent.unique_id, set())
-            rows.append({"episode": self.episode,
-                         "agent_id": agent.unique_id,
-                         "agent_type": agent.agent_type,
-                         "end_day": self.day,
-                         "num_learned_norms": len(learned),
-                         "num_learned_prohibitions": sum(b["type"] == "prohibition" for b in learned),
-                         "num_learned_commitments": sum(b["type"] == "commitment" for b in learned),
-                         "num_gained_norms": len(learned_ids - previous_ids),
-                         "num_lost_norms": len(previous_ids - learned_ids),
-                         "mean_learned_posterior": float(np.mean([b["posterior"] for b in learned])) if learned else None,
-                         "num_observed_behaviours": sum(agent.norms_module.behaviour_counts(*view)[0] > 0 for view in agent.norms_module.iter_behaviours()),
-                         "num_learned_cooperative_norms": sum(b["type"] == "commitment" and b["action"] == "throw" for b in learned),
-                         "num_learned_uncooperative_norms": sum(b["type"] == "prohibition" and b["action"] == "throw" for b in learned)})
-            self.previous_learned_norms[agent.unique_id] = learned_ids
-        pd.DataFrame(rows, columns=self._agent_norms_columns()).to_csv(self._agent_norms_csv_filename(), header=None, mode='a', index=False)
-
-    def _agent_norms_csv_filename(self):
-        return "data/results/current_run/agent_norms_"+self.filepath+".csv"
-
-    def _agent_norms_columns(self):
-        return ["episode", "agent_id", "agent_type", "end_day", "num_learned_norms", "num_learned_prohibitions",
-                "num_learned_commitments", "num_gained_norms", "num_lost_norms", "mean_learned_posterior",
-                "num_observed_behaviours", "num_learned_cooperative_norms",
-                "num_learned_uncooperative_norms"]
-
-    def _check_emerged_norms(self):
-        """
-        function to check the current emerged norms at this step and update the norms that have emerged across the whole episode
-        for each living agent, add the behaviours in its behaviour base to society_norms_snapshot
-        filter society_norms_snapshot by emergence threshold
-        update norms emerged across the whole episode with the norms emerged at this step
-        """
-        if len(self.living_agents) < 2:
-            return
-        emergence_threshold = len(self.living_agents) * self.societal_norm_emergence_threshold
-        society_norms_snapshot = {}
-        for agent in self.schedule.agents:
-            if agent.agent_type != "berry" and not agent.off_grid:
-                for norm_name, norm_value in agent.norms_module.behaviour_base.items():
-                    #the society's totals at this step: reward, numerosity (times used by individual agents) and fitness summed over agents,
-                    #and adoption, the number of agents with the behaviour in their behaviour base
-                    totals = society_norms_snapshot.setdefault(norm_name, {"reward": 0, "numerosity": 0, "fitness": 0, "adoption": 0})
-                    for key in ["reward", "numerosity", "fitness"]:
-                        totals[key] += norm_value[key]
-                    totals["adoption"] += 1
-        for norm_name, totals in society_norms_snapshot.items():
-            if totals["adoption"] >= emergence_threshold:
-                self._update_episode_emerged_norm(norm_name, totals)
-
-    def _update_episode_emerged_norm(self, norm_name, norm_value):
-        """
-        Overwrite an emerged norm's statistics with the society's current totals (agents' behaviour
-        bases already hold running totals for the episode) and track when the norm was held: 
-        first and last day above the emergence threshold, and number of days held
-        """
-        norm = self.emerged_norms.setdefault(norm_name, {"first_day_held": self.day, "days_held": 0})
-        #adoption: the number of living agents with the norm in their behaviour base on the last day it was held
-        for key in ["reward", "numerosity", "fitness", "adoption"]:
-            norm[key] = norm_value[key]
-        norm["last_day_held"] = self.day
-        norm["days_held"] += 1
 
     def _update_schedule(self):
         if self.regrowth_timers:
@@ -992,24 +802,3 @@ class HarvestModel(Model):
         N = self.num_agents
         B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * s)
         return 1 + (1 / N) - 2 * B
-    
-    def _mean_loss(self):
-        return self._mean_over_agents(lambda agent: agent.get_mean_loss()) if self.training else 0
-
-    def _mean_reward(self):
-        return self._mean_over_agents(lambda agent: agent.total_episode_reward)
-
-    def _mean_epsilon(self):
-        return self._mean_over_agents(lambda agent: agent.get_epsilon())
-
-    def _mean_over_agents(self, value):
-        """
-        Mean of value(agent) over every agent, dead or alive (summed in schedule order); 0 when they sum to 0
-        """
-        m = 0
-        for agent in self.schedule.agents:
-            if agent.agent_type != "berry":
-                m += value(agent)
-        if m == 0:
-            return 0
-        return m / self.num_agents
