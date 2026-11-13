@@ -128,7 +128,7 @@ Other tree rules:
 - **Resolution order:** once per step, players are taken in a random order (Lua RNG). Each completed trade clears both offers and emits a `trade` event naming the two players and the offered and traded quantities.
 
 ### 2.5 Hunger (`avatar_library.lua:1124–1174`, `PeriodicNeed`)
-- **The counter:** a hunger level starts at `delay = 50` and goes down by 1 each step. `HUNGER = max(1 − level/50, 0)`, so it rises by 0.02 per step from 0 (just ate) to 1 (50 steps without eating), and then **stays at 1**.
+- **The counter:** a hunger level starts at `delay = 50` and goes down by 1 each step. `HUNGER = max(1 − level/50, 0)`, so it rises by 0.02 per step from 0 (just ate) to 1 (50 steps without eating). It **keeps rising after that** (the level goes below 0), by 0.02 a step: after 200 steps without eating it is 4. *(Corrected during implementation: the first version of this doc said it stayed at 1.)*
 - **Eating:** eating any fruit resets the level to 50. The reset doesn't add to the remaining level, so eating before HUNGER = 1 wastes the rest.
 - **The cost:** `reward = 0`, so hunger costs no reward. Its cost is through stamina: `StaminaModulatedByNeed` removes 1 stamina every step while HUNGER ≥ 1.
 
@@ -295,7 +295,8 @@ Directions are egocentric: (forward, right) components of the offset, rotated by
 
 | # | Feature | How it's computed | Privileged? | Normalisation |
 |---|---|---|---|---|
-| 1 | own hunger | `HUNGER` | no | already [0, 1] |
+| 1 | own hunger | `HUNGER` | no | clipped to [0, 1] |
+| 1a | time hungry | `(HUNGER − 1)/0.02` steps once hungry (§7.3) | no | ÷ 500, clipped to 1 |
 | 2 | own stamina | `STAMINA` | no | already [0, 1] |
 | 3 | own fruit held | `INVENTORY[specialty]` | no | ÷ 10, clipped to 1 |
 | 4 | other fruit held | `INVENTORY[other]` | no | ÷ 10, clipped to 1 |
@@ -313,7 +314,7 @@ Directions are egocentric: (forward, right) components of the offset, rotated by
 | 26 | hungry players nearby | count of players within radius 4 with HUNGER = 1 (used by norms, §9.3) | **yes** | ÷ 15 |
 | 27… | others' well-being | §7, one value per other player, in player-id order (as in Harvest) | **yes** | ÷ (50 × (1 + 10)), clipped to [−1, 1]. In `need` mode, 550 steps covers a full stomach plus 10 fruit; it is negative only when a player is hungry with no fruit (§7.3). |
 
-That is 26 + (N − 1) inputs: 41 for 16 players, 33 for 8.
+That is 27 + (N − 1) inputs: 42 for 16 players, 34 for 8. Feature 1a was added during implementation: HUNGER isn't capped (§2.5), so clipping it to 1 alone would hide how long a player has been hungry. In code the features are `features.FEATURE_NAMES`, in this order.
 
 Notes:
 - **Harvest doesn't normalise its inputs** (health, berries, days left and distance are raw). Fruit Market's ranges are wider (distances up to 60, well-being up to hundreds), so I propose the normalisation above. It doesn't affect Harvest.
@@ -399,7 +400,7 @@ So the before and after vectors differ only by that agent's own action.
 - **Everyone's** actions have taken effect.
 - **Time has passed for everyone.** Each player's hunger rose by 0.02, so `need` well-being fell by 1, or by 0.1 for a player who is already hungry (§7.3).
 
-**The three ways to build the two vectors.** For agent *i* at step *t*, let `before` be every player's well-being at *t* and `after` every player's at *t*+1. Let `passive(before)` be `before` advanced by one step with no actions: hunger +0.02 (capped at 1), one more hungry step for those at the cap, and inventories unchanged.
+**The three ways to build the two vectors.** For agent *i* at step *t*, let `before` be every player's well-being at *t* and `after` every player's at *t*+1. Let `passive(before)` be `before` advanced by one step with no actions: hunger +0.02 (so one more hungry step for those already hungry), and inventories unchanged.
 
 | Mode | Compares | So the sanction reflects |
 |---|---|---|
@@ -485,7 +486,7 @@ Two cautions:
 - **Privileged information.** Like Harvest's well-being, the vector for all players is privileged, because other players' hunger and inventories are not observable in Fruit Market. The model provides it through `get_society_well_being(observer, norms_observation, ethics_observation)` with Harvest's signature. Nobody dies, so the dead-agent branches never apply.
 
 ### 7.3 Time spent hungry (decided)
-`hungry_steps_i` counts the steps since player *i*'s HUNGER reached 1: the steps on which the substrate takes 1 stamina for hunger. It goes back to 0 when *i* eats. Each hungry step lowers well-being by **0.1**, a tenth of the rate before hunger (1 per step). So well-being keeps falling while a player stays hungry, but slowly.
+`hungry_steps_i` counts the steps since player *i*'s HUNGER reached 1: the steps on which the substrate takes 1 stamina for hunger. Since HUNGER keeps rising past 1 (§2.5), it is read straight from it: `(HUNGER − 1) / 0.02`. It goes back to 0 when *i* eats. Each hungry step lowers well-being by **0.1**, a tenth of the rate before hunger (1 per step). So well-being keeps falling while a player stays hungry, but slowly.
 
 Why 0.1:
 - A player hungry for a whole episode (at most 950 steps) loses about 95, a little under two fruit's worth (2 × 50). So hunger matters, but holding fruit still matters more.
@@ -497,7 +498,7 @@ What it changes:
 - **Helping a hungry player is worth more** to egalitarian and maximin agents, the longer that player has been hungry, because the hungry player is further below everyone else.
 - **Passive dynamics** (§6.3) include it: `passive(before)` adds one hungry step to every player already at HUNGER = 1.
 
-`hungry_steps` is counted in Python from each step's HUNGER (and reset when a player's HUNGER drops), so nothing is added to the substrate. It is reported per agent (§8.1).
+`hungry_steps` comes from each step's HUNGER, so nothing is added to the substrate. It is reported per agent (§8.1).
 
 ---
 
@@ -601,7 +602,7 @@ Rule-based antecedents use `boundaries` / `labels` / `zero_label`. The environme
 
 The last row is a derived feature (§4, feature 26): the count of players within radius 4 with HUNGER = 1. It replaces Harvest's per-agent `repeated` well-being in antecedents. With 15 others, a repeated feature makes antecedents 15 buckets long. Rule-based norms (capped at 100) would then never repeat, and the Bayesian candidate set (pairs of predicates) grows with the square of the number of agents. "Hungry player nearby" is the reading the norms are about: whether to help a partner who needs it. It is privileged, so it is reported as such.
 
-**Bayesian:** the same features as `{name, index, thresholds}` on the observation vector (§4 indices). "Hungry player nearby" is feature 26 of the observation (§4), so it has an index. `max_predicates = 2` as now. The norm actions are the 14 labels from §9.1.
+**Bayesian:** the same features as `{name, index, thresholds}` on the observation vector (§4 indices). "Hungry player nearby" is feature 26 of the observation (§4), so it has an index. `max_predicates = 2` as now. The norm actions are the 17 labels from §9.1 (`labels.NORM_LABELS`).
 
 ### 9.4 Cooperative and uncooperative norms
 - **Cooperative actions:** `offer generous`, `offer fair`.
@@ -610,7 +611,8 @@ The last row is a derived feature (§4, feature 26): the count of players within
   - *cooperative* = a learned commitment to a cooperative action, or a learned prohibition of an aggressive one;
   - *uncooperative* = a learned commitment to an aggressive action, or a learned prohibition of a cooperative one.
   This is a direct extension of Harvest's (commitment to throw / prohibition of throw).
-- **Rule-based emerged norms:** classified by consequent in the same way, via R4.
+- **Rule-based emerged norms:** classified by consequent in the same way.
+- *Implementation:* `FruitMarketModel._analyse_agent_norms` uses these sets itself, so R4 (changing the shared code) wasn't needed.
 - **Specifically interesting:** "IF hungry player nearby … THEN offer generous", "IF … own fruit many THEN offer fair", and "IF … THEN shove". These are what the norm tables should be checked for.
 - `offer demanding` is neither cooperative nor uncooperative. It's reported as is.
 
@@ -628,9 +630,11 @@ The options are prompts. They are asked only when the scenario is `fruit_market`
 4. **Well-being**: need / preference (need).
 5. **Ethics sanction from**: attributed / joint (attributed, §6.3). Not asked for baseline agents.
 6. **Spatial features**: global / view-limited (global).
+
+When testing, the options above aren't asked: a test uses the settings the checkpoint was trained with, from its `settings.json`. It asks instead how many episodes to test (100, since a 1000-step episode takes minutes), then whether to write norms and which norms module to use, as the harvest scenarios do.
 7. Society mix and agent type: the existing prompts, unchanged.
    - In a mixed society, baseline ids are chosen from the seed as now.
-   - **Roles are by id parity**, so each half has both roles.
+   - **Roles follow the substrate's own assignment**: the first half of the players are apple farmers, the rest banana farmers. *(Changed during implementation from id parity, to keep the original substrate.)* The baseline half is chosen at random from the seed, so it almost always has both roles.
    - Roles stay fixed per agent across episodes, by default; reshuffling them each episode is possible later, and the role flag is already in the observation.
 
 Not asked for this scenario: seasons, allocations, render. Choosing `fruit_market` without Melting Pot installed prints how to install it (`requirements-fruit-market.txt`) and exits. The import is lazy, inside the `fruit_market` branch of `create_and_run_model`. Nothing imports `meltingpot` otherwise, so the existing code and tests run without it.
@@ -685,14 +689,16 @@ The pilot is 20 episodes at the default scale, timing each part, before committi
    - mask behaviour (masked actions never chosen across 10,000 exploration draws; greedy skips them; the target uses the masked max);
    - observation length and order.
 3. **Mask doesn't move Harvest's random draws.** A `DQN` with `mask=None` must make the same `np.random` calls as now. The reference hashes cover this.
-4. **Integration tests** marked `pytest.importorskip("meltingpot")`:
-   - the backend builds with `LocationObserver` and `TreeStateObserver`;
-   - `WORLD.TREES` agrees with a `WORLD.RGB` parse on the first frame, and with Python tracking of harvests over 200 random steps;
+4. **Integration tests** marked `pytest.importorskip("meltingpot")` (`tests/test_fruit_market_backend.py`, `tests/test_fruit_market_run.py`):
+   - the installed substrate's actions, roles, episode length, hunger delay, taste rewards, trade radius, stamina, regrowth and map are the ones PriENE uses;
+   - players start on spawn points, and trees start ripe on potential-tree tiles;
    - `trade` events agree with inventory changes;
-   - the same seed gives the same trajectory twice;
-   - **our observers don't change the substrate** (§5.0): the same seed and actions, built with and without them, give identical rewards, inventories, hunger, stamina, offers and trade events at every step;
-   - our action list equals the installed `fruit_market.ACTION_SET`, entry by entry.
-5. **Fruit Market reference outputs:** a separate `tests/reference_data/fruit_market_hashes.json`, made once Fruit Market works and skipped without Melting Pot. The existing `hashes.json` is never touched.
+   - `HELD_BY` reports holds;
+   - **our observers don't change the substrate** (§5.0). The comparison of two runs planned here isn't possible (see the note below). Instead the tests check that our Lua components define nothing but observations (no updaters, no contact or hit handlers, no random draws, no state changes), that Melting Pot's `LocationObserver` likewise only reports, and that the settings differ from Melting Pot's only by the added observers and the level path;
+   - `run.py train` then `run.py test` end to end.
+
+   **Found during implementation: Melting Pot's substrate isn't reproducible from its seed.** Building `fruit_market__concentric_rivers` three times with the same `env_seed` gives three different starts (spawn positions, which trees are apple or banana), within one process and across processes. This holds for unmodified Melting Pot, without PriENE's observers. The seeded random number generators (Python's and Lua's) are deterministic, so the variation most likely comes from the order Lua iterates tables of game objects, which decides which object gets which random draw. PriENE's own randomness (network initialisation, exploration, replay sampling, the baseline half, each episode's `env_seed`) is still seeded. But Fruit Market episodes can't be replayed exactly, so results should be compared over many episodes.
+5. **Fruit Market reference outputs:** not possible, because the substrate isn't reproducible (above). The existing `hashes.json` is untouched.
 6. **Empirical checks before relying on them:**
    - whether stamina recovers on empty ground (§2.6);
    - the 25-action order against the installed version;
@@ -715,6 +721,13 @@ The pilot is 20 episodes at the default scale, timing each part, before committi
 11. Pilot run and timings, Fruit Market reference hashes, then a short results note.
 
 Steps 1–5 change existing code and are checked against the hashes. Step 6 changes prenv and is checked the same way. Steps 7–11 add new code only.
+
+### 13.1 Implementation status (13 Nov 2026)
+Steps 1–3, 5–10 are done, one commit each, with all 950 reference hashes matching after every change to existing code. Step 4 (R4) wasn't needed (§9.4). Melting Pot is installed in prenv: `pip freeze` before and after differs only by added packages. The code is in `src/fruit_market/`, with its tests in `tests/test_fruit_market*.py`.
+
+**Timing with the real substrate:** a step with 16 learning agents takes about 0.26 s, so a 1000-step episode takes about 4.5 minutes. That is about 14 days of training per agent type at the default scale. The DQN accounts for about 0.18 s of each step, and the rest is the substrate, features and bookkeeping. This replaces the 10 days estimated in §11.
+
+**Step 11 (pilot and results note) is still to do.** Fruit Market reference hashes aren't possible (§12).
 
 ---
 
