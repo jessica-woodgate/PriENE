@@ -200,6 +200,43 @@ class HarvestModel(SocietyModel):
                 society_well_being.append(0)
         return np.array(society_well_being, dtype=float)
 
+    def observe(self, agent):
+        """
+        What agent observes: its health, berries, days left to live and distance to the nearest berry, the well-being of every other agent
+        in the society, then any features the scenario adds
+        """
+        distance_to_berry = agent.moving_module.get_distance_to_berry()
+        observer_features = np.array([agent.health, agent.berries, agent.days_left_to_live, distance_to_berry])
+        agent_well_being = self.get_society_well_being(agent, False, False)
+        observation = np.append(observer_features, agent_well_being)
+        observation = np.append(observation, self.extra_observation_features(agent))
+        return observation
+
+    def observation_size(self, agent):
+        """
+        Number of features in agent's observation (see observe)
+        """
+        n_features = 4
+        n_features += self.get_num_agents() -1
+        n_features += self.num_extra_observation_features()
+        return n_features
+
+    def agent_actions(self, agent):
+        """
+        agent's actions: move (towards the nearest berry it may forage), eat, and throw a berry to each other agent
+        """
+        actions = ["move", "eat"]
+        for agent_id in range(self.get_num_agents()):
+            if agent_id != agent.unique_id:
+                actions.append(f"throw_{agent_id}")
+        return actions
+
+    def action_mask(self, agent):
+        """
+        Which of agent's actions it may choose (a boolean per action), or None if it may choose any
+        """
+        return None
+
     def reseed_for_continuing(self):
         """
         A continued training run is built from its seed, so its agents and their groups are the same as when it started; call this once it

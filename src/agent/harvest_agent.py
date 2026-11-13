@@ -134,13 +134,9 @@ class HarvestAgent(LearningAgent):
     
     def observe(self):
         """
-        Agents observe their attributes, distance to nearest berry, well-being of other agents in society, then any features the scenario adds
+        The observation the model gives this agent (see HarvestModel.observe)
         """
-        distance_to_berry = self.moving_module.get_distance_to_berry()
-        observer_features = np.array([self.health, self.berries, self.days_left_to_live, distance_to_berry])
-        agent_well_being = self.model.get_society_well_being(self, False, False)
-        observation = np.append(observer_features, agent_well_being)
-        observation = np.append(observation, self.model.extra_observation_features(self))
+        observation = self.model.observe(self)
         if len(observation) != self.n_features:
             raise NumFeaturesException(self.n_features, len(observation))
         return observation
@@ -177,20 +173,15 @@ class HarvestAgent(LearningAgent):
     
     def _calculate_n_features(self):
         """
-        Get number of features in observation (agent's health, days left to live, distance to berry, well-being of other agents in society,
-        and any features the scenario adds)
+        Number of features in this agent's observation (see HarvestModel.observation_size)
         """
-        n_features = 4
-        n_features += self.model.get_num_agents() -1
-        n_features += self.model.num_extra_observation_features()
-        return n_features
-    
+        return self.model.observation_size(self)
+
     def _generate_actions(self, unique_id, num_agents):
-        actions = ["move", "eat"]
-        for agent_id in range(num_agents):
-            if agent_id != unique_id:
-                actions.append(f"throw_{agent_id}")
-        return actions
+        """
+        This agent's actions (see HarvestModel.agent_actions)
+        """
+        return self.model.agent_actions(self)
     
     def _perform_action(self, action_index):
         reward = 0
