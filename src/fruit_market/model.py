@@ -152,6 +152,9 @@ class FruitMarketModel(SocietyModel):
                  ("hungry_players_nearby", [1 / 15])]
         return [{"name": name, "index": FEATURE_INDEX[name], "thresholds": thresholds, "repeated": False} for name, thresholds in specs]
 
+    def get_living_agents(self):
+        return self.living_agents
+
     def get_day(self):
         return self.day
 

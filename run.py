@@ -7,7 +7,7 @@ from src.data_handling.data_analysis import DataAnalysis
 from src.data_handling.render_pygame import RenderPygame
 from src.agent.harvest_agent import NORMS_MODULE_TYPES
 from src.checkpoints import RUN_OPTIONS, DEFAULT_CHECKPOINT
-from src.checkpoints import training_checkpoint_name, training_checkpoint_path, prepare_training_checkpoints
+from src.checkpoints import training_checkpoint_name, training_checkpoint_path, prepare_training_checkpoints, fruit_market_checkpoint_name
 from src.checkpoints import society_checkpoint_path, loading_checkpoint_path, record_agent_types, training_folder, finished_episode
 from src.checkpoints import resolve_checkpoint, trained_checkpoints, checkpoint_max_days, days_in_name
 from src.harvest_exception import CheckpointExistsException
@@ -20,7 +20,14 @@ import time
 PRINCIPLES = ["baseline", "utilitarian", "maximin", "egalitarian"]
 AGGREGATIONS = ["average", "majoritarian", "optimist", "veto"]
 AGENT_TYPES = PRINCIPLES + AGGREGATIONS
-SCENARIO_TYPES = ["basic", "colours", "capabilities", "allotment", "commons"]
+HARVEST_SCENARIO_TYPES = ["basic", "colours", "capabilities", "allotment", "commons"]
+#fruit_market is Melting Pot's Fruit Market (src/fruit_market), an optional extra: it needs Melting Pot installed (requirements-fruit-market.txt)
+SCENARIO_TYPES = HARVEST_SCENARIO_TYPES + ["fruit_market"]
+FRUIT_MARKET_PLAYER_OPTIONS = ["2", "4", "8", "16"]
+#the substrate's own episode length and number of players
+FRUIT_MARKET_STEPS = 1000
+FRUIT_MARKET_PLAYERS = 16
+FRUIT_MARKET_TEST_EPISODES = 100
 NUM_AGENTS_OPTIONS = ["2", "4", "6", "20", "50", "100"]
 MAX_EPISODES = 1000
 SOCIETY_MIXES = ["homogeneous", "heterogeneous"]
@@ -164,18 +171,18 @@ def output_file_string(training, scenario, seasons, allotment_regrowth_delays, m
     #training outputs are named apart from testing outputs, so testing the same scenario doesn't clash with them
     return ("train_" if training else "")+scenario_file_string(scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix)+"_"+agent_type
 
-def get_continue_training_input(checkpoint_path, agent_types, society_mix, file_strings):
+def get_continue_training_input(checkpoint_path, agent_types, society_mix, file_strings, report_prefix="model_episode_reports_"):
     """
     For each agent type whose training run has already saved into checkpoint_path, ask whether to continue it from the episode after the
     last one it finished, since training never overwrites a run. Returns the episode each continued agent type starts from
-    file_strings -- each agent type's training output name, so its report is found
+    file_strings -- each agent type's training output name, so its report (report_prefix + name) is found
     """
     start_episodes = {}
     for agent_type in agent_types:
         folder = training_folder(checkpoint_path, society_mix, agent_type)
         if not os.path.exists(folder):
             continue
-        finished = finished_episode(folder, "data/results/current_run/model_episode_reports_"+file_strings[agent_type]+".csv")
+        finished = finished_episode(folder, "data/results/current_run/"+report_prefix+file_strings[agent_type]+".csv")
         if finished is None:
             print(f"No episode of {agent_type}'s training in {folder} finished, so there is nothing to continue; move it to train again.")
             raise CheckpointExistsException(folder)
@@ -270,6 +277,121 @@ def get_mixed_allotments_input(num_allotments):
     return get_input("How should the two agent types share the allotments? split: each allotment has agents of both types; separate: each type has its own allotments ['split', 'separate']: ",
                      "Invalid choice. Please choose ['split', 'separate']: ", ["split", "separate"], PAPER_DEFAULTS["mixed_allotments"])
 
+def fruit_market_file_string(training, settings, society_mix, agent_type):
+    """
+    Output name of a Fruit Market run: fruit_market, then any setting that isn't the default (docs/fruit_market_design.md §10), the mix
+    and the agent type, e.g. train_fruit_market_grappling-off_utilitarian
+    """
+    parts = ["fruit_market"]
+    if settings["max_days"] != FRUIT_MARKET_STEPS:
+        parts.append(f"{settings['max_days']}steps")
+    if settings["num_agents"] != FRUIT_MARKET_PLAYERS:
+        parts.append(f"{settings['num_agents']}players")
+    if not settings["grappling"]:
+        parts.append("grappling-off")
+    for key, default in [("well_being", "need"), ("sanction", "attributed")]:
+        if settings[key] != default:
+            parts.append(settings[key])
+    if settings["observation"] != "global":
+        parts.append("view")
+    if society_mix != "homogeneous":
+        parts.append("mixed")
+    return ("train_" if training else "")+"_".join(parts)+"_"+agent_type
+
+def get_fruit_market_settings_input():
+    """
+    Ask for a Fruit Market training run's settings; pressing enter at each gives the original substrate and the design's defaults
+    """
+    from src.fruit_market.well_being import WELL_BEING_MODES
+    from src.fruit_market.sanction import SANCTION_MODES
+    from src.fruit_market.features import OBSERVATION_MODES
+    max_days = get_number_input(f"How many steps in each episode? (1 to {FRUIT_MARKET_STEPS}; the substrate's own is {FRUIT_MARKET_STEPS}) Press enter for {FRUIT_MARKET_STEPS}: ",
+                                 int, FRUIT_MARKET_STEPS, 1, FRUIT_MARKET_STEPS, out_of_range=f"Invalid choice. Must be between 1 and {FRUIT_MARKET_STEPS}.")
+    num_agents = int(get_input(f"How many players {FRUIT_MARKET_PLAYER_OPTIONS} (half apple farmers, half banana farmers; the substrate's own is {FRUIT_MARKET_PLAYERS}): ",
+                               f"Invalid number of players. Please choose {FRUIT_MARKET_PLAYER_OPTIONS}: ", FRUIT_MARKET_PLAYER_OPTIONS, str(FRUIT_MARKET_PLAYERS)))
+    grappling = get_bool(get_input("Do you want grappling (hold, shove, pull), as in the substrate? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"], "y"))
+    well_being = get_input(f"Which well-being do the ethics principles use {WELL_BEING_MODES} (need: steps until hungry; preference: fruit weighted by its value to the player): ",
+                           f"Invalid well-being. Please choose {WELL_BEING_MODES}: ", WELL_BEING_MODES, "need")
+    sanction = get_input(f"What is the ethics sanction from {SANCTION_MODES} (attributed: only the agent's own action; joint: everyone's, and time passing): ",
+                         f"Invalid choice. Please choose {SANCTION_MODES}: ", SANCTION_MODES, "attributed")
+    observation = get_input(f"Which spatial features do agents observe {OBSERVATION_MODES} (view: only what is in the player's view): ",
+                            f"Invalid choice. Please choose {OBSERVATION_MODES}: ", OBSERVATION_MODES, "global")
+    return {"scenario": "fruit_market", "max_days": max_days, "num_agents": num_agents, "grappling": grappling, "well_being": well_being,
+            "sanction": sanction, "observation": observation}
+
+def fruit_market_test_settings(checkpoint_root):
+    """
+    The settings a Fruit Market checkpoint was trained with (its settings.json), and the folder of its players: asks which number of
+    players if it has more than one
+    """
+    import json
+    from src.checkpoints import SETTINGS_FILE
+    folders = sorted(name for name in os.listdir(checkpoint_root) if name.endswith("_agents") and os.path.exists(checkpoint_root+name+"/"+SETTINGS_FILE))
+    if not folders:
+        raise ValueError(f"{checkpoint_root} has no Fruit Market checkpoints (no <n>_agents/{SETTINGS_FILE})")
+    options = [name.split("_")[0] for name in folders]
+    players = options[0] if len(options) == 1 else get_input(f"How many players {options}: ", f"Invalid number of players. Please choose {options}: ", options)
+    checkpoint_path = checkpoint_root+players+"_agents/"
+    with open(checkpoint_path+SETTINGS_FILE) as file:
+        settings = json.load(file)
+    if settings.get("scenario") != "fruit_market":
+        raise ValueError(f"{checkpoint_path} wasn't trained in fruit_market")
+    print(f"Testing with the settings the checkpoint was trained with: {settings}")
+    return checkpoint_path, settings
+
+def run_fruit_market(training, seed, log=None):
+    """
+    Train or test agents in Melting Pot's Fruit Market (docs/fruit_market_design.md), asking for its options
+    """
+    from src.fruit_market.backend import meltingpot_available, INSTALL_HINT
+    if not meltingpot_available():
+        print(INSTALL_HINT)
+        return
+    from src.fruit_market.model import FruitMarketModel
+    mode = "train" if training else "test"
+    if training:
+        settings = get_fruit_market_settings_input()
+        max_episodes = 0
+    else:
+        checkpoint_root, _ = get_checkpoint_input()
+        checkpoint_path, settings = fruit_market_test_settings(checkpoint_root)
+        max_episodes = get_number_input(f"How many episodes do you want to test? Press enter for {FRUIT_MARKET_TEST_EPISODES}: ", int, FRUIT_MARKET_TEST_EPISODES, 1, None,
+                                        out_of_range="Invalid choice. Must be at least 1.")
+    society_mix = get_input(f"What mix of society do you want to {mode} {SOCIETY_MIXES}: ", f"Invalid society mix. Please choose {SOCIETY_MIXES}: ", SOCIETY_MIXES, PAPER_DEFAULTS["society_mix"])
+    types = AGENT_TYPES + ["all"]
+    agent_type = get_input(f"What type of agent do you want to implement {types}: ", f"Invalid agent type. Please choose {types}: ", types, PAPER_DEFAULTS["agent_type"])
+    write_data = write_data_input("data", PAPER_DEFAULTS["write_data"])
+    agent_types = agent_types_to_run(society_mix) if agent_type == "all" else [agent_type]
+    track_norms = False
+    norms_module_type = NORMS_MODULE_TYPES[0]
+    start_episodes = {}
+    if training:
+        checkpoint_path = training_checkpoint_path(fruit_market_checkpoint_name(settings["max_days"], settings["grappling"], settings["well_being"], settings["sanction"],
+                                                                                settings["observation"], seed, society_mix), settings["num_agents"])
+        start_episodes = get_continue_training_input(checkpoint_path, agent_types, society_mix,
+                                                     {t: fruit_market_file_string(True, settings, society_mix, t) for t in agent_types}, report_prefix="fm_model_episode_reports_")
+        prepare_training_checkpoints(checkpoint_path, agent_types, {**settings, "seed": seed, "society_mix": society_mix}, society_mix, continuing=start_episodes)
+        print("Model variables will be written into", checkpoint_path)
+    else:
+        track_norms = write_data_input("norms", PAPER_DEFAULTS["track_norms"])
+        if track_norms:
+            norms_module_type = get_input(f"Which norms module do you want to use {NORMS_MODULE_TYPES}: ", f"Invalid norms module. Please choose {NORMS_MODULE_TYPES}: ", NORMS_MODULE_TYPES,
+                                          PAPER_DEFAULTS["norms_module_type"])
+    for this_type in agent_types:
+        start_episode = start_episodes.get(this_type, 1)
+        file_string = fruit_market_file_string(training, settings, society_mix, this_type)
+        type_checkpoint_path = society_checkpoint_path(checkpoint_path, society_mix, this_type) if training else loading_checkpoint_path(checkpoint_path, society_mix, this_type)
+        model_inst = FruitMarketModel(society_mix, settings["num_agents"], this_type, max_episodes, settings["max_days"], training, type_checkpoint_path, write_data,
+                                      track_norms, file_string, seed, norms_module_type, start_episode, settings["grappling"], settings["well_being"],
+                                      settings["sanction"], settings["observation"])
+        if start_episode > 1:
+            model_inst.reseed_for_continuing()
+            print(f"Continuing {this_type}'s training from episode {start_episode}")
+        if training and society_mix != "homogeneous":
+            record_agent_types(type_checkpoint_path, model_inst.get_living_agents())
+        run_simulation(model_inst, False, log is not None, log)
+        model_inst.backend.close()
+
 class RemovedOption(argparse.Action):
     """
     Fails with a message saying the option isn't a flag, whatever value it is given
@@ -334,7 +456,11 @@ if args.option == "test" or args.option == "train":
     mode = "train" if training else "test"
     scenario = get_input(f"What type of scenario do you want to {mode} in {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES,
                          PAPER_DEFAULTS["train_scenario" if training else "test_scenario"])
-    season_effect = "the commons regrows 1.5 times as fast" if scenario == "commons" else "one more berry per agent in each group"
+    if scenario == "fruit_market":
+        #Fruit Market has its own options (see run_fruit_market); none of the harvest scenarios' are asked
+        run_fruit_market(training, args.seed, args.log)
+        raise SystemExit(0)
+    season_effect ="the commons regrows 1.5 times as fast" if scenario == "commons" else "one more berry per agent in each group"
     season_bad = "half as fast" if scenario == "commons" else "one fewer"
     seasons = get_bool(get_input(f"Do you want seasons, where each season is randomly normal, good ({season_effect}) or bad ({season_bad})? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"], PAPER_DEFAULTS["seasons"]))
     season_length = DEFAULT_SEASON_LENGTH
@@ -428,7 +554,7 @@ elif args.option == "graphs":
     graph_runs = ["current_run", "50_days", "200_days", "paper"]
     run_name = get_input(f"What run do you want to generate graphs for (paper reproduces the graphs in the paper) {graph_runs}: ", f"Invalid name of run. Please choose {graph_runs}: ", graph_runs,
                          PAPER_DEFAULTS["graph_run"])
-    scenario = get_input(f"What type of scenario do you want to generate graphs for {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES} ", SCENARIO_TYPES,
+    scenario = get_input(f"What type of scenario do you want to generate graphs for {HARVEST_SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {HARVEST_SCENARIO_TYPES} ", HARVEST_SCENARIO_TYPES,
                          PAPER_DEFAULTS["test_scenario"])
     print("Graphs will be saved in data/results/current_run")
     if run_name == "paper":

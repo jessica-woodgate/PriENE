@@ -46,6 +46,18 @@ def training_checkpoint_name(scenario, seasons, season_length, num_allocations, 
     parts += [f"{max_days}days", f"seed{seed}"]
     return "_".join(parts)
 
+def fruit_market_checkpoint_name(max_days, grappling, well_being, sanction, observation, seed, society_mix="homogeneous"):
+    """
+    Name of a Fruit Market training run's checkpoint folder, from every setting that changes what is learned (the number of players is
+    the folder inside it), e.g. fruit_market_1000steps_grappling-on_wb-need_sanction-attributed_obs-global_seed42
+    """
+    parts = ["fruit_market", f"{max_days}steps", "grappling-on" if grappling else "grappling-off", f"wb-{well_being}", f"sanction-{sanction}",
+             f"obs-{observation}"]
+    if society_mix != "homogeneous":
+        parts.append("mixed")
+    parts.append(f"seed{seed}")
+    return "_".join(parts)
+
 def training_checkpoint_path(name, num_agents, trained_dir=TRAINED_DIR):
     return trained_dir+name+"/"+str(num_agents)+"_agents/"
 
