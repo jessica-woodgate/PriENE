@@ -1,17 +1,14 @@
-from mesa import Agent
+from .learning_agent import LearningAgent
+from .learning_agent import NORMS_MODULE_TYPES  # noqa: F401 (imported from here by HarvestModel)
 from .modules.dqn_decision_module import DQNDecisionModule
 from .modules.moving_module import MovingModule
-from .modules.norms_module import NormsModule
 from .modules.bayesian_norms_module import BayesianNormsModule
 from .modules.ethics_module import EthicsModule
 from src.harvest_exception import NumFeaturesException
 from src.harvest_exception import AgentTypeException
 import numpy as np
 
-# norm bases an agent can track its behaviour with (see _build_norms_module); the first is the default
-NORMS_MODULE_TYPES = ["rule_based", "bayesian"]
-
-class HarvestAgent(Agent):
+class HarvestAgent(LearningAgent):
     """
     HarvestAgent observes, chooses an action via its DQNDecisionModule, performs
     the action (move/eat/throw), updates its own attributes (health, berries, days left to
@@ -113,6 +110,7 @@ class HarvestAgent(Agent):
         """
         self.current_action = action
         self.current_thrown_to = None
+        antecedent = None
         if self.track_norms and self.norms_module_type == "rule_based":
             # rule-based norms are keyed on the state before acting
             antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)]
@@ -131,11 +129,7 @@ class HarvestAgent(Agent):
             reward_vector = reward_vector + sanction
         done, reward_vector = self._update_attributes(reward_vector)
         if self.track_norms:
-            if self.norms_module_type == "rule_based":
-                reward = np.sum(reward_vector).item()
-                self.norms_module.update_behaviour_base(antecedent, self.actions[action], reward, self.model.get_day(), self.model.episode)
-            else:
-                self.norms_module.update(observation, self.norm_action_index[action])
+            self._update_norms(antecedent, observation, action, np.sum(reward_vector).item())
         return reward_vector, next_state, done
     
     def observe(self):
@@ -160,16 +154,6 @@ class HarvestAgent(Agent):
         if days_left_to_live < 0:
             return 0
         return days_left_to_live
-
-    def get_epsilon(self):
-        return self.decision_module.get_epsilon()
-
-    def get_mean_loss(self):
-        return self.decision_module.get_mean_loss()
-    
-    def finish_episode(self):
-        if self.training:
-            self.decision_module.save_models(self.model.episode)
 
     def reset(self):
         """
@@ -270,12 +254,7 @@ class HarvestAgent(Agent):
             return self.rewards["eat"]
         else:
             return self.rewards["no_berries"]
-    
-    def _ethics_sanction(self):
-        society_well_being = self.model.get_society_well_being(self, False, True)
-        sanction = self.ethics_module.get_sanction(society_well_being)
-        return sanction
-    
+
     def _update_attributes(self, reward_vector):
         done = False
         self.health -= self.health_decay
@@ -302,15 +281,12 @@ class HarvestAgent(Agent):
 
     # ── Norms ───────────────────────────────────────────────────
 
-    def _build_norms_module(self):
-        """
-        Construct the norm base selected by norms_module_type. Domain knowledge (features, thresholds,
-        action groupings) lives here; both norms modules stay domain-agnostic.
-        """
-        if self.norms_module_type == "bayesian":
-            return self._build_bayesian_norms_module(self.model.get_num_agents())
-        #HarvestModel rejects any other type before agents are built
-        return NormsModule(self.unique_id, self._antecedent_features(), self._consequent_rules())
+    def _norm_action_label(self, action):
+        #the raw action name; NormsModule generalises it with _consequent_rules
+        return self.actions[action]
+
+    def _norm_action_index(self, action):
+        return self.norm_action_index[action]
 
     def _antecedent_features(self):
         """
