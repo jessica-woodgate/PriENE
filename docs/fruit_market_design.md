@@ -135,7 +135,7 @@ Other tree rules:
 ### 2.6 Stamina (`shared_components.lua`)
 - **Range and bands:** `maxStamina = 18`. The bands are red (0), yellow (1–6), green (7–12) and invisible (13–18). `STAMINA` is reported as value/18.
 - **Moving:** a move action (`move ≠ 0`; turning is free) costs 1 stamina every 2 move steps (`decrementRate = 0.5`). After a costly step the player is frozen for 0 frames in green, 2 in yellow and 6 in red.
-- **Recovering:** any step without a move recovers 1 stamina, unless the player stands on a `PreventStaminaRecoveryHere` tile. In the config that component is part of `potential_tree`, which covers every ground tile. Whether it fires on empty potential-tree tiles, which have no layer, has to be checked empirically before implementation (§12, item 6).
+- **Recovering:** any step without a move recovers 1 stamina, unless the player stands on a `PreventStaminaRecoveryHere` tile. In the config that component is part of `potential_tree`, which covers every ground tile. Checked with the installed substrate: it only takes effect on actual trees, so stamina recovers on empty ground (§13.1).
 - **Water:** standing on a river tile costs 1 stamina per step (`TraversalCost`), with no reward penalty.
 
 ### 2.7 Grappling (`avatar_grappling.lua`)
@@ -664,7 +664,7 @@ Training stops when epsilon reaches 0.01, after about 4,600 episodes. Estimated 
 These are DQN time only; the substrate step and feature computation add to them, and need measuring in the pilot.
 
 Ways to bring this down **without changing the substrate**:
-- **Compile `DQN.train` and the forward pass with `tf.function`.** Typically several times faster. It could change float results in the last bits, so it would be on for Fruit Market only, never Harvest, which keeps its hashes.
+- **Compile `DQN.train` and the forward pass with `tf.function`.** Typically several times faster. It could change float results in the last bits, so it would be on for Fruit Market only, never Harvest, which keeps its hashes. **Done:** the training step went from 10.5 ms to 0.8 ms, and a Fruit Market step from about 0.3 s to 0.035 s (§13.1).
 - **Run several agent types at once.** Each type is a separate run, and the M1 Pro has 8 performance cores, while each eager TensorFlow run uses only some of them. Two to four runs side by side, in separate terminals with `run.py train`, would each slow down somewhat, but the total would finish sooner. The pilot can measure how much.
 - **Batch the 16 agents' forward passes** in `choose_action` into one call per step. Each agent has its own network, so the gain is in the Python overhead only, and smaller.
 
@@ -725,9 +725,30 @@ Steps 1–5 change existing code and are checked against the hashes. Step 6 chan
 ### 13.1 Implementation status (13 Nov 2026)
 Steps 1–3, 5–10 are done, one commit each, with all 950 reference hashes matching after every change to existing code. Step 4 (R4) wasn't needed (§9.4). Melting Pot is installed in prenv: `pip freeze` before and after differs only by added packages. The code is in `src/fruit_market/`, with its tests in `tests/test_fruit_market*.py`.
 
-**Timing with the real substrate:** a step with 16 learning agents takes about 0.26 s, so a 1000-step episode takes about 4.5 minutes. That is about 14 days of training per agent type at the default scale. The DQN accounts for about 0.18 s of each step, and the rest is the substrate, features and bookkeeping. This replaces the 10 days estimated in §11.
+**Timing with the real substrate.**
+- *Eager training:* a step with 16 learning agents took about 0.3 s, 96% of it in the DQN's training step (Keras applying gradients eagerly, variable by variable). That is about 14 days of training per agent type at the default scale.
+- *Compiled training:* `DQN` now has a `compiled` option, which runs the same training step as one compiled TensorFlow graph (§11). Fruit Market agents use it; Harvest agents keep the eager step, so their code path and the 950 hashes are unchanged. `tests/test_dqn_compiled.py` checks that it gives the same losses and weights as the eager step, with and without the mask. It brings a step down to about 0.035 s.
 
-**Step 11 (pilot and results note) is still to do.** Fruit Market reference hashes aren't possible (§12).
+**Pilot (step 11).** Five training episodes at the default scale (16 utilitarian agents, 1000 steps, seed 42) took 37–41 s each while another training run was using the machine: about 2 days per agent type, so about 17 days for all 8 one after another.
+
+The episode reports were sensible for agents still exploring almost at random (epsilon ≈ 1):
+
+| Measure (per episode) | Range over the 5 episodes |
+|---|---|
+| Fruit eaten | 84–126 |
+| Trades | 2–5 |
+| Share of fruit eaten that was the eater's own (autarky rate) | 0.65–0.82 |
+| Offers hidden as unaffordable | about 95% |
+| Holds | about 650 |
+| Mean HUNGER | about 4–5 (players mostly hungry) |
+| Mean sanction per agent | +4 to +11 |
+
+**Empirical checks (§12, item 6):**
+- Stamina **does** recover (by 1 a step) on empty ground. It doesn't recover on a tree tile, and it drains on a river tile.
+- The 25-action order matches the installed substrate (`check_action_set`, run every time a substrate is built).
+- An offer can trade in the step it is posted (seen in the trade-event test).
+
+Fruit Market reference hashes aren't possible (§12).
 
 ---
 
