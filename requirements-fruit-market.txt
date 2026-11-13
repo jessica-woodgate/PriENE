@@ -1,0 +1,15 @@
+# Optional: what the fruit_market scenario needs on top of the existing environment. Install in two steps, so Melting Pot's own unpinned
+# dependencies (tensorflow, pygame-ce, ...) aren't installed and nothing already installed changes:
+#   pip install -c constraints-prenv.txt -r requirements-fruit-market.txt
+#   pip install --no-deps dm-meltingpot==2.4.1
+# Only the packages Melting Pot's substrate code imports, at the versions the constrained install resolved to (13 Nov 2026):
+dmlab2d==1.0.2
+dm-env==1.6
+dm-tree==0.1.10
+immutabledict==4.3.1
+ml-collections==1.1.0
+reactivex==6.1.0
+chex==0.1.90
+jax==0.4.34
+jaxlib==0.4.34
+toolz==1.2.0

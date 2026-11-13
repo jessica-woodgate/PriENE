@@ -1,0 +1,10 @@
+# prenv's versions of the packages Melting Pot's dependencies could upgrade. Pass with -c when installing requirements-fruit-market.txt,
+# so nothing the existing code (and its saved checkpoints) relies on changes: unpinned, pip would upgrade numpy to 2.x, which TensorFlow 2.16
+# can't use (dry run, 13 Nov 2026).
+numpy==1.26.4
+ml-dtypes==0.3.2
+tensorflow==2.16.2
+keras==3.15.1
+absl-py==2.5.0
+protobuf==4.25.3
+h5py==3.16.0
