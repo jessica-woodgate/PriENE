@@ -1,6 +1,7 @@
 from ..dqn.dqn import DQN
 from src.harvest_exception import CheckpointExistsException
 from src.checkpoints import record_progress
+from src.training_config import DEFAULT as DEFAULT_TRAINING_CONFIG
 import numpy as np
 import os
 
@@ -28,7 +29,9 @@ class DQNDecisionModule():
         q_network, target_network -- the two DQN instances (see DQN for why two networks are used)
         losses -- training losses recorded this episode (training mode only), used by get_mean_loss
     """
-    def __init__(self,agent_type,unique_id,training,actions,n_features,checkpoint_path,epsilon,shared_replay_buffer=None,start_episode=1,action_mask=None,compiled_training=False):
+    def __init__(self,agent_type,unique_id,training,actions,n_features,checkpoint_path,epsilon,shared_replay_buffer=None,start_episode=1,action_mask=None,compiled_training=False,training_config=None):
+        #training_config: the learning parameters (src/training_config.py); None uses the harvest scenarios' values
+        self.training_config = training_config or DEFAULT_TRAINING_CONFIG
         self.n_features = n_features
         self.action_mask = action_mask
         self.compiled_training = compiled_training
@@ -37,14 +40,14 @@ class DQNDecisionModule():
         self.training = training
         self.continuing = training and start_episode > 1
         self.start_epsilon = epsilon
-        self.min_exploration_prob = 0.01
-        self.expl_decay = 0.001
+        self.min_exploration_prob = self.training_config.epsilon_min
+        self.expl_decay = self.training_config.epsilon_decay
         self.epsilon = self._decayed_epsilon(start_episode) if self.continuing else epsilon
         self.actions = actions
         self.n_actions = len(actions)
         self.shared_replay_buffer = shared_replay_buffer
         self.learn_step = 0
-        self.replace_target_iter = 50
+        self.replace_target_iter = self.training_config.target_update_interval
         self._init_networks(checkpoint_path)
 
     def choose_action(self, observation):
@@ -105,8 +108,8 @@ class DQNDecisionModule():
             #both networks are saved in the agent's folder
             os.makedirs(os.path.dirname(self.q_checkpoint_path), exist_ok=True)
         #a continued run loads the networks it saved and trains them further (its replay buffer starts empty)
-        self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer,continuing=self.continuing,action_mask=self.action_mask,compiled=self.compiled_training)
-        self.target_network =DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer,continuing=self.continuing,action_mask=self.action_mask)
+        self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer,continuing=self.continuing,action_mask=self.action_mask,compiled=self.compiled_training,training_config=self.training_config)
+        self.target_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer,continuing=self.continuing,action_mask=self.action_mask,training_config=self.training_config)
         if self.training:
             inputs = np.zeros(self.n_features)
             self.q_network.dqn(np.atleast_2d(inputs.astype('float32')))

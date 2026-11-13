@@ -1,0 +1,16 @@
+# Training parameters for every harvest scenario (basic, colours, capabilities, allotment, commons): the values the paper's agents were
+# trained with. run.py uses this file unless --training-config gives another. See src/training_config.py for what each parameter does.
+learning_rate: 0.0001
+gamma: 0.95
+batch_size: 64
+hidden_units: 128
+huber_delta: 1.0
+min_experiences: 100
+max_experiences: 100000
+target_update_interval: 50
+epsilon_start: 1.0
+epsilon_min: 0.01
+epsilon_decay: 0.001
+# null: train until epsilon reaches epsilon_min (about 4600 episodes)
+max_training_episodes: null
+sanction: 0.4

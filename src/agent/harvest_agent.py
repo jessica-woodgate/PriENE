@@ -4,6 +4,7 @@ from .modules.dqn_decision_module import DQNDecisionModule
 from .modules.moving_module import MovingModule
 from .modules.bayesian_norms_module import BayesianNormsModule
 from .modules.ethics_module import EthicsModule
+from src.training_config import DEFAULT as DEFAULT_TRAINING_CONFIG
 from src.harvest_exception import NumFeaturesException
 from src.harvest_exception import AgentTypeException
 import numpy as np
@@ -77,7 +78,9 @@ class HarvestAgent(LearningAgent):
         restrict_to_allocation = allocation_id is not None
         self.allocation_id = self.unique_id if allocation_id is None else allocation_id
         #a continued training run starts from a later episode (see HarvestModel)
-        self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer,model.episode)
+        #the training config is only passed when it differs from the default, which the decision module uses anyway
+        config = {} if model.training_config == DEFAULT_TRAINING_CONFIG else {"training_config": model.training_config}
+        self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer,model.episode,**config)
         self.moving_module = MovingModule(self.unique_id, model, allotment, self.allocation_id, restrict_to_allocation)
         self.track_norms = track_norms
         self.norms_module_type = norms_module_type
@@ -268,7 +271,8 @@ class HarvestAgent(LearningAgent):
 
     def _ethics_rewards(self):
         #the baseline's, with smaller penalties and reward for eating, and the sanction the ethics module gives
-        return {**self._baseline_rewards(), "no_berries": -0.1, "no_benefactor": -0.1, "insufficient_health": -0.1, "eat": 0.8, "sanction": 0.4}
+        return {**self._baseline_rewards(), "no_berries": -0.1, "no_benefactor": -0.1, "insufficient_health": -0.1, "eat": 0.8,
+                "sanction": self.model.training_config.sanction}
 
     # ── Norms ───────────────────────────────────────────────────
 

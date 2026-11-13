@@ -39,14 +39,20 @@ class FruitMarketModel(SocietyModel):
                              "gini_reward", "mean_well_being", "min_well_being", "max_well_being", "gini_well_being",
                              "mean_well_being_over_steps", "total_trades", "cross_role_trades", "mean_trade_rate", "autarky_rate",
                              "preferred_eat_rate", "invalid_offer_rate", "market_freeze_steps", "total_holds", "total_shoves",
-                             "total_pulls", "mean_hunger", "steps_hungry", "mean_stamina", "num_emerged_norms", "seed"]
+                             "total_pulls", "mean_hunger", "steps_hungry", "mean_stamina", "num_emerged_norms", "seed",
+                             "max_action_share", "grapple_share", "mean_abs_sanction"]
     #spawn key for the random stream of the substrate's seeds, one per episode
     SUBSTRATE_SEED_STREAM = 4
 
     def __init__(self, society_mix, num_agents, agent_type, max_episodes, max_days, training, checkpoint_path, write_data, track_norms,
                  filepath="", seed=None, norms_module_type="rule_based", start_episode=1, grappling=True, well_being_mode="need",
-                 sanction_mode="attributed", observation_mode="global", backend=None):
+                 sanction_mode="attributed", observation_mode="global", backend=None, training_config=None):
         super().__init__()
+        #the learning parameters and ethics sanction (src/training_config.py); None uses configs/training/fruit_market.yaml
+        if training_config is None:
+            from ..training_config import for_scenario
+            training_config = for_scenario("fruit_market")
+        self.training_config = training_config
         self._set_seed(seed)
         if num_agents <= 0 or num_agents % 2 != 0:
             raise NumAgentsException("an even number above 0 (half apple farmers, half banana farmers)", num_agents)
@@ -60,7 +66,7 @@ class FruitMarketModel(SocietyModel):
         self.num_agents = num_agents
         self.max_days = max_days
         self.max_episodes = max_episodes
-        self.min_epsilon = 0.01
+        self.min_epsilon = training_config.epsilon_min
         self.day = 0
         self.episode = start_episode
         self.training = training
@@ -75,7 +81,7 @@ class FruitMarketModel(SocietyModel):
         self.societal_norm_emergence_threshold = 0.9
         self.emerged_norms = {}
         self.previous_learned_norms = {}
-        self.epsilon = 1.0 if training else 0.0
+        self.epsilon = training_config.epsilon_start if training else 0.0
         self.roles = ["apple_farmer"] * (num_agents // 2) + ["banana_farmer"] * (num_agents // 2)
         self.schedule = BaseScheduler(self)
         self.shared_replay_buffers = {}
@@ -231,7 +237,8 @@ class FruitMarketModel(SocietyModel):
         self.emerged_norms = {}
         self.last_eaten = [None] * self.num_agents
         self.agent_rows = []
-        self.episode_totals = {"freeze_steps": 0, "offers": 0, "invalid_offers": 0, "well_being_sum": 0.0}
+        self.episode_totals = {"freeze_steps": 0, "offers": 0, "invalid_offers": 0, "well_being_sum": 0.0,
+                               "actions": np.zeros(fm.NUM_ACTIONS, dtype=int), "abs_sanction": 0.0}
         self.agent_totals = {agent.unique_id: {"eaten": 0, "eaten_own": 0, "eaten_preferred": 0, "trades": 0, "cross_role_trades": 0,
                                                "given": 0, "received": 0, "holds": 0, "shoves": 0, "pulls": 0, "hunger": 0.0,
                                                "steps_hungry": 0, "stamina": 0.0, "env_reward": 0.0, "sanction": 0.0}
@@ -305,6 +312,8 @@ class FruitMarketModel(SocietyModel):
         totals["stamina"] += q.stamina
         totals["env_reward"] += agent.current_env_reward
         totals["sanction"] += agent.current_sanction or 0
+        self.episode_totals["actions"][action] += 1
+        self.episode_totals["abs_sanction"] += abs(agent.current_sanction or 0)
         if not (self.write_data and not self.training):
             return
         other_mode = "preference" if self.well_being_mode == "need" else "need"
@@ -352,6 +361,9 @@ class FruitMarketModel(SocietyModel):
                   sum(t["pulls"] for t in totals), sum(t["hunger"] for t in totals) / (self.num_agents * max(self.day, 1)),
                   sum(t["steps_hungry"] for t in totals), sum(t["stamina"] for t in totals) / (self.num_agents * max(self.day, 1)),
                   len(self.emerged_norms) if self.track_norms else None, self.seed]
+        actions = self.episode_totals["actions"]
+        chosen = max(int(actions.sum()), 1)
+        values += [actions.max() / chosen, actions[list(fm.GRAPPLING_ACTIONS)].sum() / chosen, self.episode_totals["abs_sanction"] / self.num_agents]
         row = self._report_row(self.EPISODE_REPORT_FIELDS, values, {})
         if self.write_data:
             row.to_csv(self._episode_report_path(), header=None, mode="a", index=False)

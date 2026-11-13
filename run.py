@@ -11,6 +11,7 @@ from src.checkpoints import training_checkpoint_name, training_checkpoint_path, 
 from src.checkpoints import society_checkpoint_path, loading_checkpoint_path, record_agent_types, training_folder, finished_episode
 from src.checkpoints import resolve_checkpoint, trained_checkpoints, checkpoint_max_days, days_in_name
 from src.harvest_exception import CheckpointExistsException
+from src.training_config import load as load_training_config, for_scenario as training_config_for_scenario, DEFAULT as DEFAULT_TRAINING_CONFIG
 import pandas as pd
 import argparse
 import os
@@ -106,6 +107,14 @@ def format_duration(seconds):
         return f"{minutes}m {seconds:02d}s"
     return f"{seconds}s"
 
+def within_training_budget(model_inst):
+    """
+    Whether a training run may start or carry on its current episode: always, unless its training config limits it to
+    max_training_episodes and that many have finished
+    """
+    budget = model_inst.training_config.max_training_episodes
+    return budget is None or model_inst.episode <= budget
+
 def run_simulation(model_inst, render, log_wandb, wandb_project):
     start_time = time.time()
     if log_wandb:
@@ -113,7 +122,7 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
     if render:
         render_inst = RenderPygame(model_inst.max_width, model_inst.max_height)
     #training runs until exploration has decayed to its floor; testing runs max_episodes
-    while (model_inst.training and round(model_inst.epsilon, 5) > model_inst.min_epsilon) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
+    while (model_inst.training and round(model_inst.epsilon, 5) > model_inst.min_epsilon and within_training_budget(model_inst)) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
         model_inst.step()
         if log_wandb:
             mean_reward = model_inst._mean_reward()
@@ -193,12 +202,13 @@ def get_continue_training_input(checkpoint_path, agent_types, society_mix, file_
         start_episodes[agent_type] = finished+1
     return start_episodes
 
-def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episode=1,commons_parameters=None):
+def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episode=1,commons_parameters=None,training_config=None):
     """
     checkpoint_path is the folder holding the checkpoints for this number of agents: training saves there, testing loads from it
     (in a mixed society, from the folder of agent_type trained with baseline agents; see society_checkpoint_path)
     start_episode is 1, or the episode a stopped training run continues from
     commons_parameters is the commons' carrying_capacity, growth_rate and initial_stock (commons only)
+    training_config is the training parameters (src/training_config.py); None uses configs/training/harvest.yaml's
     """
     file_string = output_file_string(training, scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix, agent_type)
     if training:
@@ -206,15 +216,15 @@ def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_sta
     else:
         checkpoint_path = loading_checkpoint_path(checkpoint_path, society_mix, agent_type)
     if scenario == "basic":
-        model_inst = BasicHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode)
+        model_inst = BasicHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode,training_config=training_config)
     elif scenario == "colours":
-        model_inst = ColoursHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode)
+        model_inst = ColoursHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode,training_config=training_config)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode=start_episode)
+        model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode=start_episode,training_config=training_config)
     elif scenario == "capabilities":
-        model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode)
+        model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode,training_config=training_config)
     elif scenario == "commons":
-        model_inst = CommonsHarvest(society_mix,num_agents,commons_parameters["carrying_capacity"],commons_parameters["growth_rate"],agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode,initial_stock=commons_parameters["initial_stock"])
+        model_inst = CommonsHarvest(society_mix,num_agents,commons_parameters["carrying_capacity"],commons_parameters["growth_rate"],agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode,initial_stock=commons_parameters["initial_stock"],training_config=training_config)
     else:
         raise ValueError("Unknown argument: "+scenario)
     if start_episode > 1:
@@ -228,10 +238,10 @@ def agent_types_to_run(society_mix):
     #in a mixed society half the agents are baseline, so baseline alone isn't run
     return AGENT_TYPES[1:] if society_mix == "heterogeneous" else AGENT_TYPES
 
-def run_all(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episodes=None,commons_parameters=None):
+def run_all(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episodes=None,commons_parameters=None,training_config=None):
     for agent_type in agent_types_to_run(society_mix):
         start_episode = start_episodes.get(agent_type, 1) if start_episodes else 1
-        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode,commons_parameters)
+        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode,commons_parameters,training_config)
 
 def get_commons_parameters_input(num_agents, num_cells):
     """
@@ -339,10 +349,14 @@ def fruit_market_test_settings(checkpoint_root):
     print(f"Testing with the settings the checkpoint was trained with: {settings}")
     return checkpoint_path, settings
 
-def run_fruit_market(training, seed, log=None):
+def run_fruit_market(training, seed, log=None, training_config=None):
     """
     Train or test agents in Melting Pot's Fruit Market (docs/fruit_market_design.md), asking for its options
+    training_config -- the training parameters to use instead of configs/training/fruit_market.yaml's (None: that file's; when testing,
+        the ones the checkpoint was trained with)
     """
+    from src.training_config import TrainingConfig
+    scenario_config = training_config_for_scenario("fruit_market")
     from src.fruit_market.backend import meltingpot_available, INSTALL_HINT
     if not meltingpot_available():
         print(INSTALL_HINT)
@@ -366,13 +380,18 @@ def run_fruit_market(training, seed, log=None):
     norms_module_type = NORMS_MODULE_TYPES[0]
     start_episodes = {}
     if training:
+        training_config = training_config or scenario_config
         checkpoint_path = training_checkpoint_path(fruit_market_checkpoint_name(settings["max_days"], settings["grappling"], settings["well_being"], settings["sanction"],
                                                                                 settings["observation"], seed, society_mix), settings["num_agents"])
         start_episodes = get_continue_training_input(checkpoint_path, agent_types, society_mix,
                                                      {t: fruit_market_file_string(True, settings, society_mix, t) for t in agent_types}, report_prefix="fm_model_episode_reports_")
-        prepare_training_checkpoints(checkpoint_path, agent_types, {**settings, "seed": seed, "society_mix": society_mix}, society_mix, continuing=start_episodes)
+        #the training config is recorded only when it isn't the scenario's own, so runs trained with other parameters can't share a checkpoint
+        recorded_config = {} if training_config == scenario_config else {"training_config": training_config.to_dict()}
+        prepare_training_checkpoints(checkpoint_path, agent_types, {**settings, "seed": seed, "society_mix": society_mix, **recorded_config}, society_mix, continuing=start_episodes)
         print("Model variables will be written into", checkpoint_path)
     else:
+        if training_config is None:
+            training_config = TrainingConfig(**settings["training_config"]) if "training_config" in settings else scenario_config
         track_norms = write_data_input("norms", PAPER_DEFAULTS["track_norms"])
         if track_norms:
             norms_module_type = get_input(f"Which norms module do you want to use {NORMS_MODULE_TYPES}: ", f"Invalid norms module. Please choose {NORMS_MODULE_TYPES}: ", NORMS_MODULE_TYPES,
@@ -383,7 +402,7 @@ def run_fruit_market(training, seed, log=None):
         type_checkpoint_path = society_checkpoint_path(checkpoint_path, society_mix, this_type) if training else loading_checkpoint_path(checkpoint_path, society_mix, this_type)
         model_inst = FruitMarketModel(society_mix, settings["num_agents"], this_type, max_episodes, settings["max_days"], training, type_checkpoint_path, write_data,
                                       track_norms, file_string, seed, norms_module_type, start_episode, settings["grappling"], settings["well_being"],
-                                      settings["sanction"], settings["observation"])
+                                      settings["sanction"], settings["observation"], training_config=training_config)
         if start_episode > 1:
             model_inst.reseed_for_continuing()
             print(f"Continuing {this_type}'s training from episode {start_episode}")
@@ -443,6 +462,8 @@ parser.add_argument("option", choices=["test", "train", "graphs"],
                     help="Choose the program operation")
 parser.add_argument("-s", "--seed", type=int, default=DEFAULT_SEED,
                     help="Random seed for reproducible runs (optional)")
+parser.add_argument("--training-config", type=str, default=None,
+                    help="Training parameters file to use instead of the scenario's (configs/training/), e.g. one written by the parameter sweep")
 parser.add_argument("-l", "--log", type=str, default=None,
                     help="Log wandb (optional)")
 for removed_option in REMOVED_OPTIONS:
@@ -456,9 +477,11 @@ if args.option == "test" or args.option == "train":
     mode = "train" if training else "test"
     scenario = get_input(f"What type of scenario do you want to {mode} in {SCENARIO_TYPES}: ", f"Invalid scenario. Please choose {SCENARIO_TYPES}: ", SCENARIO_TYPES,
                          PAPER_DEFAULTS["train_scenario" if training else "test_scenario"])
+    #the training parameters: the scenario's own file in configs/training/, unless --training-config gives another
+    training_config = load_training_config(args.training_config) if args.training_config else training_config_for_scenario(scenario)
     if scenario == "fruit_market":
         #Fruit Market has its own options (see run_fruit_market); none of the harvest scenarios' are asked
-        run_fruit_market(training, args.seed, args.log)
+        run_fruit_market(training, args.seed, args.log, None if args.training_config is None else training_config)
         raise SystemExit(0)
     season_effect ="the commons regrows 1.5 times as fast" if scenario == "commons" else "one more berry per agent in each group"
     season_bad = "half as fast" if scenario == "commons" else "one fewer"
@@ -526,7 +549,9 @@ if args.option == "test" or args.option == "train":
                                       "num_allocations": num_allocations, "allotment_regrowth_delays": allotment_regrowth_delays,
                                       "max_days": max_days, "seed": args.seed, "num_agents": num_agents, "society_mix": society_mix,
                                       "mixed_allotments": mixed_allotments if scenario == "allotment" and society_mix != "homogeneous" else None,
-                                      **({"commons_parameters": commons_parameters} if commons_parameters else {})},
+                                      **({"commons_parameters": commons_parameters} if commons_parameters else {}),
+                                      #recorded only when it isn't the harvest scenarios' own, so runs trained with other parameters can't share a checkpoint
+                                      **({"training_config": training_config.to_dict()} if training_config != DEFAULT_TRAINING_CONFIG else {})},
                                      society_mix, continuing=start_episodes)
         print("Model variables will be written into",checkpoint_path)
         track_norms = False
@@ -546,9 +571,9 @@ if args.option == "test" or args.option == "train":
         log_wandb = False
         wandb_project = None
     if agent_type == "all":
-        run_all(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episodes=start_episodes,commons_parameters=commons_parameters)
+        run_all(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episodes=start_episodes,commons_parameters=commons_parameters,training_config=training_config)
     else:
-        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episode=start_episodes.get(agent_type, 1),commons_parameters=commons_parameters)
+        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episode=start_episodes.get(agent_type, 1),commons_parameters=commons_parameters,training_config=training_config)
 #########################################################################################
 elif args.option == "graphs":
     graph_runs = ["current_run", "50_days", "200_days", "paper"]

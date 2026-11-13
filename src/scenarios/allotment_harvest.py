@@ -25,8 +25,8 @@ class AllotmentHarvest(HarvestModel):
     MIXED_ALLOTMENT_LAYOUTS = ["split", "separate"]
     SHUFFLES_ALLOCATIONS = True
 
-    def __init__(self,society_mix,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,mixed_allotments="split",start_episode=1):
-        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode)
+    def __init__(self,society_mix,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,mixed_allotments="split",start_episode=1,training_config=None):
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode,training_config=training_config)
         self.num_start_berries = num_start_berries
         if num_allotments > num_agents or num_allotments < 1:
             raise NumAllotmentsException(num_agents, num_allotments)

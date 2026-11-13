@@ -4,7 +4,8 @@ from ..agent.modules.ethics_module import EthicsModule
 from ..agent.modules.bayesian_norms_module import BayesianNormsModule
 from .labels import NORM_LABELS, NORM_LABEL_INDEX
 
-#the ethics sanction, + or - this much (docs/fruit_market_design.md §6.1)
+#the ethics sanction, + or - this much (docs/fruit_market_design.md §6.1), unless a training config gives another (its default,
+#configs/training/fruit_market.yaml, gives this)
 FRUIT_MARKET_SANCTION = 3.5
 
 class FruitMarketAgent(LearningAgent):
@@ -29,11 +30,12 @@ class FruitMarketAgent(LearningAgent):
         self.n_features = model.observation_size(self)
         self.actions = model.agent_actions(self)
         self.decision_module = DQNDecisionModule(agent_type, unique_id, training, self.actions, self.n_features, checkpoint_path, epsilon,
-                                                 shared_replay_buffer, model.episode, action_mask=model.action_mask(self), compiled_training=True)
+                                                 shared_replay_buffer, model.episode, action_mask=model.action_mask(self), compiled_training=True,
+                                                 training_config=model.training_config)
         if self.track_norms:
             self.norms_module = self._build_norms_module()
         if agent_type != "baseline":
-            self.ethics_module = EthicsModule(FRUIT_MARKET_SANCTION, agent_type)
+            self.ethics_module = EthicsModule(model.training_config.sanction, agent_type)
         self.reset()
 
     def reset(self):

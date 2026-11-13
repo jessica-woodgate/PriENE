@@ -2,6 +2,7 @@ from .n_network import NNetwork
 from src.harvest_exception import CheckpointNotFoundException
 from src.harvest_exception import CheckpointMismatchException
 from src.checkpoints import recorded_agent_types
+from src.training_config import DEFAULT as DEFAULT_TRAINING_CONFIG
 import numpy as np
 import os
 import tensorflow as tf
@@ -31,14 +32,16 @@ class DQN:
         compiled -- whether train runs as one compiled TensorFlow graph (about 13 times faster; the same algorithm and the same random draws,
             but floating point results can differ in the last bits from the eager version, so the harvest scenarios keep the eager one)
     """
-    def __init__(self,actions,n_features,training,checkpoint_path=None,shared_replay_buffer=None,continuing=False,action_mask=None,compiled=False):
+    def __init__(self,actions,n_features,training,checkpoint_path=None,shared_replay_buffer=None,continuing=False,action_mask=None,compiled=False,training_config=None):
+        #training_config: the learning parameters (src/training_config.py); None uses the harvest scenarios' values
+        config = training_config or DEFAULT_TRAINING_CONFIG
         self.action_mask = None if action_mask is None else np.asarray(action_mask, dtype=bool)
         self.compiled = compiled
         self._compiled_steps = {}
-        self.gamma = 0.95
-        self.lr = 0.0001
-        self.batch_size = 64
-        self.hidden_units = 128
+        self.gamma = config.gamma
+        self.lr = config.learning_rate
+        self.batch_size = config.batch_size
+        self.hidden_units = config.hidden_units
         self.n_features = n_features
         self.actions = actions
         self.n_actions = len(actions)
@@ -48,10 +51,10 @@ class DQN:
             self.experience = {"s": [], "a": [], "r": [], "s_": [], "done": []} #experience replay buffer
         else:
             self.experience = shared_replay_buffer
-        self.min_experiences = 100
-        self.max_experiences = 100000
+        self.min_experiences = config.min_experiences
+        self.max_experiences = config.max_experiences
         self.optimiser = keras.optimizers.Adam(learning_rate=self.lr)
-        self.delta = 1.0
+        self.delta = config.huber_delta
         if self.training and not continuing:
             self.dqn = NNetwork(self.n_actions,self.n_features,self.hidden_units)
         else:

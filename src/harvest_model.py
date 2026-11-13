@@ -5,6 +5,7 @@ import numpy as np
 import os
 from tensorflow import keras
 from .society_model import SocietyModel
+from .training_config import DEFAULT as DEFAULT_TRAINING_CONFIG
 from .agent.harvest_agent import HarvestAgent
 from .agent.harvest_agent import NORMS_MODULE_TYPES
 from .berry import Berry
@@ -81,8 +82,10 @@ class HarvestModel(SocietyModel):
                              "mean_berries_consumed", "gini_berries_consumed", "mean_berries_thrown", "max_health", "mean_health",
                              "median_health", "variance_health", "deceased", "num_emerged_norms", "seed"]
 
-    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,start_episode=1):
+    def __init__(self,num_agents,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,start_episode=1,training_config=None):
         super().__init__()
+        #the learning parameters and ethics sanction (src/training_config.py); None uses configs/training/harvest.yaml's values
+        self.training_config = training_config or DEFAULT_TRAINING_CONFIG
         self._set_seed(seed)
         self.num_agents = num_agents
         if self.num_agents <= 0:
@@ -91,7 +94,7 @@ class HarvestModel(SocietyModel):
         self.day = 0
         self.max_days = max_days
         self.max_episodes = max_episodes
-        self.min_epsilon = 0.01
+        self.min_epsilon = self.training_config.epsilon_min
         self.schedule = RandomActivation(self)
         self.max_width = max_width
         self.max_height = max_height
@@ -110,8 +113,8 @@ class HarvestModel(SocietyModel):
         self.emerged_norms = {}
         self.previous_learned_norms = {}
         if self.training:
-            #agents start training fully exploring, and epsilon decays from there each episode
-            self.epsilon = 1.0
+            #agents start training fully exploring (epsilon_start, 1.0), and epsilon decays from there each episode
+            self.epsilon = self.training_config.epsilon_start
         else:
             self.epsilon = 0.0
         if seasons and (not isinstance(season_length, int) or season_length < 1):

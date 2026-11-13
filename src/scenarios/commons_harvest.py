@@ -40,7 +40,7 @@ class CommonsHarvest(HarvestModel):
     #added to the end of the model episode report
     EPISODE_SUMMARY_COLUMNS = ["collapse_day", "mean_stock", "final_stock", "efficiency"]
 
-    def __init__(self,society_mix,num_agents,carrying_capacity,growth_rate,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,start_episode=1,initial_stock=None):
+    def __init__(self,society_mix,num_agents,carrying_capacity,growth_rate,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,start_episode=1,initial_stock=None,training_config=None):
         if allotment_regrowth_delays is not None:
             raise RegrowthDelaysNotSupported("commons")
         if initial_stock is None:
@@ -49,7 +49,7 @@ class CommonsHarvest(HarvestModel):
         self.carrying_capacity = carrying_capacity
         self.growth_rate = growth_rate
         self.initial_stock = initial_stock
-        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,seasons,season_length,start_episode=start_episode)
+        super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,seasons,season_length,start_episode=start_episode,training_config=training_config)
         self.regrowth_rng = np.random.default_rng(None if seed is None else [seed, self.COMMONS_REGROWTH_STREAM])
         self.current_growth_rate = growth_rate
         self.harvested_this_step = 0
