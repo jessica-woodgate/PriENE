@@ -1,0 +1,28 @@
+# Fruit Market sweep, step B (docs/fruit_market_sweep.md §3.3): the ethics sanction f, for every agent type that uses it, with step A's
+# learning parameters. Before running: save step A's chosen training config as configs/training/fruit_market_step_a.yaml and set
+# base_config to it (its sanction is replaced by each configuration's).
+# Run:        python -m src.sweep.run configs/sweeps/fruit_market_B.yaml --workers 4
+# Summarise:  python -m src.sweep.summarise configs/sweeps/fruit_market_B.yaml
+name: fruit_market_B
+scenario: fruit_market
+step: B
+# base_config: configs/training/fruit_market_step_a.yaml
+agent_types: [utilitarian, maximin, egalitarian, average, majoritarian, optimist, veto]
+seeds: [1, 2, 3]
+episodes: 200
+epsilon_floor_fraction: 0.7
+search:
+  method: list
+  include_base: false
+configurations:
+  - {sanction: 0.5}
+  - {sanction: 1.0}
+  - {sanction: 2.0}
+  - {sanction: 3.5}
+  - {sanction: 6.0}
+early_stopping:
+  episode: 100
+  window: 20
+  min_reward: null
+  max_action_share: 0.95
+selection: {rule: step_b, last_episodes: 50}

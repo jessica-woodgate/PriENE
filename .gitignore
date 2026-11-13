@@ -5,3 +5,5 @@ __pycache__/
 .coverage
 #the reference run's output files (tests/reference_outputs.py compares against hashes.json alone)
 tests/reference_data/outputs/
+#parameter sweeps' runs (python -m src.sweep.run): checkpoints and reports for every run
+/sweeps/

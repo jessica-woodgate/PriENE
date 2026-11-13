@@ -1,0 +1,28 @@
+# Fruit Market sweep, step A1 (docs/fruit_market_sweep.md §3.1): learning parameters, baseline agents only, coarse random search.
+# Run:        python -m src.sweep.run configs/sweeps/fruit_market_A1.yaml --workers 4
+# Summarise:  python -m src.sweep.summarise configs/sweeps/fruit_market_A1.yaml
+name: fruit_market_A1
+scenario: fruit_market
+step: A1
+agent_types: [baseline]
+seeds: [1, 2, 3]
+episodes: 300
+epsilon_floor_fraction: 0.7
+search:
+  method: random
+  configurations: 12
+  sampling_seed: 0
+  include_base: true
+parameters:
+  learning_rate: {log_uniform: [3.0e-5, 1.0e-3]}
+  gamma: [0.9, 0.95, 0.99]
+  target_update_interval: [50, 200, 1000]
+  max_experiences: [100000, 300000]
+  epsilon_min: [0.01, 0.05]
+early_stopping:
+  episode: 100
+  window: 20
+  # the random policy's mean substrate reward per agent per episode, from the environment check (§2); set before running
+  min_reward: null
+  max_action_share: 0.95
+selection: {rule: step_a, last_episodes: 50}
