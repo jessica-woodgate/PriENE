@@ -26,8 +26,11 @@ class DQN:
         max_experiences -- maximum size of experience replay buffer
         optimiser -- learning optimiser
         delta -- parameter for Huber loss
+        action_mask -- boolean per action, False for actions never to be chosen (not explored, not chosen greedily, and left out of the
+            best next action in learning targets), or None to allow every action; the network keeps an output for every action either way
     """
-    def __init__(self,actions,n_features,training,checkpoint_path=None,shared_replay_buffer=None,continuing=False):
+    def __init__(self,actions,n_features,training,checkpoint_path=None,shared_replay_buffer=None,continuing=False,action_mask=None):
+        self.action_mask = None if action_mask is None else np.asarray(action_mask, dtype=bool)
         self.gamma = 0.95
         self.lr = 0.0001
         self.batch_size = 64
@@ -77,7 +80,10 @@ class DQN:
         states_next = np.asarray([self.experience['s_'][i] for i in ids])
         dones = np.asarray([self.experience['done'][i] for i in ids])
         #predict q value using target net
-        value_next = np.max(TargetNet.predict(states_next), axis=1)
+        if self.action_mask is None:
+            value_next = np.max(TargetNet.predict(states_next), axis=1)
+        else:
+            value_next = np.max(self._masked(TargetNet.predict(states_next)), axis=1)
         #where done, actual value is reward; if not done, actual value is discounted rewards
         actual_values = np.where(dones, rewards, rewards+self.gamma*value_next)
 
@@ -97,8 +103,10 @@ class DQN:
 
     def choose_action(self, observation, epsilon):
         """
-        Choose an action randomly or using network with e-greedy probability
+        Choose an action randomly or using network with e-greedy probability (only among allowed actions, if there is an action mask)
         """
+        if self.action_mask is not None:
+            return self._choose_allowed_action(observation, epsilon)
         if np.random.uniform(0,1) < epsilon:
             a = np.random.choice(self.actions)
             action = self.actions.index(a)
@@ -106,6 +114,19 @@ class DQN:
             action_values = self.predict(np.atleast_2d(observation))
             action = np.argmax(action_values)
         return action
+
+    def _choose_allowed_action(self, observation, epsilon):
+        if np.random.uniform(0,1) < epsilon:
+            return int(np.random.choice(np.flatnonzero(self.action_mask)))
+        return int(np.argmax(self._masked(self.predict(np.atleast_2d(observation)))))
+
+    def _masked(self, action_values):
+        """
+        Q values with every masked action's set to -inf, so it is never the best
+        """
+        values = np.array(action_values, dtype=float)
+        values[..., ~self.action_mask] = -np.inf
+        return values
     
     def predict(self, inputs):
         """
