@@ -9,6 +9,12 @@ from src.harvest_exception import NumFeaturesException
 from src.harvest_exception import AgentTypeException
 import numpy as np
 
+#health changes in steps of 0.1 (eating or being thrown a berry, and each day's decay), which floating point can't hold exactly: after
+#a few steps health that should be 0.6 is stored as 0.5999999999999996, so an agent at the throwing threshold couldn't throw, and an
+#agent at 0 health could be stored just above 0 and live another day. Health and days left to live are rounded to this many decimals
+#whenever they change, so every comparison (throwing, dying, the norms' thresholds) sees the value it should
+DECIMALS = 10
+
 class HarvestAgent(LearningAgent):
     """
     HarvestAgent observes, chooses an action via its DQNDecisionModule, performs
@@ -149,7 +155,7 @@ class HarvestAgent(LearningAgent):
         Get the days an agent has left to live (Equation 4)
         """
         days_left_to_live = (self.berry_health_payoff * self.berries) + self.health
-        days_left_to_live = days_left_to_live / self.health_decay
+        days_left_to_live = round(days_left_to_live / self.health_decay, DECIMALS)
         if days_left_to_live < 0:
             return 0
         return days_left_to_live
@@ -230,7 +236,7 @@ class HarvestAgent(LearningAgent):
                 if not self.model.can_throw_to(self, a):
                     #out of reach (e.g. in another allotment) is treated the same as no living benefactor
                     return self.rewards["no_benefactor"]
-                a.health += self.berry_health_payoff 
+                a.health = round(a.health + self.berry_health_payoff, DECIMALS)
                 a.berries_consumed += 1
                 a.days_left_to_live = a.get_days_left_to_live()
                 self.berries -= 1
@@ -242,7 +248,7 @@ class HarvestAgent(LearningAgent):
     
     def _eat(self):
         if self.berries > 0:
-            self.health += self.berry_health_payoff
+            self.health = round(self.health + self.berry_health_payoff, DECIMALS)
             self.berries -= 1
             self.berries_consumed += 1
             return self.rewards["eat"]
@@ -251,7 +257,7 @@ class HarvestAgent(LearningAgent):
 
     def _update_attributes(self, reward_vector):
         done = False
-        self.health -= self.health_decay
+        self.health = round(self.health - self.health_decay, DECIMALS)
         self.days_left_to_live = self.get_days_left_to_live()
         self.total_days_left_to_live += self.days_left_to_live 
         day = self.model.get_day()
