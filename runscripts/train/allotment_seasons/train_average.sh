@@ -19,5 +19,6 @@ homogeneous
 average
 4
 2
+n
 y
 EOF

@@ -18,5 +18,6 @@ homogeneous
 maximin
 4
 2
+n
 y
 EOF

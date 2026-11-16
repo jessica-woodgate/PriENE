@@ -15,6 +15,7 @@ class AllotmentHarvest(HarvestModel):
         berries -- list of active berry objects
         society_mix -- "homogeneous" (every agent is agent_type) or "heterogeneous" (half agent_type, half baseline)
         mixed_allotments -- how a heterogeneous society shares the allotments (see MIXED_ALLOTMENT_LAYOUTS); ignored when homogeneous
+        throw_between_allotments -- whether agents can throw berries to agents in other allotments (by default only within their own)
     """
     #by default allotment 1 regrows SLOW_ALLOTMENT_DELAY steps after a berry is foraged, and every other allotment instantly
     SLOW_ALLOTMENT = 1
@@ -25,8 +26,9 @@ class AllotmentHarvest(HarvestModel):
     MIXED_ALLOTMENT_LAYOUTS = ["split", "separate"]
     SHUFFLES_ALLOCATIONS = True
 
-    def __init__(self,society_mix,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,mixed_allotments="split",start_episode=1,training_config=None):
+    def __init__(self,society_mix,num_agents,num_start_berries,num_allotments,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,write_norms,filepath="",seed=None,norms_module_type="rule_based",seasons=False,season_length=25,allotment_regrowth_delays=None,mixed_allotments="split",start_episode=1,training_config=None,throw_between_allotments=False):
         super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode,training_config=training_config)
+        self.throw_between_allotments = throw_between_allotments
         self.num_start_berries = num_start_berries
         if num_allotments > num_agents or num_allotments < 1:
             raise NumAllotmentsException(num_agents, num_allotments)
@@ -167,6 +169,6 @@ class AllotmentHarvest(HarvestModel):
 
     def can_throw_to(self, thrower, benefactor):
         """
-        Berries can only be thrown to agents in the same allotment
+        Berries can only be thrown to agents in the same allotment, unless throwing between allotments is on
         """
-        return thrower.allocation_id == benefactor.allocation_id
+        return self.throw_between_allotments or thrower.allocation_id == benefactor.allocation_id

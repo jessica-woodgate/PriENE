@@ -19,13 +19,16 @@ PROGRESS_FILE = "progress.json"
 MIXED_SUFFIX = "_with_baseline"
 
 def training_checkpoint_name(scenario, seasons, season_length, num_allocations, allotment_regrowth_delays, max_days, seed,
-                             society_mix="homogeneous", mixed_allotments="split", commons_parameters=None, config_name=None):
+                             society_mix="homogeneous", mixed_allotments="split", commons_parameters=None, config_name=None,
+                             throw_between_allotments=False):
     """
     Name of a training run's checkpoint folder, from every setting that changes what is learned (the number of agents is the
     folder inside it), e.g. allotment_seasons25_2allotments_regrow0-2_200days_seed42, or with a mixed society
     allotment_2allotments_regrow0-2_mixed-separate_200days_seed42, or commons_K48_r0.25_R024_200days_seed42
     config_name -- the name of the training config file the run uses, when it isn't the scenario's own (e.g. basic_200days_seed42_R2
         for configs/training/R2.yaml); None for the scenario's own
+    throw_between_allotments -- allotment only: agents could throw berries to other allotments (e.g. allotment_2allotments_regrow0-2_
+        throwbetween_200days_seed42)
     allotment_regrowth_delays -- the delays the allotments regrow with (AllotmentHarvest.default_regrowth_delays when none are chosen);
         only used, and needed, for the allotment scenario
     commons_parameters -- dict of the commons' carrying_capacity, growth_rate and initial_stock; only used, and needed, for the commons scenario
@@ -43,6 +46,8 @@ def training_checkpoint_name(scenario, seasons, season_length, num_allocations, 
         if allotment_regrowth_delays is None:
             raise ValueError("an allotment checkpoint name needs the regrowth delays its allotments use")
         parts += [f"{num_allocations}allotments", "regrow" + "-".join(str(delay) for delay in allotment_regrowth_delays)]
+        if throw_between_allotments:
+            parts.append("throwbetween")
     if society_mix != "homogeneous":
         parts.append("mixed-separate" if scenario == "allotment" and mixed_allotments == "separate" else "mixed")
     parts += [f"{max_days}days", f"seed{seed}"]
@@ -175,16 +180,22 @@ def days_in_name(name):
         return int(match.group(1))
     return None
 
+def recorded_settings(checkpoint_path):
+    """
+    The settings recorded when the checkpoint in checkpoint_path was trained, or {} if it has none (e.g. the paper's checkpoints)
+    """
+    settings_path = checkpoint_path+SETTINGS_FILE
+    if not os.path.exists(settings_path):
+        return {}
+    with open(settings_path) as file:
+        return json.load(file)
+
 def checkpoint_training_config(checkpoint_path):
     """
     The training config (as a dict) recorded when the checkpoint in checkpoint_path was trained, or None if it was trained with its
     scenario's own (which isn't recorded) or has no settings
     """
-    settings_path = checkpoint_path+SETTINGS_FILE
-    if not os.path.exists(settings_path):
-        return None
-    with open(settings_path) as file:
-        return json.load(file).get("training_config")
+    return recorded_settings(checkpoint_path).get("training_config")
 
 def checkpoint_max_days(checkpoint_name, checkpoint_path):
     """

@@ -18,5 +18,6 @@ homogeneous
 egalitarian
 4
 2
+n
 y
 EOF

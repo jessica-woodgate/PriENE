@@ -9,7 +9,7 @@ from src.agent.harvest_agent import NORMS_MODULE_TYPES
 from src.checkpoints import RUN_OPTIONS, DEFAULT_CHECKPOINT
 from src.checkpoints import training_checkpoint_name, training_checkpoint_path, prepare_training_checkpoints, fruit_market_checkpoint_name
 from src.checkpoints import society_checkpoint_path, loading_checkpoint_path, record_agent_types, training_folder, finished_episode
-from src.checkpoints import resolve_checkpoint, trained_checkpoints, checkpoint_max_days, days_in_name, checkpoint_training_config
+from src.checkpoints import resolve_checkpoint, trained_checkpoints, checkpoint_max_days, days_in_name, checkpoint_training_config, recorded_settings
 from src.harvest_exception import CheckpointExistsException
 from src.training_config import load as load_training_config, for_scenario as training_config_for_scenario, DEFAULT as DEFAULT_TRAINING_CONFIG
 from src.training_config import TrainingConfig, config_name as training_config_name, scenario_config_path
@@ -66,17 +66,19 @@ def generate_paper_graphs(scenario):
     end_episode_totals_dfs = [pd.read_csv(episodes_filepath+agent_type+".csv") for agent_type in AGENT_TYPES]
     data_analysis.proccess_and_display_data(agent_end_episode_dfs, PRINCIPLES, AGGREGATIONS, scenario, end_episode_totals_dfs=end_episode_totals_dfs, write=True, process_norms=False)
 
-def generate_graphs(scenario, run_name, num_agents, seasons=False, allotment_regrowth_delays=None, mixed_allotments="split", society_mix="homogeneous", process_norms=True):
+def generate_graphs(scenario, run_name, num_agents, seasons=False, allotment_regrowth_delays=None, mixed_allotments="split", society_mix="homogeneous", process_norms=True,
+                    throw_between_allotments=False):
     """
     takes raw files and generates graphs
     processed dfs contain data for each agent at the end of each episode
     seasons, allotment regrowth delay and mixed society runs are read from the same scenario folder, with "_seasons", "_regrow" and the
-    delays (e.g. "_regrow0-1"), and/or "_mixed" ("_mixed_separate" for separate allotments) after the scenario in each filename;
+    delays (e.g. "_regrow0-1"), "_mixed" ("_mixed_separate" for separate allotments) and/or "_throwbetween" (allotment, when agents
+    could throw berries to other allotments) after the scenario in each filename;
     a mixed society has no baseline-only run, so its graphs compare the other agent types
     process_norms -- whether the run wrote rule-based norms (<file>_emerged_norms.json) to analyse
     """
     writing_filepath = "data/results/current_run/"
-    file_scenario = scenario_file_string(scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix)
+    file_scenario = scenario_file_string(scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix, throw_between_allotments)
     if run_name == "current_run":
         norms_filepath = "data/results/"+run_name+"/"+file_scenario+"_"
     else:
@@ -137,7 +139,8 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
     print(f"Simulation finished at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))}, after {format_duration(end_time - start_time)}")
     return num_episodes
 
-def scenario_file_string(scenario, seasons, allotment_regrowth_delays=None, mixed_allotments="split", society_mix="homogeneous"):
+def scenario_file_string(scenario, seasons, allotment_regrowth_delays=None, mixed_allotments="split", society_mix="homogeneous",
+                         throw_between_allotments=False):
     """
     scenario part of output filenames; options that are on are added after the scenario so runs don't overwrite each other
     """
@@ -150,6 +153,8 @@ def scenario_file_string(scenario, seasons, allotment_regrowth_delays=None, mixe
         file_scenario += "_mixed"
         if scenario == "allotment" and mixed_allotments == "separate":
             file_scenario += "_separate"
+    if scenario == "allotment" and throw_between_allotments:
+        file_scenario += "_throwbetween"
     return file_scenario
 
 def get_checkpoint_input():
@@ -177,9 +182,17 @@ def get_max_days_input(checkpoint_name, checkpoint_path):
         print(f"Testing with {max_days} days in each episode, as the checkpoint was trained.")
     return max_days
 
-def output_file_string(training, scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix, agent_type):
+def output_file_string(training, scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix, agent_type, throw_between_allotments=False):
     #training outputs are named apart from testing outputs, so testing the same scenario doesn't clash with them
-    return ("train_" if training else "")+scenario_file_string(scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix)+"_"+agent_type
+    return ("train_" if training else "")+scenario_file_string(scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix,
+                                                              throw_between_allotments)+"_"+agent_type
+
+def get_throw_between_allotments_input(default="n"):
+    """
+    Whether agents in allotment can throw berries to agents in other allotments, not only their own
+    """
+    return get_bool(get_input("Can agents throw berries to agents in other allotments? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"],
+                              default))
 
 def get_continue_training_input(checkpoint_path, agent_types, society_mix, file_strings, report_prefix="model_episode_reports_"):
     """
@@ -203,7 +216,7 @@ def get_continue_training_input(checkpoint_path, agent_types, society_mix, file_
         start_episodes[agent_type] = finished+1
     return start_episodes
 
-def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episode=1,commons_parameters=None,training_config=None):
+def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episode=1,commons_parameters=None,training_config=None,throw_between_allotments=False):
     """
     checkpoint_path is the folder holding the checkpoints for this number of agents: training saves there, testing loads from it
     (in a mixed society, from the folder of agent_type trained with baseline agents; see society_checkpoint_path)
@@ -211,7 +224,7 @@ def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_sta
     commons_parameters is the commons' carrying_capacity, growth_rate and initial_stock (commons only)
     training_config is the training parameters (src/training_config.py); None uses configs/training/harvest.yaml's
     """
-    file_string = output_file_string(training, scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix, agent_type)
+    file_string = output_file_string(training, scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix, agent_type, throw_between_allotments)
     if training:
         checkpoint_path = society_checkpoint_path(checkpoint_path, society_mix, agent_type)
     else:
@@ -221,7 +234,7 @@ def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_sta
     elif scenario == "colours":
         model_inst = ColoursHarvest(society_mix,num_agents,num_start_berries,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode,training_config=training_config)
     elif scenario == "allotment":
-        model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode=start_episode,training_config=training_config)
+        model_inst = AllotmentHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode=start_episode,training_config=training_config,throw_between_allotments=throw_between_allotments)
     elif scenario == "capabilities":
         model_inst = CapabilitiesHarvest(society_mix,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode,training_config=training_config)
     elif scenario == "commons":
@@ -239,10 +252,10 @@ def agent_types_to_run(society_mix):
     #in a mixed society half the agents are baseline, so baseline alone isn't run
     return AGENT_TYPES[1:] if society_mix == "heterogeneous" else AGENT_TYPES
 
-def run_all(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episodes=None,commons_parameters=None,training_config=None):
+def run_all(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project=None,seed=None,norms_module_type="rule_based",seasons=False,season_length=DEFAULT_SEASON_LENGTH,allotment_regrowth_delays=None,mixed_allotments="split",start_episodes=None,commons_parameters=None,training_config=None,throw_between_allotments=False):
     for agent_type in agent_types_to_run(society_mix):
         start_episode = start_episodes.get(agent_type, 1) if start_episodes else 1
-        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode,commons_parameters,training_config)
+        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_start_berries,num_allocations,agent_type,max_width,max_height,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,mixed_allotments,start_episode,commons_parameters,training_config,throw_between_allotments)
 
 def get_commons_parameters_input(num_agents, num_cells):
     """
@@ -508,12 +521,16 @@ if args.option == "test" or args.option == "train":
     #allotment uses its default regrowth delays (allotment 1 regrows slower than the others)
     allotment_regrowth_delays = None
     mixed_allotments = "split"
+    throw_between_allotments = False
     if scenario == "allotment":
         MAX_WIDTH = num_agents * 4
         num_allocations = get_integer_input(f"How many allotments do you want? (must be more than 0 and less than {num_agents+1}): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1,
                                             min(PAPER_DEFAULTS["num_allocations"], num_agents))
         if society_mix == "heterogeneous":
             mixed_allotments = get_mixed_allotments_input(num_allocations)
+        #testing defaults to what the checkpoint was trained with; otherwise only within an allotment, as in the paper
+        recorded = False if training else recorded_settings(checkpoint_root+str(num_agents)+"_agents/").get("throw_between_allotments", False)
+        throw_between_allotments = get_throw_between_allotments_input("y" if recorded else "n")
     elif scenario == "capabilities":
         MAX_WIDTH = num_agents * 2
         num_allocations = get_integer_input(f"How many capabilities do you want? (must be more than 0 and less than {num_agents+1}): ", f"Invalid choice. Must be a number between 1 and {num_agents}", num_agents, 1,
@@ -535,7 +552,8 @@ if args.option == "test" or args.option == "train":
             delays = AllotmentHarvest.default_regrowth_delays(num_allocations)
         #a run with another training config (e.g. other rewards) is named after its file, so it never meets the scenario's own run
         config_name = None if training_config == DEFAULT_TRAINING_CONFIG else training_config_name(args.training_config or scenario_config_path(scenario))
-        checkpoint_path = training_checkpoint_path(training_checkpoint_name(scenario, seasons, season_length, num_allocations, delays, max_days, args.seed, society_mix, mixed_allotments, commons_parameters, config_name), num_agents)
+        checkpoint_path = training_checkpoint_path(training_checkpoint_name(scenario, seasons, season_length, num_allocations, delays, max_days, args.seed, society_mix, mixed_allotments, commons_parameters, config_name,
+                                                                           throw_between_allotments), num_agents)
     else:
         checkpoint_path = checkpoint_root+str(num_agents)+"_agents/"
         max_days = get_max_days_input(checkpoint_name, checkpoint_path)
@@ -551,13 +569,16 @@ if args.option == "test" or args.option == "train":
         training_types = agent_types_to_run(society_mix) if agent_type == "all" else [agent_type]
         #a run that has already saved here can only be continued, never overwritten
         start_episodes = get_continue_training_input(checkpoint_path, training_types, society_mix,
-                                                     {t: output_file_string(training, scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix, t) for t in training_types})
+                                                     {t: output_file_string(training, scenario, seasons, allotment_regrowth_delays, mixed_allotments, society_mix, t,
+                                                                            throw_between_allotments) for t in training_types})
         prepare_training_checkpoints(checkpoint_path, training_types,
                                      {"scenario": scenario, "seasons": seasons, "season_length": season_length if seasons else None,
                                       "num_allocations": num_allocations, "allotment_regrowth_delays": allotment_regrowth_delays,
                                       "max_days": max_days, "seed": args.seed, "num_agents": num_agents, "society_mix": society_mix,
                                       "mixed_allotments": mixed_allotments if scenario == "allotment" and society_mix != "homogeneous" else None,
                                       **({"commons_parameters": commons_parameters} if commons_parameters else {}),
+                                      #recorded only when on, so the settings of checkpoints trained before it was an option still match
+                                      **({"throw_between_allotments": True} if throw_between_allotments else {}),
                                       #recorded only when it isn't the harvest scenarios' own, so runs trained with other parameters can't share a checkpoint
                                       **({"training_config": training_config.to_dict()} if training_config != DEFAULT_TRAINING_CONFIG else {})},
                                      society_mix, continuing=start_episodes)
@@ -579,9 +600,9 @@ if args.option == "test" or args.option == "train":
         log_wandb = False
         wandb_project = None
     if agent_type == "all":
-        run_all(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episodes=start_episodes,commons_parameters=commons_parameters,training_config=training_config)
+        run_all(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episodes=start_episodes,commons_parameters=commons_parameters,training_config=training_config,throw_between_allotments=throw_between_allotments)
     else:
-        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episode=start_episodes.get(agent_type, 1),commons_parameters=commons_parameters,training_config=training_config)
+        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episode=start_episodes.get(agent_type, 1),commons_parameters=commons_parameters,training_config=training_config,throw_between_allotments=throw_between_allotments)
 #########################################################################################
 elif args.option == "graphs":
     graph_runs = ["current_run", "50_days", "200_days", "paper"]
@@ -600,5 +621,8 @@ elif args.option == "graphs":
         if scenario == "allotment" and society_mix == "heterogeneous":
             separate = get_bool(get_input("Did each agent type have separate allotments? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"], "n"))
             mixed_allotments = "separate" if separate else "split"
+        throw_between_allotments = scenario == "allotment" and get_bool(get_input("Could agents throw berries to agents in other allotments? (y, n): ",
+                                                                                 "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"], "n"))
         process_norms = get_bool(get_input("Did the run write rule-based norms to file? (y, n): ", "Invalid choice. Please choose 'y' or 'n': ", ["y", "n"], PAPER_DEFAULTS["track_norms"]))
-        generate_graphs(scenario,run_name,num_agents,seasons,mixed_allotments=mixed_allotments,society_mix=society_mix,process_norms=process_norms)
+        generate_graphs(scenario,run_name,num_agents,seasons,mixed_allotments=mixed_allotments,society_mix=society_mix,process_norms=process_norms,
+                        throw_between_allotments=throw_between_allotments)

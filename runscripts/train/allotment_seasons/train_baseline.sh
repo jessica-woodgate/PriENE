@@ -19,5 +19,6 @@ homogeneous
 baseline
 4
 2
+n
 y
 EOF

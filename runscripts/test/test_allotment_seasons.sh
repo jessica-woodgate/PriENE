@@ -18,6 +18,7 @@ homogeneous
 all
 20
 2
+n
 y
 y
 rule_based

@@ -14,5 +14,6 @@ allotment
 20
 y
 homogeneous
+n
 y
 EOF
