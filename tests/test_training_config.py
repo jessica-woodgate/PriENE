@@ -15,7 +15,10 @@ def test_the_harvest_file_holds_the_parameters_harvest_agents_have_always_traine
     assert config == tc.DEFAULT
     assert config.to_dict() == {"learning_rate": 0.0001, "gamma": 0.95, "batch_size": 64, "hidden_units": 128, "huber_delta": 1.0,
                                 "min_experiences": 100, "max_experiences": 100000, "target_update_interval": 50, "epsilon_start": 1.0,
-                                "epsilon_min": 0.01, "epsilon_decay": 0.001, "max_training_episodes": None, "sanction": 0.4}
+                                "epsilon_min": 0.01, "epsilon_decay": 0.001, "max_training_episodes": None, "sanction": 0.4,
+                                "rewards": {"death": -1, "no_berries": -0.2, "no_benefactor": -0.2, "insufficient_health": -0.2,
+                                            "neutral_reward": 0, "throw": 0.5, "forage": 0.5, "eat": 1, "survive": 1},
+                                "ethics_rewards": {"no_berries": -0.1, "no_benefactor": -0.1, "insufficient_health": -0.1, "eat": 0.8}}
 
 @pytest.mark.parametrize("scenario", ["basic", "colours", "capabilities", "allotment", "commons"])
 def test_every_harvest_scenario_uses_the_harvest_file(scenario):

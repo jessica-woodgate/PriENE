@@ -14,3 +14,21 @@ epsilon_decay: 0.001
 # null: train until epsilon reaches epsilon_min (about 4600 episodes)
 max_training_episodes: null
 sanction: 0.4
+# a baseline agent's reward for each outcome of its action: dying, trying to throw with no berries, with no one to throw to or with too
+# little health, an action with no other effect, throwing, foraging and eating a berry, and surviving to the episode's last day
+rewards:
+  death: -1
+  no_berries: -0.2
+  no_benefactor: -0.2
+  insufficient_health: -0.2
+  neutral_reward: 0
+  throw: 0.5
+  forage: 0.5
+  eat: 1
+  survive: 1
+# the rewards ethics agents get instead of the baseline's, for these outcomes (they also get the sanction)
+ethics_rewards:
+  no_berries: -0.1
+  no_benefactor: -0.1
+  insufficient_health: -0.1
+  eat: 0.8

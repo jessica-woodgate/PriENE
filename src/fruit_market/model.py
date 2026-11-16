@@ -52,6 +52,11 @@ class FruitMarketModel(SocietyModel):
         if training_config is None:
             from ..training_config import for_scenario
             training_config = for_scenario("fruit_market")
+        from ..training_config import DEFAULT, HARVEST_ONLY_PARAMETERS, TrainingConfigError
+        #the reward is the substrate's own, so a config changing the harvest scenarios' rewards would be silently ignored
+        changed = [name for name in sorted(HARVEST_ONLY_PARAMETERS) if getattr(training_config, name) != getattr(DEFAULT, name)]
+        if changed:
+            raise TrainingConfigError(f"Fruit Market's reward is the substrate's own, so its training config can't change {changed}")
         self.training_config = training_config
         self._set_seed(seed)
         if num_agents <= 0 or num_agents % 2 != 0:

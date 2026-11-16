@@ -19,11 +19,13 @@ PROGRESS_FILE = "progress.json"
 MIXED_SUFFIX = "_with_baseline"
 
 def training_checkpoint_name(scenario, seasons, season_length, num_allocations, allotment_regrowth_delays, max_days, seed,
-                             society_mix="homogeneous", mixed_allotments="split", commons_parameters=None):
+                             society_mix="homogeneous", mixed_allotments="split", commons_parameters=None, config_name=None):
     """
     Name of a training run's checkpoint folder, from every setting that changes what is learned (the number of agents is the
     folder inside it), e.g. allotment_seasons25_2allotments_regrow0-2_200days_seed42, or with a mixed society
     allotment_2allotments_regrow0-2_mixed-separate_200days_seed42, or commons_K48_r0.25_R024_200days_seed42
+    config_name -- the name of the training config file the run uses, when it isn't the scenario's own (e.g. basic_200days_seed42_R2
+        for configs/training/R2.yaml); None for the scenario's own
     allotment_regrowth_delays -- the delays the allotments regrow with (AllotmentHarvest.default_regrowth_delays when none are chosen);
         only used, and needed, for the allotment scenario
     commons_parameters -- dict of the commons' carrying_capacity, growth_rate and initial_stock; only used, and needed, for the commons scenario
@@ -44,6 +46,8 @@ def training_checkpoint_name(scenario, seasons, season_length, num_allocations, 
     if society_mix != "homogeneous":
         parts.append("mixed-separate" if scenario == "allotment" and mixed_allotments == "separate" else "mixed")
     parts += [f"{max_days}days", f"seed{seed}"]
+    if config_name is not None:
+        parts.append(config_name)
     return "_".join(parts)
 
 def fruit_market_checkpoint_name(max_days, grappling, well_being, sanction, observation, seed, society_mix="homogeneous"):
@@ -170,6 +174,17 @@ def days_in_name(name):
     if match:
         return int(match.group(1))
     return None
+
+def checkpoint_training_config(checkpoint_path):
+    """
+    The training config (as a dict) recorded when the checkpoint in checkpoint_path was trained, or None if it was trained with its
+    scenario's own (which isn't recorded) or has no settings
+    """
+    settings_path = checkpoint_path+SETTINGS_FILE
+    if not os.path.exists(settings_path):
+        return None
+    with open(settings_path) as file:
+        return json.load(file).get("training_config")
 
 def checkpoint_max_days(checkpoint_name, checkpoint_path):
     """

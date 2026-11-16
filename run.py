@@ -9,9 +9,10 @@ from src.agent.harvest_agent import NORMS_MODULE_TYPES
 from src.checkpoints import RUN_OPTIONS, DEFAULT_CHECKPOINT
 from src.checkpoints import training_checkpoint_name, training_checkpoint_path, prepare_training_checkpoints, fruit_market_checkpoint_name
 from src.checkpoints import society_checkpoint_path, loading_checkpoint_path, record_agent_types, training_folder, finished_episode
-from src.checkpoints import resolve_checkpoint, trained_checkpoints, checkpoint_max_days, days_in_name
+from src.checkpoints import resolve_checkpoint, trained_checkpoints, checkpoint_max_days, days_in_name, checkpoint_training_config
 from src.harvest_exception import CheckpointExistsException
 from src.training_config import load as load_training_config, for_scenario as training_config_for_scenario, DEFAULT as DEFAULT_TRAINING_CONFIG
+from src.training_config import TrainingConfig, config_name as training_config_name, scenario_config_path
 import pandas as pd
 import argparse
 import os
@@ -532,10 +533,17 @@ if args.option == "test" or args.option == "train":
         delays = allotment_regrowth_delays
         if scenario == "allotment" and delays is None:
             delays = AllotmentHarvest.default_regrowth_delays(num_allocations)
-        checkpoint_path = training_checkpoint_path(training_checkpoint_name(scenario, seasons, season_length, num_allocations, delays, max_days, args.seed, society_mix, mixed_allotments, commons_parameters), num_agents)
+        #a run with another training config (e.g. other rewards) is named after its file, so it never meets the scenario's own run
+        config_name = None if training_config == DEFAULT_TRAINING_CONFIG else training_config_name(args.training_config or scenario_config_path(scenario))
+        checkpoint_path = training_checkpoint_path(training_checkpoint_name(scenario, seasons, season_length, num_allocations, delays, max_days, args.seed, society_mix, mixed_allotments, commons_parameters, config_name), num_agents)
     else:
         checkpoint_path = checkpoint_root+str(num_agents)+"_agents/"
         max_days = get_max_days_input(checkpoint_name, checkpoint_path)
+        #testing uses the training config the checkpoint was trained with (e.g. its rewards), unless --training-config gives another
+        recorded_config = checkpoint_training_config(checkpoint_path)
+        if args.training_config is None and recorded_config is not None:
+            training_config = TrainingConfig(**recorded_config)
+            print(f"Testing with the training config the checkpoint was trained with (recorded in {checkpoint_path}settings.json).")
     #########################################################################################
     norms_module_type = NORMS_MODULE_TYPES[0]
     start_episodes = {}

@@ -1,10 +1,10 @@
 """
-Training parameters (the DQN's, the epsilon schedule, the training length and the ethics sanction), read from a file so they can be
-changed without changing code: configs/training/harvest.yaml (every harvest scenario) and configs/training/fruit_market.yaml hold the
+Training parameters (the DQN's, the epsilon schedule, the training length, the ethics sanction and the harvest scenarios' rewards),
+read from a file so they can be changed without changing code: configs/training/harvest.yaml (every harvest scenario) and configs/training/fruit_market.yaml hold the
 values each scenario trains with, and run.py's --training-config swaps in another file (e.g. one written by the parameter sweep,
 src/sweep/). Only these parameters can be set this way; the scenario's own (substrate) parameters are refused.
 """
-from dataclasses import dataclass, asdict, fields
+from dataclasses import dataclass, asdict, field, fields
 import json
 import math
 import os
@@ -24,6 +24,13 @@ SCENARIO_PARAMETERS = {"scenario", "num_agents", "num_players", "players", "max_
 class TrainingConfigError(ValueError):
     pass
 
+#the harvest scenarios' rewards (HarvestAgent): what a baseline agent gets for each outcome of its action, and how ethics agents' differ
+HARVEST_REWARDS = {"death": -1, "no_berries": -0.2, "no_benefactor": -0.2, "insufficient_health": -0.2, "neutral_reward": 0,
+                   "throw": 0.5, "forage": 0.5, "eat": 1, "survive": 1}
+HARVEST_ETHICS_REWARDS = {"no_berries": -0.1, "no_benefactor": -0.1, "insufficient_health": -0.1, "eat": 0.8}
+#the parameters only the harvest scenarios use, so a file may leave them out (Fruit Market's reward is the substrate's own)
+HARVEST_ONLY_PARAMETERS = {"rewards", "ethics_rewards"}
+
 @dataclass(frozen=True)
 class TrainingConfig:
     """
@@ -33,6 +40,8 @@ class TrainingConfig:
     epsilon_start, epsilon_min, epsilon_decay -- exploration: epsilon_start * exp(-epsilon_decay * (episode - 1)), never below epsilon_min
     max_training_episodes -- training stops after this many episodes; None trains until epsilon reaches epsilon_min
     sanction -- the ethics module's self-directed sanction (+ or - this much)
+    rewards -- harvest scenarios only: a baseline agent's reward for each outcome, every one of HARVEST_REWARDS' keys
+    ethics_rewards -- harvest scenarios only: the rewards ethics agents get instead of the baseline's, for any of those outcomes
     """
     learning_rate: float = 0.0001
     gamma: float = 0.95
@@ -47,6 +56,28 @@ class TrainingConfig:
     epsilon_decay: float = 0.001
     max_training_episodes: int = None
     sanction: float = 0.4
+    rewards: dict = field(default_factory=lambda: dict(HARVEST_REWARDS))
+    ethics_rewards: dict = field(default_factory=lambda: dict(HARVEST_ETHICS_REWARDS))
+
+    def __post_init__(self):
+        for name, allowed, exact in [("rewards", HARVEST_REWARDS, True), ("ethics_rewards", HARVEST_REWARDS, False)]:
+            values = getattr(self, name)
+            if not isinstance(values, dict):
+                raise TrainingConfigError(f"{name} must map outcomes {list(allowed)} to rewards, not {values!r}")
+            unknown = [outcome for outcome in values if outcome not in allowed]
+            if unknown:
+                raise TrainingConfigError(f"{name} gives {unknown}, which aren't outcomes; the outcomes are {list(allowed)}")
+            missing = [outcome for outcome in allowed if outcome not in values]
+            if exact and missing:
+                raise TrainingConfigError(f"{name} doesn't give {missing}")
+
+    def harvest_rewards(self, ethics):
+        """
+        A harvest agent's rewards: the baseline's, with ethics_rewards in their place for an ethics agent (which also gets the sanction)
+        """
+        if not ethics:
+            return dict(self.rewards)
+        return {**self.rewards, **self.ethics_rewards, "sanction": self.sanction}
 
     def to_dict(self):
         return asdict(self)
@@ -69,14 +100,15 @@ def check_parameter_names(values):
 
 def load(path):
     """
-    The training config in path (YAML or JSON): every training parameter must be given, and nothing else
+    The training config in path (YAML or JSON): every training parameter must be given, and nothing else (except the harvest scenarios'
+    rewards, which a file for another scenario can leave out)
     """
     with open(path) as file:
         values = yaml.safe_load(file) if path.endswith((".yaml", ".yml")) else json.load(file)
     if not isinstance(values, dict):
         raise TrainingConfigError(f"{path} doesn't hold a mapping of parameter names to values")
     check_parameter_names(values)
-    missing = [name for name in PARAMETER_NAMES if name not in values]
+    missing = [name for name in PARAMETER_NAMES if name not in values and name not in HARVEST_ONLY_PARAMETERS]
     if missing:
         raise TrainingConfigError(f"{path} doesn't give {missing}")
     return TrainingConfig(**values)
@@ -84,6 +116,12 @@ def load(path):
 def save(config, path):
     with open(path, "w") as file:
         yaml.safe_dump(config.to_dict(), file, sort_keys=False)
+
+def config_name(path):
+    """
+    A training config file's name, as it is added to the names of checkpoints trained with it: the file name without its extension
+    """
+    return os.path.splitext(os.path.basename(path))[0]
 
 def scenario_config_path(scenario):
     """
