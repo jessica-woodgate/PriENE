@@ -40,7 +40,7 @@ def in_tmp_dir(tmp_path, monkeypatch):
 
 def report_hash(path):
     # columns added since the reference outputs were made
-    df = pd.read_csv(path).drop(columns=["thrown_to", "ethics_sanction", "season", "season_quality", "seasonal_berry_target", "allotment_regrowth_delay"],
+    df = pd.read_csv(path).drop(columns=["thrown_to", "group_thrown_to", "agent_thrown_to", "ethics_sanction", "season", "season_quality", "seasonal_berry_target", "allotment_regrowth_delay"],
                                 errors="ignore")
     return hashlib.sha256(df.to_csv(index=False).encode()).hexdigest()
 

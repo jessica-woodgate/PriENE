@@ -14,6 +14,7 @@ Each run is in a temporary directory of its own (run.py writes to relative paths
 CSVs and JSONs as they are, checkpoints (.keras zips) by their model config and weights, since their metadata records the time saved.
 """
 import argparse
+import csv
 import glob
 import hashlib
 import io
@@ -225,9 +226,32 @@ def _hash_keras(path):
     return digest.hexdigest()
 
 
+#columns added to the reports since the reference outputs were made: a CSV is hashed without them, so its other columns are still
+#compared byte for byte with the reference
+COLUMNS_ADDED_SINCE = ["group_thrown_to", "agent_thrown_to"]
+
+
+def _without_added_columns(path):
+    """The CSV's bytes without COLUMNS_ADDED_SINCE (as pandas wrote them: minimal quoting, \\n line endings), or None if it has none."""
+    with open(path, newline="") as file:
+        rows = list(csv.reader(file))
+    if not rows or not any(column in rows[0] for column in COLUMNS_ADDED_SINCE):
+        return None
+    keep = [i for i, column in enumerate(rows[0]) if column not in COLUMNS_ADDED_SINCE]
+    text = io.StringIO()
+    writer = csv.writer(text, lineterminator="\n")
+    for row in rows:
+        writer.writerow([row[i] for i in keep])
+    return text.getvalue().encode()
+
+
 def hash_file(path):
     if path.endswith(".keras"):
         return _hash_keras(path)
+    if path.endswith(".csv"):
+        content = _without_added_columns(path)
+        if content is not None:
+            return hashlib.sha256(content).hexdigest()
     with open(path, "rb") as file:
         return hashlib.sha256(file.read()).hexdigest()
 

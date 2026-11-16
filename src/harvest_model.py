@@ -76,7 +76,8 @@ class HarvestModel(SocietyModel):
     #columns of the agent report (one row per agent per step) and the model episode report (one row per episode), in order, before any
     #a scenario adds; each row's values are listed in the same order in _collect_agent_data and _collect_model_episode_data
     AGENT_REPORT_FIELDS = ["agent_id", "agent_type", "episode", "day", "berries", "berries_consumed", "berries_thrown", "health",
-                           "days_left_to_live", "total_days_left_to_live", "action", "thrown_to", "reward", "ethics_sanction", "num_norms",
+                           "days_left_to_live", "total_days_left_to_live", "action", "thrown_to", "group_thrown_to", "agent_thrown_to", "reward",
+                           "ethics_sanction", "num_norms",
                            "season", "season_quality", "seasonal_berry_target", "allotment_regrowth_delay"]
     EPISODE_REPORT_FIELDS = ["episode", "end_day", "epsilon", "mean_reward", "mean_loss", "max_berries", "mean_berries", "max_berries_consumed",
                              "mean_berries_consumed", "gini_berries_consumed", "mean_berries_thrown", "max_health", "mean_health",
@@ -670,7 +671,7 @@ class HarvestModel(SocietyModel):
         #in the order of AGENT_REPORT_FIELDS
         values = [agent.unique_id, agent.agent_type, self.episode, self.day, agent.berries, agent.berries_consumed, agent.berries_thrown,
                   agent.health, agent.days_left_to_live, agent.total_days_left_to_live, agent.current_action, agent.current_thrown_to,
-                  agent.current_reward, agent.current_sanction, self._num_agent_norms(agent), self.season, self._current_season_quality(),
+                  agent.current_group_thrown_to, agent.current_agent_thrown_to, agent.current_reward, agent.current_sanction, self._num_agent_norms(agent), self.season, self._current_season_quality(),
                   self._seasonal_berry_target(agent), self._allotment_regrowth_delay(agent)]
         new_entry = self._report_row(self.AGENT_REPORT_FIELDS, values, self.extra_agent_report_values(agent))
         self.agent_reporter = pd.concat([self.agent_reporter, new_entry])
@@ -733,6 +734,30 @@ class HarvestModel(SocietyModel):
                 self._place_agent_in_allotment(berry)
             else:
                 self._remove_berry(berry)
+
+    def agent_by_id(self, agent_id):
+        """
+        The (non-berry) agent with this id, living or dead: dead agents stay in the schedule, off the grid
+        """
+        for a in self.schedule.agents:
+            if a.agent_type != "berry" and a.unique_id == agent_id:
+                return a
+        return None
+
+    def group_thrown_to(self, giver, receiver):
+        """
+        Which group giver threw a berry to: "same_group" (its own), or another group that is "better_off_other", "worse_off_other" or
+        "equal_other" than its own. A group is better off with more berries this season and, with as many, a shorter regrowth delay
+        (allotment). None in scenarios without groups (basic, commons)
+        """
+        if not self.SHUFFLES_ALLOCATIONS:
+            return None
+        if receiver.allocation_id == giver.allocation_id:
+            return "same_group"
+        def access(agent):
+            delay = self._allotment_regrowth_delay(agent)
+            return (self._seasonal_berry_target(agent), 0 if delay is None else -delay)
+        return HarvestAgent._compare_well_off(access(receiver), access(giver))
 
     def _allotment_regrowth_delay(self, agent):
         """

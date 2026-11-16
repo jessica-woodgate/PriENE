@@ -55,6 +55,14 @@ class HarvestAgent(LearningAgent):
         self.current_sanction = None
         #id of the agent this step's action threw a berry to; None if it didn't throw one (or the throw failed)
         self.current_thrown_to = None
+        #the group that agent was in when the berry was thrown, compared with this agent's (see HarvestModel.group_thrown_to); None if no
+        #berry was thrown or the scenario has no groups (basic, commons)
+        self.current_group_thrown_to = None
+        #that agent compared with this one by days left to live, before the berry moved ("better_off_other", "worse_off_other" or
+        #"equal_other"); "dead_other" for a throw tried to an agent that has died (which always fails); None otherwise
+        self.current_agent_thrown_to = None
+        #this step's action as rule-based norms label it, worked out before acting (see _throw_norm_label)
+        self.current_norm_label = None
         self.total_episode_reward = 0
         self.training = training
         self.agent_type = agent_type
@@ -119,11 +127,14 @@ class HarvestAgent(LearningAgent):
         """
         self.current_action = action
         self.current_thrown_to = None
+        self.current_group_thrown_to = None
+        self.current_agent_thrown_to = None
         antecedent = None
         if self.track_norms and self.norms_module_type == "rule_based":
-            # rule-based norms are keyed on the state before acting
+            # rule-based norms are keyed on the state before acting, and so is the action's label
             antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)]
                                                           + list(self.model.extra_observation_features(self)))
+            self.current_norm_label = self._throw_norm_label(action)
         if self.agent_type != "baseline":
             society_well_being = self.model.get_society_well_being(self, False, True)
             self.ethics_module.update_ethics_state(society_well_being)
@@ -175,6 +186,8 @@ class HarvestAgent(LearningAgent):
         self.current_reward = 0
         self.current_sanction = None
         self.current_thrown_to = None
+        self.current_group_thrown_to = None
+        self.current_agent_thrown_to = None
         self.moving_module.reset()
         self.decision_module.start_episode()
         if self.track_norms:
@@ -220,7 +233,16 @@ class HarvestAgent(LearningAgent):
             self.model.move_agent_to_cell(self, new_pos)
         return self.rewards["neutral_reward"]
     
+    def is_dead(self):
+        """
+        Whether this agent has died: earlier this step (done), or on an earlier day (taken off the grid)
+        """
+        return self.done or self.off_grid
+
     def _throw(self, benefactor_id):
+        #a throw to a dead agent always fails, so it is recorded when it is tried, whatever else would have stopped it
+        if self.model.agent_by_id(benefactor_id).is_dead():
+            self.current_agent_thrown_to = "dead_other"
         if self.berries <= 0:
             return self.rewards["no_berries"]
         #have to have a minimum amount of health to throw
@@ -236,16 +258,30 @@ class HarvestAgent(LearningAgent):
                 if not self.model.can_throw_to(self, a):
                     #out of reach (e.g. in another allotment) is treated the same as no living benefactor
                     return self.rewards["no_benefactor"]
+                #who the berry goes to, compared before it moves, so the giver still holds it and the receiver hasn't been fed
+                self.current_thrown_to = a.unique_id
+                self.current_group_thrown_to = self.model.group_thrown_to(self, a)
+                self.current_agent_thrown_to = self._compare_well_off(a.get_days_left_to_live(), self.get_days_left_to_live())
                 a.health = round(a.health + self.berry_health_payoff, DECIMALS)
                 a.berries_consumed += 1
                 a.days_left_to_live = a.get_days_left_to_live()
                 self.berries -= 1
                 self.berries_thrown += 1
-                self.current_thrown_to = a.unique_id
                 self.days_left_to_live = self.get_days_left_to_live()
                 return self.rewards["throw"]
         return self.rewards["no_benefactor"]
-    
+
+    @staticmethod
+    def _compare_well_off(receiver, giver):
+        """
+        "better_off_other", "worse_off_other" or "equal_other": the receiver's measure of how well off it is compared with the giver's
+        """
+        if receiver > giver:
+            return "better_off_other"
+        if receiver < giver:
+            return "worse_off_other"
+        return "equal_other"
+
     def _eat(self):
         if self.berries > 0:
             self.health = round(self.health + self.berry_health_payoff, DECIMALS)
@@ -282,8 +318,34 @@ class HarvestAgent(LearningAgent):
     # ── Norms ───────────────────────────────────────────────────
 
     def _norm_action_label(self, action):
-        #the raw action name; NormsModule generalises it with _consequent_rules
-        return self.actions[action]
+        #the label worked out before acting (see _throw_norm_label), so it describes the state the norm's antecedent does
+        return self.current_norm_label
+
+    #how a norm about throwing names who the berry goes to
+    AGENT_NORM_LABELS = {"better_off_other": "better off agent", "worse_off_other": "worse off agent", "equal_other": "equally off agent"}
+    GROUP_NORM_LABELS = {"same_group": "same group", "better_off_other": "better off group", "worse_off_other": "worse off group",
+                         "equal_other": "equally off group"}
+
+    def _throw_norm_label(self, action):
+        """
+        The action's label for rule-based norms, worked out before acting: move and eat by name, and a throw by who it goes to,
+        compared with this agent as it is before the berry moves: the receiver ("worse off agent", "better off agent", "equally off
+        agent", or "dead agent"), then, in scenarios with groups, its group ("same group", or a "worse off", "better off" or "equally
+        off group"), e.g. "throw,worse off agent,same group". A tried throw is labelled by who it was meant for, whether or not it
+        succeeds, as norms are about what agents choose
+        """
+        name = self.actions[action]
+        if not name.startswith("throw_"):
+            return name
+        target = self.model.agent_by_id(int(name.split("_")[1]))
+        if target.is_dead():
+            parts = ["throw", "dead agent"]
+        else:
+            parts = ["throw", self.AGENT_NORM_LABELS[self._compare_well_off(target.get_days_left_to_live(), self.get_days_left_to_live())]]
+        group = self.model.group_thrown_to(self, target)
+        if group is not None:
+            parts.append(self.GROUP_NORM_LABELS[group])
+        return ",".join(parts)
 
     def _norm_action_index(self, action):
         return self.norm_action_index[action]
@@ -306,10 +368,10 @@ class HarvestAgent(LearningAgent):
     def _consequent_rules(self):
         """
         Registers with NormsModule how to generalise this agent's raw action names (move/eat/
-        throw_X) into a natural language postcondition string: all throw_X variants collapse to
-        "throw"; everything else (move, eat) is used as-is.
+        throw_X) into a natural language postcondition string: a raw throw_X collapses to "throw"; everything else (move, eat,
+        and throws already named by who they go to, "throw,...", see _throw_norm_label) is used as-is.
         """
-        return [{"prefix": "throw", "label": "throw"}]
+        return [{"prefix": "throw_", "label": "throw"}]
 
     def _build_bayesian_norms_module(self, n_agents):
         """
