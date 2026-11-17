@@ -124,6 +124,20 @@ def test_an_unknown_policy_is_refused():
         ScriptedDecisionModule("lazy", None, None)
 
 
+def test_an_agent_that_dies_on_the_last_day_doesnt_get_the_survive_reward(in_tmp_dir):
+    model, agent, agents = scripted("eater")
+    model.day = agent.max_days - 1
+    table = agent.rewards
+    # dies on the last day: death, not survive
+    set_state(agent, 0.1, 0)
+    done, reward = agent._update_attributes([0.0])
+    assert done and float(np.sum(reward)) == table["death"]
+    # alive at the end of the last day: survive
+    set_state(agents[1], 0.5, 0)
+    done, reward = agents[1]._update_attributes([0.0])
+    assert not done and float(np.sum(reward)) == table["survive"]
+
+
 # ── outcome logging ─────────────────────────────────────────────
 
 def test_logging_outcomes_doesnt_change_a_run(tmp_path, monkeypatch):
@@ -153,7 +167,7 @@ def test_every_outcome_is_the_key_its_reward_was_looked_up_by(in_tmp_dir):
     from src.agent.harvest_agent import HarvestAgent
     assert set(log["outcome"]) <= set(HarvestAgent.OUTCOMES)
     table = rw.load(CURRENT).table("baseline")
-    base = log["reward"] - np.where(log["died"], table["death"], 0) - np.where(log["last_day"], table["survive"], 0)
+    base = log["reward"] - np.where(log["died"], table["death"], 0) - np.where(log["last_day"] & ~log["died"], table["survive"], 0)
     assert np.allclose(base, log["outcome"].map(table))
     assert (log[log["outcome"] == "eat"]["berries_after"] == log[log["outcome"] == "eat"]["berries_before"] - 1).all()
     assert (log[log["outcome"] == "throw"]["thrown_to"].notna()).all()

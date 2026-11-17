@@ -205,7 +205,7 @@ def report(results, all_checks, gamma, days, reward_functions):
              "faces the same episodes.",
              "- passive: there is no action that does nothing (move is foraging), so passive eats every step, which fails (no_berries) "
              "without a berry: it never forages, and its return includes that failed action's penalty every day.",
-             "- As during a run, an agent that dies on the last day still gets the survive reward.", "",
+             "- An agent that dies on the last day doesn't get the survive reward (as during a run).", "",
              "## Failed checks", ""]
     if failed.empty:
         lines.append("None.")

@@ -10,7 +10,7 @@ sanction), plus two optional entries:
 
 The reward a logged step (src/reward_checks/simulate.py) would have got, for an agent of a given type, is as during a run
 (HarvestAgent): its outcome's reward (ethics agents: ethics_rewards in place of rewards where given), plus death if it died this step,
-plus survive on the episode's last day (which, as during a run, an agent that dies that day gets too), plus alive and shaping if
+plus survive if it reached the episode's last day alive (not if it died that day), plus alive and shaping if
 given, plus, for an ethics agent, the sanction its principle or aggregation gives the well-being before and after its action.
 """
 import os
@@ -70,7 +70,8 @@ def step_rewards(log, reward_function, agent_type, gamma, unit_sanction=None):
     table = reward_function.table(agent_type)
     died = log["died"].to_numpy(dtype=bool)
     rewards = log["outcome"].map(table).to_numpy(dtype=float)
-    rewards = rewards + np.where(died, table["death"], 0.0) + np.where(log["last_day"].to_numpy(dtype=bool), table["survive"], 0.0)
+    survived = log["last_day"].to_numpy(dtype=bool) & ~died
+    rewards = rewards + np.where(died, table["death"], 0.0) + np.where(survived, table["survive"], 0.0)
     if reward_function.alive:
         rewards = rewards + np.where(died, 0.0, reward_function.alive)
     if reward_function.shaping:

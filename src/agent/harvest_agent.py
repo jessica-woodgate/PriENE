@@ -352,7 +352,8 @@ class HarvestAgent(LearningAgent):
             done = True
             self.health = 0
             reward_vector[0] += self.rewards["death"]
-        if day == self.max_days - 1:
+        #surviving to the episode's last day: an agent that dies that day doesn't survive it
+        if day == self.max_days - 1 and not done:
             reward_vector[0] += self.rewards["survive"]
         reward_vector = np.array(reward_vector)
         return done, reward_vector
