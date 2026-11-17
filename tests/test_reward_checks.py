@@ -228,6 +228,25 @@ def test_passive_neutral_scores_passives_failed_eats_as_doing_nothing():
     assert list(extended["outcome"][:3]) == ["no_berries"] * 3
 
 
+def test_a_sanction_sweep_names_each_reward_function_at_each_sanction():
+    from src.reward_checks.evaluate import with_sanctions
+    swept = with_sanctions([rw.load(CURRENT)], [0, 0.4, 2])
+    assert [f.name for f in swept] == ["current_s0", "current_s0.4", "current_s2"] and [f.sanction for f in swept] == [0, 0.4, 2]
+    assert all(f.rewards == rw.load(CURRENT).rewards for f in swept)
+
+
+def test_the_sweep_finds_where_the_sharer_catches_up_from_the_linear_effect():
+    from src.reward_checks.evaluate import sanction_sweep
+    # the sharer starts 1.0 behind; a sanction of 1 adds 2.0 (maximin) or takes 0.5 away (utilitarian)
+    rows = [{"reward_function": f"r_s{s:g}", "agent_type": t, "check": "sanction raises sharer relative to eater", "value": -1.0 + s * u,
+             "compared_with": -1.0, "sanction": s, "break_even_sanction": (s * 1.0 / (s * u)) if s > 0 and u > 0 else np.nan}
+            for s in [0, 0.5, 1] for t, u in [("maximin", 2.0), ("utilitarian", -0.5)]]
+    sweep = sanction_sweep(pd.DataFrame(rows), None, {f"r_s{s:g}": "r" for s in [0, 0.5, 1]}).set_index("agent_type")
+    assert sweep.loc["maximin", "effect_per_unit"] == pytest.approx(2.0) and sweep.loc["maximin", "break_even_sanction"] == pytest.approx(0.5)
+    assert sweep.loc["utilitarian", "effect_per_unit"] == pytest.approx(-0.5) and np.isnan(sweep.loc["utilitarian", "break_even_sanction"])
+    assert sweep.loc["maximin", "sharer - eaters at s=1"] == pytest.approx(1.0)
+
+
 def test_reward_files_load_and_current_is_the_training_configs():
     for path in sorted(os.listdir(os.path.join(REPO, "configs", "rewards"))):
         rw.load(os.path.join(REPO, "configs", "rewards", path))

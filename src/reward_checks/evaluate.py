@@ -185,11 +185,41 @@ def sanction_effects(logs, reward_functions, gamma, sanctions, agent_table):
                 gaps[label] = by_role["focal"] - by_role["eaters"]
             for scenario in gaps["with_sanction"].index:
                 with_s, base = float(gaps["with_sanction"][scenario]), float(gaps["base_only"][scenario])
+                effect = with_s - base
+                #the sanction's effect is linear in it (see unit_sanctions), so the sharer catches up with the eaters at
+                #sanction * -base / effect, when the sanction raises it and it starts behind
+                break_even = reward_function.sanction * -base / effect if reward_function.sanction > 0 and effect > 0 and base < 0 else np.nan
                 rows.append({"scenario": scenario, "reward_function": reward_function.name, "agent_type": agent_type,
                              "check": "sanction raises sharer relative to eater", "value": with_s, "compared_with": base,
-                             "passed": with_s - base > 0, "detail": f"sharer - eaters: {with_s:.3f} with the sanction, {base:.3f} on base rewards "
-                                                                     f"alone; the sanction adds {with_s - base:+.3f}"})
+                             #with no sanction there is nothing to check
+                             "passed": effect > 0 if reward_function.sanction > 0 else None,
+                             "sanction": reward_function.sanction, "break_even_sanction": break_even,
+                             "detail": f"sharer - eaters: {with_s:.3f} with the sanction, {base:.3f} on base rewards alone; the sanction adds "
+                                       f"{effect:+.3f}" + (f"; the sharer catches up with the eaters at a sanction of {break_even:.2f}"
+                                                           if not np.isnan(break_even) else "")})
     return pd.DataFrame(rows)
+
+
+def with_sanctions(reward_functions, sanctions):
+    """Each reward function at each of sanctions, named <name>_s<sanction> (e.g. suggested_s0.8)"""
+    from dataclasses import replace
+    return [replace(function, name=f"{function.name}_s{sanction:g}", sanction=float(sanction))
+            for function in reward_functions for sanction in sanctions]
+
+
+def sanction_sweep(all_checks, reward_functions, base_names):
+    """
+    For a sanction sweep: each base reward function and ethics agent type, the focal sharer's return minus the eaters' at each sanction,
+    the sanction's effect for a sanction of 1, and the sanction at which the sharer catches up with the eaters
+    """
+    rows = all_checks[all_checks["check"] == "sanction raises sharer relative to eater"].copy()
+    rows["base_reward_function"] = rows["reward_function"].map(base_names)
+    rows["effect_per_unit"] = np.where(rows["sanction"] > 0, (rows["value"] - rows["compared_with"]) / rows["sanction"].replace(0, np.nan), np.nan)
+    table = rows.pivot_table(index=["base_reward_function", "agent_type"], columns="sanction", values="value")
+    table.columns = [f"sharer - eaters at s={c:g}" for c in table.columns]
+    summary = rows.groupby(["base_reward_function", "agent_type"]).agg(effect_per_unit=("effect_per_unit", "mean"),
+                                                                       break_even_sanction=("break_even_sanction", "min"))
+    return table.join(summary).reset_index()
 
 
 def markdown_table(frame, index=True, digits=3):
@@ -202,6 +232,38 @@ def markdown_table(frame, index=True, digits=3):
     header = "| " + " | ".join(str(c) for c in frame.columns) + " |"
     rule = "|" + "|".join("---" for _ in frame.columns) + "|"
     return "\n".join([header, rule] + ["| " + " | ".join(cell(v) for v in row) + " |" for row in frame.itertuples(index=False)])
+
+
+def sweep_report(all_checks, sweep, gamma, days, sanctions, base_names):
+    """The report of a sanction sweep: the sharer against the eaters at every sanction, and the failed checks by sanction"""
+    checks_with = all_checks.assign(base_reward_function=all_checks["reward_function"].map(base_names),
+                                    sanction=all_checks["reward_function"].map({name: float(name.rsplit("_s", 1)[1]) for name in base_names}))
+    failed = checks_with[checks_with["passed"] == False]  # noqa: E712
+    lines = ["# Reward checks: varying the ethics sanction", "",
+             "The scripted-policy check (docs/reward_checks.md) with every reward function in configs/rewards/ at each sanction "
+             f"{', '.join(f'{s:g}' for s in sanctions)} (the reward functions named <file>_s<sanction>). The scripted policies don't "
+             "depend on the rewards, so the same logs (basic, 200 validation episodes per set-up) are evaluated afresh for each.", "",
+             f"Gamma is {gamma}; a reward on day {days} is worth {gamma ** (days - 1):.2e} of one on the first day.", "",
+             "A sanction of s is s times a sanction of 1 at every step (every principle gives +s, -s or 0, and every aggregation combines those "
+             "linearly or clips them to +/- s), so its effect on any return is linear in s: it can't change sign as the sanction grows.", "",
+             "## The sharer against the eaters (focal set-up)", "",
+             "The focal sharer's discounted return minus the eaters' at each sanction; the sanction's effect for a sanction of 1; and the "
+             "sanction at which the sharer catches up with the eaters (blank: it never does, as the sanction lowers it or it isn't behind).", "",
+             markdown_table(sweep, index=False), "",
+             "## Failed checks by sanction", ""]
+    if failed.empty:
+        lines.append("None.")
+    else:
+        counts = failed.pivot_table(index="check", columns="sanction", values="reward_function", aggfunc="count", fill_value=0)
+        counts.columns = [f"s={c:g}" for c in counts.columns]
+        lines += ["Failed checks (reward functions x agent types) at each sanction:", "", markdown_table(counts), ""]
+        by_type = failed.pivot_table(index="check", columns="agent_type", values="reward_function", aggfunc="count", fill_value=0)
+        lines += ["By agent type:", "", markdown_table(by_type), ""]
+    lines += ["## Checks passed per reward function", "", "| reward function | checks passed | failed | not checked |", "|---|---|---|---|"]
+    for name, group in all_checks.groupby("reward_function"):
+        lines.append(f"| {name} | {(group['passed'] == True).sum()} | {(group['passed'] == False).sum()} | {group['passed'].isna().sum()} |")  # noqa: E712
+    lines += ["", "Full results: data/reward_checks/sanctions/results.csv, checks.csv and sweep.csv."]
+    return "\n".join(lines) + "\n"
 
 
 def report(results, all_checks, gamma, days, reward_functions):
@@ -256,23 +318,37 @@ def report(results, all_checks, gamma, days, reward_functions):
     return "\n".join(lines) + "\n"
 
 
-def evaluate(reward_paths, log_paths, out=OUT, report_path=os.path.join(REPO, "docs", "reward_checks.md"), days=200, log=print):
+def evaluate(reward_paths, log_paths, out=OUT, report_path=os.path.join(REPO, "docs", "reward_checks.md"), days=200, log=print, sanctions=None):
+    """
+    sanctions -- a sanction sweep: every reward function at each of these sanctions (with_sanctions), reported by sweep_report
+    """
     reward_functions = [load(path) for path in reward_paths]
+    base_names = None
+    if sanctions:
+        swept = with_sanctions(reward_functions, sanctions)
+        base_names = {s.name: f.name for f in reward_functions for s in swept if s.name.startswith(f.name + "_s")
+                      and s.name.rsplit("_s", 1)[0] == f.name}
+        reward_functions = swept
     gamma = for_scenario("basic").gamma
     logs = load_logs(log_paths)
     log(f"{len(logs)} logged steps from {len(log_paths)} runs; {len(reward_functions)} reward functions; gamma {gamma}")
-    sanctions = unit_sanctions(logs)
+    unit = unit_sanctions(logs)
     agent_table = agent_episodes(logs)
-    returns_table = returns(logs, reward_functions, gamma, sanctions=sanctions)
+    returns_table = returns(logs, reward_functions, gamma, sanctions=unit)
     results = results_table(agent_table, returns_table)
     data = returns_table.merge(agent_table, on=["scenario", "run", "episode", "agent_id"])
-    all_checks = pd.concat([checks(results, data), sanction_effects(logs, reward_functions, gamma, sanctions, agent_table)], ignore_index=True)
+    all_checks = pd.concat([checks(results, data), sanction_effects(logs, reward_functions, gamma, unit, agent_table)], ignore_index=True)
     os.makedirs(out, exist_ok=True)
     results.to_csv(os.path.join(out, "results.csv"), index=False)
     all_checks.to_csv(os.path.join(out, "checks.csv"), index=False)
+    sweep = None
+    if sanctions:
+        sweep = sanction_sweep(all_checks, reward_functions, base_names)
+        sweep.to_csv(os.path.join(out, "sweep.csv"), index=False)
     if report_path:
         with open(report_path, "w") as file:
-            file.write(report(results, all_checks, gamma, days, reward_functions))
+            file.write(sweep_report(all_checks, sweep, gamma, days, sanctions, base_names) if sanctions
+                       else report(results, all_checks, gamma, days, reward_functions))
     failed = all_checks[all_checks["passed"] == False]  # noqa: E712
     log(f"{len(all_checks)} checks: {int((all_checks['passed'] == True).sum())} passed, {len(failed)} failed")  # noqa: E712
     return results, all_checks
@@ -283,12 +359,19 @@ def main():
     parser.add_argument("rewards", nargs="*", help="Reward function files (default: every file in configs/rewards/, current.yaml first)")
     parser.add_argument("--logs", nargs="+", default=None, help="Log files (default: every log in data/reward_checks/logs/)")
     parser.add_argument("--days", type=int, default=200, help="Days in each episode of the logs")
+    parser.add_argument("--sanctions", nargs="+", type=float, default=None,
+                        help="A sanction sweep: every reward function at each of these sanctions (into data/reward_checks/sanctions/ and "
+                             "docs/reward_checks_sanctions.md), e.g. --sanctions 0 0.1 0.2 0.4 0.8 1 2 5")
     args = parser.parse_args()
     rewards = args.rewards or sorted(glob.glob(os.path.join(REPO, "configs", "rewards", "*.yaml")), key=lambda p: (not p.endswith("current.yaml"), p))
     logs = args.logs or sorted(glob.glob(os.path.join(OUT, "logs", "*", "*.csv.gz")))
     if not logs:
         raise SystemExit("no logs: run python -m src.reward_checks.simulate first")
-    evaluate(rewards, logs, days=args.days)
+    if args.sanctions:
+        evaluate(rewards, logs, out=os.path.join(OUT, "sanctions"), report_path=os.path.join(REPO, "docs", "reward_checks_sanctions.md"),
+                 days=args.days, sanctions=args.sanctions)
+    else:
+        evaluate(rewards, logs, days=args.days)
 
 
 if __name__ == "__main__":
