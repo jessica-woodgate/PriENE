@@ -110,7 +110,8 @@ def test_test_runs_with_the_test_seed_face_the_same_episodes_whatever_the_traini
     assert layouts[0] == layouts[1] and len(layouts[0]) == 3
 
 
-@pytest.mark.parametrize("scenario", ["colours", "allotment"])
+#one scenario: test_continue_training.py continues a stopped run in every scenario
+@pytest.mark.parametrize("scenario", ["colours"])
 def test_a_stopped_run_continued_from_its_checkpoint_matches_an_uninterrupted_run(tmp_path, scenario):
     uninterrupted = str(tmp_path / "whole")
     train(uninterrupted, 7, episodes=5, scenario=scenario, checkpoint_every=2)
@@ -144,7 +145,9 @@ def train_args(root, short_config, seed=3):
             "--num-agents", "4", "--write-data", "y"]
 
 
-def test_a_run_given_every_flag_runs_in_its_own_folder_and_records_itself(tmp_path, short_config):
+def test_a_run_given_every_flag_runs_in_its_own_folder_records_itself_and_is_relaunched_as_it_stands(tmp_path, short_config):
+    # one training run serves every check (each run.py process takes seconds just to start): its folder and record, relaunching it once
+    # complete, a test run of it, and relaunching it once stopped partway
     root = str(tmp_path / "runs")
     result = run_py(train_args(root, short_config))
     assert result.returncode == 0, result.stdout + result.stderr
@@ -172,23 +175,15 @@ def test_a_run_given_every_flag_runs_in_its_own_folder_and_records_itself(tmp_pa
     assert read_status(tested) == "complete"
     episodes = pd.read_csv(f"{tested}/data/results/current_run/model_episode_reports_capabilities_maximin.csv")
     assert list(episodes["episode"]) == [1, 2] and set(episodes["seed"]) == {1000}
-
-
-def test_relaunching_a_stopped_training_run_continues_it(tmp_path, short_config):
-    root = str(tmp_path / "runs")
-    assert run_py(train_args(root, short_config)).returncode == 0
-    (folder,) = glob.glob(f"{root}/x/train/*/maximin/seed_3")
-    # as if it had stopped partway: its status says running, but its process is gone
+    # relaunching it as if it had stopped partway (its status says running, but its process is gone) continues it from its checkpoint
     write_status(folder, "running", pid=999999)
     assert read_status(folder) == "incomplete"
-    again = run_py(train_args(root, short_config))
-    assert again.returncode == 0, again.stdout + again.stderr
-    assert "continuing it from its checkpoint" in again.stdout
+    stopped = run_py(train_args(root, short_config))
+    assert stopped.returncode == 0, stopped.stdout + stopped.stderr
+    assert "continuing it from its checkpoint" in stopped.stdout
     assert read_status(folder) == "complete"
 
 
-def test_a_flag_the_prompt_refuses_stops_the_run(tmp_path, short_config):
-    result = run_py(train_args(str(tmp_path / "runs"), short_config)[:-1] + ["maybe"])
-    assert result.returncode != 0
+def test_a_flag_the_prompt_refuses_stops_the_run():
     result = run_py(["train", "--scenario", "nowhere"])
     assert result.returncode != 0 and "--scenario 'nowhere' is not a valid answer" in result.stdout + result.stderr

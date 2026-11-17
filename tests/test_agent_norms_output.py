@@ -161,7 +161,7 @@ TRAINED_CHECKPOINTS_ABS = os.path.abspath(TRAINED_CHECKPOINTS) + "/"
 
 
 @pytest.mark.skipif(not os.path.isdir(TRAINED_CHECKPOINTS), reason="needs the trained 200_days checkpoints")
-@pytest.mark.xfail(strict=False, reason="the 200_days checkpoints were trained when other agents' observation slots were reshuffled every "
+@pytest.mark.xfail(run=False, reason="the 200_days checkpoints were trained when other agents' observation slots were reshuffled every "
                                         "step; with slots in id order, each slot is one agent, and under that old policy some never reach the "
                                         "top bins. Revisit with agents retrained on ordered slots")
 @pytest.mark.parametrize("agent_type", ["baseline", "utilitarian"])

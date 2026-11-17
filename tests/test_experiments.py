@@ -4,12 +4,11 @@ its own, complete runs skipped, failures reported, test runs only after their tr
 """
 import json
 import os
-import subprocess
 import sys
 import pytest
 import yaml
 from src import experiments as ex
-from src.run_record import read_status, write_status
+from src.run_record import write_status
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -121,23 +120,24 @@ def test_status_summarises_every_run(tmp_path, capsys):
     assert "failed" in capsys.readouterr().out
 
 
-def test_an_experiment_runs_each_run_in_a_process_of_its_own(tmp_path):
-    with open(os.path.join(REPO, "configs/training/harvest.yaml")) as file:
-        short = file.read().replace("max_training_episodes: null", "max_training_episodes: 2")
-    with open(tmp_path / "short.yaml", "w") as file:
-        file.write(short)
-    path = experiment_file(tmp_path, seeds=[1], societies=["maximin"], training_config=str(tmp_path / "short.yaml"),
-                           tests=[{"scenario": "colours", "seasons": "n"}], num_threads=1)
-    result = subprocess.run([sys.executable, os.path.join(REPO, "run.py"), "experiments", path, "--max-workers", "2"], cwd=REPO,
-                            capture_output=True, text=True)
-    assert result.returncode == 0, result.stdout + result.stderr
-    runs = ex.plan(ex.load_experiment(path))
-    assert [read_status(run.folder) for run in runs] == ["complete", "complete"]
+def test_an_experiment_runs_each_run_in_a_process_of_its_own(tmp_path, monkeypatch):
+    # each run's command stands in for run.py (whose own runs test_multiseed_runs.py covers): it records its status, with its process id,
+    # in its folder, as run.py does; the runner launches each as a process of its own and reads back how it ended
+    experiment = ex.load_experiment(experiment_file(tmp_path, seeds=[1], societies=["maximin"], tests=[{"scenario": "colours", "seasons": "n"}]))
+    planned = ex.plan(experiment)
+    record = ("import os, sys; sys.path.insert(0, {repo!r}); from src.run_record import write_status; "
+              "os.makedirs({folder!r}, exist_ok=True); write_status({folder!r}, {status!r})")
+    for run in planned:
+        status = "failed" if run.mode == "test" else "complete"
+        run.command = [sys.executable, "-c", record.format(repo=REPO, folder=run.folder, status=status)] + (["--fail"] if status == "failed" else [])
+    monkeypatch.setattr(ex, "plan", lambda experiment: planned)
+    outcomes = ex.run_experiment(experiment, max_workers=2, log=lambda message: None)
+    assert [outcomes[run.name] for run in planned] == ["complete", "failed"]
     pids = set()
-    for run in runs:
+    for run in planned:
         with open(os.path.join(run.folder, "status.json")) as file:
             pids.add(json.load(file)["pid"])
-    assert len(pids) == 2
-    # nothing left to do
-    again = subprocess.run([sys.executable, os.path.join(REPO, "run.py"), "experiments", path], cwd=REPO, capture_output=True, text=True)
-    assert again.returncode == 0 and again.stdout.count("complete (skipped)") == 2
+    assert len(pids) == 2 and os.getpid() not in pids
+    # the complete run is skipped; the failed one is launched again
+    again = ex.run_experiment(experiment, log=lambda message: None)
+    assert again[planned[0].name] == "complete (skipped)" and again[planned[1].name] == "failed"
