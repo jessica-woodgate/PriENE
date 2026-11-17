@@ -111,6 +111,33 @@ def test_altruist_throws_to_the_worst_off_whenever_it_can_and_otherwise_hoards(i
     assert chosen(agent) == "eat"
 
 
+def test_altruist_eater_throws_to_the_worst_off_whenever_it_can_and_otherwise_eats(in_tmp_dir):
+    _, agent, agents = scripted("altruist_eater")
+    set_state(agent, 0.6, 1)
+    for agent_id, health in [(1, 3.0), (2, 2.5), (3, 4.0)]:
+        set_state(agents[agent_id], health, 0)
+    assert chosen(agent) == "throw_2"
+    # can't throw (too little health): eats the berry at once, as an eater (an altruist would keep it)
+    set_state(agent, 0.5, 1)
+    assert chosen(agent) == "eat"
+    set_state(agent, 0.5, 0)
+    assert chosen(agent) == "move"
+
+
+def test_sharer_hoarder_shares_with_the_needy_and_otherwise_hoards(in_tmp_dir):
+    _, agent, agents = scripted("sharer_hoarder")
+    set_state(agent, 0.6, 1)
+    set_state(agents[1], 0.5, 0)    # 5 days left: needy
+    set_state(agents[2], 2.0, 0)
+    set_state(agents[3], 2.0, 0)
+    assert chosen(agent) == "throw_1"
+    # nobody needy: as a hoarder, it keeps its berry and forages, eating only when the next decay would kill it (a sharer would eat)
+    set_state(agents[1], 2.0, 0)
+    assert chosen(agent) == "move"
+    set_state(agent, 0.1, 1)
+    assert chosen(agent) == "eat"
+
+
 def test_random_chooses_every_action_reproducibly_from_the_agents_stream(in_tmp_dir):
     _, agent, _ = scripted("random")
     picks = [chosen(agent) for _ in range(300)]
@@ -244,7 +271,7 @@ def test_the_sweep_finds_where_the_sharer_catches_up_from_the_linear_effect():
     sweep = sanction_sweep(pd.DataFrame(rows), None, {f"r_s{s:g}": "r" for s in [0, 0.5, 1]}).set_index("agent_type")
     assert sweep.loc["maximin", "effect_per_unit"] == pytest.approx(2.0) and sweep.loc["maximin", "break_even_sanction"] == pytest.approx(0.5)
     assert sweep.loc["utilitarian", "effect_per_unit"] == pytest.approx(-0.5) and np.isnan(sweep.loc["utilitarian", "break_even_sanction"])
-    assert sweep.loc["maximin", "sharer - eaters at s=1"] == pytest.approx(1.0)
+    assert sweep.loc["maximin", "focal - eaters at s=1"] == pytest.approx(1.0)
 
 
 def test_reward_files_load_and_current_is_the_training_configs():

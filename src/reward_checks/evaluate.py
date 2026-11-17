@@ -27,6 +27,8 @@ REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 OUT = os.path.join(REPO, "data", "reward_checks")
 #an agent-episode that died before this day "died early" (check: surviving to the end scores clearly better than dying early)
 EARLY_DEATH_DAY = 100
+#the policies that give berries away, each checked as the focal agent among eaters
+SHARING_POLICIES = ["sharer", "altruist", "sharer_hoarder", "altruist_eater"]
 
 
 def load_logs(paths):
@@ -143,7 +145,7 @@ def checks(results, data):
         hoarder = mean(scenario, "homogeneous", "hoarder", "all", reward, agent_type)
         add(scenario, reward, agent_type, "hoarder <= eater", hoarder, eater, hoarder <= eater)
         if agent_type == "baseline":
-            for policy in ["sharer", "altruist"]:
+            for policy in SHARING_POLICIES:
                 focal = mean(scenario, "focal", policy, "focal", reward, agent_type)
                 eaters = mean(scenario, "focal", policy, "eaters", reward, agent_type)
                 add(scenario, reward, agent_type, f"focal {policy} <= eaters (baseline rewards)", focal, eaters, focal <= eaters)
@@ -165,38 +167,40 @@ def checks(results, data):
 
 def sanction_effects(logs, reward_functions, gamma, sanctions, agent_table):
     """
-    For each reward function and ethics agent type, in the focal sharer set-up: the sharer's return minus the eaters', with the sanction
-    and with its base rewards alone (sanction 0); the sanction's effect is the first minus the second (a check: it should raise the sharer)
+    For each reward function, ethics agent type and sharing policy (SHARING_POLICIES, each a focal set-up): the focal agent's return minus
+    the eaters', with the sanction and with its base rewards alone (sanction 0); the sanction's effect is the first minus the second (a
+    check: it should raise the sharing agent), and the sanction at which it catches up with the eaters
     """
     from dataclasses import replace
-    focal = logs["run"] == "focal_sharer"
-    if not focal.any():
-        return pd.DataFrame()
-    focal_logs = logs[focal].reset_index(drop=True)
-    focal_sanctions = sanctions[focal.to_numpy()].reset_index(drop=True)
     rows = []
-    for reward_function in reward_functions:
-        for agent_type in [t for t in AGENT_TYPES if t != "baseline"]:
-            gaps = {}
-            for label, function in [("with_sanction", reward_function), ("base_only", replace(reward_function, sanction=0.0))]:
-                table = returns(focal_logs, [function], gamma, [agent_type], focal_sanctions)
-                table = table.merge(agent_table[["scenario", "run", "episode", "agent_id", "role"]], on=["scenario", "run", "episode", "agent_id"])
-                by_role = table.groupby(["scenario", "role"])["discounted_return"].mean().unstack()
-                gaps[label] = by_role["focal"] - by_role["eaters"]
-            for scenario in gaps["with_sanction"].index:
-                with_s, base = float(gaps["with_sanction"][scenario]), float(gaps["base_only"][scenario])
-                effect = with_s - base
-                #the sanction's effect is linear in it (see unit_sanctions), so the sharer catches up with the eaters at
-                #sanction * -base / effect, when the sanction raises it and it starts behind
-                break_even = reward_function.sanction * -base / effect if reward_function.sanction > 0 and effect > 0 and base < 0 else np.nan
-                rows.append({"scenario": scenario, "reward_function": reward_function.name, "agent_type": agent_type,
-                             "check": "sanction raises sharer relative to eater", "value": with_s, "compared_with": base,
-                             #with no sanction there is nothing to check
-                             "passed": effect > 0 if reward_function.sanction > 0 else None,
-                             "sanction": reward_function.sanction, "break_even_sanction": break_even,
-                             "detail": f"sharer - eaters: {with_s:.3f} with the sanction, {base:.3f} on base rewards alone; the sanction adds "
-                                       f"{effect:+.3f}" + (f"; the sharer catches up with the eaters at a sanction of {break_even:.2f}"
-                                                           if not np.isnan(break_even) else "")})
+    for policy in SHARING_POLICIES:
+        focal = logs["run"] == f"focal_{policy}"
+        if not focal.any():
+            continue
+        focal_logs = logs[focal].reset_index(drop=True)
+        focal_sanctions = sanctions[focal.to_numpy()].reset_index(drop=True)
+        for reward_function in reward_functions:
+            for agent_type in [t for t in AGENT_TYPES if t != "baseline"]:
+                gaps = {}
+                for label, function in [("with_sanction", reward_function), ("base_only", replace(reward_function, sanction=0.0))]:
+                    table = returns(focal_logs, [function], gamma, [agent_type], focal_sanctions)
+                    table = table.merge(agent_table[["scenario", "run", "episode", "agent_id", "role"]], on=["scenario", "run", "episode", "agent_id"])
+                    by_role = table.groupby(["scenario", "role"])["discounted_return"].mean().unstack()
+                    gaps[label] = by_role["focal"] - by_role["eaters"]
+                for scenario in gaps["with_sanction"].index:
+                    with_s, base = float(gaps["with_sanction"][scenario]), float(gaps["base_only"][scenario])
+                    effect = with_s - base
+                    #the sanction's effect is linear in it (see unit_sanctions), so the focal agent catches up with the eaters at
+                    #sanction * -base / effect, when the sanction raises it and it starts behind
+                    break_even = reward_function.sanction * -base / effect if reward_function.sanction > 0 and effect > 0 and base < 0 else np.nan
+                    rows.append({"scenario": scenario, "reward_function": reward_function.name, "agent_type": agent_type, "policy": policy,
+                                 "check": f"sanction raises {policy} relative to eater", "value": with_s, "compared_with": base,
+                                 #with no sanction there is nothing to check
+                                 "passed": effect > 0 if reward_function.sanction > 0 else None,
+                                 "sanction": reward_function.sanction, "break_even_sanction": break_even,
+                                 "detail": f"{policy} - eaters: {with_s:.3f} with the sanction, {base:.3f} on base rewards alone; the sanction "
+                                           f"adds {effect:+.3f}" + (f"; it catches up with the eaters at a sanction of {break_even:.2f}"
+                                                                   if not np.isnan(break_even) else "")})
     return pd.DataFrame(rows)
 
 
@@ -209,16 +213,18 @@ def with_sanctions(reward_functions, sanctions):
 
 def sanction_sweep(all_checks, reward_functions, base_names):
     """
-    For a sanction sweep: each base reward function and ethics agent type, the focal sharer's return minus the eaters' at each sanction,
-    the sanction's effect for a sanction of 1, and the sanction at which the sharer catches up with the eaters
+    For a sanction sweep: each sharing policy, base reward function and ethics agent type, the focal agent's return minus the eaters' at
+    each sanction, the sanction's effect for a sanction of 1, and the sanction at which it catches up with the eaters
     """
-    rows = all_checks[all_checks["check"] == "sanction raises sharer relative to eater"].copy()
+    rows = all_checks[all_checks["check"].str.startswith("sanction raises ")].copy()
+    if "policy" not in rows.columns:
+        rows["policy"] = "sharer"
     rows["base_reward_function"] = rows["reward_function"].map(base_names)
     rows["effect_per_unit"] = np.where(rows["sanction"] > 0, (rows["value"] - rows["compared_with"]) / rows["sanction"].replace(0, np.nan), np.nan)
-    table = rows.pivot_table(index=["base_reward_function", "agent_type"], columns="sanction", values="value")
-    table.columns = [f"sharer - eaters at s={c:g}" for c in table.columns]
-    summary = rows.groupby(["base_reward_function", "agent_type"]).agg(effect_per_unit=("effect_per_unit", "mean"),
-                                                                       break_even_sanction=("break_even_sanction", "min"))
+    index = ["policy", "base_reward_function", "agent_type"]
+    table = rows.pivot_table(index=index, columns="sanction", values="value")
+    table.columns = [f"focal - eaters at s={c:g}" for c in table.columns]
+    summary = rows.groupby(index).agg(effect_per_unit=("effect_per_unit", "mean"), break_even_sanction=("break_even_sanction", "min"))
     return table.join(summary).reset_index()
 
 
@@ -246,9 +252,10 @@ def sweep_report(all_checks, sweep, gamma, days, sanctions, base_names):
              f"Gamma is {gamma}; a reward on day {days} is worth {gamma ** (days - 1):.2e} of one on the first day.", "",
              "A sanction of s is s times a sanction of 1 at every step (every principle gives +s, -s or 0, and every aggregation combines those "
              "linearly or clips them to +/- s), so its effect on any return is linear in s: it can't change sign as the sanction grows.", "",
-             "## The sharer against the eaters (focal set-up)", "",
-             "The focal sharer's discounted return minus the eaters' at each sanction; the sanction's effect for a sanction of 1; and the "
-             "sanction at which the sharer catches up with the eaters (blank: it never does, as the sanction lowers it or it isn't behind).", "",
+             "## Sharing agents against the eaters (focal set-ups)", "",
+             "For each sharing policy as the focal agent among eaters: its discounted return minus the eaters' at each sanction; the "
+             "sanction's effect for a sanction of 1; and the sanction at which it catches up with the eaters (blank: it never does, as "
+             "the sanction lowers it or it isn't behind).", "",
              markdown_table(sweep, index=False), "",
              "## Failed checks by sanction", ""]
     if failed.empty:
@@ -296,13 +303,15 @@ def report(results, all_checks, gamma, days, reward_functions):
               "| reward function | checks passed | failed | not checked |", "|---|---|---|---|"]
     for name, group in all_checks.groupby("reward_function"):
         lines.append(f"| {name} | {(group['passed'] == True).sum()} | {(group['passed'] == False).sum()} | {group['passed'].isna().sum()} |")  # noqa: E712
-    sanction_rows = all_checks[all_checks["check"] == "sanction raises sharer relative to eater"]
+    sanction_rows = all_checks[all_checks["check"].str.startswith("sanction raises ")]
     if len(sanction_rows):
-        lines += ["", "## The sanction's effect on a sharer (focal set-up)", "",
-                  "Sharer's discounted return minus the eaters', with the sanction and on base rewards alone, and the sanction's effect "
-                  "(the difference):", "", "| reward function | agent type | with sanction | base only | effect |", "|---|---|---|---|---|"]
+        lines += ["", "## The sanction's effect on sharing agents (focal set-ups)", "",
+                  "The focal agent's discounted return minus the eaters', with the sanction and on base rewards alone, and the sanction's "
+                  "effect (the difference):", "", "| policy | reward function | agent type | with sanction | base only | effect |",
+                  "|---|---|---|---|---|---|"]
         for row in sanction_rows.itertuples():
-            lines.append(f"| {row.reward_function} | {row.agent_type} | {row.value:.3f} | {row.compared_with:.3f} | {row.value - row.compared_with:+.3f} |")
+            lines.append(f"| {row.policy} | {row.reward_function} | {row.agent_type} | {row.value:.3f} | {row.compared_with:.3f} | "
+                         f"{row.value - row.compared_with:+.3f} |")
     lines += ["", "## Discounted returns (homogeneous set-ups, mean over agent-episodes)", ""]
     homogeneous = results[(results["setup"] == "homogeneous")]
     for (scenario, agent_type), group in homogeneous.groupby(["scenario", "agent_type"]):

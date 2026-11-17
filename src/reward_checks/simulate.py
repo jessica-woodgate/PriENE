@@ -21,8 +21,8 @@ import pandas as pd
 
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 VALIDATION_BASE_SEED = 2000
-HOMOGENEOUS_POLICIES = ["random", "passive", "eater", "hoarder", "sharer", "altruist"]
-FOCAL_POLICIES = ["sharer", "altruist", "hoarder", "random"]
+HOMOGENEOUS_POLICIES = ["random", "passive", "eater", "hoarder", "sharer", "altruist", "altruist_eater", "sharer_hoarder"]
+FOCAL_POLICIES = ["sharer", "altruist", "hoarder", "random", "altruist_eater", "sharer_hoarder"]
 SCENARIOS = ["basic", "colours"]
 
 
@@ -83,9 +83,14 @@ def main():
     parser.add_argument("--seed", type=int, default=VALIDATION_BASE_SEED, help="The validation seed every episode's environment is seeded from")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--out", default=os.path.join(REPO, "data", "reward_checks", "logs"))
+    parser.add_argument("--setups", nargs="+", default=None, help="Only these set-ups (e.g. homogeneous_sharer focal_altruist_eater)")
     args = parser.parse_args()
+    chosen = [s for s in setups() if args.setups is None or s[0] in args.setups]
+    unknown = set(args.setups or []) - {s[0] for s in setups()}
+    if unknown:
+        parser.error(f"unknown set-ups {sorted(unknown)}; they are {[s[0] for s in setups()]}")
     jobs = [(scenario, name, kind, first, rest, args.episodes, args.days, args.agents, args.seed, args.out)
-            for scenario in args.scenarios for name, kind, _, first, rest in setups()]
+            for scenario in args.scenarios for name, kind, _, first, rest in chosen]
     with ProcessPoolExecutor(max_workers=args.workers) as pool:
         for message in pool.map(run_setup, jobs):
             print(message, flush=True)

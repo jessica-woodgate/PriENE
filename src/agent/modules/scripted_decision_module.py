@@ -17,11 +17,14 @@ at least low_health_threshold health (as a throw needs), and counts another agen
     altruist -- throw to the reachable living agent with the fewest days left whenever it can (a berry, at least low_health_threshold
         health, and a reachable living agent); otherwise eat a berry it carries if its health would reach 0 on the next decay, and
         move (forage) if not
+    altruist_eater -- the altruist's first rule (throw to the worst-off reachable living agent whenever it can); otherwise as eater
+    sharer_hoarder -- the sharer's first rule (throw to the neediest reachable living agent below low_days_left_threshold, when it can
+        throw); otherwise as hoarder
 """
 
 
 class ScriptedDecisionModule:
-    POLICIES = ["random", "passive", "eater", "hoarder", "sharer", "altruist"]
+    POLICIES = ["random", "passive", "eater", "hoarder", "sharer", "altruist", "altruist_eater", "sharer_hoarder"]
 
     def __init__(self, policy, agent, rng):
         if policy not in self.POLICIES:
@@ -85,16 +88,30 @@ class ScriptedDecisionModule:
     def _hoarder(self):
         return "eat" if self.agent.berries > 0 and self._would_die_on_next_decay() else "move"
 
-    def _sharer(self):
+    def _share_with_the_needy(self):
+        """The sharer's first rule: a throw to the neediest reachable living agent below low_days_left_threshold, or None"""
         if self._can_throw():
             needy = [a for a in self._reachable_living_others() if a.days_left_to_live < self.agent.low_days_left_threshold]
             if needy:
                 return self._throw_to(self._worst_off(needy))
-        return self._eater()
+        return None
 
-    def _altruist(self):
+    def _give_to_the_worst_off(self):
+        """The altruist's first rule: a throw to the worst-off reachable living agent whenever it can, or None"""
         if self._can_throw():
             others = self._reachable_living_others()
             if others:
                 return self._throw_to(self._worst_off(others))
-        return self._hoarder()
+        return None
+
+    def _sharer(self):
+        return self._share_with_the_needy() or self._eater()
+
+    def _altruist(self):
+        return self._give_to_the_worst_off() or self._hoarder()
+
+    def _altruist_eater(self):
+        return self._give_to_the_worst_off() or self._eater()
+
+    def _sharer_hoarder(self):
+        return self._share_with_the_needy() or self._hoarder()
