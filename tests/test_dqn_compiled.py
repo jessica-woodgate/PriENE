@@ -33,7 +33,8 @@ def test_compiled_training_matches_eager_training(action_mask):
     results = []
     for compiled in (False, True):
         q, target = networks(compiled, action_mask, buffer)
-        np.random.seed(3)
+        # the same replay samples for both (since multi-seed seeding, from the agent's replay stream rather than numpy's global RNG)
+        q.replay_rng = np.random.default_rng(3)
         losses = [float(np.asarray(q.train(target))) for _ in range(5)]
         results.append((losses, [v.numpy() for v in q.dqn.trainable_variables]))
     (eager_losses, eager_weights), (compiled_losses, compiled_weights) = results

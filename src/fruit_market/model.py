@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from mesa.time import BaseScheduler
+from .. import seeding
 from ..society_model import SocietyModel, gini
 from ..agent.learning_agent import NORMS_MODULE_TYPES
 from ..harvest_exception import NumAgentsException, UnrecognisedNormsModule, FileExistsException
@@ -41,8 +42,6 @@ class FruitMarketModel(SocietyModel):
                              "preferred_eat_rate", "invalid_offer_rate", "market_freeze_steps", "total_holds", "total_shoves",
                              "total_pulls", "mean_hunger", "steps_hungry", "mean_stamina", "num_emerged_norms", "seed",
                              "max_action_share", "grapple_share", "mean_abs_sanction"]
-    #spawn key for the random stream of the substrate's seeds, one per episode
-    SUBSTRATE_SEED_STREAM = 4
 
     def __init__(self, society_mix, num_agents, agent_type, max_episodes, max_days, training, checkpoint_path, write_data, track_norms,
                  filepath="", seed=None, norms_module_type="rule_based", start_episode=1, grappling=True, well_being_mode="need",
@@ -228,6 +227,10 @@ class FruitMarketModel(SocietyModel):
                 self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.filepath+"_emerged_norms.json")
             else:
                 self._analyse_agent_norms()
+        #see HarvestModel.finish_episode: the end of a run always saves a checkpoint, replay buffers before the agents
+        self._decide_checkpoint(finishing_run=not collect_data)
+        if self.saving_checkpoint:
+            self.save_replay_buffers()
         for agent in self.schedule.agents:
             agent.finish_episode()
         if collect_data:
@@ -250,22 +253,22 @@ class FruitMarketModel(SocietyModel):
                              for agent in self.schedule.agents}
         for agent in self.schedule.agents:
             agent.reset()
+        self._start_episode_streams()
         self.state = self.backend.reset(self._substrate_seed())
 
     def _substrate_seed(self):
-        #from the seed and the episode, in a stream of its own: each episode's substrate is reproducible, and a continued run gets the
-        #substrates the run it continues would have had
+        #from the seed and the episode, in a stream of its own (src/seeding.py): a continued run gets the substrates the run it continues
+        #would have had (Melting Pot itself isn't reproducible from its seed, so the substrate's own draws may still differ)
         if self.seed is None:
             return None
-        return int(np.random.SeedSequence([self.seed, self.SUBSTRATE_SEED_STREAM, self.episode]).generate_state(1)[0]) + 1
+        return seeding.episode_seed(self.seed, self.episode, "fruit_market_substrate") + 1
 
     def reseed_for_continuing(self):
-        if self.seed is None:
-            return
-        import keras
-        seed = int(np.random.SeedSequence([self.seed, self.episode]).generate_state(1)[0])
-        keras.utils.set_random_seed(seed)
-        self.reset_randomizer(seed)
+        """
+        A continued training run is built for the episode it continues from, whose substrate seed depends only on the seed and that
+        episode, and its agents restore their own streams from the checkpoint; here, its replay buffers are restored too
+        """
+        self.restore_replay_buffers()
 
     # ── reports ─────────────────────────────────────────────────
 

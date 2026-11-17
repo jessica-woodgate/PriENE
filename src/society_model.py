@@ -5,6 +5,7 @@ import json
 import os
 import tensorflow
 from tensorflow import keras
+from . import seeding
 from .harvest_exception import FileExistsException
 from .harvest_exception import MixedSocietyException
 from os.path import exists
@@ -20,19 +21,16 @@ class SocietyModel(Model):
     Subclasses set seed (via _set_seed), num_agents, schedule, training, filepath, episode, day, living_agents, emerged_norms,
     previous_learned_norms and societal_norm_emergence_threshold.
     """
-    #spawn key for the random stream that chooses which agents of a mixed society are baseline
-    MIXED_SOCIETY_STREAM = 1
 
     def get_num_agents(self):
         return self.num_agents
 
     def _set_seed(self, seed):
         """
-        Seeds every source of randomness so a run can be reproduced: python's random module, numpy's
-        global RNG (grid placement, resource allocations, DQN replay sampling and exploration),
-        tensorflow (network weight initialisation), and mesa's own model RNG (RandomActivation's
-        agent ordering). Must run before any agents are created. Op determinism is process-wide and
-        stays on for any later models in the same process. seed=None leaves the run unseeded.
+        Record the run seed every random stream is derived from (src/seeding.py), and make TensorFlow's ops deterministic (process-wide,
+        so it stays on for any later models in the same process: a run is meant to have a process of its own). The global seeds
+        (python's random, numpy's global RNG, tensorflow's) are set too, only so that any draw not given a stream of its own is still
+        reproducible; none is relied on. Must run before any agents are created. seed=None leaves the run unseeded.
         """
         self.seed = seed
         if seed is None:
@@ -40,6 +38,56 @@ class SocietyModel(Model):
         keras.utils.set_random_seed(seed)
         tensorflow.config.experimental.enable_op_determinism()
         self.reset_randomizer(seed)
+
+    #a training run saves its checkpoint every this many episodes, and at the end of the run (set by run.py's --checkpoint-every)
+    checkpoint_every = 1
+    REPLAY_BUFFER_FILE = "replay_buffer.npz"
+
+    def _decide_checkpoint(self, finishing_run):
+        """
+        Whether the episode being finished saves a checkpoint (read by each agent's finish_episode): every checkpoint_every episodes,
+        and when the run finishes
+        """
+        self.saving_checkpoint = self.training and (finishing_run or self.episode % self.checkpoint_every == 0)
+
+    def _replay_buffer_paths(self):
+        #one per agent type (agents of a type share one buffer), kept in the folder of the type's lowest-id agent:
+        #<checkpoint folder>/<type>/agent_<id>/replay_buffer.npz
+        paths = {}
+        for agent in sorted(self.schedule.agents, key=lambda a: a.unique_id):
+            module = getattr(agent, "decision_module", None)
+            if module is not None and hasattr(module, "q_checkpoint_path") and agent.agent_type in self.shared_replay_buffers:
+                paths.setdefault(agent.agent_type, os.path.join(os.path.dirname(module.q_checkpoint_path), self.REPLAY_BUFFER_FILE))
+        return paths
+
+    def save_replay_buffers(self):
+        """
+        Save each agent type's replay buffer with the checkpoint, so a continued run learns from the experiences the run it continues had
+        """
+        for agent_type, path in self._replay_buffer_paths().items():
+            buffer = self.shared_replay_buffers[agent_type]
+            writing = path[:-len(".npz")] + ".writing.npz"
+            np.savez(writing, **{key: np.asarray(values) for key, values in buffer.items()})
+            os.replace(writing, path)
+
+    def restore_replay_buffers(self):
+        """
+        A continued run's replay buffers, as its checkpoint saved them (left empty for a checkpoint saved without them)
+        """
+        for agent_type, path in self._replay_buffer_paths().items():
+            if os.path.exists(path):
+                with np.load(path) as saved:
+                    buffer = self.shared_replay_buffers[agent_type]
+                    for key in buffer:
+                        buffer[key][:] = list(saved[key])
+
+    def _start_episode_streams(self):
+        """
+        Reseed the environment streams for the episode starting (self.episode), from the seed and the episode alone; here, Mesa's
+        model RNG, which decides the order agents act in. Models with other environment streams add theirs
+        """
+        if self.seed is not None:
+            self.reset_randomizer(seeding.episode_seed(self.seed, self.episode, "activation"))
 
     def _choose_agent_types(self, society_mix):
         """
@@ -50,7 +98,7 @@ class SocietyModel(Model):
 
     def _mixed_society_rng(self):
         #its own stream from the seed, so choosing the baseline agents doesn't shift any other random draws
-        return np.random.default_rng(None if self.seed is None else [self.seed, self.MIXED_SOCIETY_STREAM])
+        return seeding.run_rng(self.seed, "mixed_society")
 
     def _choose_baseline_ids(self, rng):
         """

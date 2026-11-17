@@ -4,6 +4,7 @@ import os
 
 import numpy as np
 import pytest
+from src import seeding
 
 from src.agent.dqn.n_network import NNetwork
 from src.agent.modules.dqn_decision_module import DQNDecisionModule
@@ -363,7 +364,8 @@ def test_the_baseline_agents_are_chosen_from_the_seed(in_tmp_dir, layout):
     model = build_mixed(layout, True, str(in_tmp_dir / "checkpoints") + "/")
     choices = set()
     for seed in range(20):
-        baseline_ids = model._choose_baseline_ids(np.random.default_rng([seed, model.MIXED_SOCIETY_STREAM]))
+        # (the mixed society's stream, src/seeding.py, since multi-seed seeding)
+        baseline_ids = model._choose_baseline_ids(seeding.run_rng(seed, "mixed_society"))
         assert_mixed_layout(layout, model, baseline_ids)
         choices.add(frozenset(baseline_ids))
     # different seeds choose different agents (all 6 halves of 4 agents, or both options when the layout allows only 2)

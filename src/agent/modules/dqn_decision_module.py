@@ -1,9 +1,23 @@
 from ..dqn.dqn import DQN
+from src import seeding
 from src.harvest_exception import CheckpointExistsException
 from src.checkpoints import record_progress
 from src.training_config import DEFAULT as DEFAULT_TRAINING_CONFIG
+import json
 import numpy as np
 import os
+
+
+def _dump_json(value, path):
+    with open(path, "w") as file:
+        json.dump(value, file)
+
+
+def _write_atomically(path, write, suffix=""):
+    """Write a file beside path and move it over path, so a run stopped while saving leaves the last one whole"""
+    writing = path[:-len(suffix)] + ".writing" + suffix if suffix else path + ".writing"
+    write(writing)
+    os.replace(writing, path)
 
 class DQNDecisionModule():
     """
@@ -28,10 +42,21 @@ class DQNDecisionModule():
             copied from q_network every replace_target_iter calls
         q_network, target_network -- the two DQN instances (see DQN for why two networks are used)
         losses -- training losses recorded this episode (training mode only), used by get_mean_loss
+        exploration_rng, replay_rng -- this agent's exploration and replay sampling streams, from the run seed and its id (src/seeding.py),
+            carried on across episodes; a checkpoint saves their states, the learning step count and the optimiser's state beside the
+            networks (TRAINING_STATE_FILE, OPTIMISER_FILE), and a continued run restores them, so it learns as the run it continues would have
     """
-    def __init__(self,agent_type,unique_id,training,actions,n_features,checkpoint_path,epsilon,shared_replay_buffer=None,start_episode=1,action_mask=None,compiled_training=False,training_config=None):
+    TRAINING_STATE_FILE = "training_state.json"
+    OPTIMISER_FILE = "optimiser.npz"
+
+    def __init__(self,agent_type,unique_id,training,actions,n_features,checkpoint_path,epsilon,shared_replay_buffer=None,start_episode=1,action_mask=None,compiled_training=False,training_config=None,
+                 seed=None):
         #training_config: the learning parameters (src/training_config.py); None uses the harvest scenarios' values
+        #seed: the run seed this agent's streams (initial weights, exploration, replay sampling) are derived from; None leaves them unseeded
         self.training_config = training_config or DEFAULT_TRAINING_CONFIG
+        self.seed = seed
+        self.exploration_rng = seeding.agent_rng(seed, unique_id, "exploration")
+        self.replay_rng = seeding.agent_rng(seed, unique_id, "replay")
         self.n_features = n_features
         self.action_mask = action_mask
         self.compiled_training = compiled_training
@@ -42,7 +67,9 @@ class DQNDecisionModule():
         self.start_epsilon = epsilon
         self.min_exploration_prob = self.training_config.epsilon_min
         self.expl_decay = self.training_config.epsilon_decay
-        self.epsilon = self._decayed_epsilon(start_episode) if self.continuing else epsilon
+        #epsilon is updated after each learning step, so an episode's first action takes the epsilon the previous episode ended with: a
+        #continued run starts with that too, as the run it continues would have
+        self.epsilon = self._decayed_epsilon(start_episode - 1) if self.continuing else epsilon
         self.actions = actions
         self.n_actions = len(actions)
         self.shared_replay_buffer = shared_replay_buffer
@@ -70,11 +97,34 @@ class DQNDecisionModule():
 
     def save_models(self, episode):
         """
-        Save q and target networks to file, then record the episode they were saved after, so a stopped run can be continued from the next
+        Save q and target networks to file, and what learning carries on with (the agent's random streams, its learning step count and
+        the optimiser's state), then record the episode they were saved after, so a stopped run can be continued from the next
         """
         self._save(self.q_network, self.q_checkpoint_path)
         self._save(self.target_network, self.target_checkpoint_path)
-        record_progress(os.path.dirname(self.q_checkpoint_path)+"/", episode)
+        folder = os.path.dirname(self.q_checkpoint_path)+"/"
+        state = {"learn_step": self.learn_step, "exploration_rng": self.exploration_rng.bit_generator.state,
+                 "replay_rng": self.replay_rng.bit_generator.state}
+        _write_atomically(folder+self.TRAINING_STATE_FILE, lambda path: _dump_json(state, path))
+        optimiser = self.q_network.optimiser_state()
+        _write_atomically(folder+self.OPTIMISER_FILE, lambda path: np.savez(path, *optimiser), suffix=".npz")
+        record_progress(folder, episode)
+
+    def _restore_training_state(self):
+        """
+        A continued run carries on from what its checkpoint saved beside the networks; a checkpoint saved before these were (whose run
+        can't be continued exactly) is continued without them, with fresh streams, the step count from 0 and a fresh optimiser
+        """
+        folder = os.path.dirname(self.q_checkpoint_path)+"/"
+        if os.path.exists(folder+self.TRAINING_STATE_FILE):
+            with open(folder+self.TRAINING_STATE_FILE) as file:
+                state = json.load(file)
+            self.learn_step = state["learn_step"]
+            self.exploration_rng.bit_generator.state = state["exploration_rng"]
+            self.replay_rng.bit_generator.state = state["replay_rng"]
+        if os.path.exists(folder+self.OPTIMISER_FILE):
+            with np.load(folder+self.OPTIMISER_FILE) as saved:
+                self.q_network.restore_optimiser_state([saved[f"arr_{i}"] for i in range(len(saved.files))])
 
     def _save(self, network, checkpoint_path):
         #written beside the checkpoint and then moved over it, so a run stopped while saving leaves the last checkpoint whole
@@ -107,14 +157,20 @@ class DQNDecisionModule():
                     raise CheckpointExistsException(path)
             #both networks are saved in the agent's folder
             os.makedirs(os.path.dirname(self.q_checkpoint_path), exist_ok=True)
-        #a continued run loads the networks it saved and trains them further (its replay buffer starts empty)
-        self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer,continuing=self.continuing,action_mask=self.action_mask,compiled=self.compiled_training,training_config=self.training_config)
-        self.target_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer,continuing=self.continuing,action_mask=self.action_mask,training_config=self.training_config)
+        #a continued run loads the networks it saved and trains them further (its replay buffer is restored by its model); a new one's
+        #networks start from weights drawn from the agent's weights stream, three seeds (one per layer) for each network
+        weight_seeds = seeding.agent_seeds(self.seed, self.unique_id, "weights", 6)
+        self.q_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.q_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer,continuing=self.continuing,action_mask=self.action_mask,compiled=self.compiled_training,training_config=self.training_config,
+                             weight_seeds=weight_seeds[:3],exploration_rng=self.exploration_rng,replay_rng=self.replay_rng)
+        self.target_network = DQN(self.actions,(self.n_features,),self.training,checkpoint_path=self.target_checkpoint_path,shared_replay_buffer=self.shared_replay_buffer,continuing=self.continuing,action_mask=self.action_mask,training_config=self.training_config,
+                                  weight_seeds=weight_seeds[3:])
         if self.training:
             inputs = np.zeros(self.n_features)
             self.q_network.dqn(np.atleast_2d(inputs.astype('float32')))
             self.target_network.dqn(np.atleast_2d(inputs.astype('float32')))
             self.losses = list()
+        if self.continuing:
+            self._restore_training_state()
     
     def _append_losses(self, loss):
         if isinstance(loss, int):

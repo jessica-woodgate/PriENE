@@ -1,3 +1,4 @@
+from src import seeding
 from src.harvest_model import HarvestModel
 from src.harvest_exception import RegrowthDelaysNotSupported
 from src.harvest_exception import CommonsParameterException
@@ -15,8 +16,8 @@ class CommonsHarvest(HarvestModel):
         growth_rate -- r, the commons' growth rate in a normal season (and without seasons)
         initial_stock -- R0, the berries the commons starts every episode with
         current_growth_rate -- growth rate this season: growth_rate changed by GROWTH_RATE_MULTIPLIERS for the season's quality
-        regrowth_rng -- generator for the rounding of regrowth and the cells berries regrow at, seeded from the seed and its own stream
-            (COMMONS_REGROWTH_STREAM) so regrowth doesn't shift other random draws
+        regrowth_rng -- generator for the rounding of regrowth and the cells berries regrow at, reseeded each episode from the seed and
+            its own stream (src/seeding.py) so regrowth doesn't shift other random draws
         harvested_this_step -- berries foraged in the current step
         commons_steps -- this episode's steps, each its stock, harvest, regrowth and growth rate at the end of the step: added to every
             agent's row of the agent report (AGENT_REPORT_COLUMNS), and summarised at the end of the model episode report's rows
@@ -24,8 +25,6 @@ class CommonsHarvest(HarvestModel):
         collapse_day -- the first day this episode the stock was 0 (None if it hasn't collapsed); once collapsed, nothing regrows
     """
     COMMONS = "allocation_commons"
-    #spawn key for the commons' regrowth random stream (see HarvestModel.MIXED_SOCIETY_STREAM)
-    COMMONS_REGROWTH_STREAM = 2
     #in good seasons the commons regrows faster, in bad seasons slower; seasons never add or remove berries
     GROWTH_RATE_MULTIPLIERS = {"normal": 1.0, "good": 1.5, "bad": 0.5}
     #defaults for run.py
@@ -50,7 +49,6 @@ class CommonsHarvest(HarvestModel):
         self.growth_rate = growth_rate
         self.initial_stock = initial_stock
         super().__init__(num_agents,max_width,max_height,max_episodes,max_days,training,write_data,write_norms,filepath,seed,norms_module_type,seasons,season_length,start_episode=start_episode,training_config=training_config)
-        self.regrowth_rng = np.random.default_rng(None if seed is None else [seed, self.COMMONS_REGROWTH_STREAM])
         self.current_growth_rate = growth_rate
         self.harvested_this_step = 0
         self.commons_steps = []
@@ -97,17 +95,18 @@ class CommonsHarvest(HarvestModel):
     def extra_observation_feature_specs(self):
         return [self.STOCK_FEATURE_SPEC]
 
-    def reseed_for_continuing(self):
-        super().reseed_for_continuing()
-        if self.seed is not None:
-            self.regrowth_rng = np.random.default_rng([self.seed, self.COMMONS_REGROWTH_STREAM, self.episode])
+    def _start_episode_streams(self):
+        #the commons' regrowth has a stream of its own, reseeded each episode like the other environment streams
+        super()._start_episode_streams()
+        self.regrowth_rng = seeding.episode_rng(self.seed, self.episode, "commons_regrowth")
 
-    def _place_agent_in_allotment(self, agent):
+    def _place_agent_in_allotment(self, agent, respawn=False):
         #berries take a free cell, so the commons can hold up to its carrying capacity; agents are placed as in the other scenarios
         if agent.agent_type != "berry":
-            return super()._place_agent_in_allotment(agent)
+            return super()._place_agent_in_allotment(agent, respawn)
         cells = self._free_cells()
-        self.grid.place_agent(agent, cells[np.random.randint(len(cells))])
+        rng = self.respawn_rng if respawn else self.placement_rng
+        self.grid.place_agent(agent, cells[rng.integers(len(cells))])
 
     def _free_cells(self):
         #sorted, so which cell a draw picks doesn't depend on the order the grid keeps them in

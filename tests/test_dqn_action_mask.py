@@ -46,12 +46,13 @@ def test_the_learning_target_bootstraps_from_the_best_allowed_next_action():
     assert np.allclose(recorded["actual"], dqn.gamma * 2.0)
 
 def test_without_a_mask_choosing_makes_the_same_random_draws_as_before():
+    # (since multi-seed seeding, exploration draws from the agent's own exploration stream rather than numpy's global RNG)
     dqn = network()
-    np.random.seed(5)
+    dqn.exploration_rng = np.random.default_rng(5)
     chosen = [dqn.choose_action(np.zeros(4), 1.0) for _ in range(50)]
-    np.random.seed(5)
+    rng = np.random.default_rng(5)
     expected = []
     for _ in range(50):
-        np.random.uniform(0, 1)
-        expected.append(ACTIONS.index(np.random.choice(ACTIONS)))
+        rng.uniform(0, 1)
+        expected.append(ACTIONS.index(ACTIONS[rng.integers(len(ACTIONS))]))
     assert chosen == expected

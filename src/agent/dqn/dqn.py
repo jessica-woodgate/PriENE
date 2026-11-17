@@ -32,9 +32,14 @@ class DQN:
         compiled -- whether train runs as one compiled TensorFlow graph (about 13 times faster; the same algorithm and the same random draws,
             but floating point results can differ in the last bits from the eager version, so the harvest scenarios keep the eager one)
     """
-    def __init__(self,actions,n_features,training,checkpoint_path=None,shared_replay_buffer=None,continuing=False,action_mask=None,compiled=False,training_config=None):
+    def __init__(self,actions,n_features,training,checkpoint_path=None,shared_replay_buffer=None,continuing=False,action_mask=None,compiled=False,training_config=None,
+                 weight_seeds=None,exploration_rng=None,replay_rng=None):
         #training_config: the learning parameters (src/training_config.py); None uses the harvest scenarios' values
+        #weight_seeds: one seed per layer for a new network's initial weights; exploration_rng, replay_rng: the generators exploration
+        #and replay sampling draw from (the agent's streams, src/seeding.py); None for unseeded ones
         config = training_config or DEFAULT_TRAINING_CONFIG
+        self.exploration_rng = exploration_rng if exploration_rng is not None else np.random.default_rng()
+        self.replay_rng = replay_rng if replay_rng is not None else np.random.default_rng()
         self.action_mask = None if action_mask is None else np.asarray(action_mask, dtype=bool)
         self.compiled = compiled
         self._compiled_steps = {}
@@ -56,7 +61,7 @@ class DQN:
         self.optimiser = keras.optimizers.Adam(learning_rate=self.lr)
         self.delta = config.huber_delta
         if self.training and not continuing:
-            self.dqn = NNetwork(self.n_actions,self.n_features,self.hidden_units)
+            self.dqn = NNetwork(self.n_actions,self.n_features,self.hidden_units,kernel_seeds=weight_seeds)
         else:
             self.dqn = self._load(self.checkpoint_path)
 
@@ -80,7 +85,7 @@ class DQN:
         if len(self.experience['s']) < self.min_experiences:
             return 0
         #get a batch of experiences
-        ids = np.random.randint(low=0, high=len(self.experience["s"]), size=self.batch_size)
+        ids = self.replay_rng.integers(low=0, high=len(self.experience["s"]), size=self.batch_size)
         states = np.asarray([self.experience['s'][i] for i in ids])
         actions = np.asarray([self.experience['a'][i] for i in ids])
         rewards = np.asarray([self.experience['r'][i] for i in ids])
@@ -140,8 +145,8 @@ class DQN:
         """
         if self.action_mask is not None:
             return self._choose_allowed_action(observation, epsilon)
-        if np.random.uniform(0,1) < epsilon:
-            a = np.random.choice(self.actions)
+        if self.exploration_rng.uniform(0,1) < epsilon:
+            a = self.actions[self.exploration_rng.integers(len(self.actions))]
             action = self.actions.index(a)
         else:
             action_values = self.predict(np.atleast_2d(observation))
@@ -149,8 +154,8 @@ class DQN:
         return action
 
     def _choose_allowed_action(self, observation, epsilon):
-        if np.random.uniform(0,1) < epsilon:
-            return int(np.random.choice(np.flatnonzero(self.action_mask)))
+        if self.exploration_rng.uniform(0,1) < epsilon:
+            return int(self.exploration_rng.choice(np.flatnonzero(self.action_mask)))
         return int(np.argmax(self._masked(self.predict(np.atleast_2d(observation)))))
 
     def _masked(self, action_values):
@@ -181,6 +186,20 @@ class DQN:
         for key, value in experience.items():
             self.experience[key].append(value)
     
+    def optimiser_state(self):
+        """
+        The optimiser's variables (its step count and moment estimates), so a continued run can carry on learning where it stopped
+        """
+        self.optimiser.build(self.dqn.trainable_variables)
+        return [v.numpy() for v in self.optimiser.variables]
+
+    def restore_optimiser_state(self, values):
+        self.optimiser.build(self.dqn.trainable_variables)
+        if len(values) != len(self.optimiser.variables):
+            raise ValueError(f"the saved optimiser state has {len(values)} variables, this optimiser {len(self.optimiser.variables)}")
+        for variable, value in zip(self.optimiser.variables, values):
+            variable.assign(value)
+
     def copy_weights(self, QNet):
         """
         Copy weights of q net to target net every n steps

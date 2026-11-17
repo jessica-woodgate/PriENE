@@ -18,7 +18,8 @@ class LearningAgent(Agent):
         return self.decision_module.get_mean_loss()
 
     def finish_episode(self):
-        if self.training:
+        #a training run saves its checkpoint when its model says one is due (SocietyModel._decide_checkpoint)
+        if self.training and getattr(self.model, "saving_checkpoint", True):
             self.decision_module.save_models(self.model.episode)
 
     def _ethics_sanction(self):

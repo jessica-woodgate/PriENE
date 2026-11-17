@@ -94,7 +94,8 @@ class HarvestAgent(LearningAgent):
         #a continued training run starts from a later episode (see HarvestModel)
         #the training config is only passed when it differs from the default, which the decision module uses anyway
         config = {} if model.training_config == DEFAULT_TRAINING_CONFIG else {"training_config": model.training_config}
-        self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer,model.episode,**config)
+        self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer,model.episode,**config,
+                                                 seed=model.seed)
         self.moving_module = MovingModule(self.unique_id, model, allotment, self.allocation_id, restrict_to_allocation)
         self.track_norms = track_norms
         self.norms_module_type = norms_module_type

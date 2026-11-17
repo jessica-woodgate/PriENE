@@ -1,9 +1,11 @@
 from mesa.time import RandomActivation
+from mesa.agent import AgentSet
 from mesa.space import MultiGrid
 import pandas as pd
 import numpy as np
 import os
 from tensorflow import keras
+from . import seeding
 from .society_model import SocietyModel
 from .training_config import DEFAULT as DEFAULT_TRAINING_CONFIG
 from .agent.harvest_agent import HarvestAgent
@@ -69,8 +71,6 @@ class HarvestModel(SocietyModel):
     """
     SEASON_QUALITIES = ["normal", "good", "bad"]
     SEASON_QUALITY_CHANGE = {"normal": 0, "good": 1, "bad": -1}
-    #spawn key for the random stream that puts agents in allocations each episode (commons uses 2)
-    ALLOCATION_MEMBERSHIP_STREAM = 3
     #whether agents are put in allocations afresh each episode (see _episode_groups): scenarios with more than one allocation
     SHUFFLES_ALLOCATIONS = False
     #columns of the agent report (one row per agent per step) and the model episode report (one row per episode), in order, before any
@@ -125,11 +125,12 @@ class HarvestModel(SocietyModel):
         self.season_length = season_length
         self.season = 0
         self.current_season_quality = None
-        self.season_rng = np.random.default_rng(seed) if seasons else None
         self.dormant_berries = []
         self.allotment_regrowth_delays = None if allotment_regrowth_delays is None else list(allotment_regrowth_delays)
         self.holder_regrowth_delays = None
         self.regrowth_timers = {}
+        #the first episode's environment streams; every later episode's are reseeded in _reset
+        self._start_episode_streams()
         self._init_reporters()
 
     def step(self):
@@ -155,6 +156,11 @@ class HarvestModel(SocietyModel):
                 self._append_norm_dict_to_file(self.emerged_norms, "data/results/current_run/"+self.filepath+"_emerged_norms.json")
             else:
                 self._analyse_agent_norms()
+        #finish_episode(collect_data=False) is the end of a run (run_simulation), which always saves a checkpoint; the replay buffers
+        #are saved before the agents, whose progress records (written last) say the checkpoint is whole
+        self._decide_checkpoint(finishing_run=not collect_data)
+        if self.saving_checkpoint:
+            self.save_replay_buffers()
         for a in self.schedule.agents:
             if a.agent_type != "berry":
                 a.finish_episode()
@@ -241,18 +247,35 @@ class HarvestModel(SocietyModel):
         """
         return None
 
+    def _start_episode_streams(self):
+        """
+        Reseed every environment stream for the episode starting, from the seed and the episode alone (src/seeding.py): the order agents
+        act in, where agents and berries are placed at the start of the episode and where foraged berries regrow, and seasons (the
+        groups each episode are drawn from their own stream, see _allocation_membership_rng)
+        """
+        super()._start_episode_streams()
+        self._restore_schedule_order()
+        self.placement_rng = seeding.episode_rng(self.seed, self.episode, "placement")
+        self.respawn_rng = seeding.episode_rng(self.seed, self.episode, "respawn")
+        self.season_rng = seeding.episode_rng(self.seed, self.episode, "seasons") if self.seasons else None
+
+    def _restore_schedule_order(self):
+        """
+        Put the schedule back in its starting order (agents by id, then berries by id) at the start of every episode. Mesa's
+        RandomActivation shuffles the schedule in place each step, so without this the order agents act in (and the order the episode's
+        placement goes through them) would depend on every earlier episode; with it, it depends only on the seed and the episode.
+        Within an episode the schedule is still reshuffled in place each step, as before
+        """
+        ordered = sorted(self.schedule.agents, key=lambda a: (a.agent_type == "berry", a.unique_id))
+        self.schedule._agents = AgentSet(ordered, self)
+
     def reseed_for_continuing(self):
         """
-        A continued training run is built from its seed, so its agents and their groups are the same as when it started; call this once it
-        is built to reseed every random stream from the seed and the episode it continues from, so it doesn't repeat the run's first episodes
+        A continued training run is built for the episode it continues from, whose environment streams depend only on the seed and that
+        episode (_start_episode_streams), and its agents restore their own streams from the checkpoint (DQNDecisionModule); here, its
+        replay buffers are restored too
         """
-        if self.seed is None:
-            return
-        seed = int(np.random.SeedSequence([self.seed, self.episode]).generate_state(1)[0])
-        keras.utils.set_random_seed(seed)
-        self.reset_randomizer(seed)
-        if self.seasons:
-            self.season_rng = np.random.default_rng([self.seed, self.episode])
+        self.restore_replay_buffers()
 
     def get_living_agents(self):
         return self.living_agents
@@ -373,6 +396,7 @@ class HarvestModel(SocietyModel):
         num_agents = 0
         num_berries = 0
         self.episode += 1
+        self._start_episode_streams()
         #every berry waiting to regrow is placed again below, so no timer carries over to the new episode
         self.regrowth_timers = {}
         self._clear_grid()
@@ -408,7 +432,7 @@ class HarvestModel(SocietyModel):
     def _allocation_membership_rng(self):
         #from the seed and the episode, in a stream of its own, so it shifts no other random draws, every agent type gets the same groups
         #in the same episode, and a continued run gets the groups the run it continues would have had
-        return np.random.default_rng(None if self.seed is None else [self.seed, self.ALLOCATION_MEMBERSHIP_STREAM, self.episode])
+        return seeding.episode_rng(self.seed, self.episode, "membership")
 
     def _episode_groups(self):
         """
@@ -642,8 +666,9 @@ class HarvestModel(SocietyModel):
         if not end_of_episode:
             self.grid.remove_agent(berry)
         berry.reset()
-        self._place_agent_in_allotment(berry)
-        
+        #a berry foraged during the episode regrows from the respawn stream; at the end of an episode, every berry is placed afresh
+        self._place_agent_in_allotment(berry, respawn=not end_of_episode)
+
     def _empty_agent_reporter(self):
         agent_reporter = pd.DataFrame({column: [] for column in self.AGENT_REPORT_FIELDS})
         for column in self.extra_agent_report_columns():
@@ -731,7 +756,7 @@ class HarvestModel(SocietyModel):
             on_grid = sum(1 for b in self.berries if b.allocation_id == berry.allocation_id and b.pos is not None)
             if on_grid < targets[berry.allocation_id]:
                 berry.reset()
-                self._place_agent_in_allotment(berry)
+                self._place_agent_in_allotment(berry, respawn=True)
             else:
                 self._remove_berry(berry)
 
@@ -767,11 +792,14 @@ class HarvestModel(SocietyModel):
             return None
         return self.holder_regrowth_delays[agent.allocation_id]
 
-    def _place_agent_in_allotment(self, agent):
-        #for new agents who aren't yet on the grid
+    def _place_agent_in_allotment(self, agent, respawn=False):
+        """
+        Put an agent or berry not yet on the grid in a random cell of its region: from the placement stream at the start of an episode,
+        or the respawn stream for a berry regrowing during one, so how many berries regrow never shifts where the next episode starts
+        """
         if not self.grid.exists_empty_cells:
             raise NoEmptyCells
-        cell = self._random_allotment_cell(agent)
+        cell = self._random_allotment_cell(agent, self.respawn_rng if respawn else self.placement_rng)
         self.grid.place_agent(agent, cell)
 
     def _clear_grid(self):
@@ -797,9 +825,9 @@ class HarvestModel(SocietyModel):
         self.berry_id += 1
         return berry
     
-    def _random_allotment_cell(self, agent):
-        width = np.random.randint(agent.min_width, agent.max_width)
-        height = np.random.randint(agent.min_height, agent.max_height)
+    def _random_allotment_cell(self, agent, rng):
+        width = int(rng.integers(agent.min_width, agent.max_width))
+        height = int(rng.integers(agent.min_height, agent.max_height))
         return (width, height)
     
     def _generate_resource_allocations(self, num_agents):
@@ -845,15 +873,17 @@ class HarvestModel(SocietyModel):
         #.astype(int) truncates each share toward zero, which can only ever lose berries to
         #rounding (never gain), so diff is always >= 0; redistribute that shortfall one berry at a
         #time to a random agent so the total exactly matches total_resources
+        #(drawn from the run's resources stream, afresh on each call, so every call in a run gives the same resources)
+        rng = seeding.run_rng(self.seed, "resources")
         diff = total_resources - allocations.sum()
         for _ in range(abs(diff)):
-            i = np.random.randint(num_agents)
+            i = rng.integers(num_agents)
             allocations[i] += np.sign(diff)
 
         #without this, agent index/unique_id 0 would always be the richest agent, since the Zipf
         #weighting always puts the largest share at rank 0 -- shuffle to decouple "who is agent 0"
         #from "who is rich" while keeping the overall few-rich-many-poor distribution shape
-        np.random.shuffle(allocations)
+        rng.shuffle(allocations)
         self.num_start_berries = int(allocations.sum())
         return allocations.tolist()
 

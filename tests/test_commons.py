@@ -8,6 +8,7 @@ import pytest
 from src.checkpoints import society_checkpoint_path, record_agent_types, training_checkpoint_name
 from src.harvest_exception import (CheckpointMismatchException, CommonsGridException, CommonsParameterException,
                                    RegrowthDelaysNotSupported)
+from src import seeding
 from src.scenarios.commons_harvest import CommonsHarvest
 from tests.conftest import GRID, NUM_AGENTS, SCENARIOS, _build, _make_pretrained_checkpoint, long_lived
 
@@ -156,12 +157,13 @@ def test_foraged_berries_leave_the_stock_and_are_reused_when_it_regrows(model):
 def test_regrowth_has_its_own_random_stream(in_tmp_dir):
     first = build(str(in_tmp_dir / "a") + "/")
     second = build(str(in_tmp_dir / "b") + "/")
-    # the same seed gives the same regrowth draws, from a stream of its own
-    assert first.regrowth_rng.random() == second.regrowth_rng.random() == np.random.default_rng([42, CommonsHarvest.COMMONS_REGROWTH_STREAM]).random()
-    # a continued run reseeds it from the seed and the episode it continues from
+    # the same seed gives the same regrowth draws, from a stream of its own (since multi-seed seeding, reseeded from the seed and the
+    # episode at the start of every episode, src/seeding.py)
+    assert first.regrowth_rng.random() == second.regrowth_rng.random() == seeding.episode_rng(42, 1, "commons_regrowth").random()
+    # a later episode (or a run continued from it) reseeds it from the seed and that episode
     first.episode = 2
-    first.reseed_for_continuing()
-    assert first.regrowth_rng.random() == np.random.default_rng([42, CommonsHarvest.COMMONS_REGROWTH_STREAM, 2]).random()
+    first._start_episode_streams()
+    assert first.regrowth_rng.random() == seeding.episode_rng(42, 2, "commons_regrowth").random()
 
 
 # ── seasons and episodes ──────────────────────────────────────────

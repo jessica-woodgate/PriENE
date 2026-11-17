@@ -69,10 +69,14 @@ def test_a_stopped_run_continues_from_the_episode_after_the_last_it_saved(in_tmp
 
     continued = build(scenario, checkpoint_path, start_episode=3)
     assert continued.episode == 3
-    # the networks saved after episode 2, trained further with epsilon where it left off, and a new (empty) replay buffer
+    # the networks saved after episode 2, trained further with epsilon where it left off, and the replay buffer saved with them
+    # (changed with multi-seed continuation: the buffer used to start empty)
     assert same_weights(saved, weights(continued))
-    assert all(agent.get_epsilon() == pytest.approx(np.exp(-0.001 * 2)) for agent in agents(continued))
-    assert all(len(buffer["s"]) == 0 for buffer in continued.shared_replay_buffers.values())
+    # episode 3's first action takes the epsilon episode 2 ended with, as in the run it continues (exp(-0.001 * 2), episode 3's own
+    # value, before multi-seed continuation)
+    assert all(agent.get_epsilon() == pytest.approx(np.exp(-0.001 * 1)) for agent in agents(continued))
+    assert all(len(buffer["s"]) == len(model.shared_replay_buffers[agent_type]["s"]) - 2 * len(agents(model))
+               for agent_type, buffer in continued.shared_replay_buffers.items())
     train_until(continued, 4)
     assert not same_weights(saved, weights(continued))
     # one report, every episode once

@@ -176,9 +176,10 @@ def test_every_predicate_is_informative_under_trained_policy(in_tmp_dir, monkeyp
         return original_update(self, observation, action_taken)
 
     monkeypatch.setattr(BayesianNormsModule, "update", logging_update)
-    model = _build("basic", "homogeneous", 12, agent_type, False, TRAINED_CHECKPOINTS_ABS, False, True, "informative", 3, 200,
+    # 10 episodes (3 before multi-seed seeding): with 3, whether the rarest bins reach 1% hung on those few episodes' draws
+    model = _build("basic", "homogeneous", 12, agent_type, False, TRAINED_CHECKPOINTS_ABS, False, True, "informative", 10, 200,
                    seed=42, norms_module_type="bayesian")
-    while model.episode <= 3:
+    while model.episode <= 10:
         model.step()
     observations = np.array(observations)
     uninformative = []

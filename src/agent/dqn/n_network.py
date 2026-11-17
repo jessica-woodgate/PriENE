@@ -16,20 +16,23 @@ class NNetwork(keras.Model):
         output_layer -- output layer of network
         model -- the sequential model
     """
-    def __init__(self, n_actions, n_features, hidden_units, trainable=True, dtype="float32", **kwargs):
+    def __init__(self, n_actions, n_features, hidden_units, trainable=True, dtype="float32", kernel_seeds=None, **kwargs):
         """
         n_features must be a shape tuple (e.g. (5,)), not a bare int, since it is passed straight
         through to layers.InputLayer(shape=n_features); callers always construct it this way
         (DQN.__init__ receives n_features as a tuple and forwards it unchanged).
+        kernel_seeds -- one seed per layer (hidden 1, hidden 2, output) for its initial weights, from the agent's weights stream
+        (src/seeding.py); None for unseeded ones. A loaded network takes its saved weights, so it needs none
         """
         super().__init__()
         self.n_features = n_features
         self.n_actions = n_actions
         self.hidden_units = hidden_units
+        seeds = kernel_seeds if kernel_seeds is not None else [None, None, None]
         self.input_layer = layers.InputLayer(shape=n_features,)
-        self.hidden_layer_1 = layers.Dense(hidden_units, activation="relu", kernel_initializer=initialiser.HeNormal())
-        self.hidden_layer_2 = layers.Dense(hidden_units, activation="relu", kernel_initializer=initialiser.HeNormal())
-        self.output_layer = layers.Dense(n_actions, activation="linear", kernel_initializer=initialiser.HeNormal())
+        self.hidden_layer_1 = layers.Dense(hidden_units, activation="relu", kernel_initializer=initialiser.HeNormal(seed=seeds[0]))
+        self.hidden_layer_2 = layers.Dense(hidden_units, activation="relu", kernel_initializer=initialiser.HeNormal(seed=seeds[1]))
+        self.output_layer = layers.Dense(n_actions, activation="linear", kernel_initializer=initialiser.HeNormal(seed=seeds[2]))
         
         self.model = keras.Sequential([
             self.input_layer,

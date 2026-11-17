@@ -31,7 +31,7 @@ class FruitMarketAgent(LearningAgent):
         self.actions = model.agent_actions(self)
         self.decision_module = DQNDecisionModule(agent_type, unique_id, training, self.actions, self.n_features, checkpoint_path, epsilon,
                                                  shared_replay_buffer, model.episode, action_mask=model.action_mask(self), compiled_training=True,
-                                                 training_config=model.training_config)
+                                                 training_config=model.training_config, seed=model.seed)
         if self.track_norms:
             self.norms_module = self._build_norms_module()
         if agent_type != "baseline":
