@@ -1,6 +1,8 @@
 from .learning_agent import LearningAgent
 from .learning_agent import NORMS_MODULE_TYPES  # noqa: F401 (imported from here by HarvestModel)
 from .modules.dqn_decision_module import DQNDecisionModule
+from .modules.scripted_decision_module import ScriptedDecisionModule
+from src import seeding
 from .modules.moving_module import MovingModule
 from .modules.bayesian_norms_module import BayesianNormsModule
 from .modules.ethics_module import EthicsModule
@@ -47,7 +49,12 @@ class HarvestAgent(LearningAgent):
         norms_module -- norm base tracking this agent's behaviour (present only if track_norms)
         rewards -- this agent's reward table (see _baseline_rewards/_ethics_rewards)
     """
-    def __init__(self,unique_id,model,agent_type,allotment,training,checkpoint_path,epsilon,track_norms,shared_replay_buffer=None,allocation_id=None,norms_module_type="rule_based"):
+    #what an action can come to, each the key of its reward (death and survive are added to a step's reward on top of these)
+    OUTCOMES = ["eat", "forage", "throw", "no_berries", "no_benefactor", "insufficient_health", "neutral_reward"]
+
+    def __init__(self,unique_id,model,agent_type,allotment,training,checkpoint_path,epsilon,track_norms,shared_replay_buffer=None,allocation_id=None,norms_module_type="rule_based",
+                 policy=None):
+        #policy: a scripted policy's name (ScriptedDecisionModule.POLICIES) to act with instead of a network, or None (a DQN, as always)
         super().__init__(unique_id,model)
         self.done = False
         self.current_reward = 0
@@ -63,6 +70,8 @@ class HarvestAgent(LearningAgent):
         self.current_agent_thrown_to = None
         #this step's action as rule-based norms label it, worked out before acting (see _throw_norm_label)
         self.current_norm_label = None
+        #the outcome of this step's action, the key its reward is looked up by (one of OUTCOMES; see _reward)
+        self.current_outcome = None
         self.total_episode_reward = 0
         self.training = training
         self.agent_type = agent_type
@@ -94,8 +103,13 @@ class HarvestAgent(LearningAgent):
         #a continued training run starts from a later episode (see HarvestModel)
         #the training config is only passed when it differs from the default, which the decision module uses anyway
         config = {} if model.training_config == DEFAULT_TRAINING_CONFIG else {"training_config": model.training_config}
-        self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer,model.episode,**config,
-                                                 seed=model.seed)
+        self.policy = policy
+        if policy is None:
+            self.decision_module = DQNDecisionModule(agent_type,unique_id,training,self.actions,self.n_features,checkpoint_path,epsilon,shared_replay_buffer,model.episode,**config,
+                                                     seed=model.seed)
+        else:
+            #a scripted policy (src/agent/modules/scripted_decision_module.py) chooses instead of a network, and doesn't learn
+            self.decision_module = ScriptedDecisionModule(policy, self, seeding.agent_rng(model.seed, unique_id, "exploration"))
         self.moving_module = MovingModule(self.unique_id, model, allotment, self.allocation_id, restrict_to_allocation)
         self.track_norms = track_norms
         self.norms_module_type = norms_module_type
@@ -136,6 +150,13 @@ class HarvestAgent(LearningAgent):
             antecedent = self.norms_module.get_antecedent([self.berries, self.health, self.model.get_society_well_being(self, True, False)]
                                                           + list(self.model.extra_observation_features(self)))
             self.current_norm_label = self._throw_norm_label(action)
+        self.current_outcome = None
+        #a run collecting outcomes (src/reward_checks) logs each step's outcome and what the ethics module sees; reading only, so the run
+        #is the same either way
+        outcome_log = self.model.outcome_log
+        if outcome_log is not None:
+            logged = {"health_before": self.health, "berries_before": self.berries, "days_left_before": self.days_left_to_live,
+                      "well_being_before": self.model.get_society_well_being(self, False, True).tolist()}
         if self.agent_type != "baseline":
             society_well_being = self.model.get_society_well_being(self, False, True)
             self.ethics_module.update_ethics_state(society_well_being)
@@ -144,11 +165,17 @@ class HarvestAgent(LearningAgent):
         #well-being, e.g. a foraged berry; health decay comes after, in _update_attributes
         self.days_left_to_live = self.get_days_left_to_live()
         next_state = self.observe()
+        if outcome_log is not None:
+            logged["well_being_after"] = self.model.get_society_well_being(self, False, True).tolist()
+            #the state the DQN's transition ends in (next_state): after the action, before the day's decay
+            logged["days_left_acted"] = self.days_left_to_live
         if self.agent_type != "baseline":
             sanction = self._ethics_sanction()
             self.current_sanction = float(np.sum(sanction))
             reward_vector = reward_vector + sanction
         done, reward_vector = self._update_attributes(reward_vector)
+        if outcome_log is not None:
+            self._log_outcome(outcome_log, logged, action, done, reward_vector)
         if self.track_norms:
             self._update_norms(antecedent, observation, action, np.sum(reward_vector).item())
         return reward_vector, next_state, done
@@ -224,15 +251,37 @@ class HarvestAgent(LearningAgent):
     def _move(self):
         if not self.moving_module.check_nearest_berry(self.pos):
             #if no berries have been found to walk towards, have to wait
-            return self.rewards["neutral_reward"]
+            return self._reward("neutral_reward")
         #otherwise, we have a path, move towards the berry; returns True if we are at the end of the path and find a berry
         berry_found, new_pos = self.moving_module.move_towards_berry(self.pos)
         if berry_found:
             self.berries += 1
-            return self.rewards["forage"]
+            return self._reward("forage")
         if new_pos != self.pos:
             self.model.move_agent_to_cell(self, new_pos)
-        return self.rewards["neutral_reward"]
+        return self._reward("neutral_reward")
+
+    def _log_outcome(self, outcome_log, logged, action, died, reward_vector):
+        """
+        One step's row of an outcome log: the action and its outcome, whether the agent died this step and whether this was the
+        episode's last day (which earns the survive reward), its health, berries and days left to live before and after (after the
+        day's decay), every agent's days left to live before and after the action as its ethics module sees them, and the reward and
+        sanction it got
+        """
+        day = self.model.get_day()
+        outcome_log.append({"episode": self.model.episode, "day": day, "agent_id": self.unique_id, "agent_type": self.agent_type,
+                            "policy": self.policy, "action": self.actions[action], "outcome": self.current_outcome,
+                            "thrown_to": self.current_thrown_to, "died": bool(died), "last_day": day == self.max_days - 1,
+                            **logged, "health_after": self.health, "berries_after": self.berries, "days_left_after": self.days_left_to_live,
+                            "reward": float(np.sum(reward_vector)), "sanction": self.current_sanction if self.agent_type != "baseline" else None})
+
+    def _reward(self, outcome):
+        """
+        The reward for this step's action's outcome, recording the outcome (current_outcome: one of OUTCOMES), so the outcome can be
+        logged and rewarded afresh offline (src/reward_checks)
+        """
+        self.current_outcome = outcome
+        return self.rewards[outcome]
     
     def is_dead(self):
         """
@@ -245,20 +294,20 @@ class HarvestAgent(LearningAgent):
         if self.model.agent_by_id(benefactor_id).is_dead():
             self.current_agent_thrown_to = "dead_other"
         if self.berries <= 0:
-            return self.rewards["no_berries"]
+            return self._reward("no_berries")
         #have to have a minimum amount of health to throw
         if self.health < self.low_health_threshold:
-            return self.rewards["insufficient_health"]
+            return self._reward("insufficient_health")
         for a in self.model.get_living_agents():
             if a.unique_id == benefactor_id:
                 if a.agent_type == "berry":
                     raise AgentTypeException("agent to throw to", "berry")
                 if a.done:
                     #died earlier this step (it leaves living_agents at the end of the step): no living benefactor
-                    return self.rewards["no_benefactor"]
+                    return self._reward("no_benefactor")
                 if not self.model.can_throw_to(self, a):
                     #out of reach (e.g. in another allotment) is treated the same as no living benefactor
-                    return self.rewards["no_benefactor"]
+                    return self._reward("no_benefactor")
                 #who the berry goes to, compared before it moves, so the giver still holds it and the receiver hasn't been fed
                 self.current_thrown_to = a.unique_id
                 self.current_group_thrown_to = self.model.group_thrown_to(self, a)
@@ -269,8 +318,8 @@ class HarvestAgent(LearningAgent):
                 self.berries -= 1
                 self.berries_thrown += 1
                 self.days_left_to_live = self.get_days_left_to_live()
-                return self.rewards["throw"]
-        return self.rewards["no_benefactor"]
+                return self._reward("throw")
+        return self._reward("no_benefactor")
 
     @staticmethod
     def _compare_well_off(receiver, giver):
@@ -288,9 +337,9 @@ class HarvestAgent(LearningAgent):
             self.health = round(self.health + self.berry_health_payoff, DECIMALS)
             self.berries -= 1
             self.berries_consumed += 1
-            return self.rewards["eat"]
+            return self._reward("eat")
         else:
-            return self.rewards["no_berries"]
+            return self._reward("no_berries")
 
     def _update_attributes(self, reward_vector):
         done = False

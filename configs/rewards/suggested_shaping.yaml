@@ -1,0 +1,14 @@
+# suggested.yaml with potential-based shaping on the agent's own days left to live instead of rewards for eating and foraging
+rewards:
+  death: -1
+  no_berries: -0.1
+  no_benefactor: -0.1
+  insufficient_health: -0.1
+  neutral_reward: 0
+  throw: 0
+  forage: 0
+  eat: 0
+  survive: 1
+ethics_rewards: {}
+sanction: 0.4
+shaping: true

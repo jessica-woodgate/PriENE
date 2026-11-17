@@ -73,6 +73,11 @@ class HarvestModel(SocietyModel):
     SEASON_QUALITY_CHANGE = {"normal": 0, "good": 1, "bad": -1}
     #whether agents are put in allocations afresh each episode (see _episode_groups): scenarios with more than one allocation
     SHUFFLES_ALLOCATIONS = False
+    #scripted policies some agents act with instead of networks ({agent id: policy}, see ScriptedDecisionModule), set on a subclass so
+    #they are there as the agents are made (src/reward_checks/simulate.py); None: every agent has a network
+    scripted_policies = None
+    #a list a run collecting outcomes appends each agent's step to (HarvestAgent._log_outcome); None: nothing is logged
+    outcome_log = None
     #columns of the agent report (one row per agent per step) and the model episode report (one row per episode), in order, before any
     #a scenario adds; each row's values are listed in the same order in _collect_agent_data and _collect_model_episode_data
     AGENT_REPORT_FIELDS = ["agent_id", "agent_type", "episode", "day", "berries", "berries_consumed", "berries_thrown", "health",
@@ -387,7 +392,9 @@ class HarvestModel(SocietyModel):
 
     def _add_agent(self, i, agent_type, allotment, checkpoint_path, allocation_id=None):
         shared_replay_buffer = self.shared_replay_buffers.setdefault(agent_type, {"s": [], "a": [], "r": [], "s_": [], "done": []})
-        a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.track_norms,shared_replay_buffer=shared_replay_buffer,allocation_id=allocation_id,norms_module_type=self.norms_module_type)
+        policy = (self.scripted_policies or {}).get(i)
+        a = HarvestAgent(i,self,agent_type,allotment,self.training,checkpoint_path,self.epsilon,self.track_norms,shared_replay_buffer=shared_replay_buffer,allocation_id=allocation_id,norms_module_type=self.norms_module_type,
+                         policy=policy)
         self.schedule.add(a)
         self._place_agent_in_allotment(a)
         self.living_agents.append(a)

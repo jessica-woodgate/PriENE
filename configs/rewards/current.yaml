@@ -1,0 +1,23 @@
+# The rewards agents train with now (configs/training/harvest.yaml's rewards, ethics_rewards and sanction; a test checks they match).
+# Candidate reward functions for the scripted-policy check (python -m src.reward_checks.evaluate, see src/reward_checks/rewards.py):
+#   rewards -- every agent's reward for each outcome of its action, and death and survive (reaching the episode's last day)
+#   ethics_rewards -- the rewards ethics agents get instead, for any of those (empty: the same as every agent's)
+#   sanction -- the ethics module's sanction
+#   alive (optional, default 0) -- reward for each day an agent is still alive at the end of
+#   shaping (optional, default false) -- add potential-based shaping on the agent's own days left to live, gamma * phi(s') - phi(s)
+rewards:
+  death: -1
+  no_berries: -0.2
+  no_benefactor: -0.2
+  insufficient_health: -0.2
+  neutral_reward: 0
+  throw: 0.5
+  forage: 0.5
+  eat: 1
+  survive: 1
+ethics_rewards:
+  no_berries: -0.1
+  no_benefactor: -0.1
+  insufficient_health: -0.1
+  eat: 0.8
+sanction: 0.4

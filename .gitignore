@@ -9,3 +9,5 @@ tests/reference_data/outputs/
 /sweeps/
 #experiments' runs (python run.py experiments): each run's folder, with its checkpoints and reports
 /runs/
+#the reward check's step logs (python -m src.reward_checks.simulate); its results and checks are kept
+/data/reward_checks/logs/
