@@ -33,7 +33,21 @@ def load_logs(paths):
     logs = pd.concat([pd.read_csv(path) for path in paths], ignore_index=True)
     for column in ["died", "last_day"]:
         logs[column] = logs[column].astype(bool)
-    return logs
+    return with_neutral_passive(logs)
+
+
+def with_neutral_passive(logs):
+    """
+    The logs, with a copy of the homogeneous passive runs (run homogeneous_passive_neutral, policy passive_neutral) whose failed eats
+    (no_berries) count as actions with no other effect (neutral_reward): passive can't do nothing (there is no such action), so it
+    tries to eat every step and pays the failed action's penalty; this scores the same steps as pure inaction
+    """
+    passive = logs[(logs["setup"] == "homogeneous") & (logs["run"].str.endswith("_passive"))]
+    if passive.empty:
+        return logs
+    neutral = passive.assign(run=passive["run"] + "_neutral", policy="passive_neutral",
+                             outcome=passive["outcome"].replace("no_berries", "neutral_reward"))
+    return pd.concat([logs, neutral], ignore_index=True)
 
 
 def unit_sanctions(logs, agent_types=AGENT_TYPES):
@@ -123,7 +137,7 @@ def checks(results, data):
 
     for (scenario, reward, agent_type), _ in results.groupby(["scenario", "reward_function", "agent_type"]):
         eater = mean(scenario, "homogeneous", "eater", "all", reward, agent_type)
-        for other in ["random", "passive"]:
+        for other in ["random", "passive", "passive_neutral"]:
             value = mean(scenario, "homogeneous", other, "all", reward, agent_type)
             add(scenario, reward, agent_type, f"eater > {other}", eater, value, eater > value)
         hoarder = mean(scenario, "homogeneous", "hoarder", "all", reward, agent_type)
@@ -133,7 +147,9 @@ def checks(results, data):
                 focal = mean(scenario, "focal", policy, "focal", reward, agent_type)
                 eaters = mean(scenario, "focal", policy, "eaters", reward, agent_type)
                 add(scenario, reward, agent_type, f"focal {policy} <= eaters (baseline rewards)", focal, eaters, focal <= eaters)
-        own = data[(data["scenario"] == scenario) & (data["reward_function"] == reward) & (data["agent_type"] == agent_type)]
+        #every agent-episode simulated (not passive_neutral's copies of the passive ones, which would count them twice)
+        own = data[(data["scenario"] == scenario) & (data["reward_function"] == reward) & (data["agent_type"] == agent_type)
+                   & (data["run_policy"] != "passive_neutral")]
         survived = own[own["survived"]]["discounted_return"]
         early = own[own["died"] & (own["death_day"] < EARLY_DEATH_DAY)]["discounted_return"]
         if len(survived) and len(early):
@@ -204,7 +220,8 @@ def report(results, all_checks, gamma, days, reward_functions):
              f"- Validation episodes: each episode's environment is reseeded from the validation seed (2000) and the episode, so every set-up "
              "faces the same episodes.",
              "- passive: there is no action that does nothing (move is foraging), so passive eats every step, which fails (no_berries) "
-             "without a berry: it never forages, and its return includes that failed action's penalty every day.",
+             "without a berry: it never forages, and its return includes that failed action's penalty every day. passive_neutral scores "
+             "the same steps with those failed eats as actions with no other effect (neutral_reward): pure inaction.",
              "- An agent that dies on the last day doesn't get the survive reward (as during a run).", "",
              "## Failed checks", ""]
     if failed.empty:

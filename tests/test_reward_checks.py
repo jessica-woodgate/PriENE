@@ -218,6 +218,16 @@ def test_alive_and_shaping_rewards():
     assert np.allclose(rw.step_rewards(log, function, "baseline", gamma), expected)
 
 
+def test_passive_neutral_scores_passives_failed_eats_as_doing_nothing():
+    from src.reward_checks.evaluate import with_neutral_passive
+    logs = pd.DataFrame({"setup": ["homogeneous", "homogeneous", "focal"], "run": ["homogeneous_passive", "homogeneous_eater", "focal_sharer"],
+                         "policy": ["passive", "eater", "sharer"], "outcome": ["no_berries", "no_berries", "no_berries"]})
+    extended = with_neutral_passive(logs)
+    neutral = extended[extended["run"] == "homogeneous_passive_neutral"]
+    assert len(extended) == 4 and list(neutral["outcome"]) == ["neutral_reward"] and list(neutral["policy"]) == ["passive_neutral"]
+    assert list(extended["outcome"][:3]) == ["no_berries"] * 3
+
+
 def test_reward_files_load_and_current_is_the_training_configs():
     for path in sorted(os.listdir(os.path.join(REPO, "configs", "rewards"))):
         rw.load(os.path.join(REPO, "configs", "rewards", path))

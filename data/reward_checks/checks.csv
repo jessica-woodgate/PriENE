@@ -1,0 +1,491 @@
+scenario,reward_function,agent_type,check,value,compared_with,passed,detail
+basic,current,average,eater > random,6.221993045880595,-0.8251231280619753,True,
+basic,current,average,eater > passive,6.221993045880595,-1.3714964335156248,True,
+basic,current,average,eater > passive_neutral,6.221993045880595,-0.6983372960937497,True,
+basic,current,average,hoarder <= eater,4.407781195706171,6.221993045880595,True,
+basic,current,average,surviving > dying early (by 1 sd),6.471488553515221,0.38032230725054195,True,"difference 6.091, sd 3.379; 4984 survived, 2908 died before day 100"
+basic,current,baseline,eater > random,6.331596811321784,-1.4382021987336306,True,
+basic,current,baseline,eater > passive,6.331596811321784,-2.0446555709374996,True,
+basic,current,baseline,eater > passive_neutral,6.331596811321784,-0.6983372960937497,True,
+basic,current,baseline,hoarder <= eater,4.209973405703363,6.331596811321784,True,
+basic,current,baseline,focal sharer <= eaters (baseline rewards),5.014665465839489,6.594400701186429,True,
+basic,current,baseline,focal altruist <= eaters (baseline rewards),3.7305210390614105,6.55054211933009,True,
+basic,current,baseline,surviving > dying early (by 1 sd),6.344013638018798,-0.13020467596534935,True,"difference 6.474, sd 3.635; 4984 survived, 2908 died before day 100"
+basic,current,egalitarian,eater > random,5.179357192318107,-0.9755635537916016,True,
+basic,current,egalitarian,eater > passive,5.179357192318107,-1.3714964335156248,True,
+basic,current,egalitarian,eater > passive_neutral,5.179357192318107,-0.6983372960937497,True,
+basic,current,egalitarian,hoarder <= eater,3.3233378516025365,5.179357192318107,True,
+basic,current,egalitarian,surviving > dying early (by 1 sd),5.242772360245936,0.19951071684249036,True,"difference 5.043, sd 2.924; 4984 survived, 2908 died before day 100"
+basic,current,majoritarian,eater > random,6.402316707478758,-0.7885091535296184,True,
+basic,current,majoritarian,eater > passive,6.402316707478758,-1.3714964335156248,True,
+basic,current,majoritarian,eater > passive_neutral,6.402316707478758,-0.6983372960937497,True,
+basic,current,majoritarian,hoarder <= eater,4.563445708283262,6.402316707478758,True,
+basic,current,majoritarian,surviving > dying early (by 1 sd),6.7499713141079605,0.4281541952120661,True,"difference 6.322, sd 3.493; 4984 survived, 2908 died before day 100"
+basic,current,maximin,eater > random,6.223584308481296,-0.7933911254514934,True,
+basic,current,maximin,eater > passive,6.223584308481296,-1.3714964335156248,True,
+basic,current,maximin,eater > passive_neutral,6.223584308481296,-0.6983372960937497,True,
+basic,current,maximin,hoarder <= eater,4.402787949470428,6.223584308481296,True,
+basic,current,maximin,surviving > dying early (by 1 sd),6.557764033364059,0.3949650612328357,True,"difference 6.163, sd 3.410; 4984 survived, 2908 died before day 100"
+basic,current,optimist,eater > random,7.263037636842383,-0.6902419138720886,True,
+basic,current,optimist,eater > passive,7.263037636842383,-1.3714964335156248,True,
+basic,current,optimist,eater > passive_neutral,7.263037636842383,-0.6983372960937497,True,
+basic,current,optimist,hoarder <= eater,5.4972177860455504,7.263037636842383,True,
+basic,current,optimist,surviving > dying early (by 1 sd),7.8480878097375255,0.5545987008987968,True,"difference 7.293, sd 3.997; 4984 survived, 2908 died before day 100"
+basic,current,utilitarian,eater > random,7.263037636842383,-0.7064147049428307,True,
+basic,current,utilitarian,eater > passive,7.263037636842383,-1.3714964335156248,True,
+basic,current,utilitarian,eater > passive_neutral,7.263037636842383,-0.6983372960937497,True,
+basic,current,utilitarian,hoarder <= eater,5.4972177860455504,7.263037636842383,True,
+basic,current,utilitarian,surviving > dying early (by 1 sd),7.613929266935668,0.5464911436762994,True,"difference 7.067, sd 3.915; 4984 survived, 2908 died before day 100"
+basic,current,veto,eater > random,5.206576146120717,-0.9576696530812363,True,
+basic,current,veto,eater > passive,5.206576146120717,-1.3714964335156248,True,
+basic,current,veto,eater > passive_neutral,5.206576146120717,-0.6983372960937497,True,
+basic,current,veto,hoarder <= eater,3.363487339630028,5.206576146120717,True,
+basic,current,veto,surviving > dying early (by 1 sd),5.282455961960949,0.20776507366104,True,"difference 5.075, sd 2.940; 4984 survived, 2908 died before day 100"
+basic,suggested,average,eater > random,4.848729816017479,-1.0451495190627906,True,
+basic,suggested,average,eater > passive,4.848729816017479,-1.3714964335156248,True,
+basic,suggested,average,eater > passive_neutral,4.848729816017479,-0.6983372960937497,True,
+basic,suggested,average,hoarder <= eater,2.689833916376388,4.848729816017479,True,
+basic,suggested,average,surviving > dying early (by 1 sd),4.263508992632296,-0.09236053492560359,True,"difference 4.356, sd 2.674; 4984 survived, 2908 died before day 100"
+basic,suggested,baseline,eater > random,4.122484789609197,-1.0972153414493653,True,
+basic,suggested,baseline,eater > passive,4.122484789609197,-1.3714964335156248,True,
+basic,suggested,baseline,eater > passive_neutral,4.122484789609197,-0.6983372960937497,True,
+basic,suggested,baseline,hoarder <= eater,2.0564589107653855,4.122484789609197,True,
+basic,suggested,baseline,focal sharer <= eaters (baseline rewards),2.7080430062809335,4.307859911918335,True,
+basic,suggested,baseline,focal altruist <= eaters (baseline rewards),1.3452536997400586,4.276555823483126,True,
+basic,suggested,baseline,surviving > dying early (by 1 sd),3.446701213870463,-0.33601525360162465,True,"difference 3.783, sd 2.443; 4984 survived, 2908 died before day 100"
+basic,suggested,egalitarian,eater > random,3.806093962454991,-1.195589944792417,True,
+basic,suggested,egalitarian,eater > passive,3.806093962454991,-1.3714964335156248,True,
+basic,suggested,egalitarian,eater > passive_neutral,3.806093962454991,-0.6983372960937497,True,
+basic,suggested,egalitarian,hoarder <= eater,1.6053905722727517,3.806093962454991,True,
+basic,suggested,egalitarian,surviving > dying early (by 1 sd),3.034792799363011,-0.2731721253336552,True,"difference 3.308, sd 2.314; 4984 survived, 2908 died before day 100"
+basic,suggested,majoritarian,eater > random,5.029053477615642,-1.0085355445304338,True,
+basic,suggested,majoritarian,eater > passive,5.029053477615642,-1.3714964335156248,True,
+basic,suggested,majoritarian,eater > passive_neutral,5.029053477615642,-0.6983372960937497,True,
+basic,suggested,majoritarian,hoarder <= eater,2.8454984289534786,5.029053477615642,True,
+basic,suggested,majoritarian,surviving > dying early (by 1 sd),4.5419917532250365,-0.04452864696407919,True,"difference 4.587, sd 2.743; 4984 survived, 2908 died before day 100"
+basic,suggested,maximin,eater > random,4.85032107861818,-1.0134175164523087,True,
+basic,suggested,maximin,eater > passive,4.85032107861818,-1.3714964335156248,True,
+basic,suggested,maximin,eater > passive_neutral,4.85032107861818,-0.6983372960937497,True,
+basic,suggested,maximin,hoarder <= eater,2.684840670140644,4.85032107861818,True,
+basic,suggested,maximin,surviving > dying early (by 1 sd),4.349784472481134,-0.07771778094330967,True,"difference 4.428, sd 2.664; 4984 survived, 2908 died before day 100"
+basic,suggested,optimist,eater > random,5.889774406979267,-0.910268304872904,True,
+basic,suggested,optimist,eater > passive,5.889774406979267,-1.3714964335156248,True,
+basic,suggested,optimist,eater > passive_neutral,5.889774406979267,-0.6983372960937497,True,
+basic,suggested,optimist,hoarder <= eater,3.779270506715768,5.889774406979267,True,
+basic,suggested,optimist,surviving > dying early (by 1 sd),5.640108248854601,0.0819158587226514,True,"difference 5.558, sd 3.193; 4984 survived, 2908 died before day 100"
+basic,suggested,utilitarian,eater > random,5.889774406979267,-0.9264410959436462,True,
+basic,suggested,utilitarian,eater > passive,5.889774406979267,-1.3714964335156248,True,
+basic,suggested,utilitarian,eater > passive_neutral,5.889774406979267,-0.6983372960937497,True,
+basic,suggested,utilitarian,hoarder <= eater,3.779270506715768,5.889774406979267,True,
+basic,suggested,utilitarian,surviving > dying early (by 1 sd),5.405949706052744,0.07380830150015408,True,"difference 5.332, sd 3.202; 4984 survived, 2908 died before day 100"
+basic,suggested,veto,eater > random,3.8333129162576016,-1.1776960440820519,True,
+basic,suggested,veto,eater > passive,3.8333129162576016,-1.3714964335156248,True,
+basic,suggested,veto,eater > passive_neutral,3.8333129162576016,-0.6983372960937497,True,
+basic,suggested,veto,hoarder <= eater,1.645540060300244,3.8333129162576016,True,
+basic,suggested,veto,surviving > dying early (by 1 sd),3.0744764010780234,-0.2649177685151054,True,"difference 3.339, sd 2.330; 4984 survived, 2908 died before day 100"
+basic,suggested_alive,average,eater > random,5.22597188202267,-0.905462547426216,True,
+basic,suggested_alive,average,eater > passive,5.22597188202267,-1.2508313519531247,True,
+basic,suggested_alive,average,eater > passive_neutral,5.22597188202267,-0.5776722145312497,True,
+basic,suggested_alive,average,hoarder <= eater,3.0412484866147986,5.22597188202267,True,
+basic,suggested_alive,average,surviving > dying early (by 1 sd),4.663458074022377,0.08956947315931076,True,"difference 4.574, sd 2.778; 4984 survived, 2908 died before day 100"
+basic,suggested_alive,baseline,eater > random,4.499726855614389,-0.9575283698127905,True,
+basic,suggested_alive,baseline,eater > passive,4.499726855614389,-1.2508313519531247,True,
+basic,suggested_alive,baseline,eater > passive_neutral,4.499726855614389,-0.5776722145312497,True,
+basic,suggested_alive,baseline,hoarder <= eater,2.4078734810037967,4.499726855614389,True,
+basic,suggested_alive,baseline,focal sharer <= eaters (baseline rewards),3.041302334770614,4.696662184167082,True,
+basic,suggested_alive,baseline,focal altruist <= eaters (baseline rewards),1.637113227659836,4.662888346398847,True,
+basic,suggested_alive,baseline,surviving > dying early (by 1 sd),3.846650295260544,-0.15408524551671024,True,"difference 4.001, sd 2.541; 4984 survived, 2908 died before day 100"
+basic,suggested_alive,egalitarian,eater > random,4.183336028460182,-1.0559029731558425,True,
+basic,suggested_alive,egalitarian,eater > passive,4.183336028460182,-1.2508313519531247,True,
+basic,suggested_alive,egalitarian,eater > passive_neutral,4.183336028460182,-0.5776722145312497,True,
+basic,suggested_alive,egalitarian,hoarder <= eater,1.9568051425111626,4.183336028460182,True,
+basic,suggested_alive,egalitarian,surviving > dying early (by 1 sd),3.4347418807530907,-0.09124211724874083,True,"difference 3.526, sd 2.409; 4984 survived, 2908 died before day 100"
+basic,suggested_alive,majoritarian,eater > random,5.406295543620834,-0.8688485728938591,True,
+basic,suggested_alive,majoritarian,eater > passive,5.406295543620834,-1.2508313519531247,True,
+basic,suggested_alive,majoritarian,eater > passive_neutral,5.406295543620834,-0.5776722145312497,True,
+basic,suggested_alive,majoritarian,hoarder <= eater,3.1969129991918894,5.406295543620834,True,
+basic,suggested_alive,majoritarian,surviving > dying early (by 1 sd),4.9419408346151155,0.1374013611208351,True,"difference 4.805, sd 2.850; 4984 survived, 2908 died before day 100"
+basic,suggested_alive,maximin,eater > random,5.227563144623371,-0.8737305448157341,True,
+basic,suggested_alive,maximin,eater > passive,5.227563144623371,-1.2508313519531247,True,
+basic,suggested_alive,maximin,eater > passive_neutral,5.227563144623371,-0.5776722145312497,True,
+basic,suggested_alive,maximin,hoarder <= eater,3.036255240379055,5.227563144623371,True,
+basic,suggested_alive,maximin,surviving > dying early (by 1 sd),4.749733553871213,0.10421222714160461,True,"difference 4.646, sd 2.770; 4984 survived, 2908 died before day 100"
+basic,suggested_alive,optimist,eater > random,6.267016472984458,-0.7705813332363295,True,
+basic,suggested_alive,optimist,eater > passive,6.267016472984458,-1.2508313519531247,True,
+basic,suggested_alive,optimist,eater > passive_neutral,6.267016472984458,-0.5776722145312497,True,
+basic,suggested_alive,optimist,hoarder <= eater,4.130685076954178,6.267016472984458,True,
+basic,suggested_alive,optimist,surviving > dying early (by 1 sd),6.040057330244681,0.2638458668075655,True,"difference 5.776, sd 3.301; 4984 survived, 2908 died before day 100"
+basic,suggested_alive,utilitarian,eater > random,6.267016472984458,-0.7867541243070716,True,
+basic,suggested_alive,utilitarian,eater > passive,6.267016472984458,-1.2508313519531247,True,
+basic,suggested_alive,utilitarian,eater > passive_neutral,6.267016472984458,-0.5776722145312497,True,
+basic,suggested_alive,utilitarian,hoarder <= eater,4.130685076954178,6.267016472984458,True,
+basic,suggested_alive,utilitarian,surviving > dying early (by 1 sd),5.805898787442823,0.25573830958506827,True,"difference 5.550, sd 3.307; 4984 survived, 2908 died before day 100"
+basic,suggested_alive,veto,eater > random,4.210554982262793,-1.0380090724454771,True,
+basic,suggested_alive,veto,eater > passive,4.210554982262793,-1.2508313519531247,True,
+basic,suggested_alive,veto,eater > passive_neutral,4.210554982262793,-0.5776722145312497,True,
+basic,suggested_alive,veto,hoarder <= eater,1.9969546305386547,4.210554982262793,True,
+basic,suggested_alive,veto,surviving > dying early (by 1 sd),3.474425482468104,-0.08298776043019113,True,"difference 3.557, sd 2.425; 4984 survived, 2908 died before day 100"
+basic,suggested_death5,average,eater > random,4.621571191083853,-3.6482798026970427,True,
+basic,suggested_death5,average,eater > passive,4.621571191083853,-4.164845617890623,True,
+basic,suggested_death5,average,eater > passive_neutral,4.621571191083853,-3.491686480468749,True,
+basic,suggested_death5,average,hoarder <= eater,2.2042475779451958,4.621571191083853,True,
+basic,suggested_death5,average,surviving > dying early (by 1 sd),4.263508992632296,-2.2730604540764587,True,"difference 6.537, sd 3.758; 4984 survived, 2908 died before day 100"
+basic,suggested_death5,baseline,eater > random,3.895326164675571,-3.7003456250836173,True,
+basic,suggested_death5,baseline,eater > passive,3.895326164675571,-4.164845617890623,True,
+basic,suggested_death5,baseline,eater > passive_neutral,3.895326164675571,-3.491686480468749,True,
+basic,suggested_death5,baseline,hoarder <= eater,1.5708725723341939,3.895326164675571,True,
+basic,suggested_death5,baseline,focal sharer <= eaters (baseline rewards),2.040918889462787,4.196355328834556,True,
+basic,suggested_death5,baseline,focal altruist <= eaters (baseline rewards),0.2638515248683259,4.140350352495094,True,
+basic,suggested_death5,baseline,surviving > dying early (by 1 sd),3.446701213870463,-2.5167151727524804,True,"difference 5.963, sd 3.484; 4984 survived, 2908 died before day 100"
+basic,suggested_death5,egalitarian,eater > random,3.5789353375213655,-3.798720228426669,True,
+basic,suggested_death5,egalitarian,eater > passive,3.5789353375213655,-4.164845617890623,True,
+basic,suggested_death5,egalitarian,eater > passive_neutral,3.5789353375213655,-3.491686480468749,True,
+basic,suggested_death5,egalitarian,hoarder <= eater,1.1198042338415601,3.5789353375213655,True,
+basic,suggested_death5,egalitarian,surviving > dying early (by 1 sd),3.034792799363011,-2.4538720444845104,True,"difference 5.489, sd 3.335; 4984 survived, 2908 died before day 100"
+basic,suggested_death5,majoritarian,eater > random,4.801894852682016,-3.6116658281646856,True,
+basic,suggested_death5,majoritarian,eater > passive,4.801894852682016,-4.164845617890623,True,
+basic,suggested_death5,majoritarian,eater > passive_neutral,4.801894852682016,-3.491686480468749,True,
+basic,suggested_death5,majoritarian,hoarder <= eater,2.359912090522287,4.801894852682016,True,
+basic,suggested_death5,majoritarian,surviving > dying early (by 1 sd),4.5419917532250365,-2.225228566114935,True,"difference 6.767, sd 3.843; 4984 survived, 2908 died before day 100"
+basic,suggested_death5,maximin,eater > random,4.623162453684554,-3.6165478000865607,True,
+basic,suggested_death5,maximin,eater > passive,4.623162453684554,-4.164845617890623,True,
+basic,suggested_death5,maximin,eater > passive_neutral,4.623162453684554,-3.491686480468749,True,
+basic,suggested_death5,maximin,hoarder <= eater,2.199254331709452,4.623162453684554,True,
+basic,suggested_death5,maximin,surviving > dying early (by 1 sd),4.349784472481134,-2.258417700094165,True,"difference 6.608, sd 3.760; 4984 survived, 2908 died before day 100"
+basic,suggested_death5,optimist,eater > random,5.662615782045641,-3.513398588507156,True,
+basic,suggested_death5,optimist,eater > passive,5.662615782045641,-4.164845617890623,True,
+basic,suggested_death5,optimist,eater > passive_neutral,5.662615782045641,-3.491686480468749,True,
+basic,suggested_death5,optimist,hoarder <= eater,3.2936841682845763,5.662615782045641,True,
+basic,suggested_death5,optimist,surviving > dying early (by 1 sd),5.640108248854601,-2.098784060428204,True,"difference 7.739, sd 4.305; 4984 survived, 2908 died before day 100"
+basic,suggested_death5,utilitarian,eater > random,5.662615782045641,-3.5295713795778982,True,
+basic,suggested_death5,utilitarian,eater > passive,5.662615782045641,-4.164845617890623,True,
+basic,suggested_death5,utilitarian,eater > passive_neutral,5.662615782045641,-3.491686480468749,True,
+basic,suggested_death5,utilitarian,hoarder <= eater,3.2936841682845763,5.662615782045641,True,
+basic,suggested_death5,utilitarian,surviving > dying early (by 1 sd),5.405949706052744,-2.1068916176507018,True,"difference 7.513, sd 4.285; 4984 survived, 2908 died before day 100"
+basic,suggested_death5,veto,eater > random,3.606154291323976,-3.7808263277163037,True,
+basic,suggested_death5,veto,eater > passive,3.606154291323976,-4.164845617890623,True,
+basic,suggested_death5,veto,eater > passive_neutral,3.606154291323976,-3.491686480468749,True,
+basic,suggested_death5,veto,hoarder <= eater,1.1599537218690523,3.606154291323976,True,
+basic,suggested_death5,veto,surviving > dying early (by 1 sd),3.0744764010780234,-2.4456176876659605,True,"difference 5.520, sd 3.352; 4984 survived, 2908 died before day 100"
+basic,suggested_ethics_as_current,average,eater > random,4.012881024168008,-1.0737946384988604,True,
+basic,suggested_ethics_as_current,average,eater > passive,4.012881024168008,-1.3714964335156248,True,
+basic,suggested_ethics_as_current,average,eater > passive_neutral,4.012881024168008,-0.6983372960937497,True,
+basic,suggested_ethics_as_current,average,hoarder <= eater,2.254266700768196,4.012881024168008,True,
+basic,suggested_ethics_as_current,average,surviving > dying early (by 1 sd),3.574176129366887,-0.2113685326070934,True,"difference 3.786, sd 2.290; 4984 survived, 2908 died before day 100"
+basic,suggested_ethics_as_current,baseline,eater > random,4.122484789609197,-1.0972153414493653,True,
+basic,suggested_ethics_as_current,baseline,eater > passive,4.122484789609197,-1.3714964335156248,True,
+basic,suggested_ethics_as_current,baseline,eater > passive_neutral,4.122484789609197,-0.6983372960937497,True,
+basic,suggested_ethics_as_current,baseline,hoarder <= eater,2.0564589107653855,4.122484789609197,True,
+basic,suggested_ethics_as_current,baseline,focal sharer <= eaters (baseline rewards),2.7080430062809335,4.307859911918335,True,
+basic,suggested_ethics_as_current,baseline,focal altruist <= eaters (baseline rewards),1.3452536997400586,4.276555823483126,True,
+basic,suggested_ethics_as_current,baseline,surviving > dying early (by 1 sd),3.446701213870463,-0.33601525360162465,True,"difference 3.783, sd 2.443; 4984 survived, 2908 died before day 100"
+basic,suggested_ethics_as_current,egalitarian,eater > random,2.9702451706055206,-1.2242350642284867,True,
+basic,suggested_ethics_as_current,egalitarian,eater > passive,2.9702451706055206,-1.3714964335156248,True,
+basic,suggested_ethics_as_current,egalitarian,eater > passive_neutral,2.9702451706055206,-0.6983372960937497,True,
+basic,suggested_ethics_as_current,egalitarian,hoarder <= eater,1.1698233566645602,2.9702451706055206,True,
+basic,suggested_ethics_as_current,egalitarian,surviving > dying early (by 1 sd),2.345459936097602,-0.3921801230151448,True,"difference 2.738, sd 1.962; 4984 survived, 2908 died before day 100"
+basic,suggested_ethics_as_current,majoritarian,eater > random,4.193204685766172,-1.0371806639665033,True,
+basic,suggested_ethics_as_current,majoritarian,eater > passive,4.193204685766172,-1.3714964335156248,True,
+basic,suggested_ethics_as_current,majoritarian,eater > passive_neutral,4.193204685766172,-0.6983372960937497,True,
+basic,suggested_ethics_as_current,majoritarian,hoarder <= eater,2.409931213345287,4.193204685766172,True,
+basic,suggested_ethics_as_current,majoritarian,surviving > dying early (by 1 sd),3.8526588899596264,-0.163536644645569,True,"difference 4.016, sd 2.368; 4984 survived, 2908 died before day 100"
+basic,suggested_ethics_as_current,maximin,eater > random,4.014472286768709,-1.0420626358883784,True,
+basic,suggested_ethics_as_current,maximin,eater > passive,4.014472286768709,-1.3714964335156248,True,
+basic,suggested_ethics_as_current,maximin,eater > passive_neutral,4.014472286768709,-0.6983372960937497,True,
+basic,suggested_ethics_as_current,maximin,hoarder <= eater,2.249273454532452,4.014472286768709,True,
+basic,suggested_ethics_as_current,maximin,surviving > dying early (by 1 sd),3.660451609215724,-0.1967257786247994,True,"difference 3.857, sd 2.286; 4984 survived, 2908 died before day 100"
+basic,suggested_ethics_as_current,optimist,eater > random,5.053925615129796,-0.9389134243089736,True,
+basic,suggested_ethics_as_current,optimist,eater > passive,5.053925615129796,-1.3714964335156248,True,
+basic,suggested_ethics_as_current,optimist,eater > passive_neutral,5.053925615129796,-0.6983372960937497,True,
+basic,suggested_ethics_as_current,optimist,hoarder <= eater,3.3437032911075755,5.053925615129796,True,
+basic,suggested_ethics_as_current,optimist,surviving > dying early (by 1 sd),4.950775385589192,-0.0370921389588384,True,"difference 4.988, sd 2.820; 4984 survived, 2908 died before day 100"
+basic,suggested_ethics_as_current,utilitarian,eater > random,5.053925615129796,-0.9550862153797159,True,
+basic,suggested_ethics_as_current,utilitarian,eater > passive,5.053925615129796,-1.3714964335156248,True,
+basic,suggested_ethics_as_current,utilitarian,eater > passive_neutral,5.053925615129796,-0.6983372960937497,True,
+basic,suggested_ethics_as_current,utilitarian,hoarder <= eater,3.3437032911075755,5.053925615129796,True,
+basic,suggested_ethics_as_current,utilitarian,surviving > dying early (by 1 sd),4.716616842787334,-0.04519969618133557,True,"difference 4.762, sd 2.814; 4984 survived, 2908 died before day 100"
+basic,suggested_ethics_as_current,veto,eater > random,2.9974641244081313,-1.2063411635181214,True,
+basic,suggested_ethics_as_current,veto,eater > passive,2.9974641244081313,-1.3714964335156248,True,
+basic,suggested_ethics_as_current,veto,eater > passive_neutral,2.9974641244081313,-0.6983372960937497,True,
+basic,suggested_ethics_as_current,veto,hoarder <= eater,1.2099728446920524,2.9974641244081313,True,
+basic,suggested_ethics_as_current,veto,surviving > dying early (by 1 sd),2.385143537812615,-0.38392576619659513,True,"difference 2.769, sd 1.978; 4984 survived, 2908 died before day 100"
+basic,suggested_forage05,average,eater > random,7.057841837730066,-0.8316817121806419,True,
+basic,suggested_forage05,average,eater > passive,7.057841837730066,-1.3714964335156248,True,
+basic,suggested_forage05,average,eater > passive_neutral,7.057841837730066,-0.6983372960937497,True,
+basic,suggested_forage05,average,hoarder <= eater,4.843348411314365,7.057841837730066,True,
+basic,suggested_forage05,average,surviving > dying early (by 1 sd),6.712569607860144,0.41991890895161993,True,"difference 6.293, sd 3.655; 4984 survived, 2908 died before day 100"
+basic,suggested_forage05,baseline,eater > random,6.331596811321784,-0.8837475345672164,True,
+basic,suggested_forage05,baseline,eater > passive,6.331596811321784,-1.3714964335156248,True,
+basic,suggested_forage05,baseline,eater > passive_neutral,6.331596811321784,-0.6983372960937497,True,
+basic,suggested_forage05,baseline,hoarder <= eater,4.209973405703363,6.331596811321784,True,
+basic,suggested_forage05,baseline,focal sharer <= eaters (baseline rewards),4.64291821279583,6.594400701186429,True,
+basic,suggested_forage05,baseline,focal altruist <= eaters (baseline rewards),3.0914810118958993,6.55054211933009,True,
+basic,suggested_forage05,baseline,surviving > dying early (by 1 sd),5.895761829098313,0.17626419027559878,True,"difference 5.719, sd 3.400; 4984 survived, 2908 died before day 100"
+basic,suggested_forage05,egalitarian,eater > random,6.0152059841675785,-0.9821221379102683,True,
+basic,suggested_forage05,egalitarian,eater > passive,6.0152059841675785,-1.3714964335156248,True,
+basic,suggested_forage05,egalitarian,eater > passive_neutral,6.0152059841675785,-0.6983372960937497,True,
+basic,suggested_forage05,egalitarian,hoarder <= eater,3.758905067210729,6.0152059841675785,True,
+basic,suggested_forage05,egalitarian,surviving > dying early (by 1 sd),5.48385341459086,0.23910731854356834,True,"difference 5.245, sd 3.197; 4984 survived, 2908 died before day 100"
+basic,suggested_forage05,majoritarian,eater > random,7.238165499328229,-0.795067737648285,True,
+basic,suggested_forage05,majoritarian,eater > passive,7.238165499328229,-1.3714964335156248,True,
+basic,suggested_forage05,majoritarian,eater > passive_neutral,7.238165499328229,-0.6983372960937497,True,
+basic,suggested_forage05,majoritarian,hoarder <= eater,4.999012923891456,7.238165499328229,True,
+basic,suggested_forage05,majoritarian,surviving > dying early (by 1 sd),6.991052368452884,0.46775079691314425,True,"difference 6.523, sd 3.738; 4984 survived, 2908 died before day 100"
+basic,suggested_forage05,maximin,eater > random,7.059433100330766,-0.79994970957016,True,
+basic,suggested_forage05,maximin,eater > passive,7.059433100330766,-1.3714964335156248,True,
+basic,suggested_forage05,maximin,eater > passive_neutral,7.059433100330766,-0.6983372960937497,True,
+basic,suggested_forage05,maximin,hoarder <= eater,4.838355165078621,7.059433100330766,True,
+basic,suggested_forage05,maximin,surviving > dying early (by 1 sd),6.798845087708983,0.4345616629339137,True,"difference 6.364, sd 3.658; 4984 survived, 2908 died before day 100"
+basic,suggested_forage05,optimist,eater > random,8.098886428691854,-0.6968004979907552,True,
+basic,suggested_forage05,optimist,eater > passive,8.098886428691854,-1.3714964335156248,True,
+basic,suggested_forage05,optimist,eater > passive_neutral,8.098886428691854,-0.6983372960937497,True,
+basic,suggested_forage05,optimist,hoarder <= eater,5.932785001653745,8.098886428691854,True,
+basic,suggested_forage05,optimist,surviving > dying early (by 1 sd),8.089168864082449,0.5941953025998747,True,"difference 7.495, sd 4.227; 4984 survived, 2908 died before day 100"
+basic,suggested_forage05,utilitarian,eater > random,8.098886428691854,-0.7129732890614973,True,
+basic,suggested_forage05,utilitarian,eater > passive,8.098886428691854,-1.3714964335156248,True,
+basic,suggested_forage05,utilitarian,eater > passive_neutral,8.098886428691854,-0.6983372960937497,True,
+basic,suggested_forage05,utilitarian,hoarder <= eater,5.932785001653745,8.098886428691854,True,
+basic,suggested_forage05,utilitarian,surviving > dying early (by 1 sd),7.855010321280593,0.5860877453773775,True,"difference 7.269, sd 4.212; 4984 survived, 2908 died before day 100"
+basic,suggested_forage05,veto,eater > random,6.042424937970188,-0.9642282371999029,True,
+basic,suggested_forage05,veto,eater > passive,6.042424937970188,-1.3714964335156248,True,
+basic,suggested_forage05,veto,eater > passive_neutral,6.042424937970188,-0.6983372960937497,True,
+basic,suggested_forage05,veto,hoarder <= eater,3.7990545552382207,6.042424937970188,True,
+basic,suggested_forage05,veto,surviving > dying early (by 1 sd),5.523537016305872,0.24736167536211814,True,"difference 5.276, sd 3.214; 4984 survived, 2908 died before day 100"
+basic,suggested_forage08,average,eater > random,8.38330905075762,-0.7036010280513526,True,
+basic,suggested_forage08,average,eater > passive,8.38330905075762,-1.3714964335156248,True,
+basic,suggested_forage08,average,eater > passive_neutral,8.38330905075762,-0.6983372960937497,True,
+basic,suggested_forage08,average,hoarder <= eater,6.1354571082771505,8.38330905075762,True,
+basic,suggested_forage08,average,surviving > dying early (by 1 sd),8.182005976996855,0.7272865752779539,True,"difference 7.455, sd 4.269; 4984 survived, 2908 died before day 100"
+basic,suggested_forage08,baseline,eater > random,7.657064024349337,-0.7556668504379271,True,
+basic,suggested_forage08,baseline,eater > passive,7.657064024349337,-1.3714964335156248,True,
+basic,suggested_forage08,baseline,eater > passive_neutral,7.657064024349337,-0.6983372960937497,True,
+basic,suggested_forage08,baseline,hoarder <= eater,5.50208210266615,7.657064024349337,True,
+basic,suggested_forage08,baseline,focal sharer <= eaters (baseline rewards),5.803843336704768,7.966325174747286,True,
+basic,suggested_forage08,baseline,focal altruist <= eaters (baseline rewards),4.139217399189405,7.91493389683827,True,
+basic,suggested_forage08,baseline,surviving > dying early (by 1 sd),7.365198198235024,0.4836318566019328,True,"difference 6.882, sd 4.007; 4984 survived, 2908 died before day 100"
+basic,suggested_forage08,egalitarian,eater > random,7.340673197195132,-0.854041453780979,True,
+basic,suggested_forage08,egalitarian,eater > passive,7.340673197195132,-1.3714964335156248,True,
+basic,suggested_forage08,egalitarian,eater > passive_neutral,7.340673197195132,-0.6983372960937497,True,
+basic,suggested_forage08,egalitarian,hoarder <= eater,5.051013764173516,7.340673197195132,True,
+basic,suggested_forage08,egalitarian,surviving > dying early (by 1 sd),6.953289783727572,0.5464749848699023,True,"difference 6.407, sd 3.779; 4984 survived, 2908 died before day 100"
+basic,suggested_forage08,majoritarian,eater > random,8.563632712355783,-0.6669870535189957,True,
+basic,suggested_forage08,majoritarian,eater > passive,8.563632712355783,-1.3714964335156248,True,
+basic,suggested_forage08,majoritarian,eater > passive_neutral,8.563632712355783,-0.6983372960937497,True,
+basic,suggested_forage08,majoritarian,hoarder <= eater,6.291121620854242,8.563632712355783,True,
+basic,suggested_forage08,majoritarian,surviving > dying early (by 1 sd),8.460488737589596,0.7751184632394783,True,"difference 7.685, sd 4.357; 4984 survived, 2908 died before day 100"
+basic,suggested_forage08,maximin,eater > random,8.38490031335832,-0.6718690254408706,True,
+basic,suggested_forage08,maximin,eater > passive,8.38490031335832,-1.3714964335156248,True,
+basic,suggested_forage08,maximin,eater > passive_neutral,8.38490031335832,-0.6983372960937497,True,
+basic,suggested_forage08,maximin,hoarder <= eater,6.130463862041407,8.38490031335832,True,
+basic,suggested_forage08,maximin,surviving > dying early (by 1 sd),8.268281456845695,0.7419293292602479,True,"difference 7.526, sd 4.276; 4984 survived, 2908 died before day 100"
+basic,suggested_forage08,optimist,eater > random,9.42435364171941,-0.5687198138614658,True,
+basic,suggested_forage08,optimist,eater > passive,9.42435364171941,-1.3714964335156248,True,
+basic,suggested_forage08,optimist,eater > passive_neutral,9.42435364171941,-0.6983372960937497,True,
+basic,suggested_forage08,optimist,hoarder <= eater,7.2248936986165315,9.42435364171941,True,
+basic,suggested_forage08,optimist,surviving > dying early (by 1 sd),9.558605233219161,0.901562968926209,True,"difference 8.657, sd 4.858; 4984 survived, 2908 died before day 100"
+basic,suggested_forage08,utilitarian,eater > random,9.42435364171941,-0.584892604932208,True,
+basic,suggested_forage08,utilitarian,eater > passive,9.42435364171941,-1.3714964335156248,True,
+basic,suggested_forage08,utilitarian,eater > passive_neutral,9.42435364171941,-0.6983372960937497,True,
+basic,suggested_forage08,utilitarian,hoarder <= eater,7.2248936986165315,9.42435364171941,True,
+basic,suggested_forage08,utilitarian,surviving > dying early (by 1 sd),9.324446690417304,0.8934554117037116,True,"difference 8.431, sd 4.834; 4984 survived, 2908 died before day 100"
+basic,suggested_forage08,veto,eater > random,7.367892150997742,-0.8361475530706136,True,
+basic,suggested_forage08,veto,eater > passive,7.367892150997742,-1.3714964335156248,True,
+basic,suggested_forage08,veto,eater > passive_neutral,7.367892150997742,-0.6983372960937497,True,
+basic,suggested_forage08,veto,hoarder <= eater,5.0911632522010075,7.367892150997742,True,
+basic,suggested_forage08,veto,surviving > dying early (by 1 sd),6.992973385442585,0.5547293416884521,True,"difference 6.438, sd 3.796; 4984 survived, 2908 died before day 100"
+basic,suggested_shaping,average,eater > random,10.592297371577917,-2.963864774509428,True,
+basic,suggested_shaping,average,eater > passive,10.592297371577917,-3.6399050592968756,True,
+basic,suggested_shaping,average,eater > passive_neutral,10.592297371577917,-2.966745921875001,True,
+basic,suggested_shaping,average,hoarder <= eater,9.206686726076828,10.592297371577917,True,
+basic,suggested_shaping,average,surviving > dying early (by 1 sd),6.233411299352077,-0.380952726945386,False,"difference 6.614, sd 8.265; 4984 survived, 2908 died before day 100"
+basic,suggested_shaping,baseline,eater > random,9.866052345169637,-3.015930596896003,True,
+basic,suggested_shaping,baseline,eater > passive,9.866052345169637,-3.6399050592968756,True,
+basic,suggested_shaping,baseline,eater > passive_neutral,9.866052345169637,-2.966745921875001,True,
+basic,suggested_shaping,baseline,hoarder <= eater,8.573311720465826,9.866052345169637,True,
+basic,suggested_shaping,baseline,focal sharer <= eaters (baseline rewards),7.665381543964145,8.989996889433321,True,
+basic,suggested_shaping,baseline,focal altruist <= eaters (baseline rewards),5.592988083285721,7.8331852831431386,True,
+basic,suggested_shaping,baseline,surviving > dying early (by 1 sd),5.416603520590244,-0.6246074456214072,False,"difference 6.041, sd 8.187; 4984 survived, 2908 died before day 100"
+basic,suggested_shaping,egalitarian,eater > random,9.54966151801543,-3.1143052002390545,True,
+basic,suggested_shaping,egalitarian,eater > passive,9.54966151801543,-3.6399050592968756,True,
+basic,suggested_shaping,egalitarian,eater > passive_neutral,9.54966151801543,-2.966745921875001,True,
+basic,suggested_shaping,egalitarian,hoarder <= eater,8.12224338197319,9.54966151801543,True,
+basic,suggested_shaping,egalitarian,surviving > dying early (by 1 sd),5.004695106082791,-0.5617643173534373,False,"difference 5.566, sd 8.032; 4984 survived, 2908 died before day 100"
+basic,suggested_shaping,majoritarian,eater > random,10.772621033176081,-2.9272507999770716,True,
+basic,suggested_shaping,majoritarian,eater > passive,10.772621033176081,-3.6399050592968756,True,
+basic,suggested_shaping,majoritarian,eater > passive_neutral,10.772621033176081,-2.966745921875001,True,
+basic,suggested_shaping,majoritarian,hoarder <= eater,9.362351238653918,10.772621033176081,True,
+basic,suggested_shaping,majoritarian,surviving > dying early (by 1 sd),6.511894059944817,-0.3331208389838615,False,"difference 6.845, sd 8.235; 4984 survived, 2908 died before day 100"
+basic,suggested_shaping,maximin,eater > random,10.593888634178619,-2.9321327718989467,True,
+basic,suggested_shaping,maximin,eater > passive,10.593888634178619,-3.6399050592968756,True,
+basic,suggested_shaping,maximin,eater > passive_neutral,10.593888634178619,-2.966745921875001,True,
+basic,suggested_shaping,maximin,hoarder <= eater,9.201693479841083,10.593888634178619,True,
+basic,suggested_shaping,maximin,surviving > dying early (by 1 sd),6.319686779200914,-0.3663099729630919,False,"difference 6.686, sd 8.183; 4984 survived, 2908 died before day 100"
+basic,suggested_shaping,optimist,eater > random,11.633341962539708,-2.8289835603195415,True,
+basic,suggested_shaping,optimist,eater > passive,11.633341962539708,-3.6399050592968756,True,
+basic,suggested_shaping,optimist,eater > passive_neutral,11.633341962539708,-2.966745921875001,True,
+basic,suggested_shaping,optimist,hoarder <= eater,10.296123316416208,11.633341962539708,True,
+basic,suggested_shaping,optimist,surviving > dying early (by 1 sd),7.610010555574383,-0.20667633329713073,False,"difference 7.817, sd 8.439; 4984 survived, 2908 died before day 100"
+basic,suggested_shaping,utilitarian,eater > random,11.633341962539708,-2.8451563513902833,True,
+basic,suggested_shaping,utilitarian,eater > passive,11.633341962539708,-3.6399050592968756,True,
+basic,suggested_shaping,utilitarian,eater > passive_neutral,11.633341962539708,-2.966745921875001,True,
+basic,suggested_shaping,utilitarian,hoarder <= eater,10.296123316416208,11.633341962539708,True,
+basic,suggested_shaping,utilitarian,surviving > dying early (by 1 sd),7.3758520127725244,-0.21478389051962826,False,"difference 7.591, sd 8.643; 4984 survived, 2908 died before day 100"
+basic,suggested_shaping,veto,eater > random,9.576880471818042,-3.096411299528689,True,
+basic,suggested_shaping,veto,eater > passive,9.576880471818042,-3.6399050592968756,True,
+basic,suggested_shaping,veto,eater > passive_neutral,9.576880471818042,-2.966745921875001,True,
+basic,suggested_shaping,veto,hoarder <= eater,8.162392870000684,9.576880471818042,True,
+basic,suggested_shaping,veto,surviving > dying early (by 1 sd),5.044378707797804,-0.5535099605348881,False,"difference 5.598, sd 8.045; 4984 survived, 2908 died before day 100"
+basic,suggested_throw05,average,eater > random,4.848729816017479,-1.0099458155080543,True,
+basic,suggested_throw05,average,eater > passive,4.848729816017479,-1.3714964335156248,True,
+basic,suggested_throw05,average,eater > passive_neutral,4.848729816017479,-0.6983372960937497,True,
+basic,suggested_throw05,average,hoarder <= eater,2.689833916376388,4.848729816017479,True,
+basic,suggested_throw05,average,surviving > dying early (by 1 sd),4.7117608015527805,-0.012949138945191752,True,"difference 4.725, sd 2.685; 4984 survived, 2908 died before day 100"
+basic,suggested_throw05,baseline,eater > random,4.122484789609197,-1.062011637894629,True,
+basic,suggested_throw05,baseline,eater > passive,4.122484789609197,-1.3714964335156248,True,
+basic,suggested_throw05,baseline,eater > passive_neutral,4.122484789609197,-0.6983372960937497,True,
+basic,suggested_throw05,baseline,hoarder <= eater,2.0564589107653855,4.122484789609197,True,
+basic,suggested_throw05,baseline,focal sharer <= eaters (baseline rewards),3.0797902593245925,4.307859911918335,True,
+basic,suggested_throw05,baseline,focal altruist <= eaters (baseline rewards),1.9842937269055698,4.276555823483126,True,
+basic,suggested_throw05,baseline,surviving > dying early (by 1 sd),3.894953022790948,-0.25660385762121285,True,"difference 4.152, sd 2.385; 4984 survived, 2908 died before day 100"
+basic,suggested_throw05,egalitarian,eater > random,3.806093962454991,-1.1603862412376806,True,
+basic,suggested_throw05,egalitarian,eater > passive,3.806093962454991,-1.3714964335156248,True,
+basic,suggested_throw05,egalitarian,eater > passive_neutral,3.806093962454991,-0.6983372960937497,True,
+basic,suggested_throw05,egalitarian,hoarder <= eater,1.6053905722727517,3.806093962454991,True,
+basic,suggested_throw05,egalitarian,surviving > dying early (by 1 sd),3.483044608283495,-0.19376072935324318,True,"difference 3.677, sd 2.300; 4984 survived, 2908 died before day 100"
+basic,suggested_throw05,majoritarian,eater > random,5.029053477615642,-0.9733318409756975,True,
+basic,suggested_throw05,majoritarian,eater > passive,5.029053477615642,-1.3714964335156248,True,
+basic,suggested_throw05,majoritarian,eater > passive_neutral,5.029053477615642,-0.6983372960937497,True,
+basic,suggested_throw05,majoritarian,hoarder <= eater,2.8454984289534786,5.029053477615642,True,
+basic,suggested_throw05,majoritarian,surviving > dying early (by 1 sd),4.990243562145521,0.03488274901633265,True,"difference 4.955, sd 2.788; 4984 survived, 2908 died before day 100"
+basic,suggested_throw05,maximin,eater > random,4.85032107861818,-0.9782138128975724,True,
+basic,suggested_throw05,maximin,eater > passive,4.85032107861818,-1.3714964335156248,True,
+basic,suggested_throw05,maximin,eater > passive_neutral,4.85032107861818,-0.6983372960937497,True,
+basic,suggested_throw05,maximin,hoarder <= eater,2.684840670140644,4.85032107861818,True,
+basic,suggested_throw05,maximin,surviving > dying early (by 1 sd),4.798036281401619,0.0016936150371021693,True,"difference 4.796, sd 2.705; 4984 survived, 2908 died before day 100"
+basic,suggested_throw05,optimist,eater > random,5.889774406979267,-0.8750646013181677,True,
+basic,suggested_throw05,optimist,eater > passive,5.889774406979267,-1.3714964335156248,True,
+basic,suggested_throw05,optimist,eater > passive_neutral,5.889774406979267,-0.6983372960937497,True,
+basic,suggested_throw05,optimist,hoarder <= eater,3.779270506715768,5.889774406979267,True,
+basic,suggested_throw05,optimist,surviving > dying early (by 1 sd),6.088360057775086,0.16132725470306325,True,"difference 5.927, sd 3.264; 4984 survived, 2908 died before day 100"
+basic,suggested_throw05,utilitarian,eater > random,5.889774406979267,-0.8912373923889099,True,
+basic,suggested_throw05,utilitarian,eater > passive,5.889774406979267,-1.3714964335156248,True,
+basic,suggested_throw05,utilitarian,eater > passive_neutral,5.889774406979267,-0.6983372960937497,True,
+basic,suggested_throw05,utilitarian,hoarder <= eater,3.779270506715768,5.889774406979267,True,
+basic,suggested_throw05,utilitarian,surviving > dying early (by 1 sd),5.854201514973228,0.153219697480566,True,"difference 5.701, sd 3.206; 4984 survived, 2908 died before day 100"
+basic,suggested_throw05,veto,eater > random,3.8333129162576016,-1.1424923405273153,True,
+basic,suggested_throw05,veto,eater > passive,3.8333129162576016,-1.3714964335156248,True,
+basic,suggested_throw05,veto,eater > passive_neutral,3.8333129162576016,-0.6983372960937497,True,
+basic,suggested_throw05,veto,hoarder <= eater,1.645540060300244,3.8333129162576016,True,
+basic,suggested_throw05,veto,surviving > dying early (by 1 sd),3.5227282099985078,-0.18550637253469354,True,"difference 3.708, sd 2.316; 4984 survived, 2908 died before day 100"
+basic,suggested_throw08,average,eater > random,4.848729816017479,-0.9888235933752125,True,
+basic,suggested_throw08,average,eater > passive,4.848729816017479,-1.3714964335156248,True,
+basic,suggested_throw08,average,eater > passive_neutral,4.848729816017479,-0.6983372960937497,True,
+basic,suggested_throw08,average,hoarder <= eater,2.689833916376388,4.848729816017479,True,
+basic,suggested_throw08,average,surviving > dying early (by 1 sd),4.9807118869050715,0.0346976986430554,True,"difference 4.946, sd 2.770; 4984 survived, 2908 died before day 100"
+basic,suggested_throw08,baseline,eater > random,4.122484789609197,-1.0408894157617872,True,
+basic,suggested_throw08,baseline,eater > passive,4.122484789609197,-1.3714964335156248,True,
+basic,suggested_throw08,baseline,eater > passive_neutral,4.122484789609197,-0.6983372960937497,True,
+basic,suggested_throw08,baseline,hoarder <= eater,2.0564589107653855,4.122484789609197,True,
+basic,suggested_throw08,baseline,focal sharer <= eaters (baseline rewards),3.3028386111507877,4.307859911918335,True,
+basic,suggested_throw08,baseline,focal altruist <= eaters (baseline rewards),2.3677177432048766,4.276555823483126,True,
+basic,suggested_throw08,baseline,surviving > dying early (by 1 sd),4.163904108143239,-0.20895702003296576,True,"difference 4.373, sd 2.439; 4984 survived, 2908 died before day 100"
+basic,suggested_throw08,egalitarian,eater > random,3.806093962454991,-1.1392640191048389,True,
+basic,suggested_throw08,egalitarian,eater > passive,3.806093962454991,-1.3714964335156248,True,
+basic,suggested_throw08,egalitarian,eater > passive_neutral,3.806093962454991,-0.6983372960937497,True,
+basic,suggested_throw08,egalitarian,hoarder <= eater,1.6053905722727517,3.806093962454991,True,
+basic,suggested_throw08,egalitarian,surviving > dying early (by 1 sd),3.7519956936357866,-0.14611389176499603,True,"difference 3.898, sd 2.383; 4984 survived, 2908 died before day 100"
+basic,suggested_throw08,majoritarian,eater > random,5.029053477615642,-0.9522096188428556,True,
+basic,suggested_throw08,majoritarian,eater > passive,5.029053477615642,-1.3714964335156248,True,
+basic,suggested_throw08,majoritarian,eater > passive_neutral,5.029053477615642,-0.6983372960937497,True,
+basic,suggested_throw08,majoritarian,hoarder <= eater,2.8454984289534786,5.029053477615642,True,
+basic,suggested_throw08,majoritarian,surviving > dying early (by 1 sd),5.259194647497812,0.08252958660457979,True,"difference 5.177, sd 2.889; 4984 survived, 2908 died before day 100"
+basic,suggested_throw08,maximin,eater > random,4.85032107861818,-0.9570915907647306,True,
+basic,suggested_throw08,maximin,eater > passive,4.85032107861818,-1.3714964335156248,True,
+basic,suggested_throw08,maximin,eater > passive_neutral,4.85032107861818,-0.6983372960937497,True,
+basic,suggested_throw08,maximin,hoarder <= eater,2.684840670140644,4.85032107861818,True,
+basic,suggested_throw08,maximin,surviving > dying early (by 1 sd),5.06698736675391,0.04934045262534932,True,"difference 5.018, sd 2.806; 4984 survived, 2908 died before day 100"
+basic,suggested_throw08,optimist,eater > random,5.889774406979267,-0.853942379185326,True,
+basic,suggested_throw08,optimist,eater > passive,5.889774406979267,-1.3714964335156248,True,
+basic,suggested_throw08,optimist,eater > passive_neutral,5.889774406979267,-0.6983372960937497,True,
+basic,suggested_throw08,optimist,hoarder <= eater,3.779270506715768,5.889774406979267,True,
+basic,suggested_throw08,optimist,surviving > dying early (by 1 sd),6.357311143127377,0.20897409229131023,True,"difference 6.148, sd 3.370; 4984 survived, 2908 died before day 100"
+basic,suggested_throw08,utilitarian,eater > random,5.889774406979267,-0.8701151702560681,True,
+basic,suggested_throw08,utilitarian,eater > passive,5.889774406979267,-1.3714964335156248,True,
+basic,suggested_throw08,utilitarian,eater > passive_neutral,5.889774406979267,-0.6983372960937497,True,
+basic,suggested_throw08,utilitarian,hoarder <= eater,3.779270506715768,5.889774406979267,True,
+basic,suggested_throw08,utilitarian,surviving > dying early (by 1 sd),6.123152600325519,0.20086653506881313,True,"difference 5.922, sd 3.274; 4984 survived, 2908 died before day 100"
+basic,suggested_throw08,veto,eater > random,3.8333129162576016,-1.1213701183944738,True,
+basic,suggested_throw08,veto,eater > passive,3.8333129162576016,-1.3714964335156248,True,
+basic,suggested_throw08,veto,eater > passive_neutral,3.8333129162576016,-0.6983372960937497,True,
+basic,suggested_throw08,veto,hoarder <= eater,1.645540060300244,3.8333129162576016,True,
+basic,suggested_throw08,veto,surviving > dying early (by 1 sd),3.7916792953507996,-0.1378595349464464,True,"difference 3.930, sd 2.398; 4984 survived, 2908 died before day 100"
+basic,current,utilitarian,sanction raises sharer relative to eater,-1.5688880521253123,-1.287555585922754,False,"sharer - eaters: -1.569 with the sanction, -1.288 on base rewards alone; the sanction adds -0.281"
+basic,current,maximin,sanction raises sharer relative to eater,-0.5442653574068563,-1.287555585922754,True,"sharer - eaters: -0.544 with the sanction, -1.288 on base rewards alone; the sanction adds +0.743"
+basic,current,egalitarian,sanction raises sharer relative to eater,0.33404402603383865,-1.287555585922754,True,"sharer - eaters: 0.334 with the sanction, -1.288 on base rewards alone; the sanction adds +1.622"
+basic,current,average,sanction raises sharer relative to eater,-0.5930364611661085,-1.287555585922754,True,"sharer - eaters: -0.593 with the sanction, -1.288 on base rewards alone; the sanction adds +0.695"
+basic,current,majoritarian,sanction raises sharer relative to eater,-0.5960503918511879,-1.287555585922754,True,"sharer - eaters: -0.596 with the sanction, -1.288 on base rewards alone; the sanction adds +0.692"
+basic,current,optimist,sanction raises sharer relative to eater,-1.4290308807821663,-1.287555585922754,False,"sharer - eaters: -1.429 with the sanction, -1.288 on base rewards alone; the sanction adds -0.141"
+basic,current,veto,sanction raises sharer relative to eater,0.31744301453128987,-1.287555585922754,True,"sharer - eaters: 0.317 with the sanction, -1.288 on base rewards alone; the sanction adds +1.605"
+basic,suggested_ethics_as_current,utilitarian,sanction raises sharer relative to eater,-1.5889697224157735,-1.3076372562132157,False,"sharer - eaters: -1.589 with the sanction, -1.308 on base rewards alone; the sanction adds -0.281"
+basic,suggested_ethics_as_current,maximin,sanction raises sharer relative to eater,-0.5643470276973179,-1.3076372562132157,True,"sharer - eaters: -0.564 with the sanction, -1.308 on base rewards alone; the sanction adds +0.743"
+basic,suggested_ethics_as_current,egalitarian,sanction raises sharer relative to eater,0.3139623557433766,-1.3076372562132157,True,"sharer - eaters: 0.314 with the sanction, -1.308 on base rewards alone; the sanction adds +1.622"
+basic,suggested_ethics_as_current,average,sanction raises sharer relative to eater,-0.6131181314565715,-1.3076372562132157,True,"sharer - eaters: -0.613 with the sanction, -1.308 on base rewards alone; the sanction adds +0.695"
+basic,suggested_ethics_as_current,majoritarian,sanction raises sharer relative to eater,-0.61613206214165,-1.3076372562132157,True,"sharer - eaters: -0.616 with the sanction, -1.308 on base rewards alone; the sanction adds +0.692"
+basic,suggested_ethics_as_current,optimist,sanction raises sharer relative to eater,-1.449112551072627,-1.3076372562132157,False,"sharer - eaters: -1.449 with the sanction, -1.308 on base rewards alone; the sanction adds -0.141"
+basic,suggested_ethics_as_current,veto,sanction raises sharer relative to eater,0.2973613442408274,-1.3076372562132157,True,"sharer - eaters: 0.297 with the sanction, -1.308 on base rewards alone; the sanction adds +1.605"
+basic,suggested,utilitarian,sanction raises sharer relative to eater,-1.8811493718399594,-1.5998169056374016,False,"sharer - eaters: -1.881 with the sanction, -1.600 on base rewards alone; the sanction adds -0.281"
+basic,suggested,maximin,sanction raises sharer relative to eater,-0.8565266771215043,-1.5998169056374016,True,"sharer - eaters: -0.857 with the sanction, -1.600 on base rewards alone; the sanction adds +0.743"
+basic,suggested,egalitarian,sanction raises sharer relative to eater,0.02178270631918977,-1.5998169056374016,True,"sharer - eaters: 0.022 with the sanction, -1.600 on base rewards alone; the sanction adds +1.622"
+basic,suggested,average,sanction raises sharer relative to eater,-0.9052977808807587,-1.5998169056374016,True,"sharer - eaters: -0.905 with the sanction, -1.600 on base rewards alone; the sanction adds +0.695"
+basic,suggested,majoritarian,sanction raises sharer relative to eater,-0.9083117115658368,-1.5998169056374016,True,"sharer - eaters: -0.908 with the sanction, -1.600 on base rewards alone; the sanction adds +0.692"
+basic,suggested,optimist,sanction raises sharer relative to eater,-1.7412922004968134,-1.5998169056374016,False,"sharer - eaters: -1.741 with the sanction, -1.600 on base rewards alone; the sanction adds -0.141"
+basic,suggested,veto,sanction raises sharer relative to eater,0.005181694816640103,-1.5998169056374016,True,"sharer - eaters: 0.005 with the sanction, -1.600 on base rewards alone; the sanction adds +1.605"
+basic,suggested_alive,utilitarian,sanction raises sharer relative to eater,-1.9366923155990268,-1.6553598493964685,False,"sharer - eaters: -1.937 with the sanction, -1.655 on base rewards alone; the sanction adds -0.281"
+basic,suggested_alive,maximin,sanction raises sharer relative to eater,-0.9120696208805716,-1.6553598493964685,True,"sharer - eaters: -0.912 with the sanction, -1.655 on base rewards alone; the sanction adds +0.743"
+basic,suggested_alive,egalitarian,sanction raises sharer relative to eater,-0.03376023743987622,-1.6553598493964685,True,"sharer - eaters: -0.034 with the sanction, -1.655 on base rewards alone; the sanction adds +1.622"
+basic,suggested_alive,average,sanction raises sharer relative to eater,-0.9608407246398247,-1.6553598493964685,True,"sharer - eaters: -0.961 with the sanction, -1.655 on base rewards alone; the sanction adds +0.695"
+basic,suggested_alive,majoritarian,sanction raises sharer relative to eater,-0.9638546553249041,-1.6553598493964685,True,"sharer - eaters: -0.964 with the sanction, -1.655 on base rewards alone; the sanction adds +0.692"
+basic,suggested_alive,optimist,sanction raises sharer relative to eater,-1.7968351442558799,-1.6553598493964685,False,"sharer - eaters: -1.797 with the sanction, -1.655 on base rewards alone; the sanction adds -0.141"
+basic,suggested_alive,veto,sanction raises sharer relative to eater,-0.05036124894242633,-1.6553598493964685,True,"sharer - eaters: -0.050 with the sanction, -1.655 on base rewards alone; the sanction adds +1.605"
+basic,suggested_death5,utilitarian,sanction raises sharer relative to eater,-2.4367689055743265,-2.1554364393717687,False,"sharer - eaters: -2.437 with the sanction, -2.155 on base rewards alone; the sanction adds -0.281"
+basic,suggested_death5,maximin,sanction raises sharer relative to eater,-1.4121462108558722,-2.1554364393717687,True,"sharer - eaters: -1.412 with the sanction, -2.155 on base rewards alone; the sanction adds +0.743"
+basic,suggested_death5,egalitarian,sanction raises sharer relative to eater,-0.5338368274151764,-2.1554364393717687,True,"sharer - eaters: -0.534 with the sanction, -2.155 on base rewards alone; the sanction adds +1.622"
+basic,suggested_death5,average,sanction raises sharer relative to eater,-1.4609173146151253,-2.1554364393717687,True,"sharer - eaters: -1.461 with the sanction, -2.155 on base rewards alone; the sanction adds +0.695"
+basic,suggested_death5,majoritarian,sanction raises sharer relative to eater,-1.4639312453002038,-2.1554364393717687,True,"sharer - eaters: -1.464 with the sanction, -2.155 on base rewards alone; the sanction adds +0.692"
+basic,suggested_death5,optimist,sanction raises sharer relative to eater,-2.2969117342311796,-2.1554364393717687,False,"sharer - eaters: -2.297 with the sanction, -2.155 on base rewards alone; the sanction adds -0.141"
+basic,suggested_death5,veto,sanction raises sharer relative to eater,-0.5504378389177265,-2.1554364393717687,True,"sharer - eaters: -0.550 with the sanction, -2.155 on base rewards alone; the sanction adds +1.605"
+basic,suggested_forage05,utilitarian,sanction raises sharer relative to eater,-2.232814954593157,-1.9514824883905995,False,"sharer - eaters: -2.233 with the sanction, -1.951 on base rewards alone; the sanction adds -0.281"
+basic,suggested_forage05,maximin,sanction raises sharer relative to eater,-1.2081922598747017,-1.9514824883905995,True,"sharer - eaters: -1.208 with the sanction, -1.951 on base rewards alone; the sanction adds +0.743"
+basic,suggested_forage05,egalitarian,sanction raises sharer relative to eater,-0.3298828764340067,-1.9514824883905995,True,"sharer - eaters: -0.330 with the sanction, -1.951 on base rewards alone; the sanction adds +1.622"
+basic,suggested_forage05,average,sanction raises sharer relative to eater,-1.2569633636339548,-1.9514824883905995,True,"sharer - eaters: -1.257 with the sanction, -1.951 on base rewards alone; the sanction adds +0.695"
+basic,suggested_forage05,majoritarian,sanction raises sharer relative to eater,-1.2599772943190342,-1.9514824883905995,True,"sharer - eaters: -1.260 with the sanction, -1.951 on base rewards alone; the sanction adds +0.692"
+basic,suggested_forage05,optimist,sanction raises sharer relative to eater,-2.092957783250011,-1.9514824883905995,False,"sharer - eaters: -2.093 with the sanction, -1.951 on base rewards alone; the sanction adds -0.141"
+basic,suggested_forage05,veto,sanction raises sharer relative to eater,-0.3464838879365555,-1.9514824883905995,True,"sharer - eaters: -0.346 with the sanction, -1.951 on base rewards alone; the sanction adds +1.605"
+basic,suggested_forage08,utilitarian,sanction raises sharer relative to eater,-2.4438143042450777,-2.1624818380425186,False,"sharer - eaters: -2.444 with the sanction, -2.162 on base rewards alone; the sanction adds -0.281"
+basic,suggested_forage08,maximin,sanction raises sharer relative to eater,-1.4191916095266208,-2.1624818380425186,True,"sharer - eaters: -1.419 with the sanction, -2.162 on base rewards alone; the sanction adds +0.743"
+basic,suggested_forage08,egalitarian,sanction raises sharer relative to eater,-0.540882226085925,-2.1624818380425186,True,"sharer - eaters: -0.541 with the sanction, -2.162 on base rewards alone; the sanction adds +1.622"
+basic,suggested_forage08,average,sanction raises sharer relative to eater,-1.467962713285873,-2.1624818380425186,True,"sharer - eaters: -1.468 with the sanction, -2.162 on base rewards alone; the sanction adds +0.695"
+basic,suggested_forage08,majoritarian,sanction raises sharer relative to eater,-1.4709766439709524,-2.1624818380425186,True,"sharer - eaters: -1.471 with the sanction, -2.162 on base rewards alone; the sanction adds +0.692"
+basic,suggested_forage08,optimist,sanction raises sharer relative to eater,-2.303957132901931,-2.1624818380425186,False,"sharer - eaters: -2.304 with the sanction, -2.162 on base rewards alone; the sanction adds -0.141"
+basic,suggested_forage08,veto,sanction raises sharer relative to eater,-0.5574832375884737,-2.1624818380425186,True,"sharer - eaters: -0.557 with the sanction, -2.162 on base rewards alone; the sanction adds +1.605"
+basic,suggested_shaping,utilitarian,sanction raises sharer relative to eater,-1.6059478116717365,-1.3246153454691765,False,"sharer - eaters: -1.606 with the sanction, -1.325 on base rewards alone; the sanction adds -0.281"
+basic,suggested_shaping,maximin,sanction raises sharer relative to eater,-0.5813251169532805,-1.3246153454691765,True,"sharer - eaters: -0.581 with the sanction, -1.325 on base rewards alone; the sanction adds +0.743"
+basic,suggested_shaping,egalitarian,sanction raises sharer relative to eater,0.2969842664874154,-1.3246153454691765,True,"sharer - eaters: 0.297 with the sanction, -1.325 on base rewards alone; the sanction adds +1.622"
+basic,suggested_shaping,average,sanction raises sharer relative to eater,-0.6300962207125327,-1.3246153454691765,True,"sharer - eaters: -0.630 with the sanction, -1.325 on base rewards alone; the sanction adds +0.695"
+basic,suggested_shaping,majoritarian,sanction raises sharer relative to eater,-0.633110151397613,-1.3246153454691765,True,"sharer - eaters: -0.633 with the sanction, -1.325 on base rewards alone; the sanction adds +0.692"
+basic,suggested_shaping,optimist,sanction raises sharer relative to eater,-1.4660906403285896,-1.3246153454691765,False,"sharer - eaters: -1.466 with the sanction, -1.325 on base rewards alone; the sanction adds -0.141"
+basic,suggested_shaping,veto,sanction raises sharer relative to eater,0.2803832549848657,-1.3246153454691765,True,"sharer - eaters: 0.280 with the sanction, -1.325 on base rewards alone; the sanction adds +1.605"
+basic,suggested_throw05,utilitarian,sanction raises sharer relative to eater,-1.5094021187963014,-1.2280696525937427,False,"sharer - eaters: -1.509 with the sanction, -1.228 on base rewards alone; the sanction adds -0.281"
+basic,suggested_throw05,maximin,sanction raises sharer relative to eater,-0.48477942407784536,-1.2280696525937427,True,"sharer - eaters: -0.485 with the sanction, -1.228 on base rewards alone; the sanction adds +0.743"
+basic,suggested_throw05,egalitarian,sanction raises sharer relative to eater,0.3935299593628492,-1.2280696525937427,True,"sharer - eaters: 0.394 with the sanction, -1.228 on base rewards alone; the sanction adds +1.622"
+basic,suggested_throw05,average,sanction raises sharer relative to eater,-0.5335505278371002,-1.2280696525937427,True,"sharer - eaters: -0.534 with the sanction, -1.228 on base rewards alone; the sanction adds +0.695"
+basic,suggested_throw05,majoritarian,sanction raises sharer relative to eater,-0.5365644585221778,-1.2280696525937427,True,"sharer - eaters: -0.537 with the sanction, -1.228 on base rewards alone; the sanction adds +0.692"
+basic,suggested_throw05,optimist,sanction raises sharer relative to eater,-1.3695449474531545,-1.2280696525937427,False,"sharer - eaters: -1.370 with the sanction, -1.228 on base rewards alone; the sanction adds -0.141"
+basic,suggested_throw05,veto,sanction raises sharer relative to eater,0.37692894786029907,-1.2280696525937427,True,"sharer - eaters: 0.377 with the sanction, -1.228 on base rewards alone; the sanction adds +1.605"
+basic,suggested_throw08,utilitarian,sanction raises sharer relative to eater,-1.2863537669701053,-1.0050213007675475,False,"sharer - eaters: -1.286 with the sanction, -1.005 on base rewards alone; the sanction adds -0.281"
+basic,suggested_throw08,maximin,sanction raises sharer relative to eater,-0.26173107225165015,-1.0050213007675475,True,"sharer - eaters: -0.262 with the sanction, -1.005 on base rewards alone; the sanction adds +0.743"
+basic,suggested_throw08,egalitarian,sanction raises sharer relative to eater,0.6165783111890444,-1.0050213007675475,True,"sharer - eaters: 0.617 with the sanction, -1.005 on base rewards alone; the sanction adds +1.622"
+basic,suggested_throw08,average,sanction raises sharer relative to eater,-0.31050217601090413,-1.0050213007675475,True,"sharer - eaters: -0.311 with the sanction, -1.005 on base rewards alone; the sanction adds +0.695"
+basic,suggested_throw08,majoritarian,sanction raises sharer relative to eater,-0.3135161066959826,-1.0050213007675475,True,"sharer - eaters: -0.314 with the sanction, -1.005 on base rewards alone; the sanction adds +0.692"
+basic,suggested_throw08,optimist,sanction raises sharer relative to eater,-1.1464965956269584,-1.0050213007675475,False,"sharer - eaters: -1.146 with the sanction, -1.005 on base rewards alone; the sanction adds -0.141"
+basic,suggested_throw08,veto,sanction raises sharer relative to eater,0.5999772996864943,-1.0050213007675475,True,"sharer - eaters: 0.600 with the sanction, -1.005 on base rewards alone; the sanction adds +1.605"
