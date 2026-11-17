@@ -95,6 +95,7 @@ class FruitMarketModel(SocietyModel):
         self.backend = backend
         self._init_reporters()
         self._choose_agent_types(society_mix)
+        self._use_recorded_agent_types(society_mix, checkpoint_path)
         for i in range(num_agents):
             this_type = self._agent_type_of(i, agent_type)
             buffer = self.shared_replay_buffers.setdefault(this_type, {"s": [], "a": [], "r": [], "s_": [], "done": []})

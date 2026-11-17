@@ -13,9 +13,13 @@ from src.checkpoints import resolve_checkpoint, trained_checkpoints, checkpoint_
 from src.harvest_exception import CheckpointExistsException
 from src.training_config import load as load_training_config, for_scenario as training_config_for_scenario, DEFAULT as DEFAULT_TRAINING_CONFIG
 from src.training_config import TrainingConfig, config_name as training_config_name, scenario_config_path
+from src.run_record import (RUN_FILE, run_folder, write_run_record, write_status, read_status, log_to_folder)
 import pandas as pd
 import argparse
+import datetime
+import glob
 import os
+import shutil
 import wandb
 import time
 
@@ -34,6 +38,9 @@ NUM_AGENTS_OPTIONS = ["2", "4", "6", "20", "50", "100"]
 MAX_EPISODES = 1000
 SOCIETY_MIXES = ["homogeneous", "heterogeneous"]
 DEFAULT_SEED = 42
+#a test run's environment is seeded from the test seed, whatever the training seed of the agents it tests, so every trained society
+#faces the same test episodes (src/seeding.py)
+DEFAULT_TEST_SEED = 1000
 DEFAULT_SEASON_LENGTH = 25
 #the paper's settings, used when enter is pressed at a prompt: agents trained in basic (and tested in colours, capabilities and
 #allotment), 200 days, 4 agents, 2 allotments or capabilities, no seasons, societies of one type, every agent type, rule-based norms
@@ -45,8 +52,6 @@ REMOVED_OPTIONS = {
     "--initial-healths": "unequal starting health was removed; every agent starts each episode with the default health",
     "--season-quality": "it is now part of seasons, chosen at the prompt, where each season is randomly normal, good or bad",
     "--season-swaps": "random swaps of berry allocations between groups were removed; seasons (chosen at the prompt) give each season a random quality instead",
-    "--seasons": "seasons are chosen at the prompt",
-    "--season-length": "the season length is chosen at the prompt",
 }
 
 def generate_paper_graphs(scenario):
@@ -167,11 +172,25 @@ def get_checkpoint_input():
     trained = trained_checkpoints()
     trained_string = f", a trained checkpoint {trained}" if trained else ""
     while True:
-        value = input(f"Which checkpoint do you want to test? Choose a run {RUN_OPTIONS}{trained_string} or a path; press enter for {DEFAULT_CHECKPOINT} (the agents trained in basic for the paper): ").strip()
-        checkpoint_root = resolve_checkpoint(value)
+        value = answer(f"Which checkpoint do you want to test? Choose a run {RUN_OPTIONS}{trained_string} or a path; press enter for {DEFAULT_CHECKPOINT} (the agents trained in basic for the paper): ").strip()
+        #a training run's own folder (made with --output-root) holds its checkpoint under data/model_variables/trained/
+        checkpoint_root = checkpoint_in_run_folder(value) or resolve_checkpoint(value)
         if checkpoint_root is not None:
-            return checkpoint_root, value or DEFAULT_CHECKPOINT
+            #absolute, so it is still found from a test run's own folder (--output-root)
+            return os.path.abspath(checkpoint_root) + "/", value or DEFAULT_CHECKPOINT
         print(f"Invalid checkpoint. {value} is not a run, a trained checkpoint or a folder.")
+
+def checkpoint_in_run_folder(path):
+    """
+    The checkpoint folder a training run made with --output-root saved into (its only folder in data/model_variables/trained/), if
+    path is such a run's folder; None otherwise
+    """
+    if not path or not os.path.exists(os.path.join(path, RUN_FILE)):
+        return None
+    trained = sorted(glob.glob(os.path.join(path, "data", "model_variables", "trained", "*", "")))
+    if len(trained) != 1:
+        raise SystemExit(f"{path} is a run's folder, but holds {len(trained)} trained checkpoints, not 1: {trained}")
+    return trained[0]
 
 def get_max_days_input(checkpoint_name, checkpoint_path):
     """
@@ -243,6 +262,7 @@ def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_sta
         model_inst = CommonsHarvest(society_mix,num_agents,commons_parameters["carrying_capacity"],commons_parameters["growth_rate"],agent_type,max_width,max_height,max_episodes,max_days,training,checkpoint_path,write_data,track_norms,file_string,seed,norms_module_type,seasons,season_length,allotment_regrowth_delays,start_episode=start_episode,initial_stock=commons_parameters["initial_stock"],training_config=training_config)
     else:
         raise ValueError("Unknown argument: "+scenario)
+    model_inst.checkpoint_every = CHECKPOINT_EVERY
     if start_episode > 1:
         model_inst.reseed_for_continuing()
         print(f"Continuing {agent_type}'s training from episode {start_episode}")
@@ -280,7 +300,7 @@ def get_number_input(prompt, number_type, default, min_value, max_value, exclusi
     printing out_of_range for one outside them; pressing enter chooses default, if there is one
     """
     while True:
-        value = input(prompt).strip()
+        value = answer(prompt).strip()
         if value == "" and default is not None:
             return default
         try:
@@ -392,6 +412,11 @@ def run_fruit_market(training, seed, log=None, training_config=None):
     agent_type = get_input(f"What type of agent do you want to implement {types}: ", f"Invalid agent type. Please choose {types}: ", types, PAPER_DEFAULTS["agent_type"])
     write_data = write_data_input("data", PAPER_DEFAULTS["write_data"])
     agent_types = agent_types_to_run(society_mix) if agent_type == "all" else [agent_type]
+    if args.output_root is not None:
+        enter_run_folder(mode, fruit_market_file_string(False, settings, society_mix, "x")[:-len("_x")], agent_type,
+                         {"scenario": "fruit_market", **settings, "society_mix": society_mix, "agent_type": agent_type, "write_data": write_data,
+                          "max_episodes": max_episodes, "checkpoint": None if training else checkpoint_path,
+                          "training_config": (training_config or scenario_config).to_dict()})
     track_norms = False
     norms_module_type = NORMS_MODULE_TYPES[0]
     start_episodes = {}
@@ -412,20 +437,25 @@ def run_fruit_market(training, seed, log=None, training_config=None):
         if track_norms:
             norms_module_type = get_input(f"Which norms module do you want to use {NORMS_MODULE_TYPES}: ", f"Invalid norms module. Please choose {NORMS_MODULE_TYPES}: ", NORMS_MODULE_TYPES,
                                           PAPER_DEFAULTS["norms_module_type"])
-    for this_type in agent_types:
-        start_episode = start_episodes.get(this_type, 1)
-        file_string = fruit_market_file_string(training, settings, society_mix, this_type)
-        type_checkpoint_path = society_checkpoint_path(checkpoint_path, society_mix, this_type) if training else loading_checkpoint_path(checkpoint_path, society_mix, this_type)
-        model_inst = FruitMarketModel(society_mix, settings["num_agents"], this_type, max_episodes, settings["max_days"], training, type_checkpoint_path, write_data,
-                                      track_norms, file_string, seed, norms_module_type, start_episode, settings["grappling"], settings["well_being"],
-                                      settings["sanction"], settings["observation"], training_config=training_config)
-        if start_episode > 1:
-            model_inst.reseed_for_continuing()
-            print(f"Continuing {this_type}'s training from episode {start_episode}")
-        if training and society_mix != "homogeneous":
-            record_agent_types(type_checkpoint_path, model_inst.get_living_agents())
-        run_simulation(model_inst, False, log is not None, log)
-        model_inst.backend.close()
+    #training is seeded from the seed; testing from --test-seed, whatever the training seed, so every trained society faces the same episodes
+    run_seed = seed if training else args.test_seed
+    def run_types():
+        for this_type in agent_types:
+            start_episode = start_episodes.get(this_type, 1)
+            file_string = fruit_market_file_string(training, settings, society_mix, this_type)
+            type_checkpoint_path = society_checkpoint_path(checkpoint_path, society_mix, this_type) if training else loading_checkpoint_path(checkpoint_path, society_mix, this_type)
+            model_inst = FruitMarketModel(society_mix, settings["num_agents"], this_type, max_episodes, settings["max_days"], training, type_checkpoint_path, write_data,
+                                          track_norms, file_string, run_seed, norms_module_type, start_episode, settings["grappling"], settings["well_being"],
+                                          settings["sanction"], settings["observation"], training_config=training_config)
+            model_inst.checkpoint_every = CHECKPOINT_EVERY
+            if start_episode > 1:
+                model_inst.reseed_for_continuing()
+                print(f"Continuing {this_type}'s training from episode {start_episode}")
+            if training and society_mix != "homogeneous":
+                record_agent_types(type_checkpoint_path, model_inst.get_living_agents())
+            run_simulation(model_inst, False, log is not None, log)
+            model_inst.backend.close()
+    run_recorded(run_types)
 
 class RemovedOption(argparse.Action):
     """
@@ -433,6 +463,116 @@ class RemovedOption(argparse.Action):
     """
     def __call__(self, parser, namespace, values, option_string=None):
         parser.error(f"{option_string} is not an option: {REMOVED_OPTIONS[option_string]}")
+
+def harvest_condition(scenario, seasons, season_length, num_allocations, mixed_allotments, society_mix, throw_between_allotments, num_agents,
+                      max_days, commons_parameters=None, config_name=None):
+    """
+    A harvest run's condition, as its folder (--output-root) names it: the scenario and its options, e.g. colours_seasons_len25_4agents_200days
+    """
+    parts = [scenario_file_string(scenario, seasons, None, mixed_allotments, society_mix, throw_between_allotments)]
+    if seasons:
+        parts.append(f"len{season_length}")
+    if scenario in ["allotment", "capabilities"]:
+        parts.append(f"{num_allocations}groups")
+    if commons_parameters:
+        parts.append(f"K{commons_parameters['carrying_capacity']}_r{commons_parameters['growth_rate']}_R0{commons_parameters['initial_stock']}")
+    parts += [f"{num_agents}agents", f"{max_days}days"]
+    if config_name:
+        parts.append(config_name)
+    return "_".join(parts)
+
+def enter_run_folder(mode, condition, society, configuration):
+    """
+    With --output-root, work in the run's own folder (src/run_record.py) and record the run there: everything the run writes lands in
+    it, and its output is logged to run.log. A complete run stops here (relaunching it does nothing); an incomplete or failed training
+    run is continued from its checkpoint (or restarted, if it stopped before saving one), and an incomplete or failed test run is
+    restarted, its earlier outputs moved aside (into data/incomplete_<time>/), never overwritten
+    """
+    seed_label = f"seed_{args.seed}" if mode == "train" else f"train_seed_{args.seed}"
+    folder = os.path.abspath(run_folder(args.output_root, args.experiment, mode, condition, society, seed_label))
+    os.makedirs(folder, exist_ok=True)
+    os.chdir(folder)
+    log_to_folder(folder)
+    status = read_status(folder)
+    if status == "complete":
+        print(f"{folder} is complete: nothing to do.")
+        raise SystemExit(0)
+    if status == "running":
+        raise SystemExit(f"{folder} is already running (see its status.json).")
+    if status in ["incomplete", "failed"] and os.path.isdir("data"):
+        saved = glob.glob(os.path.join("data", "model_variables", "**", "progress.json"), recursive=True)
+        if mode == "train" and saved:
+            print(f"{folder} stopped partway ({status}): continuing it from its checkpoint.")
+            args.continue_run = "y"
+        else:
+            aside = os.path.join("data", "incomplete_" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+            os.makedirs(aside)
+            for name in ["results", "model_variables"]:
+                if os.path.isdir(os.path.join("data", name)):
+                    os.replace(os.path.join("data", name), os.path.join(aside, name))
+            print(f"{folder} stopped partway ({status}): starting it again; its earlier outputs are in {aside}.")
+    write_run_record(folder, {**configuration, "mode": mode, "condition": condition, "society": society, "seed": args.seed,
+                              "test_seed": args.test_seed if mode == "test" else None, "experiment": args.experiment,
+                              "checkpoint_every": args.checkpoint_every, "num_threads": args.num_threads, "folder": folder})
+    write_status(folder, "running")
+    return folder
+
+def run_recorded(run):
+    """
+    Call run(), recording in the run's status.json (with --output-root) whether it completed or failed
+    """
+    if args.output_root is None:
+        return run()
+    try:
+        result = run()
+    except BaseException as error:
+        write_status(os.getcwd(), "failed", error=f"{type(error).__name__}: {error}")
+        raise
+    write_status(os.getcwd(), "complete")
+    return result
+
+#each prompt's flag (the start of the prompt's text, and the argparse name of the flag that answers it): a run given every flag it
+#needs asks nothing, so it is one self-contained command; a prompt without its flag is asked as before
+PROMPT_FLAGS = [("What type of scenario do you want to", "scenario"), ("Do you want seasons", "seasons"),
+                ("Did the run have seasons", "seasons"), ("How many days in each season", "season_length"),
+                ("How many days in each episode", "days"), ("Which checkpoint do you want to test", "checkpoint"),
+                ("What mix of society", "society_mix"), ("What type of agent do you want to implement", "agent_type"),
+                ("How many agents", "num_agents"), ("How many allotments do you want", "groups"), ("How many capabilities do you want", "groups"),
+                ("How should the two agent types share the allotments", "layout"),
+                ("Can agents throw berries to agents in other allotments", "throw_between_allotments"),
+                ("Could agents throw berries to agents in other allotments", "throw_between_allotments"),
+                ("What carrying capacity", "carrying_capacity"), ("What growth rate", "growth_rate"),
+                ("How many berries should the commons start", "initial_stock"), ("Do you want to write data to file", "write_data"),
+                ("Do you want to write norms to file", "norms"), ("Did the run write rule-based norms", "norms"),
+                ("Which norms module", "norms_module"), ("Do you want to render", "render"), ("stopped after episode", "continue_run"),
+                ("How many steps in each episode", "steps"), ("How many players", "players"), ("Do you want grappling", "grappling"),
+                ("Which well-being", "well_being"), ("What is the ethics sanction from", "sanction_mode"),
+                ("Which spatial features", "observation"), ("How many episodes do you want to test", "test_episodes"),
+                ("What run do you want to generate graphs for", "graph_run")]
+#flags that answer a prompt asked more than once (the continue prompt is asked for each agent type with a stopped run)
+REPEATED_FLAGS = {"continue_run"}
+_flags_used = set()
+_last_flag = None
+
+def answer(prompt):
+    """
+    The answer to a prompt: its flag's value, if the flag was given (printed after the prompt, as if typed), otherwise what is typed.
+    A flag's value the prompt refuses stops the run with an error rather than asking again
+    """
+    global _last_flag
+    if _last_flag is not None and prompt.lstrip().startswith("Invalid"):
+        raise SystemExit(f"--{_last_flag.replace('_', '-')} {getattr(args, _last_flag)!r} is not a valid answer: {prompt.strip()}")
+    for start, name in PROMPT_FLAGS:
+        if start in prompt and getattr(args, name, None) is not None:
+            if name in _flags_used and name not in REPEATED_FLAGS:
+                raise SystemExit(f"--{name.replace('_', '-')} {getattr(args, name)!r} is not a valid answer to: {prompt.strip()}")
+            _flags_used.add(name)
+            _last_flag = name
+            value = str(getattr(args, name))
+            print(prompt + value)
+            return value
+    _last_flag = None
+    return input(prompt)
 
 def with_default(prompt, default):
     """
@@ -449,11 +589,11 @@ def get_input(input_string, error_string, valid_options, default=None):
     """
     Ask until one of valid_options is given; pressing enter chooses default, if there is one
     """
-    variable = input(with_default(input_string, default)).strip()
+    variable = answer(with_default(input_string, default)).strip()
     while variable not in valid_options:
         if variable == "" and default is not None:
             return default
-        variable = input(with_default(error_string, default)).strip()
+        variable = answer(with_default(error_string, default)).strip()
     return variable
 
 def get_bool(input):
@@ -482,9 +622,57 @@ parser.add_argument("--training-config", type=str, default=None,
                     help="Training parameters file to use instead of the scenario's (configs/training/), e.g. one written by the parameter sweep")
 parser.add_argument("-l", "--log", type=str, default=None,
                     help="Log wandb (optional)")
+#runs: a run's own folder, seeds, threads and checkpoints
+runs = parser.add_argument_group("runs", "A run given --output-root works in a folder of its own, <output-root>/<experiment>/<train|test>/"
+                                 "<condition>/<agent type>/<seed_<s>|train_seed_<s>>, with run.json, status.json and run.log; relaunching "
+                                 "it continues an incomplete training run from its checkpoint, restarts an incomplete test run, and does "
+                                 "nothing for a complete one")
+runs.add_argument("--output-root", type=str, default=None, help="Folder to make each run's own folder in")
+runs.add_argument("--experiment", type=str, default="default", help="Experiment name: the first folder under --output-root")
+runs.add_argument("--test-seed", type=int, default=DEFAULT_TEST_SEED,
+                  help=f"Seed of a test run's environment (default {DEFAULT_TEST_SEED}); --seed is then the training seed of the agents tested")
+runs.add_argument("--num-threads", type=int, default=None, help="TensorFlow's intra- and inter-op threads, so runs can share a machine")
+runs.add_argument("--checkpoint-every", type=int, default=1, help="Training saves its checkpoint every this many episodes (and at the end)")
+#each prompt's answer (see PROMPT_FLAGS); a prompt whose flag isn't given is asked
+answers = parser.add_argument_group("answers", "Each answers a prompt, which is then not asked")
+answers.add_argument("--scenario")
+answers.add_argument("--seasons", choices=["y", "n"])
+answers.add_argument("--season-length", type=int)
+answers.add_argument("--days", type=int, help="Days in each episode (training)")
+answers.add_argument("--checkpoint", help="Checkpoint to test: a run (e.g. 200_days), a trained checkpoint's name, a folder, or a training run's own folder")
+answers.add_argument("--society-mix", choices=SOCIETY_MIXES)
+answers.add_argument("--agent-type")
+answers.add_argument("--num-agents", type=int)
+answers.add_argument("--groups", type=int, help="Allotments (allotment) or capabilities (capabilities)")
+answers.add_argument("--layout", choices=["split", "separate"], help="How a mixed society shares the allotments")
+answers.add_argument("--throw-between-allotments", choices=["y", "n"])
+answers.add_argument("--carrying-capacity", type=int)
+answers.add_argument("--growth-rate", type=float)
+answers.add_argument("--initial-stock", type=int)
+answers.add_argument("--write-data", choices=["y", "n"])
+answers.add_argument("--norms", choices=["y", "n"], help="Write norms to file (test)")
+answers.add_argument("--norms-module", choices=NORMS_MODULE_TYPES)
+answers.add_argument("--render", choices=["y", "n"])
+answers.add_argument("--continue", dest="continue_run", choices=["y", "n"], help="Continue a stopped training run")
+answers.add_argument("--test-episodes", type=int, help=f"Episodes in a test run (default {MAX_EPISODES}; Fruit Market {FRUIT_MARKET_TEST_EPISODES})")
+answers.add_argument("--steps", type=int, help="Fruit Market: steps in each episode")
+answers.add_argument("--players", type=int, help="Fruit Market: players")
+answers.add_argument("--grappling", choices=["y", "n"], help="Fruit Market")
+answers.add_argument("--well-being", help="Fruit Market")
+answers.add_argument("--sanction-mode", help="Fruit Market")
+answers.add_argument("--observation", help="Fruit Market")
+answers.add_argument("--graph-run", help="graphs: the run to make graphs for")
 for removed_option in REMOVED_OPTIONS:
     parser.add_argument(removed_option, action=RemovedOption, nargs="*", help=argparse.SUPPRESS)
 args = parser.parse_args()
+if args.num_threads is not None:
+    #before any TensorFlow op runs
+    import tensorflow
+    tensorflow.config.threading.set_intra_op_parallelism_threads(args.num_threads)
+    tensorflow.config.threading.set_inter_op_parallelism_threads(args.num_threads)
+if args.option == "test" and args.test_episodes is not None:
+    MAX_EPISODES = args.test_episodes
+CHECKPOINT_EVERY = args.checkpoint_every
 
 #argparse only accepts test, train or graphs
 if args.option == "test" or args.option == "train":
@@ -547,6 +735,7 @@ if args.option == "test" or args.option == "train":
     #########################################################################################
     write_data = write_data_input("data", PAPER_DEFAULTS["write_data"])
     #########################################################################################
+    config_name = None
     if training:
         #the delays allotments actually regrow with, so the name says which were used
         delays = allotment_regrowth_delays
@@ -565,6 +754,15 @@ if args.option == "test" or args.option == "train":
             training_config = TrainingConfig(**recorded_config)
             print(f"Testing with the training config the checkpoint was trained with (recorded in {checkpoint_path}settings.json).")
     #########################################################################################
+    if args.output_root is not None:
+        condition = harvest_condition(scenario, seasons, season_length, num_allocations, mixed_allotments, society_mix, throw_between_allotments,
+                                      num_agents, max_days, commons_parameters, config_name if training else None)
+        enter_run_folder(mode, condition, agent_type,
+                         {"scenario": scenario, "seasons": seasons, "season_length": season_length if seasons else None, "max_days": max_days,
+                          "society_mix": society_mix, "agent_type": agent_type, "num_agents": num_agents, "num_allocations": num_allocations,
+                          "mixed_allotments": mixed_allotments, "throw_between_allotments": throw_between_allotments,
+                          "commons_parameters": commons_parameters, "write_data": write_data, "max_episodes": max_episodes,
+                          "checkpoint": None if training else checkpoint_path, "training_config": training_config.to_dict()})
     norms_module_type = NORMS_MODULE_TYPES[0]
     start_episodes = {}
     if training:
@@ -601,10 +799,12 @@ if args.option == "test" or args.option == "train":
     else:
         log_wandb = False
         wandb_project = None
+    #training is seeded from --seed; testing from --test-seed, whatever the training seed, so every trained society faces the same episodes
+    run_seed = args.seed if training else args.test_seed
     if agent_type == "all":
-        run_all(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episodes=start_episodes,commons_parameters=commons_parameters,training_config=training_config,throw_between_allotments=throw_between_allotments)
+        run_recorded(lambda: run_all(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=run_seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episodes=start_episodes,commons_parameters=commons_parameters,training_config=training_config,throw_between_allotments=throw_between_allotments))
     else:
-        create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=args.seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episode=start_episodes.get(agent_type, 1),commons_parameters=commons_parameters,training_config=training_config,throw_between_allotments=throw_between_allotments)
+        run_recorded(lambda: create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,NUM_BERRIES,num_allocations,agent_type,MAX_WIDTH,MAX_HEIGHT,max_episodes,max_days,training,write_data,track_norms,render,log_wandb,wandb_project,seed=run_seed,norms_module_type=norms_module_type,seasons=seasons,season_length=season_length,allotment_regrowth_delays=allotment_regrowth_delays,mixed_allotments=mixed_allotments,start_episode=start_episodes.get(agent_type, 1),commons_parameters=commons_parameters,training_config=training_config,throw_between_allotments=throw_between_allotments))
 #########################################################################################
 elif args.option == "graphs":
     graph_runs = ["current_run", "50_days", "200_days", "paper"]

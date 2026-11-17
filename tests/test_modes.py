@@ -394,13 +394,15 @@ def test_choosing_baseline_agents_draws_nothing_from_the_other_random_streams(in
     assert start(mixed) == start(homogeneous)
 
 
-def test_a_mixed_society_tested_with_other_agent_types_fails_clearly(in_tmp_dir):
+def test_a_mixed_society_is_tested_with_the_agent_types_it_was_trained_with(in_tmp_dir):
+    # (before multi-seed runs, a test seed that chose other baseline agents failed with CheckpointNotFoundException; test runs are now
+    # seeded from the test seed, whatever the training seed, so they take the agent types the training recorded)
     root = str(in_tmp_dir / "checkpoints") + "/"
     _, trained = train_mixed("colours", root, seed=42)
     # a seed that chooses other baseline agents
     seed = next(s for s in range(100) if build_mixed("colours", True, str(in_tmp_dir / f"probe{s}") + "/", seed=s).baseline_ids != trained.baseline_ids)
-    with pytest.raises(CheckpointNotFoundException, match=r"No checkpoint at .*trained together as \{'agent_0'"):
-        build_mixed("colours", False, loading_checkpoint_path(root, "heterogeneous", "utilitarian"), seed=seed)
+    tested = build_mixed("colours", False, loading_checkpoint_path(root, "heterogeneous", "utilitarian"), seed=seed)
+    assert tested.baseline_ids == trained.baseline_ids and agent_types_of(tested) == agent_types_of(trained)
 
 
 @needs_paper_checkpoints

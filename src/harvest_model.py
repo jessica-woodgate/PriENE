@@ -368,6 +368,7 @@ class HarvestModel(SocietyModel):
         """
         self.living_agents = []
         self._choose_agent_types(society_mix)
+        self._use_recorded_agent_types(society_mix, checkpoint_path)
         if self.SHUFFLES_ALLOCATIONS:
             self._assign_agents_to_allocations()
         for i in range(self.num_agents):

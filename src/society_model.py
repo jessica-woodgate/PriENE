@@ -6,6 +6,7 @@ import os
 import tensorflow
 from tensorflow import keras
 from . import seeding
+from .checkpoints import recorded_agent_types
 from .harvest_exception import FileExistsException
 from .harvest_exception import MixedSocietyException
 from os.path import exists
@@ -95,6 +96,17 @@ class SocietyModel(Model):
         _choose_baseline_ids), since agent ids decide resources in some scenarios and neither type should always get the better ones
         """
         self.baseline_ids = set() if society_mix == "homogeneous" else self._choose_baseline_ids(self._mixed_society_rng())
+
+    def _use_recorded_agent_types(self, society_mix, checkpoint_path):
+        """
+        A test of a mixed society trained together has the agent types its training recorded (beside its checkpoints), not ones chosen
+        from this run's seed: a test run is seeded from the test seed, which needn't choose the agents its training did
+        """
+        if self.training or society_mix == "homogeneous" or not checkpoint_path:
+            return
+        recorded = recorded_agent_types(checkpoint_path)
+        if recorded:
+            self.baseline_ids = {int(name.split("_")[1]) for name, agent_type in recorded.items() if agent_type == "baseline"}
 
     def _mixed_society_rng(self):
         #its own stream from the seed, so choosing the baseline agents doesn't shift any other random draws
