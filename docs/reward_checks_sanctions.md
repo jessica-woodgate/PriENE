@@ -19,6 +19,13 @@ For each sharing policy as the focal agent among eaters: its discounted return m
 | altruist | current | optimist | -2.281 | -2.426 | -2.571 | -2.861 | -3.442 | -3.732 | -5.183 | -9.535 | -1.451 |  |
 | altruist | current | utilitarian | -2.281 | -2.387 | -2.492 | -2.703 | -3.125 | -3.337 | -4.392 | -7.559 | -1.056 |  |
 | altruist | current | veto | -2.281 | -1.933 | -1.586 | -0.890 | 0.501 | 1.197 | 4.674 | 15.107 | 3.478 | 0.656 |
+| altruist | nonnegative | average | -2.695 | -2.532 | -2.368 | -2.041 | -1.387 | -1.060 | 0.575 | 5.479 | 1.635 | 1.648 |
+| altruist | nonnegative | egalitarian | -2.695 | -2.522 | -2.348 | -2.002 | -1.309 | -0.962 | 0.770 | 5.968 | 1.733 | 1.555 |
+| altruist | nonnegative | majoritarian | -2.695 | -2.535 | -2.374 | -2.053 | -1.412 | -1.091 | 0.513 | 5.324 | 1.604 | 1.680 |
+| altruist | nonnegative | maximin | -2.695 | -2.519 | -2.342 | -1.990 | -1.284 | -0.932 | 0.832 | 6.122 | 1.763 | 1.528 |
+| altruist | nonnegative | optimist | -2.695 | -2.773 | -2.851 | -3.008 | -3.320 | -3.477 | -4.258 | -6.603 | -0.782 |  |
+| altruist | nonnegative | utilitarian | -2.695 | -2.801 | -2.906 | -3.117 | -3.539 | -3.751 | -4.806 | -7.973 | -1.056 |  |
+| altruist | nonnegative | veto | -2.695 | -2.527 | -2.358 | -2.022 | -1.349 | -1.012 | 0.670 | 5.718 | 1.683 | 1.602 |
 | altruist | suggested | average | -2.931 | -2.811 | -2.691 | -2.451 | -1.972 | -1.732 | -0.532 | 3.067 | 1.200 | 2.443 |
 | altruist | suggested | egalitarian | -2.931 | -2.575 | -2.219 | -1.507 | -0.083 | 0.629 | 4.190 | 14.871 | 3.560 | 0.823 |
 | altruist | suggested | majoritarian | -2.931 | -2.838 | -2.744 | -2.557 | -2.183 | -1.997 | -1.062 | 1.742 | 0.935 | 3.136 |
@@ -61,6 +68,13 @@ For each sharing policy as the focal agent among eaters: its discounted return m
 | altruist | suggested_forage08 | optimist | -3.776 | -3.921 | -4.066 | -4.356 | -4.936 | -5.226 | -6.677 | -11.030 | -1.451 |  |
 | altruist | suggested_forage08 | utilitarian | -3.776 | -3.881 | -3.987 | -4.198 | -4.620 | -4.831 | -5.887 | -9.053 | -1.056 |  |
 | altruist | suggested_forage08 | veto | -3.776 | -3.428 | -3.080 | -2.385 | -0.994 | -0.298 | 3.179 | 13.612 | 3.478 | 1.086 |
+| altruist | suggested_positive_sanction | average | -2.931 | -2.768 | -2.604 | -2.277 | -1.623 | -1.296 | 0.338 | 5.243 | 1.635 | 1.793 |
+| altruist | suggested_positive_sanction | egalitarian | -2.931 | -2.758 | -2.585 | -2.238 | -1.545 | -1.199 | 0.534 | 5.732 | 1.733 | 1.692 |
+| altruist | suggested_positive_sanction | majoritarian | -2.931 | -2.771 | -2.611 | -2.290 | -1.648 | -1.327 | 0.276 | 5.088 | 1.604 | 1.828 |
+| altruist | suggested_positive_sanction | maximin | -2.931 | -2.755 | -2.579 | -2.226 | -1.521 | -1.168 | 0.595 | 5.885 | 1.763 | 1.662 |
+| altruist | suggested_positive_sanction | optimist | -2.931 | -3.009 | -3.088 | -3.244 | -3.557 | -3.713 | -4.495 | -6.840 | -0.782 |  |
+| altruist | suggested_positive_sanction | utilitarian | -2.931 | -3.037 | -3.142 | -3.354 | -3.776 | -3.987 | -5.042 | -8.209 | -1.056 |  |
+| altruist | suggested_positive_sanction | veto | -2.931 | -2.763 | -2.595 | -2.258 | -1.585 | -1.249 | 0.434 | 5.481 | 1.683 | 1.742 |
 | altruist | suggested_shaping | average | -2.240 | -2.120 | -2.000 | -1.760 | -1.280 | -1.040 | 0.159 | 3.758 | 1.200 | 1.867 |
 | altruist | suggested_shaping | egalitarian | -2.240 | -1.884 | -1.528 | -0.816 | 0.608 | 1.320 | 4.881 | 15.562 | 3.560 | 0.629 |
 | altruist | suggested_shaping | majoritarian | -2.240 | -2.147 | -2.053 | -1.866 | -1.492 | -1.305 | -0.371 | 2.434 | 0.935 | 2.397 |
@@ -89,6 +103,13 @@ For each sharing policy as the focal agent among eaters: its discounted return m
 | altruist_eater | current | optimist | -2.008 | -2.161 | -2.315 | -2.621 | -3.235 | -3.542 | -5.076 | -9.678 | -1.534 |  |
 | altruist_eater | current | utilitarian | -2.008 | -2.113 | -2.219 | -2.430 | -2.852 | -3.063 | -4.118 | -7.282 | -1.055 |  |
 | altruist_eater | current | veto | -2.008 | -1.609 | -1.209 | -0.411 | 1.185 | 1.984 | 5.975 | 17.950 | 3.992 | 0.503 |
+| altruist_eater | nonnegative | average | -2.421 | -2.226 | -2.032 | -1.643 | -0.865 | -0.476 | 1.469 | 7.303 | 1.945 | 1.245 |
+| altruist_eater | nonnegative | egalitarian | -2.421 | -2.219 | -2.017 | -1.614 | -0.807 | -0.404 | 1.613 | 7.663 | 2.017 | 1.200 |
+| altruist_eater | nonnegative | majoritarian | -2.421 | -2.236 | -2.052 | -1.684 | -0.946 | -0.578 | 1.265 | 6.794 | 1.843 | 1.313 |
+| altruist_eater | nonnegative | maximin | -2.421 | -2.210 | -1.999 | -1.577 | -0.733 | -0.311 | 1.798 | 8.126 | 2.109 | 1.148 |
+| altruist_eater | nonnegative | optimist | -2.421 | -2.502 | -2.583 | -2.745 | -3.069 | -3.231 | -4.041 | -6.472 | -0.810 |  |
+| altruist_eater | nonnegative | utilitarian | -2.421 | -2.526 | -2.632 | -2.843 | -3.265 | -3.476 | -4.530 | -7.695 | -1.055 |  |
+| altruist_eater | nonnegative | veto | -2.421 | -2.225 | -2.030 | -1.640 | -0.859 | -0.468 | 1.484 | 7.342 | 1.953 | 1.240 |
 | altruist_eater | suggested | average | -2.638 | -2.490 | -2.343 | -2.047 | -1.455 | -1.159 | 0.320 | 4.757 | 1.479 | 1.784 |
 | altruist_eater | suggested | egalitarian | -2.638 | -2.228 | -1.817 | -0.996 | 0.647 | 1.468 | 5.574 | 17.894 | 4.106 | 0.642 |
 | altruist_eater | suggested | majoritarian | -2.638 | -2.526 | -2.415 | -2.191 | -1.743 | -1.519 | -0.400 | 2.958 | 1.119 | 2.357 |
@@ -131,6 +152,13 @@ For each sharing policy as the focal agent among eaters: its discounted return m
 | altruist_eater | suggested_forage08 | optimist | -3.482 | -3.636 | -3.789 | -4.096 | -4.710 | -5.016 | -6.551 | -11.153 | -1.534 |  |
 | altruist_eater | suggested_forage08 | utilitarian | -3.482 | -3.588 | -3.693 | -3.904 | -4.326 | -4.537 | -5.592 | -8.757 | -1.055 |  |
 | altruist_eater | suggested_forage08 | veto | -3.482 | -3.083 | -2.684 | -1.886 | -0.289 | 0.509 | 4.501 | 16.475 | 3.992 | 0.872 |
+| altruist_eater | suggested_positive_sanction | average | -2.638 | -2.444 | -2.249 | -1.860 | -1.083 | -0.694 | 1.251 | 7.085 | 1.945 | 1.357 |
+| altruist_eater | suggested_positive_sanction | egalitarian | -2.638 | -2.437 | -2.235 | -1.832 | -1.025 | -0.622 | 1.395 | 7.445 | 2.017 | 1.308 |
+| altruist_eater | suggested_positive_sanction | majoritarian | -2.638 | -2.454 | -2.270 | -1.901 | -1.164 | -0.795 | 1.048 | 6.577 | 1.843 | 1.432 |
+| altruist_eater | suggested_positive_sanction | maximin | -2.638 | -2.427 | -2.216 | -1.795 | -0.951 | -0.529 | 1.580 | 7.908 | 2.109 | 1.251 |
+| altruist_eater | suggested_positive_sanction | optimist | -2.638 | -2.719 | -2.800 | -2.962 | -3.287 | -3.449 | -4.259 | -6.690 | -0.810 |  |
+| altruist_eater | suggested_positive_sanction | utilitarian | -2.638 | -2.744 | -2.849 | -3.060 | -3.482 | -3.693 | -4.748 | -7.913 | -1.055 |  |
+| altruist_eater | suggested_positive_sanction | veto | -2.638 | -2.443 | -2.248 | -1.857 | -1.076 | -0.686 | 1.267 | 7.124 | 1.953 | 1.351 |
 | altruist_eater | suggested_shaping | average | -1.729 | -1.581 | -1.433 | -1.137 | -0.546 | -0.250 | 1.229 | 5.666 | 1.479 | 1.169 |
 | altruist_eater | suggested_shaping | egalitarian | -1.729 | -1.318 | -0.908 | -0.087 | 1.556 | 2.377 | 6.484 | 18.803 | 4.106 | 0.421 |
 | altruist_eater | suggested_shaping | majoritarian | -1.729 | -1.617 | -1.505 | -1.281 | -0.834 | -0.610 | 0.509 | 3.867 | 1.119 | 1.545 |
@@ -159,6 +187,13 @@ For each sharing policy as the focal agent among eaters: its discounted return m
 | sharer | current | optimist | -1.288 | -1.323 | -1.358 | -1.429 | -1.571 | -1.641 | -1.995 | -3.056 | -0.354 |  |
 | sharer | current | utilitarian | -1.288 | -1.358 | -1.428 | -1.569 | -1.850 | -1.991 | -2.694 | -4.804 | -0.703 |  |
 | sharer | current | veto | -1.288 | -0.886 | -0.485 | 0.317 | 1.922 | 2.725 | 6.737 | 18.775 | 4.012 | 0.321 |
+| sharer | nonnegative | average | -1.461 | -1.287 | -1.114 | -0.766 | -0.072 | 0.275 | 2.012 | 7.221 | 1.736 | 0.841 |
+| sharer | nonnegative | egalitarian | -1.461 | -1.274 | -1.087 | -0.713 | 0.036 | 0.410 | 2.281 | 7.894 | 1.871 | 0.781 |
+| sharer | nonnegative | majoritarian | -1.461 | -1.288 | -1.115 | -0.769 | -0.078 | 0.268 | 1.997 | 7.183 | 1.729 | 0.845 |
+| sharer | nonnegative | maximin | -1.461 | -1.275 | -1.089 | -0.718 | 0.026 | 0.397 | 2.256 | 7.830 | 1.858 | 0.786 |
+| sharer | nonnegative | optimist | -1.461 | -1.496 | -1.532 | -1.602 | -1.744 | -1.815 | -2.168 | -3.229 | -0.354 |  |
+| sharer | nonnegative | utilitarian | -1.461 | -1.531 | -1.602 | -1.742 | -2.024 | -2.164 | -2.868 | -4.978 | -0.703 |  |
+| sharer | nonnegative | veto | -1.461 | -1.278 | -1.095 | -0.729 | 0.003 | 0.368 | 2.198 | 7.686 | 1.829 | 0.799 |
 | sharer | suggested | average | -1.600 | -1.426 | -1.253 | -0.905 | -0.211 | 0.136 | 1.873 | 7.082 | 1.736 | 0.921 |
 | sharer | suggested | egalitarian | -1.600 | -1.194 | -0.789 | 0.022 | 1.643 | 2.454 | 6.508 | 18.670 | 4.054 | 0.395 |
 | sharer | suggested | majoritarian | -1.600 | -1.427 | -1.254 | -0.908 | -0.217 | 0.129 | 1.858 | 7.044 | 1.729 | 0.925 |
@@ -201,6 +236,13 @@ For each sharing policy as the focal agent among eaters: its discounted return m
 | sharer | suggested_forage08 | optimist | -2.162 | -2.198 | -2.233 | -2.304 | -2.445 | -2.516 | -2.870 | -3.931 | -0.354 |  |
 | sharer | suggested_forage08 | utilitarian | -2.162 | -2.233 | -2.303 | -2.444 | -2.725 | -2.866 | -3.569 | -5.679 | -0.703 |  |
 | sharer | suggested_forage08 | veto | -2.162 | -1.761 | -1.360 | -0.557 | 1.048 | 1.850 | 5.863 | 17.900 | 4.012 | 0.539 |
+| sharer | suggested_positive_sanction | average | -1.600 | -1.426 | -1.253 | -0.905 | -0.211 | 0.136 | 1.873 | 7.082 | 1.736 | 0.921 |
+| sharer | suggested_positive_sanction | egalitarian | -1.600 | -1.413 | -1.226 | -0.851 | -0.103 | 0.271 | 2.142 | 7.755 | 1.871 | 0.855 |
+| sharer | suggested_positive_sanction | majoritarian | -1.600 | -1.427 | -1.254 | -0.908 | -0.217 | 0.129 | 1.858 | 7.044 | 1.729 | 0.925 |
+| sharer | suggested_positive_sanction | maximin | -1.600 | -1.414 | -1.228 | -0.857 | -0.113 | 0.258 | 2.117 | 7.691 | 1.858 | 0.861 |
+| sharer | suggested_positive_sanction | optimist | -1.600 | -1.635 | -1.671 | -1.741 | -1.883 | -1.954 | -2.307 | -3.368 | -0.354 |  |
+| sharer | suggested_positive_sanction | utilitarian | -1.600 | -1.670 | -1.740 | -1.881 | -2.162 | -2.303 | -3.006 | -5.116 | -0.703 |  |
+| sharer | suggested_positive_sanction | veto | -1.600 | -1.417 | -1.234 | -0.868 | -0.136 | 0.230 | 2.059 | 7.547 | 1.829 | 0.875 |
 | sharer | suggested_shaping | average | -1.325 | -1.151 | -0.977 | -0.630 | 0.064 | 0.412 | 2.148 | 7.357 | 1.736 | 0.763 |
 | sharer | suggested_shaping | egalitarian | -1.325 | -0.919 | -0.514 | 0.297 | 1.919 | 2.729 | 6.783 | 18.945 | 4.054 | 0.327 |
 | sharer | suggested_shaping | majoritarian | -1.325 | -1.152 | -0.979 | -0.633 | 0.058 | 0.404 | 2.133 | 7.319 | 1.729 | 0.766 |
@@ -229,6 +271,13 @@ For each sharing policy as the focal agent among eaters: its discounted return m
 | sharer_hoarder | current | optimist | -1.927 | -1.950 | -1.973 | -2.018 | -2.109 | -2.155 | -2.382 | -3.065 | -0.228 |  |
 | sharer_hoarder | current | utilitarian | -1.927 | -1.976 | -2.026 | -2.124 | -2.321 | -2.419 | -2.911 | -4.386 | -0.492 |  |
 | sharer_hoarder | current | veto | -1.927 | -1.735 | -1.543 | -1.159 | -0.390 | -0.006 | 1.915 | 7.679 | 1.921 | 1.003 |
+| sharer_hoarder | nonnegative | average | -2.290 | -2.208 | -2.126 | -1.962 | -1.635 | -1.471 | -0.653 | 1.803 | 0.819 | 2.797 |
+| sharer_hoarder | nonnegative | egalitarian | -2.290 | -2.201 | -2.113 | -1.936 | -1.581 | -1.404 | -0.519 | 2.137 | 0.885 | 2.586 |
+| sharer_hoarder | nonnegative | majoritarian | -2.290 | -2.205 | -2.120 | -1.950 | -1.610 | -1.440 | -0.590 | 1.961 | 0.850 | 2.693 |
+| sharer_hoarder | nonnegative | maximin | -2.290 | -2.191 | -2.092 | -1.895 | -1.500 | -1.302 | -0.314 | 2.649 | 0.988 | 2.318 |
+| sharer_hoarder | nonnegative | optimist | -2.290 | -2.313 | -2.335 | -2.381 | -2.472 | -2.517 | -2.745 | -3.428 | -0.228 |  |
+| sharer_hoarder | nonnegative | utilitarian | -2.290 | -2.339 | -2.388 | -2.487 | -2.683 | -2.782 | -3.274 | -4.749 | -0.492 |  |
+| sharer_hoarder | nonnegative | veto | -2.290 | -2.205 | -2.120 | -1.951 | -1.612 | -1.443 | -0.596 | 1.944 | 0.847 | 2.704 |
 | sharer_hoarder | suggested | average | -2.431 | -2.349 | -2.268 | -2.104 | -1.776 | -1.613 | -0.794 | 1.661 | 0.819 | 2.970 |
 | sharer_hoarder | suggested | egalitarian | -2.431 | -2.235 | -2.039 | -1.647 | -0.863 | -0.472 | 1.488 | 7.368 | 1.960 | 1.241 |
 | sharer_hoarder | suggested | majoritarian | -2.431 | -2.346 | -2.261 | -2.091 | -1.751 | -1.581 | -0.731 | 1.819 | 0.850 | 2.860 |
@@ -271,6 +320,13 @@ For each sharing policy as the focal agent among eaters: its discounted return m
 | sharer_hoarder | suggested_forage08 | optimist | -2.825 | -2.848 | -2.870 | -2.916 | -3.007 | -3.052 | -3.280 | -3.963 | -0.228 |  |
 | sharer_hoarder | suggested_forage08 | utilitarian | -2.825 | -2.874 | -2.923 | -3.022 | -3.218 | -3.317 | -3.809 | -5.284 | -0.492 |  |
 | sharer_hoarder | suggested_forage08 | veto | -2.825 | -2.633 | -2.441 | -2.056 | -1.288 | -0.904 | 1.018 | 6.781 | 1.921 | 1.470 |
+| sharer_hoarder | suggested_positive_sanction | average | -2.431 | -2.349 | -2.268 | -2.104 | -1.776 | -1.613 | -0.794 | 1.661 | 0.819 | 2.970 |
+| sharer_hoarder | suggested_positive_sanction | egalitarian | -2.431 | -2.343 | -2.254 | -2.077 | -1.723 | -1.546 | -0.661 | 1.996 | 0.885 | 2.746 |
+| sharer_hoarder | suggested_positive_sanction | majoritarian | -2.431 | -2.346 | -2.261 | -2.091 | -1.751 | -1.581 | -0.731 | 1.819 | 0.850 | 2.860 |
+| sharer_hoarder | suggested_positive_sanction | maximin | -2.431 | -2.333 | -2.234 | -2.036 | -1.641 | -1.444 | -0.456 | 2.507 | 0.988 | 2.462 |
+| sharer_hoarder | suggested_positive_sanction | optimist | -2.431 | -2.454 | -2.477 | -2.522 | -2.613 | -2.659 | -2.886 | -3.569 | -0.228 |  |
+| sharer_hoarder | suggested_positive_sanction | utilitarian | -2.431 | -2.480 | -2.530 | -2.628 | -2.825 | -2.923 | -3.415 | -4.891 | -0.492 |  |
+| sharer_hoarder | suggested_positive_sanction | veto | -2.431 | -2.347 | -2.262 | -2.093 | -1.754 | -1.584 | -0.738 | 1.803 | 0.847 | 2.871 |
 | sharer_hoarder | suggested_shaping | average | -1.686 | -1.605 | -1.523 | -1.359 | -1.032 | -0.868 | -0.049 | 2.406 | 0.819 | 2.060 |
 | sharer_hoarder | suggested_shaping | egalitarian | -1.686 | -1.491 | -1.295 | -0.903 | -0.119 | 0.273 | 2.233 | 8.113 | 1.960 | 0.861 |
 | sharer_hoarder | suggested_shaping | majoritarian | -1.686 | -1.601 | -1.516 | -1.346 | -1.006 | -0.836 | 0.014 | 2.564 | 0.850 | 1.984 |
@@ -299,20 +355,20 @@ Failed checks (reward functions x agent types) at each sanction:
 
 | check | s=0 | s=0.1 | s=0.2 | s=0.4 | s=0.8 | s=1 | s=2 | s=5 |
 |---|---|---|---|---|---|---|---|---|
-| sanction raises altruist relative to eater | 0 | 20 | 20 | 20 | 20 | 20 | 20 | 20 |
-| sanction raises altruist_eater relative to eater | 0 | 20 | 20 | 20 | 20 | 20 | 20 | 20 |
-| sanction raises sharer relative to eater | 0 | 20 | 20 | 20 | 20 | 20 | 20 | 20 |
-| sanction raises sharer_hoarder relative to eater | 0 | 20 | 20 | 20 | 20 | 20 | 20 | 20 |
+| sanction raises altruist relative to eater | 0 | 24 | 24 | 24 | 24 | 24 | 24 | 24 |
+| sanction raises altruist_eater relative to eater | 0 | 24 | 24 | 24 | 24 | 24 | 24 | 24 |
+| sanction raises sharer relative to eater | 0 | 24 | 24 | 24 | 24 | 24 | 24 | 24 |
+| sanction raises sharer_hoarder relative to eater | 0 | 24 | 24 | 24 | 24 | 24 | 24 | 24 |
 | surviving > dying early (by 1 sd) | 8 | 8 | 8 | 8 | 14 | 18 | 24 | 22 |
 
 By agent type:
 
 | check | average | baseline | egalitarian | majoritarian | maximin | optimist | utilitarian | veto |
 |---|---|---|---|---|---|---|---|---|
-| sanction raises altruist relative to eater | 0 | 0 | 0 | 0 | 0 | 70 | 70 | 0 |
-| sanction raises altruist_eater relative to eater | 0 | 0 | 0 | 0 | 0 | 70 | 70 | 0 |
-| sanction raises sharer relative to eater | 0 | 0 | 0 | 0 | 0 | 70 | 70 | 0 |
-| sanction raises sharer_hoarder relative to eater | 0 | 0 | 0 | 0 | 0 | 70 | 70 | 0 |
+| sanction raises altruist relative to eater | 0 | 0 | 0 | 0 | 0 | 84 | 84 | 0 |
+| sanction raises altruist_eater relative to eater | 0 | 0 | 0 | 0 | 0 | 84 | 84 | 0 |
+| sanction raises sharer relative to eater | 0 | 0 | 0 | 0 | 0 | 84 | 84 | 0 |
+| sanction raises sharer_hoarder relative to eater | 0 | 0 | 0 | 0 | 0 | 84 | 84 | 0 |
 | surviving > dying early (by 1 sd) | 8 | 8 | 34 | 7 | 7 | 6 | 6 | 34 |
 
 ## Checks passed per reward function
@@ -327,6 +383,14 @@ By agent type:
 | current_s1 | 64 | 8 | 0 |
 | current_s2 | 62 | 10 | 0 |
 | current_s5 | 62 | 10 | 0 |
+| nonnegative_s0 | 44 | 0 | 28 |
+| nonnegative_s0.1 | 64 | 8 | 0 |
+| nonnegative_s0.2 | 64 | 8 | 0 |
+| nonnegative_s0.4 | 64 | 8 | 0 |
+| nonnegative_s0.8 | 64 | 8 | 0 |
+| nonnegative_s1 | 64 | 8 | 0 |
+| nonnegative_s2 | 64 | 8 | 0 |
+| nonnegative_s5 | 64 | 8 | 0 |
 | suggested_alive_s0 | 44 | 0 | 28 |
 | suggested_alive_s0.1 | 64 | 8 | 0 |
 | suggested_alive_s0.2 | 64 | 8 | 0 |
@@ -367,6 +431,14 @@ By agent type:
 | suggested_forage08_s1 | 64 | 8 | 0 |
 | suggested_forage08_s2 | 62 | 10 | 0 |
 | suggested_forage08_s5 | 62 | 10 | 0 |
+| suggested_positive_sanction_s0 | 44 | 0 | 28 |
+| suggested_positive_sanction_s0.1 | 64 | 8 | 0 |
+| suggested_positive_sanction_s0.2 | 64 | 8 | 0 |
+| suggested_positive_sanction_s0.4 | 64 | 8 | 0 |
+| suggested_positive_sanction_s0.8 | 64 | 8 | 0 |
+| suggested_positive_sanction_s1 | 64 | 8 | 0 |
+| suggested_positive_sanction_s2 | 64 | 8 | 0 |
+| suggested_positive_sanction_s5 | 64 | 8 | 0 |
 | suggested_s0 | 44 | 0 | 28 |
 | suggested_s0.1 | 64 | 8 | 0 |
 | suggested_s0.2 | 64 | 8 | 0 |

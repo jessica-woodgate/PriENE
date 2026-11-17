@@ -1,0 +1,14 @@
+# suggested.yaml with a sanction that only rewards: where an agent's principle (or aggregation) would penalise an action, it gives 0
+rewards:
+  death: -1
+  no_berries: -0.1
+  no_benefactor: -0.1
+  insufficient_health: -0.1
+  neutral_reward: 0
+  throw: 0
+  forage: 0
+  eat: 1
+  survive: 1
+ethics_rewards: {}
+sanction: 0.4
+positive_sanction_only: true

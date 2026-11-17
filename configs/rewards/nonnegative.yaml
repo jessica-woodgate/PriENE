@@ -1,0 +1,15 @@
+# No negative rewards at all, every reward between 0 and 1: eating and surviving to the last day 1, everything else 0 (death and failed
+# actions included), and a sanction that only rewards (0.4 where an agent's principle or aggregation approves, 0 where it would penalise)
+rewards:
+  death: 0
+  no_berries: 0
+  no_benefactor: 0
+  insufficient_health: 0
+  neutral_reward: 0
+  throw: 0
+  forage: 0
+  eat: 1
+  survive: 1
+ethics_rewards: {}
+sanction: 0.4
+positive_sanction_only: true

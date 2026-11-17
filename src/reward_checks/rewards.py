@@ -7,6 +7,8 @@ sanction), plus two optional entries:
         phi(s') straight after its action (before the day's decay), and phi(s') = 0 when the transition ends the agent (it died this
         step), as for a terminal state. (Between one step's s' and the next step's s come the day's decay and any berries other agents
         throw to it, which the shaping doesn't see, as the DQN's transitions don't)
+    positive_sanction_only -- the sanction only rewards (default false): where an agent's principle or aggregation gives a negative
+        sanction, it gets 0 instead (clipped after the aggregation; offline only, as the ethics module itself is unchanged)
 
 The reward a logged step (src/reward_checks/simulate.py) would have got, for an agent of a given type, is as during a run
 (HarvestAgent): its outcome's reward (ethics agents: ethics_rewards in place of rewards where given), plus death if it died this step,
@@ -37,6 +39,7 @@ class RewardFunction:
     sanction: float = 0.0
     alive: float = 0.0
     shaping: bool = False
+    positive_sanction_only: bool = False
 
     def table(self, agent_type):
         """Each outcome's reward (and death and survive) for an agent of agent_type"""
@@ -46,7 +49,7 @@ class RewardFunction:
 def load(path):
     with open(path) as file:
         values = yaml.safe_load(file) or {}
-    unknown = set(values) - {"rewards", "ethics_rewards", "sanction", "alive", "shaping"}
+    unknown = set(values) - {"rewards", "ethics_rewards", "sanction", "alive", "shaping", "positive_sanction_only"}
     if unknown:
         raise RewardFileError(f"{path}: unknown entries {sorted(unknown)}")
     rewards = values.get("rewards") or {}
@@ -58,7 +61,8 @@ def load(path):
         if extra:
             raise RewardFileError(f"{path}: {name} gives {extra}, which aren't outcomes; they are {list(HARVEST_REWARDS)}")
     return RewardFunction(os.path.splitext(os.path.basename(path))[0], dict(rewards), dict(values.get("ethics_rewards") or {}),
-                          float(values.get("sanction", 0.0)), float(values.get("alive", 0.0)), bool(values.get("shaping", False)))
+                          float(values.get("sanction", 0.0)), float(values.get("alive", 0.0)), bool(values.get("shaping", False)),
+                          bool(values.get("positive_sanction_only", False)))
 
 
 def step_rewards(log, reward_function, agent_type, gamma, unit_sanction=None):
@@ -81,5 +85,9 @@ def step_rewards(log, reward_function, agent_type, gamma, unit_sanction=None):
     if agent_type != "baseline":
         if unit_sanction is None:
             raise ValueError(f"an ethics agent's rewards ({agent_type}) need its sanctions")
-        rewards = rewards + reward_function.sanction * np.asarray(unit_sanction, dtype=float)
+        unit_sanction = np.asarray(unit_sanction, dtype=float)
+        if reward_function.positive_sanction_only:
+            #the sanction rewards, never penalises: what the principle or aggregation would penalise gives nothing
+            unit_sanction = np.maximum(unit_sanction, 0.0)
+        rewards = rewards + reward_function.sanction * unit_sanction
     return rewards

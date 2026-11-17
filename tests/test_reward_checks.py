@@ -274,6 +274,19 @@ def test_the_sweep_finds_where_the_sharer_catches_up_from_the_linear_effect():
     assert sweep.loc["maximin", "focal - eaters at s=1"] == pytest.approx(1.0)
 
 
+def test_a_positive_only_sanction_rewards_but_never_penalises():
+    log = pd.DataFrame({"outcome": ["eat", "eat", "eat"], "died": [False] * 3, "last_day": [False] * 3})
+    zero = {k: 0.0 for k in ["death", "no_berries", "no_benefactor", "insufficient_health", "neutral_reward", "throw", "forage", "survive"]}
+    both = rw.RewardFunction("x", {**zero, "eat": 1.0}, sanction=0.4)
+    positive = rw.RewardFunction("y", {**zero, "eat": 1.0}, sanction=0.4, positive_sanction_only=True)
+    unit = [1.0, -1.0, 0.0]
+    assert np.allclose(rw.step_rewards(log, both, "maximin", 0.95, unit), [1.4, 0.6, 1.0])
+    assert np.allclose(rw.step_rewards(log, positive, "maximin", 0.95, unit), [1.4, 1.0, 1.0])
+    # loaded from a file, and no reward in nonnegative.yaml is below 0 or above 1
+    nonnegative = rw.load(os.path.join(REPO, "configs", "rewards", "nonnegative.yaml"))
+    assert nonnegative.positive_sanction_only and all(0 <= value <= 1 for value in nonnegative.rewards.values())
+
+
 def test_reward_files_load_and_current_is_the_training_configs():
     for path in sorted(os.listdir(os.path.join(REPO, "configs", "rewards"))):
         rw.load(os.path.join(REPO, "configs", "rewards", path))
