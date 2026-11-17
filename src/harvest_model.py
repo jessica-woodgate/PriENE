@@ -197,10 +197,12 @@ class HarvestModel(SocietyModel):
     
     def get_society_well_being(self, observer, norms_observation, ethics_observation):
         """
-        Get the well-being of a society; iterates over all agents in the society, excluding the observer if the agent is observing
+        Get the well-being of a society; iterates over all agents in the society in id order, excluding the observer if the agent is
+        observing. In id order, so an observer's k-th reading is always the same agent, the one its action throw_k throws to (the
+        schedule itself is reshuffled every step, so it can't be read in its own order)
         """
         society_well_being = []
-        for a in self.schedule.agents:
+        for a in sorted((a for a in self.schedule.agents if a.agent_type != "berry"), key=lambda a: a.unique_id):
             if (not ethics_observation and (a.unique_id == observer.unique_id)) or a.agent_type == "berry":
                 continue
             elif a.done == False:
