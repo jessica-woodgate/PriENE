@@ -1,3 +1,6 @@
+import os
+#pygame (imported for rendering) otherwise prints a banner, which would get into --list's commands
+os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "1")
 from src.scenarios.basic_harvest import BasicHarvest
 from src.scenarios.colours_harvest import ColoursHarvest
 from src.scenarios.allotment_harvest import AllotmentHarvest
@@ -14,6 +17,7 @@ from src.harvest_exception import CheckpointExistsException
 from src.training_config import load as load_training_config, for_scenario as training_config_for_scenario, DEFAULT as DEFAULT_TRAINING_CONFIG
 from src.training_config import TrainingConfig, config_name as training_config_name, scenario_config_path
 from src.run_record import (RUN_FILE, run_folder, write_run_record, write_status, read_status, log_to_folder)
+from src.run_naming import scenario_file_string, harvest_condition
 import pandas as pd
 import argparse
 import datetime
@@ -145,24 +149,6 @@ def run_simulation(model_inst, render, log_wandb, wandb_project):
     end_time = time.time()
     print(f"Simulation finished at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time))}, after {format_duration(end_time - start_time)}")
     return num_episodes
-
-def scenario_file_string(scenario, seasons, allotment_regrowth_delays=None, mixed_allotments="split", society_mix="homogeneous",
-                         throw_between_allotments=False):
-    """
-    scenario part of output filenames; options that are on are added after the scenario so runs don't overwrite each other
-    """
-    file_scenario = scenario
-    if seasons:
-        file_scenario += "_seasons"
-    if allotment_regrowth_delays is not None:
-        file_scenario += "_regrow" + "-".join(str(delay) for delay in allotment_regrowth_delays)
-    if society_mix != "homogeneous":
-        file_scenario += "_mixed"
-        if scenario == "allotment" and mixed_allotments == "separate":
-            file_scenario += "_separate"
-    if scenario == "allotment" and throw_between_allotments:
-        file_scenario += "_throwbetween"
-    return file_scenario
 
 def get_checkpoint_input():
     """
@@ -464,23 +450,6 @@ class RemovedOption(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         parser.error(f"{option_string} is not an option: {REMOVED_OPTIONS[option_string]}")
 
-def harvest_condition(scenario, seasons, season_length, num_allocations, mixed_allotments, society_mix, throw_between_allotments, num_agents,
-                      max_days, commons_parameters=None, config_name=None):
-    """
-    A harvest run's condition, as its folder (--output-root) names it: the scenario and its options, e.g. colours_seasons_len25_4agents_200days
-    """
-    parts = [scenario_file_string(scenario, seasons, None, mixed_allotments, society_mix, throw_between_allotments)]
-    if seasons:
-        parts.append(f"len{season_length}")
-    if scenario in ["allotment", "capabilities"]:
-        parts.append(f"{num_allocations}groups")
-    if commons_parameters:
-        parts.append(f"K{commons_parameters['carrying_capacity']}_r{commons_parameters['growth_rate']}_R0{commons_parameters['initial_stock']}")
-    parts += [f"{num_agents}agents", f"{max_days}days"]
-    if config_name:
-        parts.append(config_name)
-    return "_".join(parts)
-
 def enter_run_folder(mode, condition, society, configuration):
     """
     With --output-root, work in the run's own folder (src/run_record.py) and record the run there: everything the run writes lands in
@@ -614,8 +583,13 @@ def write_data_input(data_type, default=None):
 #########################################################################################
 
 parser = argparse.ArgumentParser(description="Program options")
-parser.add_argument("option", choices=["test", "train", "graphs"],
-                    help="Choose the program operation")
+parser.add_argument("option", choices=["test", "train", "graphs", "experiments"],
+                    help="Choose the program operation (experiments: run every run of an experiment file, see src/experiments.py)")
+parser.add_argument("experiment_file", nargs="?", default=None, help="experiments: the experiment file (configs/experiments/*.yaml)")
+experiments = parser.add_argument_group("experiments")
+experiments.add_argument("--max-workers", type=int, default=1, help="Runs at once")
+experiments.add_argument("--list", action="store_true", help="Only print each run's command")
+experiments.add_argument("--status", action="store_true", help="Only summarise each run's status")
 parser.add_argument("-s", "--seed", type=int, default=DEFAULT_SEED,
                     help="Random seed for reproducible runs (optional)")
 parser.add_argument("--training-config", type=str, default=None,
@@ -675,6 +649,13 @@ if args.option == "test" and args.test_episodes is not None:
 CHECKPOINT_EVERY = args.checkpoint_every
 
 #argparse only accepts test, train or graphs
+if args.option == "experiments":
+    #every run of an experiment, each a run.py train or test command in a process of its own
+    from src.experiments import main as run_experiments
+    if args.experiment_file is None:
+        parser.error("experiments needs an experiment file, e.g. python run.py experiments configs/experiments/example.yaml")
+    raise SystemExit(run_experiments(args.experiment_file, args.max_workers, args.list, args.status))
+
 if args.option == "test" or args.option == "train":
     #the mode decides learning, exploration, saving and outputs; any scenario, with or without seasons, runs in either mode
     training = args.option == "train"

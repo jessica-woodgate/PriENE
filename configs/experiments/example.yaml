@@ -1,0 +1,23 @@
+# The paper's workflow over 5 training seeds: every society type trained in basic, then each trained society (type x seed) tested in
+# colours, capabilities and allotment on the same test episodes. See src/experiments.py for every setting.
+#   python run.py experiments configs/experiments/example.yaml --list          # the commands
+#   python run.py experiments configs/experiments/example.yaml --max-workers 4 # run them
+#   python run.py experiments configs/experiments/example.yaml --status        # how far they've got
+name: example
+output_root: runs
+seeds: [1, 2, 3, 4, 5]
+societies: [baseline, utilitarian, maximin, egalitarian, average, majoritarian, optimist, veto]
+society_mix: homogeneous
+training_config: null
+checkpoint_every: 10
+num_threads: 1
+train:
+  - {scenario: basic, seasons: n, days: 200, num_agents: 4}
+test_seed: 1000
+test_episodes: 1000
+norms: y
+norms_module: rule_based
+tests:
+  - {scenario: colours, seasons: n}
+  - {scenario: capabilities, seasons: n, groups: 2}
+  - {scenario: allotment, seasons: n, groups: 2, throw_between_allotments: n}
