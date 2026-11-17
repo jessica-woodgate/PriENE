@@ -140,8 +140,8 @@ def build_runs():
         runs[f"continued_{scenario}_{mix}_{layout}"] = [first, second]
     # run.py graphs "paper": the paper's graphs from its 200-day results (copied in, and not hashed, as they are its input)
     runs["paper_graphs"] = [{"mode": "graphs", "answers": ["paper", "colours"], "episodes": 0,
-                             "inputs": ["data/results/200_days/4_agents/colours/agent_end_episode_df_*.csv",
-                                        "data/results/200_days/4_agents/colours/end_episode_totals_*.csv"]}]
+                             "inputs": ["data/archive/2026-11-17/results/200_days/4_agents/colours/agent_end_episode_df_*.csv",
+                                        "data/archive/2026-11-17/results/200_days/4_agents/colours/end_episode_totals_*.csv"]}]
     # allotment regrowth delays (no prompt: run directly)
     runs["allotment_regrowth_delays_direct"] = [{"mode": "direct", "training": True, "episodes": TRAIN_EPISODES},
                                                 {"mode": "direct", "training": False, "episodes": TEST_EPISODES}]

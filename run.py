@@ -6,7 +6,7 @@ from src.scenarios.commons_harvest import CommonsHarvest
 from src.data_handling.data_analysis import DataAnalysis
 from src.data_handling.render_pygame import RenderPygame
 from src.agent.harvest_agent import NORMS_MODULE_TYPES
-from src.checkpoints import RUN_OPTIONS, DEFAULT_CHECKPOINT
+from src.checkpoints import RUN_OPTIONS, DEFAULT_CHECKPOINT, ARCHIVED_RESULTS_DIR
 from src.checkpoints import training_checkpoint_name, training_checkpoint_path, prepare_training_checkpoints, fruit_market_checkpoint_name
 from src.checkpoints import society_checkpoint_path, loading_checkpoint_path, record_agent_types, training_folder, finished_episode
 from src.checkpoints import resolve_checkpoint, trained_checkpoints, checkpoint_max_days, days_in_name, checkpoint_training_config, recorded_settings
@@ -59,8 +59,9 @@ def generate_paper_graphs(scenario):
     num_agents = 4
     writing_filepath = "data/results/current_run/"
     data_analysis = DataAnalysis(num_agents, writing_filepath)
-    agents_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_end_episode_df_"
-    episodes_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/end_episode_totals_"
+    #the paper's results are in the archive (read, never written to)
+    agents_filepath = ARCHIVED_RESULTS_DIR+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_end_episode_df_"
+    episodes_filepath = ARCHIVED_RESULTS_DIR+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/end_episode_totals_"
     #every agent type, in the order of the labels (principles + aggregations) the analysis gives them
     agent_end_episode_dfs = [pd.read_csv(agents_filepath+agent_type+".csv") for agent_type in AGENT_TYPES]
     end_episode_totals_dfs = [pd.read_csv(episodes_filepath+agent_type+".csv") for agent_type in AGENT_TYPES]
@@ -82,12 +83,13 @@ def generate_graphs(scenario, run_name, num_agents, seasons=False, allotment_reg
     if run_name == "current_run":
         norms_filepath = "data/results/"+run_name+"/"+file_scenario+"_"
     else:
-        norms_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/norms/"+file_scenario+"_"
+        #the paper's runs are in the archive (read, never written to)
+        norms_filepath = ARCHIVED_RESULTS_DIR+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/norms/"+file_scenario+"_"
     data_analysis = DataAnalysis(num_agents, writing_filepath)
     if run_name == "current_run":
         reading_filepath = "data/results/"+run_name+"/agent_reports_"+file_scenario+"_"
     else:
-        reading_filepath = "data/results/"+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+file_scenario+"_"
+        reading_filepath = ARCHIVED_RESULTS_DIR+run_name+"/"+str(num_agents)+"_agents/"+scenario+"/agent_reports_"+file_scenario+"_"
     #the agent types run, in the same order as the labels (principles + aggregations) the analysis gives them
     agent_types = agent_types_to_run(society_mix)
     principles = [agent_type for agent_type in PRINCIPLES if agent_type in agent_types]

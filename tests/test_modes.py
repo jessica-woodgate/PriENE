@@ -5,6 +5,7 @@ import os
 import numpy as np
 import pytest
 from src import seeding
+from src.checkpoints import PAPER_CHECKPOINTS as ARCHIVED_PAPER_CHECKPOINTS
 
 from src.agent.dqn.n_network import NNetwork
 from src.agent.modules.dqn_decision_module import DQNDecisionModule
@@ -15,8 +16,10 @@ from src.harvest_exception import CheckpointExistsException, CheckpointMismatchE
 from src.scenarios.allotment_harvest import AllotmentHarvest
 from tests.conftest import NUM_AGENTS, SCENARIOS, _build, _make_pretrained_checkpoint, long_lived
 
-REPO_CHECKPOINTS = os.path.abspath("data/model_variables") + "/"
-PAPER_CHECKPOINTS = REPO_CHECKPOINTS + "200_days/4_agents/"
+#the archived checkpoints (the paper's among them), which no run may write into
+REPO_CHECKPOINTS = os.path.abspath(os.path.dirname(ARCHIVED_PAPER_CHECKPOINTS.rstrip("/"))) + "/"
+#the paper's checkpoints, archived (src/checkpoints.py)
+PAPER_CHECKPOINTS = os.path.abspath(ARCHIVED_PAPER_CHECKPOINTS) + "/4_agents/"
 SEASON_LENGTH = 2
 
 needs_paper_checkpoints = pytest.mark.skipif(not os.path.isdir(PAPER_CHECKPOINTS), reason="needs the trained 200_days checkpoints")
@@ -228,8 +231,9 @@ def test_a_second_training_run_into_the_same_checkpoints_is_refused(in_tmp_dir):
 def test_checkpoints_are_chosen_by_run_trained_name_or_path(in_tmp_dir):
     trained_dir = str(in_tmp_dir / "trained") + "/"
     os.makedirs(trained_dir + "colours_200days_seed42")
-    assert resolve_checkpoint("") == "data/model_variables/200_days/"
-    assert resolve_checkpoint("50_days") == "data/model_variables/50_days/"
+    # the paper's runs are read from the archive (data/model_variables/<run>/ before it)
+    assert resolve_checkpoint("") == "data/archive/2026-11-17/model_variables/200_days/"
+    assert resolve_checkpoint("50_days") == "data/archive/2026-11-17/model_variables/50_days/"
     assert resolve_checkpoint("colours_200days_seed42", trained_dir=trained_dir) == trained_dir + "colours_200days_seed42/"
     assert resolve_checkpoint(trained_dir) == trained_dir
     assert resolve_checkpoint("not_a_checkpoint", trained_dir=trained_dir) is None

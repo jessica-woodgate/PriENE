@@ -6,9 +6,11 @@ import pytest
 
 from src.harvest_exception import BerryOffGrid, SeasonsException
 from src.harvest_model import HarvestModel
+from src.checkpoints import PAPER_CHECKPOINTS
 from tests.conftest import NUM_AGENTS, TEST_SCENARIOS, _build, _make_pretrained_checkpoint, long_lived
 
-TRAINED_CHECKPOINTS = "data/model_variables/200_days/4_agents/"
+#the paper's checkpoints, archived (src/checkpoints.py)
+TRAINED_CHECKPOINTS = PAPER_CHECKPOINTS + "4_agents/"
 # absolute, since in_tmp_dir changes the working directory before the model is built
 TRAINED_CHECKPOINTS_ABS = os.path.abspath(TRAINED_CHECKPOINTS) + "/"
 SEASON_LENGTH = 3

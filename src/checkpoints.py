@@ -9,6 +9,13 @@ import re
 RUN_OPTIONS = ["current_run", "50_days", "200_days"]
 DEFAULT_CHECKPOINT = "200_days"
 CHECKPOINTS_DIR = "data/model_variables/"
+#results and checkpoints made before multi-seed runs, moved out of the way (data/archive/<date>/results and .../model_variables): read,
+#never written to. The paper's runs (ARCHIVED_RUNS) are read from there
+ARCHIVE_DIR = "data/archive/2026-11-17/"
+ARCHIVED_CHECKPOINTS_DIR = ARCHIVE_DIR+"model_variables/"
+ARCHIVED_RESULTS_DIR = ARCHIVE_DIR+"results/"
+ARCHIVED_RUNS = ["50_days", "200_days"]
+PAPER_CHECKPOINTS = ARCHIVED_CHECKPOINTS_DIR+"200_days/"
 #training saves into data/model_variables/trained/<name from its settings>/<n>_agents/<agent type>/, never overwriting a checkpoint;
 #a mixed society saves into .../<n>_agents/<agent type>_with_baseline/<agent type or baseline>/, with AGENT_TYPES_FILE saying which agent is which type
 TRAINED_DIR = CHECKPOINTS_DIR+"trained/"
@@ -163,6 +170,8 @@ def resolve_checkpoint(value, trained_dir=TRAINED_DIR, checkpoints_dir=CHECKPOIN
     """
     if value == "":
         value = DEFAULT_CHECKPOINT
+    if value in ARCHIVED_RUNS:
+        return ARCHIVED_CHECKPOINTS_DIR+value+"/"
     if value in RUN_OPTIONS:
         return checkpoints_dir+value+"/"
     if value in trained_checkpoints(trained_dir):

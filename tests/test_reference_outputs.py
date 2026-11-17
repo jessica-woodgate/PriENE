@@ -4,9 +4,11 @@ import os
 import pandas as pd
 import pytest
 
+from src.checkpoints import PAPER_CHECKPOINTS
 from tests.conftest import NUM_AGENTS, TEST_SCENARIOS, _build, use_fixed_allocations, use_unequal_instant_allotments
 
-TRAINED_CHECKPOINTS = "data/model_variables/200_days/4_agents/"
+#the paper's checkpoints, archived (src/checkpoints.py)
+TRAINED_CHECKPOINTS = PAPER_CHECKPOINTS + "4_agents/"
 # absolute, since in_tmp_dir changes the working directory before the model is built
 TRAINED_CHECKPOINTS_ABS = os.path.abspath(TRAINED_CHECKPOINTS) + "/"
 
