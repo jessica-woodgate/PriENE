@@ -44,6 +44,7 @@ class DQN:
         self.compiled = compiled
         self._compiled_steps = {}
         self._compiled_predict = None
+        self._compiled_gradient_step = None
         self.gamma = config.gamma
         self.lr = config.learning_rate
         self.batch_size = config.batch_size
@@ -101,6 +102,9 @@ class DQN:
             value_next = np.max(self._masked(TargetNet.predict(states_next)), axis=1)
         #where done, actual value is reward; if not done, actual value is discounted rewards
         actual_values = np.where(dones, rewards, rewards+self.gamma*value_next)
+        if self.action_mask is None:
+            #the same gradient step as below, as one compiled graph
+            return self._gradient_step()(states.astype("float32"), actions.astype(np.int64), np.asarray(actual_values, dtype=np.float64))
 
         #gradient tape uses automatic differentiation to compute gradients of loss and records operations for back prop
         with tf.GradientTape() as tape:
@@ -116,6 +120,30 @@ class DQN:
         gradients = tape.gradient(loss, variables)
         self.optimiser.apply_gradients(grads_and_vars=zip(gradients, variables))
         return loss
+
+    def _gradient_step(self):
+        """
+        train's gradient step for targets train has computed (in numpy, as always), as one compiled graph built once: the chosen actions'
+        Q values, the Huber loss, gradients and one optimiser step. It gives bit for bit the weights, optimiser state and loss of the
+        eager step (benchmarks/check_tf_identity.py), without eager TensorFlow's per-operation overhead (about 11 -> 1.3 ms). Not for
+        networks with an action mask (their eager step is kept as it was)
+        """
+        if self._compiled_gradient_step is None:
+            variables = self.dqn.trainable_variables
+            #the optimiser's own variables must exist before the graph is traced (the eager step builds them on its first step)
+            self.optimiser.build(variables)
+            huber = losses.Huber(self.delta)
+            def step(states, actions, actual_values):
+                with tf.GradientTape() as tape:
+                    one_hot = tf.one_hot(actions, self.n_actions)
+                    selected_action_values = tf.math.reduce_sum(self.dqn(states) * one_hot, axis=1)
+                    loss = huber(actual_values, selected_action_values)
+                gradients = tape.gradient(loss, variables)
+                self.optimiser.apply_gradients(grads_and_vars=zip(gradients, variables))
+                return loss
+            self._compiled_gradient_step = tf.function(step, input_signature=[tf.TensorSpec([None, *self.n_features], tf.float32),
+                                                                              tf.TensorSpec([None], tf.int64), tf.TensorSpec([None], tf.float64)])
+        return self._compiled_gradient_step
 
     def _compiled_step(self, TargetNet):
         """
