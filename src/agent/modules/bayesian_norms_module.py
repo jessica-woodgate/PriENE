@@ -96,6 +96,12 @@ class BayesianNormsModule():
         for entry in self.behaviour_base.values():
             entry["action_counts"][:] = 0
             entry["posteriors"][:] = self.prior
+        self._count_learned()
+
+    def _count_learned(self):
+        """Each precondition's number of learned behaviours, and their total (num_learned_behaviours), counted afresh"""
+        self._learned_counts = {key: self._entry_learned_count(entry) for key, entry in self.behaviour_base.items()}
+        self._num_learned = sum(self._learned_counts.values())
 
     def update(self, observation, action_taken):
         """
@@ -144,6 +150,10 @@ class BayesianNormsModule():
             numerator = p_evidence_given_learned * prior
             denominator = numerator + p_evidence_given_not_learned * (1.0 - prior)
             entry["posteriors"] = numerator / denominator
+            #only this precondition's behaviours can have changed, so the number learned changes by its change
+            learned = self._entry_learned_count(entry)
+            self._num_learned += learned - self._learned_counts[key]
+            self._learned_counts[key] = learned
 
         self.action_counts[action_taken] += 1
 
@@ -215,6 +225,20 @@ class BayesianNormsModule():
             )
         return sorted(learned, key=lambda b: b["posterior"], reverse=True)
 
+    def num_learned_behaviours(self):
+        """
+        len(get_learned_behaviours()), without building and sorting them: the same behaviours (each action, prohibition and commitment,
+        of every precondition met at least min_observations times) with the same comparisons. Kept as a running count by update() (which
+        recounts only the preconditions it changes) and reset(), so it misses changes made to behaviour_base any other way
+        """
+        return self._num_learned
+
+    def _entry_learned_count(self, entry):
+        """How many of one precondition's behaviours get_learned_behaviours returns"""
+        if entry["action_counts"].sum() < self.min_observations:
+            return 0
+        return int(np.count_nonzero(entry["posteriors"][self._action_rows] >= self.learned_threshold))
+
     def _initialise(self):
         """
         Build one behaviour_base entry per candidate precondition, with zeroed action
@@ -236,6 +260,9 @@ class BayesianNormsModule():
                 "action_counts": np.zeros(n_actions, dtype=int),
                 "posteriors":    np.full((n_actions, 2), self.prior, dtype=float),
             }
+        # rows of posteriors in the order get_learned_behaviours visits them (each action's index), for num_learned_behaviours
+        self._action_rows = [self.action_name_to_index[action] for action in self.actions]
+        self._count_learned()
 
     def _entry_behaviours(self, precondition_key):
         """BehaviourViews of one precondition: each action, prohibition before commitment."""

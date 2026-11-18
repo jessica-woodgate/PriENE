@@ -168,7 +168,7 @@ class SocietyModel(Model):
             return None
         if self.norms_module_type == "rule_based":
             return len(agent.norms_module.behaviour_base)
-        return len(agent.norms_module.get_learned_behaviours())
+        return agent.norms_module.num_learned_behaviours()
 
     def _append_norm_dict_to_file(self, norm_dictionary, filename):
         """
