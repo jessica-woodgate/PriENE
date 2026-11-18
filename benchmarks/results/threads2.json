@@ -1,0 +1,107 @@
+{
+ "train_basic_late": {
+  "name": "train_basic_late",
+  "config": {
+   "name": "train_basic_late",
+   "kind": "harvest",
+   "scenario": "basic",
+   "training": true,
+   "mix": "homogeneous",
+   "agent_type": "utilitarian",
+   "num_agents": 4,
+   "num_allocations": 2,
+   "seasons": false,
+   "delays": null,
+   "track_norms": false,
+   "norms": "rule_based",
+   "write_data": true,
+   "episodes": 2,
+   "days": 200,
+   "late": true
+  },
+  "threads": 2,
+  "build_s": 0.5792339170002379,
+  "run_s": 11.219698624998273,
+  "end_of_run_save_s": 0.0714664580009412,
+  "episodes": 2,
+  "steps": 400,
+  "s_per_episode": 5.573910964001698,
+  "ms_per_step": 27.86955482000849,
+  "peak_rss_mb": 506.5625,
+  "parts_s": {},
+  "part_calls": {},
+  "all_run_s": [
+   11.219698624998273
+  ]
+ },
+ "train_basic_late_rule_norms": {
+  "name": "train_basic_late_rule_norms",
+  "config": {
+   "name": "train_basic_late_rule_norms",
+   "kind": "harvest",
+   "scenario": "basic",
+   "training": true,
+   "mix": "homogeneous",
+   "agent_type": "utilitarian",
+   "num_agents": 4,
+   "num_allocations": 2,
+   "seasons": false,
+   "delays": null,
+   "track_norms": true,
+   "norms": "rule_based",
+   "write_data": true,
+   "episodes": 2,
+   "days": 200,
+   "late": true
+  },
+  "threads": 2,
+  "build_s": 0.6033955410021008,
+  "run_s": 11.008919708001486,
+  "end_of_run_save_s": 0.0667523749943939,
+  "episodes": 2,
+  "steps": 400,
+  "s_per_episode": 5.470862064001267,
+  "ms_per_step": 27.354310320006334,
+  "peak_rss_mb": 507.125,
+  "parts_s": {},
+  "part_calls": {},
+  "all_run_s": [
+   11.008919708001486
+  ]
+ },
+ "train_basic_late_mixed": {
+  "name": "train_basic_late_mixed",
+  "config": {
+   "name": "train_basic_late_mixed",
+   "kind": "harvest",
+   "scenario": "basic",
+   "training": true,
+   "mix": "heterogeneous",
+   "agent_type": "utilitarian",
+   "num_agents": 4,
+   "num_allocations": 2,
+   "seasons": false,
+   "delays": null,
+   "track_norms": false,
+   "norms": "rule_based",
+   "write_data": true,
+   "episodes": 2,
+   "days": 200,
+   "late": true
+  },
+  "threads": 2,
+  "build_s": 0.6573692500023753,
+  "run_s": 3.798840208997717,
+  "end_of_run_save_s": 0.07645608299935702,
+  "episodes": 2,
+  "steps": 400,
+  "s_per_episode": 1.8610430285298207,
+  "ms_per_step": 9.305215142649104,
+  "peak_rss_mb": 512.25,
+  "parts_s": {},
+  "part_calls": {},
+  "all_run_s": [
+   3.798840208997717
+  ]
+ }
+}

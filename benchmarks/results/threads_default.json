@@ -1,0 +1,107 @@
+{
+ "train_basic_late": {
+  "name": "train_basic_late",
+  "config": {
+   "name": "train_basic_late",
+   "kind": "harvest",
+   "scenario": "basic",
+   "training": true,
+   "mix": "homogeneous",
+   "agent_type": "utilitarian",
+   "num_agents": 4,
+   "num_allocations": 2,
+   "seasons": false,
+   "delays": null,
+   "track_norms": false,
+   "norms": "rule_based",
+   "write_data": true,
+   "episodes": 2,
+   "days": 200,
+   "late": true
+  },
+  "threads": null,
+  "build_s": 0.6308697080021375,
+  "run_s": 10.625818917003926,
+  "end_of_run_save_s": 0.06878941699687857,
+  "episodes": 2,
+  "steps": 400,
+  "s_per_episode": 5.278332770958514,
+  "ms_per_step": 26.39166385479257,
+  "peak_rss_mb": 526.03125,
+  "parts_s": {},
+  "part_calls": {},
+  "all_run_s": [
+   10.625818917003926
+  ]
+ },
+ "train_basic_late_rule_norms": {
+  "name": "train_basic_late_rule_norms",
+  "config": {
+   "name": "train_basic_late_rule_norms",
+   "kind": "harvest",
+   "scenario": "basic",
+   "training": true,
+   "mix": "homogeneous",
+   "agent_type": "utilitarian",
+   "num_agents": 4,
+   "num_allocations": 2,
+   "seasons": false,
+   "delays": null,
+   "track_norms": true,
+   "norms": "rule_based",
+   "write_data": true,
+   "episodes": 2,
+   "days": 200,
+   "late": true
+  },
+  "threads": null,
+  "build_s": 0.6502238749962999,
+  "run_s": 10.824382083003002,
+  "end_of_run_save_s": 0.06710049999674084,
+  "episodes": 2,
+  "steps": 400,
+  "s_per_episode": 5.378467107497272,
+  "ms_per_step": 26.89233553748636,
+  "peak_rss_mb": 528.15625,
+  "parts_s": {},
+  "part_calls": {},
+  "all_run_s": [
+   10.824382083003002
+  ]
+ },
+ "train_basic_late_mixed": {
+  "name": "train_basic_late_mixed",
+  "config": {
+   "name": "train_basic_late_mixed",
+   "kind": "harvest",
+   "scenario": "basic",
+   "training": true,
+   "mix": "heterogeneous",
+   "agent_type": "utilitarian",
+   "num_agents": 4,
+   "num_allocations": 2,
+   "seasons": false,
+   "delays": null,
+   "track_norms": false,
+   "norms": "rule_based",
+   "write_data": true,
+   "episodes": 2,
+   "days": 200,
+   "late": true
+  },
+  "threads": null,
+  "build_s": 0.5816748750003171,
+  "run_s": 3.7389875000008033,
+  "end_of_run_save_s": 0.07004708300519269,
+  "episodes": 2,
+  "steps": 400,
+  "s_per_episode": 1.8343247969824006,
+  "ms_per_step": 9.171623984912003,
+  "peak_rss_mb": 513.0625,
+  "parts_s": {},
+  "part_calls": {},
+  "all_run_s": [
+   3.7389875000008033
+  ]
+ }
+}

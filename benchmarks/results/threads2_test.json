@@ -1,0 +1,142 @@
+{
+ "test_colours": {
+  "name": "test_colours",
+  "config": {
+   "name": "test_colours",
+   "kind": "harvest",
+   "scenario": "colours",
+   "training": false,
+   "mix": "homogeneous",
+   "agent_type": "utilitarian",
+   "num_agents": 4,
+   "num_allocations": 2,
+   "seasons": false,
+   "delays": null,
+   "track_norms": true,
+   "norms": "rule_based",
+   "write_data": true,
+   "episodes": 5,
+   "days": 200,
+   "late": false
+  },
+  "threads": 2,
+  "build_s": 0.4798655830018106,
+  "run_s": 9.921161166996171,
+  "end_of_run_save_s": 0.00025562500377418473,
+  "episodes": 5,
+  "steps": 1000,
+  "s_per_episode": 1.9839848008166883,
+  "ms_per_step": 9.919924004083441,
+  "peak_rss_mb": 499.078125,
+  "parts_s": {},
+  "part_calls": {},
+  "all_run_s": [
+   9.921161166996171
+  ]
+ },
+ "test_colours_seasons": {
+  "name": "test_colours_seasons",
+  "config": {
+   "name": "test_colours_seasons",
+   "kind": "harvest",
+   "scenario": "colours",
+   "training": false,
+   "mix": "homogeneous",
+   "agent_type": "utilitarian",
+   "num_agents": 4,
+   "num_allocations": 2,
+   "seasons": true,
+   "delays": null,
+   "track_norms": true,
+   "norms": "rule_based",
+   "write_data": true,
+   "episodes": 5,
+   "days": 200,
+   "late": false
+  },
+  "threads": 2,
+  "build_s": 0.5064903749953373,
+  "run_s": 8.940546541998629,
+  "end_of_run_save_s": 0.0002900420004152693,
+  "episodes": 5,
+  "steps": 982,
+  "s_per_episode": 1.7878728059979039,
+  "ms_per_step": 9.103222026465906,
+  "peak_rss_mb": 500.484375,
+  "parts_s": {},
+  "part_calls": {},
+  "all_run_s": [
+   8.940546541998629
+  ]
+ },
+ "test_colours_bayesian": {
+  "name": "test_colours_bayesian",
+  "config": {
+   "name": "test_colours_bayesian",
+   "kind": "harvest",
+   "scenario": "colours",
+   "training": false,
+   "mix": "homogeneous",
+   "agent_type": "utilitarian",
+   "num_agents": 4,
+   "num_allocations": 2,
+   "seasons": false,
+   "delays": null,
+   "track_norms": true,
+   "norms": "bayesian",
+   "write_data": true,
+   "episodes": 5,
+   "days": 200,
+   "late": false
+  },
+  "threads": 2,
+  "build_s": 0.5968837079999503,
+  "run_s": 11.027971957999398,
+  "end_of_run_save_s": 0.0010091250005643815,
+  "episodes": 5,
+  "steps": 1000,
+  "s_per_episode": 2.2051932906353615,
+  "ms_per_step": 11.025966453176807,
+  "peak_rss_mb": 502.234375,
+  "parts_s": {},
+  "part_calls": {},
+  "all_run_s": [
+   11.027971957999398
+  ]
+ },
+ "test_colours_20agents": {
+  "name": "test_colours_20agents",
+  "config": {
+   "name": "test_colours_20agents",
+   "kind": "harvest",
+   "scenario": "colours",
+   "training": false,
+   "mix": "homogeneous",
+   "agent_type": "utilitarian",
+   "num_agents": 20,
+   "num_allocations": 2,
+   "seasons": false,
+   "delays": null,
+   "track_norms": true,
+   "norms": "rule_based",
+   "write_data": true,
+   "episodes": 2,
+   "days": 200,
+   "late": false
+  },
+  "threads": 2,
+  "build_s": 1.115812709002057,
+  "run_s": 1.6736553330047172,
+  "end_of_run_save_s": 0.0006300410022959113,
+  "episodes": 2,
+  "steps": 28,
+  "s_per_episode": 0.836495145020308,
+  "ms_per_step": 59.74965321573628,
+  "peak_rss_mb": 517.40625,
+  "parts_s": {},
+  "part_calls": {},
+  "all_run_s": [
+   1.6736553330047172
+  ]
+ }
+}
