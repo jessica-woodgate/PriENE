@@ -174,8 +174,11 @@ class SocietyModel(Model):
         """
         Persists the current episode's emerged norms into filename, keyed by episode number
         Rewrites the whole file from a full in-memory dict each call so the file on disk is always valid,
-        complete JSON, rather than relying on the run reaching its final episode to write a closing brace
+        complete JSON, rather than relying on the run reaching its final episode to write a closing brace.
+        Once this model has written the file, a new episode is appended instead (see _append_norm_episode), which gives the same text
         """
+        if self._append_norm_episode(norm_dictionary, filename):
+            return
         if exists(filename):
             with open(filename, "r") as file:
                 try:
@@ -189,6 +192,34 @@ class SocietyModel(Model):
         all_episodes[str(self.episode)] = norm_list
         with open(filename, "w") as file:
             json.dump(all_episodes, file, indent=4)
+        self._norms_file_written = (filename, set(all_episodes), os.stat(filename))
+
+    def _append_norm_episode(self, norm_dictionary, filename):
+        """
+        Add this episode to a norms file this model wrote last (unchanged since: same size and modification time) without reading and
+        rewriting it: json.dump(..., indent=4) writes each episode of the dict as the same text whatever else is in it, so the episode's
+        text goes in before the closing "\\n}" and the file is exactly what the full rewrite would write. Returns False (nothing written)
+        when the file isn't the one this model last wrote, or already has this episode (which the full rewrite replaces in place)
+        """
+        written = getattr(self, "_norms_file_written", None)
+        key = str(self.episode)
+        if written is None or written[0] != filename or key in written[1] or not exists(filename):
+            return False
+        before = os.stat(filename)
+        if (before.st_size, before.st_mtime_ns) != (written[2].st_size, written[2].st_mtime_ns):
+            return False
+        norm_list = [{name: value} for name, value in norm_dictionary.items()]
+        #'{\n    "<episode>": [...]\n}' without its braces: the episode's text as it appears in the whole dict
+        episode_text = json.dumps({key: norm_list}, indent=4)[1:-2]
+        with open(filename, "rb+") as file:
+            file.seek(before.st_size - 2)
+            if file.read(2) != b"\n}":
+                return False
+            file.seek(before.st_size - 2)
+            file.write(("," + episode_text + "\n}").encode())
+        written[1].add(key)
+        self._norms_file_written = (filename, written[1], os.stat(filename))
+        return True
 
     def _analyse_agent_norms(self):
         """
