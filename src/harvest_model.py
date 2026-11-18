@@ -3,6 +3,7 @@ from mesa.agent import AgentSet
 from mesa.space import MultiGrid
 import pandas as pd
 import numpy as np
+import csv
 import os
 from tensorflow import keras
 from . import seeding
@@ -22,6 +23,16 @@ from .harvest_exception import SeasonsException
 from .harvest_exception import BerryOffGrid
 from .harvest_exception import NoAllocationException
 from os.path import exists
+
+
+def _csv_value(value):
+    """A value as pandas' to_csv writes it in a one-row DataFrame: None and NaN as empty, strings as they are, anything else as str"""
+    if value is None:
+        return ""
+    if isinstance(value, (float, np.floating)) and value != value:
+        return ""
+    return value if isinstance(value, str) else str(value)
+
 
 class HarvestModel(SocietyModel):
     """
@@ -171,6 +182,9 @@ class HarvestModel(SocietyModel):
                 a.finish_episode()
         if collect_data:
             self._collect_model_episode_data()
+        else:
+            #the end of a run
+            self._close_agent_report()
         self._reset()
 
     def move_agent_to_cell(self, agent, new_pos):
@@ -424,7 +438,7 @@ class HarvestModel(SocietyModel):
             raise NumBerriesException(self.num_berries, num_berries)
         if self.seasons:
             self._start_season_quality()
-        self.agent_reporter = self._empty_agent_reporter()
+        self._agent_rows = []
 
     def _restore_episode_state(self):
         """
@@ -685,9 +699,43 @@ class HarvestModel(SocietyModel):
             agent_reporter[column] = []
         return agent_reporter
 
+    @property
+    def agent_reporter(self):
+        """
+        This episode's rows of the agent report, as a DataFrame built when it is read, as one-row DataFrames concatenated onto an empty
+        report would give it: a column whose values are all numbers is float64, any other column object, and every row has index 0
+        """
+        if not self._agent_rows:
+            return self._empty_agent_reporter()
+        columns = list(self.AGENT_REPORT_FIELDS) + list(self.extra_agent_report_columns())
+        data = {}
+        for i, column in enumerate(columns):
+            values = [row[i] for row in self._agent_rows]
+            numbers = all(isinstance(v, (int, float, np.integer, np.floating)) and not isinstance(v, (bool, np.bool_)) for v in values)
+            data[column] = np.array(values, dtype=float) if numbers else np.array(values, dtype=object)
+        return pd.DataFrame(data, index=[0] * len(self._agent_rows))
+
+    def _write_agent_report_row(self, values):
+        """
+        Append one row to the agent report CSV, formatted as pandas' to_csv formats a one-row DataFrame (None and NaN empty, numbers as
+        str gives them). The file is opened once and flushed after every row, so the file is always as writing each row with to_csv left it
+        """
+        if self._agent_report_file is None:
+            self._agent_report_file = open("data/results/current_run/agent_reports_"+self.filepath+".csv", "a", newline="", encoding="utf-8")
+            self._agent_report_writer = csv.writer(self._agent_report_file, lineterminator=os.linesep)
+        self._agent_report_writer.writerow([_csv_value(value) for value in values])
+        self._agent_report_file.flush()
+
+    def _close_agent_report(self):
+        if self._agent_report_file is not None:
+            self._agent_report_file.close()
+            self._agent_report_file = None
+
     def _init_reporters(self):
         os.makedirs("data/results/current_run", exist_ok=True)
-        self.agent_reporter = self._empty_agent_reporter()
+        #this episode's agent report rows, each a list of values in the report's column order (see agent_reporter)
+        self._agent_rows = []
+        self._agent_report_file = None
         if self.write_data and not self.training:
            if exists("data/results/current_run/agent_reports_"+self.filepath+".csv"):
                raise FileExistsException("data/results/current_run/agent_reports_"+self.filepath+".csv")
@@ -708,10 +756,11 @@ class HarvestModel(SocietyModel):
                   agent.health, agent.days_left_to_live, agent.total_days_left_to_live, agent.current_action, agent.current_thrown_to,
                   agent.current_group_thrown_to, agent.current_agent_thrown_to, agent.current_reward, agent.current_sanction, self._num_agent_norms(agent), self.season, self._current_season_quality(),
                   self._seasonal_berry_target(agent), self._allotment_regrowth_delay(agent)]
-        new_entry = self._report_row(self.AGENT_REPORT_FIELDS, values, self.extra_agent_report_values(agent))
-        self.agent_reporter = pd.concat([self.agent_reporter, new_entry])
+        extra_values = self.extra_agent_report_values(agent)
+        self._agent_rows.append(values + [extra_values[column] for column in self.extra_agent_report_columns()])
         if self.write_data and not self.training:
-           new_entry.to_csv("data/results/current_run/agent_reports_"+self.filepath+".csv", header=None, mode='a',index=False)
+            #the scenario's values in the order it gives them, as a one-row DataFrame of them would write them
+            self._write_agent_report_row(values + list(extra_values.values()))
 
     def _collect_model_episode_data(self):
         #every row of the agent reporter is added with index 0, so select this episode's rows by value, not by index
