@@ -1,0 +1,13 @@
+# Reward trials (control): the current rewards (configs/training/harvest.yaml), baseline and maximin, seed 1, training only.
+#   python run.py experiments configs/experiments/reward_trials_current.yaml --max-workers 2
+name: reward_trials
+output_root: runs
+seeds: [1]
+societies: [baseline, maximin]
+society_mix: homogeneous
+training_config: null
+checkpoint_every: 10
+num_threads: 1
+train:
+  - {scenario: basic, seasons: n, days: 200, num_agents: 4}
+tests: []

@@ -1,0 +1,14 @@
+# Reward trials: configs/training/suggested_s06.yaml (sanction 0.6), maximin, seed 1, training only (baseline agents get no sanction,
+# so they would train as in reward_trials_suggested.yaml).
+#   python run.py experiments configs/experiments/reward_trials_suggested_s06.yaml
+name: reward_trials
+output_root: runs
+seeds: [1]
+societies: [maximin]
+society_mix: homogeneous
+training_config: configs/training/suggested_s06.yaml
+checkpoint_every: 10
+num_threads: 1
+train:
+  - {scenario: basic, seasons: n, days: 200, num_agents: 4}
+tests: []

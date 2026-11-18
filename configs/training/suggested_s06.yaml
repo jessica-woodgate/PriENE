@@ -1,0 +1,27 @@
+# Reward trial (docs/reward_checks.md, docs/reward_checks_sanctions.md): configs/rewards/suggested.yaml's rewards with sanction 0.6,
+# above egalitarian and veto agents' break-even for sharing (0.40) and below the sanction at which surviving stops paying (0.8). Every
+# other parameter is configs/training/harvest.yaml's.
+learning_rate: 0.0001
+gamma: 0.95
+batch_size: 64
+hidden_units: 128
+huber_delta: 1.0
+min_experiences: 100
+max_experiences: 100000
+target_update_interval: 50
+epsilon_start: 1.0
+epsilon_min: 0.01
+epsilon_decay: 0.001
+max_training_episodes: null
+sanction: 0.6
+rewards:
+  death: -1
+  no_berries: -0.1
+  no_benefactor: -0.1
+  insufficient_health: -0.1
+  neutral_reward: 0
+  throw: 0
+  forage: 0
+  eat: 1
+  survive: 1
+ethics_rewards: {}
