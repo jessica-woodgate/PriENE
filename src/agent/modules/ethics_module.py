@@ -16,10 +16,12 @@ class EthicsModule():
     #unchanged by an action (e.g. eating, or society's total after a throw) can differ by ~1e-12, which an exact comparison would sanction
     WELL_BEING_DECIMALS = 6
 
-    def __init__(self,sanction,principle):
+    def __init__(self,sanction,principle,positive_only=False):
+        #positive_only: the sanction only rewards: a negative sanction (after the principle or aggregation) is 0 instead
         if principle not in self.PRINCIPLES + self.AGGREGATIONS:
             raise UnrecognisedPrinciple(principle)
         self.sanction = sanction
+        self.positive_only = positive_only
         self.principle = principle
         self.measure_of_well_being = None
         self.number_of_minimums = None
@@ -34,7 +36,12 @@ class EthicsModule():
         """
         Obtain sanction from principle comparing current society well-being with previous well-being (Algorithm 1 Lines 3-8)
         """
-        society_well_being = self._rounded(society_well_being)
+        sanction = self._principle_sanction(self._rounded(society_well_being))
+        if self.positive_only:
+            return [max(value, 0) for value in sanction]
+        return sanction
+
+    def _principle_sanction(self, society_well_being):
         if self.principle == "egalitarian":
             return [self._egalitarian_sanction(self.measure_of_well_being, society_well_being)]
         elif self.principle == "maximin":

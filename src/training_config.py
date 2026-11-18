@@ -29,7 +29,7 @@ HARVEST_REWARDS = {"death": -1, "no_berries": -0.2, "no_benefactor": -0.2, "insu
                    "throw": 0.5, "forage": 0.5, "eat": 1, "survive": 1}
 HARVEST_ETHICS_REWARDS = {"no_berries": -0.1, "no_benefactor": -0.1, "insufficient_health": -0.1, "eat": 0.8}
 #the parameters only the harvest scenarios use, so a file may leave them out (Fruit Market's reward is the substrate's own)
-HARVEST_ONLY_PARAMETERS = {"rewards", "ethics_rewards"}
+HARVEST_ONLY_PARAMETERS = {"rewards", "ethics_rewards", "positive_sanction_only"}
 
 @dataclass(frozen=True)
 class TrainingConfig:
@@ -42,6 +42,9 @@ class TrainingConfig:
     sanction -- the ethics module's self-directed sanction (+ or - this much)
     rewards -- harvest scenarios only: a baseline agent's reward for each outcome, every one of HARVEST_REWARDS' keys
     ethics_rewards -- harvest scenarios only: the rewards ethics agents get instead of the baseline's, for any of those outcomes
+    positive_sanction_only -- harvest scenarios only: the sanction only rewards: where an ethics agent's principle or aggregation gives
+        -sanction, it gets 0 instead (default false; left out of to_dict when false, so configs and the settings checkpoints record
+        are as they were before it existed)
     """
     learning_rate: float = 0.0001
     gamma: float = 0.95
@@ -58,8 +61,11 @@ class TrainingConfig:
     sanction: float = 0.4
     rewards: dict = field(default_factory=lambda: dict(HARVEST_REWARDS))
     ethics_rewards: dict = field(default_factory=lambda: dict(HARVEST_ETHICS_REWARDS))
+    positive_sanction_only: bool = False
 
     def __post_init__(self):
+        if not isinstance(self.positive_sanction_only, bool):
+            raise TrainingConfigError(f"positive_sanction_only must be true or false, not {self.positive_sanction_only!r}")
         for name, allowed, exact in [("rewards", HARVEST_REWARDS, True), ("ethics_rewards", HARVEST_REWARDS, False)]:
             values = getattr(self, name)
             if not isinstance(values, dict):
@@ -80,7 +86,10 @@ class TrainingConfig:
         return {**self.rewards, **self.ethics_rewards, "sanction": self.sanction}
 
     def to_dict(self):
-        return asdict(self)
+        values = asdict(self)
+        if not values["positive_sanction_only"]:
+            del values["positive_sanction_only"]
+        return values
 
     def with_values(self, values):
         """

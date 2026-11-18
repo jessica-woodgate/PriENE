@@ -117,7 +117,7 @@ class HarvestAgent(LearningAgent):
             self.norms_module = self._build_norms_module()
         if agent_type != "baseline":
             self.rewards = self._ethics_rewards()
-            self.ethics_module = EthicsModule(self.rewards["sanction"],agent_type)
+            self.ethics_module = EthicsModule(self.rewards["sanction"],agent_type,positive_only=model.training_config.positive_sanction_only)
         else:
             self.rewards = self._baseline_rewards()
     
