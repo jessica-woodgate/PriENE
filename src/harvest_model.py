@@ -117,6 +117,8 @@ class HarvestModel(SocietyModel):
         self.max_height = max_height
         self.grid = MultiGrid(self.max_width, self.max_height, False)
         self.shared_replay_buffers = {}
+        #the agents (not berries) in id order, added as they are made (see _add_agent)
+        self._agents_by_id = []
         self.berry_id = 0
         self.episode = start_episode
         self.training = training
@@ -221,7 +223,7 @@ class HarvestModel(SocietyModel):
         schedule itself is reshuffled every step, so it can't be read in its own order)
         """
         society_well_being = []
-        for a in sorted((a for a in self.schedule.agents if a.agent_type != "berry"), key=lambda a: a.unique_id):
+        for a in self._agents_by_id:
             if (not ethics_observation and (a.unique_id == observer.unique_id)) or a.agent_type == "berry":
                 continue
             elif a.done == False:
@@ -412,6 +414,8 @@ class HarvestModel(SocietyModel):
         self.schedule.add(a)
         self._place_agent_in_allotment(a)
         self.living_agents.append(a)
+        #agents (not berries) by id, as get_society_well_being reads them: agents stay in the schedule once added, dead or alive
+        self._agents_by_id = sorted(self._agents_by_id + [a], key=lambda agent: agent.unique_id)
 
     def _reset(self):
         self.living_agents = []
