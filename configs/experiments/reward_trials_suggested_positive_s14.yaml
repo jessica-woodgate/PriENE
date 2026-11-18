@@ -1,9 +1,9 @@
-# Reward trials: configs/training/suggested_positive_s14.yaml (positive-only sanction 1.4), maximin, seed 1, training only (baseline
-# agents get no sanction, so they would train as in reward_trials_suggested.yaml).
+# Reward trials: configs/training/suggested_positive_s14.yaml (positive-only sanction 1.4), maximin, training seeds 101-103, training
+# only (baseline agents get no sanction, so they would train as in reward_trials_suggested.yaml).
 #   python run.py experiments configs/experiments/reward_trials_suggested_positive_s14.yaml
 name: reward_trials
 output_root: runs
-seeds: [1]
+seeds: [101, 102, 103]
 societies: [maximin]
 society_mix: homogeneous
 training_config: configs/training/suggested_positive_s14.yaml

@@ -1,8 +1,9 @@
-# Reward trials: configs/training/suggested_death5_s1.yaml (death -5, sanction 1.0), baseline and maximin, seed 1, training only.
+# Reward trials: configs/training/suggested_death5_s1.yaml (death -5, sanction 1.0), baseline and maximin, training seeds 101-103,
+# training only.
 #   python run.py experiments configs/experiments/reward_trials_suggested_death5_s1.yaml --max-workers 2
 name: reward_trials
 output_root: runs
-seeds: [1]
+seeds: [101, 102, 103]
 societies: [baseline, maximin]
 society_mix: homogeneous
 training_config: configs/training/suggested_death5_s1.yaml
