@@ -43,6 +43,7 @@ class DQN:
         self.action_mask = None if action_mask is None else np.asarray(action_mask, dtype=bool)
         self.compiled = compiled
         self._compiled_steps = {}
+        self._compiled_predict = None
         self.gamma = config.gamma
         self.lr = config.learning_rate
         self.batch_size = config.batch_size
@@ -105,7 +106,8 @@ class DQN:
         with tf.GradientTape() as tape:
             #one hot to select the action which was chosen; find predicted q value; reduce to tensor of the batch size
             one_hot = tf.one_hot(actions, self.n_actions)
-            selected_action_values = tf.math.reduce_sum(self.predict(states) * one_hot, axis=1) #mask logits through one hot
+            #the network called eagerly (not predict's compiled graph), as gradients are taken through it
+            selected_action_values = tf.math.reduce_sum(self.dqn(np.atleast_2d(states.astype('float32'))) * one_hot, axis=1) #mask logits through one hot
             huber = losses.Huber(self.delta)
             loss = huber(actual_values, selected_action_values)
         #trainable variables are automatically watched
@@ -170,8 +172,18 @@ class DQN:
         """
         Predict runs forward pass of network and returns logits (non-normalised predictions) for actions
         Keras model by default recognises input as batch so want to have at least 2 dimensions even if a single state
+        Runs as one compiled graph, built once per network: the same Q values, bit for bit, as calling the network eagerly, without
+        eager Keras's overhead on every call (no gradient is taken through it: train calls the network itself inside its tape).
+        A network with an action mask (Fruit Market, whose training step is already compiled) is called eagerly, as before: in 1 of
+        about 16 benchmark runs with this graph, Fruit Market's compiled training step failed with a shape error, never seen without it
         """
-        actions = self.dqn(np.atleast_2d(inputs.astype('float32')))
+        if self.action_mask is not None:
+            return self.dqn(np.atleast_2d(inputs.astype('float32')))
+        if self._compiled_predict is None:
+            network = self.dqn
+            self._compiled_predict = tf.function(lambda states: network(states),
+                                                 input_signature=[tf.TensorSpec([None, *self.n_features], tf.float32)])
+        actions = self._compiled_predict(np.atleast_2d(inputs.astype('float32')))
         return actions
     
     def add_experience(self, experience):
