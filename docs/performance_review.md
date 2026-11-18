@@ -2,8 +2,8 @@
 
 Where training and testing spend their time, and how to make them faster **without changing any output**.
 
-**Status: Stage 1 (profiling and report).** No code has changed except the new benchmark tools in `benchmarks/`. Stage 2 makes only
-the changes that are approved, one per commit, and checks every output against saved references after each one.
+**Status: Stage 2 done.** F1, F3, F2, F4, F5 and F7 were made, one commit each, with every harvest output unchanged: see
+[Stage 2 results](#stage-2-results). The rest of this document is the Stage 1 review they were chosen from.
 
 ## Summary
 
@@ -295,4 +295,91 @@ full test suite, rerun the benchmarks, and run `bench.py hash` and `compare`. If
 
 ## Stage 2 results
 
-*(to be filled in: before and after time per benchmark for each commit)*
+F1, F3, F2, F4, F5 and F7 were approved and made, one commit each, in that order. F6 needs no code change.
+
+| Commit | Change |
+|---|---|
+| `d746adfa` | F1: agent report rows |
+| `12671d2e` | F3: compiled forward pass |
+| `feafb7bc` | F2: compiled training step |
+| `66ca538a` | F4: norms JSON appended |
+| `e02fcfaa` | F5: Bayesian learned behaviours counted |
+| `c2f61ba0` | F7: agents sorted once |
+
+### Checks after every commit
+
+- **Outputs:** `bench.py hash`, compared with `benchmarks/reference_hashes.json` (saved before F1). All 298 harvest hashes matched after
+  every commit. They cover every report, norms file, replay buffer, optimiser state and checkpoint, and each checkpoint's Q values on
+  fixed observations.
+- **Fruit Market isn't compared:** its outputs (even its replay buffers) already differed between two runs of the unchanged code, so
+  its substrate isn't deterministic run to run. That predates these changes.
+- **Tests:** 1097 passed, 3 failed, 2 xfailed after every commit, the same as before. The 3 failures are the reference-hash tests in
+  `tests/test_reference_outputs.py`, whose stored hashes are stale and are being regenerated later.
+- **No test was changed.**
+
+### Changes from the plan
+
+- **F3:** `predict` itself runs the compiled graph, because tests replace `predict` to stand in for the network. The eager training
+  step calls the network directly inside its tape. Networks with an action mask (Fruit Market) still call the network eagerly: in 1
+  of about 16 Fruit Market runs with the compiled graph, Fruit Market's own compiled training step (`compiled=True`, unchanged) failed
+  with a shape error. That never happened in about 16 runs without it, and its cause isn't known.
+- **F2:** applies to networks without an action mask, which covers every harvest scenario. The masked eager step is kept as it was,
+  and so is a test that records its Huber loss eagerly.
+- **F5:** a count over every precondition on each row was still 40% of the Bayesian test. The count is instead kept as it changes:
+  `update()` recounts only the preconditions it changes, and `reset()` counts afresh. Checked against `len(get_learned_behaviours())`
+  for every agent at every step of 3 Bayesian episodes in testing and training: 2,544 checks, 0 differences.
+- **F4:** measured separately, since the benchmarks run only 5 episodes. Writing the paper's 1,000-episode norms file (4.9 MB) took
+  81 s rewriting it each episode and 12 s appending, giving an identical file.
+
+### Time per step after each commit
+
+ms/step, best of 2 runs (before: best of 3).
+
+| Benchmark | Before | F1 | F3 | F2 | F4 | F5 | F7 | Speed-up |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| train_basic_late | 26.21 | 26.73 | 23.58 | 5.03 | 5.28 | 5.15 | 4.83 | **5.4×** |
+| train_basic_late_rule_norms | 26.30 | 26.92 | 23.72 | 5.30 | 5.59 | 5.30 | 4.91 | **5.4×** |
+| train_basic_late_mixed | 9.14 | 9.00 | 8.07 | 3.05 | 3.00 | 2.89 | 2.76 | **3.3×** |
+| train_basic (3 early episodes, 36 steps) | 15.12 | 14.53 | 17.04 | 26.88 | 24.17 | 24.62 | 24.61 | 0.6× (see below) |
+| train_basic_rule_norms | 15.01 | 15.47 | 16.51 | 25.04 | 24.37 | 27.58 | 24.09 | 0.6× |
+| train_basic_bayesian_norms | 17.37 | 17.20 | 19.52 | 27.51 | 30.01 | 28.48 | 26.46 | 0.7× |
+| train_basic_mixed | 8.72 | 7.77 | 8.23 | 8.55 | 8.04 | 8.99 | 7.20 | 1.2× |
+| train_commons | 12.18 | 11.93 | 13.11 | 15.13 | 15.80 | 15.55 | 14.69 | 0.8× |
+| test_colours | 9.32 | 2.01 | 0.71 | 0.74 | 0.70 | 0.78 | 0.64 | **14.5×** |
+| test_colours_seasons | 8.87 | 1.91 | 0.70 | 0.84 | 0.67 | 0.72 | 0.61 | **14.5×** |
+| test_capabilities | 12.19 | 2.69 | 0.93 | 0.99 | 0.93 | 0.96 | 0.78 | **15.5×** |
+| test_allotment | 12.27 | 2.69 | 0.93 | 1.01 | 0.93 | 0.89 | 0.81 | **15.2×** |
+| test_allotment_seasons_delays | 8.96 | 1.94 | 0.68 | 0.74 | 0.70 | 0.68 | 0.60 | **14.9×** |
+| test_colours_bayesian | 10.62 | 3.19 | 1.85 | 1.91 | 1.84 | 1.05 | 0.96 | **11.0×** |
+| test_basic_mixed | 10.87 | 2.34 | 0.79 | 0.91 | 0.76 | 0.78 | 0.70 | **15.5×** |
+| test_commons (8-day episodes) | 19.01 | 5.33 | 4.36 | 4.57 | 4.23 | 4.30 | 3.88 | 4.9× |
+| test_colours_20agents (14-day episodes) | 54.67 | 14.88 | 17.69 | 17.93 | 17.11 | 17.54 | 16.80 | 3.3× |
+| train_fruit_market | 33.55 | 37.28 | 33.70 | 37.00 | 35.20 | 32.68 | 32.79 | 1.0× (unchanged by design; noise) |
+
+**The early-training rows aren't a slowdown.** Those benchmarks run 36 steps, about a second in all. Building the compiled graphs
+costs about 0.4 s once per run, which is all the difference. Over 30 early episodes (396 steps):
+
+| Benchmark | Before | After | Speed-up |
+|---|---:|---:|---:|
+| train_basic | 15.0 s | 4.8 s | 3.1× |
+| train_basic_mixed | 14.0 s | 4.7 s | 3.0× |
+
+The short commons and 20-agent tests show the same one-off cost.
+
+### What it means for a paper run (this machine)
+
+- **Training one agent type** (805,000 steps, nearly all late training): about 6 h → about 1.1 h.
+- **Testing one agent type** (1,000 episodes of 200 days): about 31 min → about 2 min, plus about 12 s writing the norms file
+  (81 s before).
+
+### Still to check, and options not taken
+
+- **On the cluster's GPU:** run `python benchmarks/check_tf_identity.py` there. F2 and F3 are bit-identical on this Mac's CPU; whether
+  they are on a GPU hasn't been checked.
+- **TensorFlow's retracing warning:** it may appear once early in a run ("5 out of the last N calls to DQN.predict.<locals>.<lambda>
+  triggered tf.function retracing"). Each network's graph is built once, and TensorFlow counts those builds together because they
+  share one function. It is harmless.
+- **F6 (no code change):** `--checkpoint-every N` would remove most of the 4,600 saves, about 8 minutes of a training run (about 12% of
+  it now).
+- **Not made:** F8 (replay buffer), F9 (Fruit Market substrate), and the options in
+  [Changes results](#changes-results-listed-not-to-be-implemented-without-approval).
