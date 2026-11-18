@@ -1,10 +1,10 @@
-# Reward trials (control): the current rewards (configs/training/harvest.yaml), baseline and maximin, training seeds 101-103, training
+# Reward trials (control): the current rewards (configs/training/harvest.yaml), every society, training seeds 101-103, training
 # only.
 #   python run.py experiments configs/experiments/reward_trials_current.yaml --max-workers 2
 name: reward_trials
 output_root: runs
 seeds: [101, 102, 103]
-societies: [baseline, maximin]
+societies: [baseline, maximin, utilitarian, egalitarian, average, majoritarian, optimist, veto]
 society_mix: homogeneous
 training_config: null
 checkpoint_every: 10
