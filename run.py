@@ -598,7 +598,7 @@ parser.add_argument("-l", "--log", type=str, default=None,
                     help="Log wandb (optional)")
 #runs: a run's own folder, seeds, threads and checkpoints
 runs = parser.add_argument_group("runs", "A run given --output-root works in a folder of its own, <output-root>/<experiment>/<train|test>/"
-                                 "<condition>/<agent type>/<seed_<s>|train_seed_<s>>, with run.json, status.json and run.log; relaunching "
+                                 "<condition>/<seed_<s>|train_seed_<s>>/<agent type>, with run.json, status.json and run.log; relaunching "
                                  "it continues an incomplete training run from its checkpoint, restarts an incomplete test run, and does "
                                  "nothing for a complete one")
 runs.add_argument("--output-root", type=str, default=None, help="Folder to make each run's own folder in")

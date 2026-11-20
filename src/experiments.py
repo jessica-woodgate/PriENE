@@ -68,7 +68,8 @@ class PlannedRun:
 
     @property
     def name(self):
-        return f"{self.mode}/{self.condition}/{self.society}/{os.path.basename(self.folder)}"
+        #as its folder is laid out (src/run_record.py): <mode>/<condition>/<seed label>/<society>
+        return f"{self.mode}/{self.condition}/{os.path.basename(os.path.dirname(self.folder))}/{self.society}"
 
 
 def load_experiment(path):

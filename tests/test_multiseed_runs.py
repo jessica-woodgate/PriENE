@@ -151,8 +151,8 @@ def test_a_run_given_every_flag_runs_in_its_own_folder_records_itself_and_is_rel
     root = str(tmp_path / "runs")
     result = run_py(train_args(root, short_config))
     assert result.returncode == 0, result.stdout + result.stderr
-    (folder,) = glob.glob(f"{root}/x/train/*/maximin/seed_3")
-    assert folder.endswith("x/train/colours_4agents_10days_short/maximin/seed_3")
+    (folder,) = glob.glob(f"{root}/x/train/*/seed_3/maximin")
+    assert folder.endswith("x/train/colours_4agents_10days_short/seed_3/maximin")
     assert read_status(folder) == "complete"
     with open(os.path.join(folder, "run.json")) as file:
         record = json.load(file)
@@ -171,7 +171,7 @@ def test_a_run_given_every_flag_runs_in_its_own_folder_records_itself_and_is_rel
                    "--scenario", "capabilities", "--seasons", "n", "--society-mix", "homogeneous", "--agent-type", "maximin", "--num-agents", "4",
                    "--groups", "2", "--write-data", "y", "--norms", "n", "--render", "n"])
     assert test.returncode == 0, test.stdout + test.stderr
-    (tested,) = glob.glob(f"{root}/x/test/*/maximin/train_seed_3")
+    (tested,) = glob.glob(f"{root}/x/test/*/train_seed_3/maximin")
     assert read_status(tested) == "complete"
     episodes = pd.read_csv(f"{tested}/data/results/current_run/model_episode_reports_capabilities_maximin.csv")
     assert list(episodes["episode"]) == [1, 2] and set(episodes["seed"]) == {1000}

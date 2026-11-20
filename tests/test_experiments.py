@@ -36,13 +36,13 @@ def test_the_plan_has_a_training_run_per_society_and_seed_and_a_test_run_per_tra
     assert runs[:4] == train
     assert len({r.folder for r in runs}) == len(runs)
     assert {(r.society, r.seed) for r in train} == {("baseline", 1), ("baseline", 2), ("maximin", 1), ("maximin", 2)}
-    assert train[0].folder == str(tmp_path / "runs/exp/train/basic_4agents_10days/baseline/seed_1")
+    assert train[0].folder == str(tmp_path / "runs/exp/train/basic_4agents_10days/seed_1/baseline")
     for run in test:
         # each test run loads its own training run's checkpoints, and is seeded from the test seed
         (trained,) = [t for t in train if (t.society, t.seed) == (run.society, run.seed)]
         assert run.train_folder == trained.folder and flag(run.command, "--checkpoint") == trained.folder
         assert flag(run.command, "--test-seed") == "1000" and flag(run.command, "--seed") == str(run.seed)
-        assert run.folder.endswith(f"/{run.society}/train_seed_{run.seed}")
+        assert run.folder.endswith(f"/train_seed_{run.seed}/{run.society}")
     conditions = {r.condition for r in test}
     assert conditions == {"colours_4agents_10days", "allotment_seasons_len25_2groups_4agents_10days"}
     for run in runs:

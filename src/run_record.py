@@ -28,10 +28,11 @@ PACKAGES = ["numpy", "pandas", "scipy", "statsmodels", "tensorflow", "keras", "m
 
 def run_folder(output_root, experiment, mode, condition, society, seed_label):
     """
-    <output-root>/<experiment>/<train|test>/<condition>/<society>/<seed_label>, e.g. runs/main/train/colours_4agents/maximin/seed_3
-    or runs/main/test/allotment_2allotments_4agents/maximin/train_seed_3
+    <output-root>/<experiment>/<train|test>/<condition>/<seed_label>/<society>, e.g. runs/main/train/colours_4agents/seed_3/maximin
+    or runs/main/test/allotment_2allotments_4agents/train_seed_3/maximin: each seed's folder holds every society trained (or tested)
+    with it
     """
-    return os.path.join(output_root, experiment, mode, condition, society, seed_label)
+    return os.path.join(output_root, experiment, mode, condition, seed_label, society)
 
 
 def _write_json(path, value):
