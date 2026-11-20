@@ -8,6 +8,9 @@ societies: [baseline, maximin, utilitarian, egalitarian, average, majoritarian, 
 society_mix: homogeneous
 training_config: null
 checkpoint_every: 10
+#training trains on at the exploration floor until learning has converged (src/convergence.py), up to episode 10000
+until_converged: true
+convergence_max_episodes: 10000
 num_threads: 1
 train:
   - {scenario: basic, seasons: n, days: 200, num_agents: 4}
