@@ -19,6 +19,9 @@ An experiment file:
     society_mix: homogeneous          # or heterogeneous (half of each society is baseline agents; baseline isn't run alone)
     training_config: null             # a training config file (run.py --training-config), or null for the scenario's own
     checkpoint_every: 10              # episodes between training checkpoints
+    until_converged: false            # training trains on at the exploration floor until its learning has converged (run.py
+                                      # --until-converged, src/convergence.py); complete training runs that haven't are continued
+    convergence_max_episodes: 10000   # with until_converged, training stops at this episode, converged or not
     num_threads: 1                    # TensorFlow threads for each run
     train:                            # one or more training conditions
       - {scenario: basic, seasons: n, days: 200, num_agents: 4}
@@ -43,12 +46,14 @@ import yaml
 from .run_naming import harvest_condition
 from .run_record import run_folder, read_status
 from . import training_config as tc
+from .convergence import MAX_EPISODES as CONVERGENCE_MAX_EPISODES, training_finished
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AGENT_TYPES = ["baseline", "utilitarian", "maximin", "egalitarian", "average", "majoritarian", "optimist", "veto"]
 HARVEST_SCENARIOS = ["basic", "colours", "capabilities", "allotment", "commons"]
 DEFAULTS = {"seeds": [1, 2, 3, 4, 5], "societies": AGENT_TYPES, "society_mix": "homogeneous", "training_config": None, "checkpoint_every": 10,
-            "num_threads": 1, "test_seed": 1000, "test_episodes": 1000, "norms": "y", "norms_module": "rule_based", "tests": []}
+            "num_threads": 1, "test_seed": 1000, "test_episodes": 1000, "norms": "y", "norms_module": "rule_based", "tests": [],
+            "until_converged": False, "convergence_max_episodes": CONVERGENCE_MAX_EPISODES}
 CONDITION_DEFAULTS = {"seasons": "n", "season_length": 25, "groups": 2, "layout": "split", "throw_between_allotments": "n"}
 
 
@@ -154,8 +159,10 @@ def plan(experiment):
         for society in societies:
             for seed in experiment["seeds"]:
                 folder = run_folder(root, name, "train", condition, society, f"seed_{seed}")
+                converging = (["--until-converged", "--convergence-max-episodes", str(experiment["convergence_max_episodes"])]
+                              if experiment["until_converged"] else [])
                 command = [python, run_py, "train", *common, "--seed", str(seed), "--checkpoint-every", str(experiment["checkpoint_every"]),
-                           *config_flags, *_condition_flags(train, train["num_agents"]), "--days", str(train["days"]),
+                           *config_flags, *converging, *_condition_flags(train, train["num_agents"]), "--days", str(train["days"]),
                            "--society-mix", mix, "--agent-type", society, "--write-data", "y"]
                 runs.append(PlannedRun("train", condition, society, seed, folder, command))
                 trained.append((train, society, seed, folder))
@@ -200,8 +207,14 @@ def run_experiment(experiment, max_workers=1, log=print, launch=launch):
     runs = plan(experiment)
     outcomes = {}
 
+    def done(run):
+        #with until_converged, a complete training run is done only once its learning has converged (or reached its max episodes)
+        if read_status(run.folder) != "complete":
+            return False
+        return not (run.mode == "train" and experiment["until_converged"]) or training_finished(run.folder)
+
     def go(run):
-        if read_status(run.folder) == "complete":
+        if done(run):
             return run, "complete (skipped)"
         log(f"starting {run.name}")
         return run, launch(experiment, run)

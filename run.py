@@ -18,6 +18,7 @@ from src.training_config import load as load_training_config, for_scenario as tr
 from src.training_config import TrainingConfig, config_name as training_config_name, scenario_config_path
 from src.run_record import (RUN_FILE, run_folder, write_run_record, write_status, read_status, log_to_folder)
 from src.run_naming import scenario_file_string, harvest_condition
+from src.convergence import ConvergenceMonitor, CONVERGENCE_PREFIX, MAX_EPISODES as CONVERGENCE_MAX_EPISODES, training_finished
 import pandas as pd
 import argparse
 import datetime
@@ -129,14 +130,25 @@ def within_training_budget(model_inst):
     budget = model_inst.training_config.max_training_episodes
     return budget is None or model_inst.episode <= budget
 
-def run_simulation(model_inst, render, log_wandb, wandb_project):
+def keeps_training(model_inst, convergence=None):
+    """
+    Whether a training run trains on: until exploration has decayed to its floor (within its training config's budget), and then, given a
+    ConvergenceMonitor (--until-converged), until its learning has converged or it reaches the monitor's max_episodes
+    """
+    if not within_training_budget(model_inst):
+        return False
+    if round(model_inst.epsilon, 5) > model_inst.min_epsilon:
+        return True
+    return convergence is not None and convergence.keep_training(model_inst.episode)
+
+def run_simulation(model_inst, render, log_wandb, wandb_project, convergence=None):
     start_time = time.time()
     if log_wandb:
         wandb.init(project=wandb_project)
     if render:
         render_inst = RenderPygame(model_inst.max_width, model_inst.max_height)
-    #training runs until exploration has decayed to its floor; testing runs max_episodes
-    while (model_inst.training and round(model_inst.epsilon, 5) > model_inst.min_epsilon and within_training_budget(model_inst)) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
+    #training runs until exploration has decayed to its floor (or, with --until-converged, until learning has converged); testing runs max_episodes
+    while (model_inst.training and keeps_training(model_inst, convergence)) or (not model_inst.training and model_inst.episode <= model_inst.max_episodes):
         model_inst.step()
         if log_wandb:
             mean_reward = model_inst._mean_reward()
@@ -254,7 +266,15 @@ def create_and_run_model(scenario,society_mix,checkpoint_path,num_agents,num_sta
         print(f"Continuing {agent_type}'s training from episode {start_episode}")
     if training and society_mix != "homogeneous":
         record_agent_types(checkpoint_path, model_inst.get_living_agents())
-    run_simulation(model_inst,render,log_wandb,wandb_project)
+    convergence = None
+    if training and args.until_converged:
+        #assessed from the run's model episode report, so it must be written
+        if not write_data:
+            raise SystemExit("--until-converged needs the run's data written (--write-data y): convergence is assessed from its model episode report")
+        convergence = ConvergenceMonitor("data/results/current_run/model_episode_reports_"+file_string+".csv",
+                                         "data/results/current_run/"+CONVERGENCE_PREFIX+file_string+".json", model_inst.min_epsilon,
+                                         max_episodes=args.convergence_max_episodes)
+    run_simulation(model_inst,render,log_wandb,wandb_project,convergence)
 
 def agent_types_to_run(society_mix):
     #in a mixed society half the agents are baseline, so baseline alone isn't run
@@ -463,7 +483,11 @@ def enter_run_folder(mode, condition, society, configuration):
     os.chdir(folder)
     log_to_folder(folder)
     status = read_status(folder)
-    if status == "complete":
+    if status == "complete" and mode == "train" and args.until_converged and not training_finished(folder):
+        #a training run that stopped when exploration decayed (or before converging) trains on from its checkpoint until converged
+        print(f"{folder} is complete, but its learning hasn't converged: continuing it from its checkpoint until it has.")
+        args.continue_run = "y"
+    elif status == "complete":
         print(f"{folder} is complete: nothing to do.")
         raise SystemExit(0)
     if status == "running":
@@ -482,7 +506,9 @@ def enter_run_folder(mode, condition, society, configuration):
             print(f"{folder} stopped partway ({status}): starting it again; its earlier outputs are in {aside}.")
     write_run_record(folder, {**configuration, "mode": mode, "condition": condition, "society": society, "seed": args.seed,
                               "test_seed": args.test_seed if mode == "test" else None, "experiment": args.experiment,
-                              "checkpoint_every": args.checkpoint_every, "num_threads": args.num_threads, "folder": folder})
+                              "checkpoint_every": args.checkpoint_every, "num_threads": args.num_threads, "folder": folder,
+                              **({"until_converged": True, "convergence_max_episodes": args.convergence_max_episodes}
+                                 if mode == "train" and args.until_converged else {})})
     write_status(folder, "running")
     return folder
 
@@ -607,6 +633,11 @@ runs.add_argument("--test-seed", type=int, default=DEFAULT_TEST_SEED,
                   help=f"Seed of a test run's environment (default {DEFAULT_TEST_SEED}); --seed is then the training seed of the agents tested")
 runs.add_argument("--num-threads", type=int, default=None, help="TensorFlow's intra- and inter-op threads, so runs can share a machine")
 runs.add_argument("--checkpoint-every", type=int, default=1, help="Training saves its checkpoint every this many episodes (and at the end)")
+runs.add_argument("--until-converged", action="store_true",
+                  help="Training trains on at the exploration floor until its learning has converged (src/convergence.py), or it reaches "
+                       "--convergence-max-episodes; a complete run that hasn't converged is continued")
+runs.add_argument("--convergence-max-episodes", type=int, default=CONVERGENCE_MAX_EPISODES,
+                  help=f"With --until-converged, training stops at this episode, converged or not (default {CONVERGENCE_MAX_EPISODES})")
 #each prompt's answer (see PROMPT_FLAGS); a prompt whose flag isn't given is asked
 answers = parser.add_argument_group("answers", "Each answers a prompt, which is then not asked")
 answers.add_argument("--scenario")
