@@ -7,6 +7,7 @@ manifest is how files are told apart once they leave their folders.
 
     python -m src.analysis.run_manifest runs/reward_trials            # writes runs/reward_trials/manifest.csv
     python -m src.analysis.run_manifest runs/reward_trials --out manifest.csv
+    python -m src.analysis.run_manifest runs/reward_trials --export runs/reward_trials/results   # and every file by reward, seed and society
 
 Everything comes from each run's run.json (src/run_record.py), not from folder names. A test run's reward config is its training run's
 (the training run whose checkpoint it tested).
@@ -110,14 +111,69 @@ def build(experiment_folder):
     return manifest
 
 
+def reward_label(reward_config):
+    """A reward config as the export names it: the harvest scenarios' own config (configs/training/harvest.yaml) is the current rewards"""
+    return "current" if reward_config == "harvest" else reward_config
+
+
+def export_name(row):
+    """
+    A file's name in the export: <reward>_seed<seed>_<society>_<train|test[_<test condition>]>_<what it is>[_agent<id>].<extension>, e.g.
+    suggested_death5_s1_seed101_maximin_train_episode_report.csv or current_seed102_veto_train_agent3_q_network.keras
+    """
+    original = os.path.basename(row["file"])
+    stem, extension = os.path.splitext(original)
+    kind = {"model_episode_report": "episode_report"}.get(row["file_type"], row["file_type"])
+    if kind == "other":
+        kind = stem
+    mode = row["mode"] if row["mode"] == "train" else f"{row['mode']}_{row['condition']}"
+    agent = [] if pd.isna(row["agent_id"]) else [f"agent{int(row['agent_id'])}"]
+    return "_".join([reward_label(row["reward_config"]), f"seed{row['training_seed']}", row["society"], mode, *agent, kind]) + extension
+
+
+def export(manifest, out):
+    """
+    Every file in the manifest, under out/<reward>/seed_<training seed>/<society>/ with a name saying the same (export_name), as a hard
+    link to the run's file (no copy: the same file under a second name; the runs' own folders are untouched, as testing and the
+    experiment runner need them as they are). Returns the manifest with each file's exported path (export_file); writes it to
+    out/manifest.csv
+    """
+    exported = manifest.copy()
+    exported["export_file"] = [os.path.join(out, reward_label(row["reward_config"]), f"seed_{row['training_seed']}", row["society"],
+                                            export_name(row)) for _, row in manifest.iterrows()]
+    duplicates = exported["export_file"][exported["export_file"].duplicated()]
+    if len(duplicates):
+        raise ValueError(f"two files would be exported under the same name, e.g. {duplicates.iloc[0]}")
+    for source, target in zip(exported["file"], exported["export_file"]):
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        source = os.path.join(REPO, source)
+        if os.path.exists(target):
+            if os.path.samefile(source, target):
+                continue
+            raise FileExistsError(f"{target} exists and isn't {source}")
+        os.link(source, target)
+    exported["export_file"] = [os.path.relpath(path, REPO) for path in exported["export_file"]]
+    exported = exported[["export_file"] + [column for column in exported.columns if column != "export_file"]]
+    exported.to_csv(os.path.join(out, "manifest.csv"), index=False)
+    return exported
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("experiment_folder", help="An experiment's folder, e.g. runs/reward_trials")
     parser.add_argument("--out", help="Where to write the manifest (default: manifest.csv in the experiment's folder)")
+    parser.add_argument("--export", help="Also link every file into this folder by reward, seed and society, named after them (see export)")
     args = parser.parse_args()
     manifest = build(args.experiment_folder)
+    if args.export:
+        #the export's own files are no run's
+        export_root = os.path.abspath(args.export)
+        manifest = manifest[[not os.path.join(REPO, path).startswith(export_root + os.sep) for path in manifest["file"]]]
     out = args.out or os.path.join(args.experiment_folder, "manifest.csv")
     manifest.to_csv(out, index=False)
+    if args.export:
+        exported = export(manifest, args.export)
+        print(f"{len(exported)} files linked into {args.export}, by reward, seed and society (its manifest: {args.export}/manifest.csv)")
     runs = manifest.drop_duplicates("run_folder")
     print(f"{len(manifest)} files from {len(runs)} runs written to {out}")
     print(runs.groupby(["mode", "reward_config", "sanction", "positive_sanction_only"], dropna=False)["society"].agg(

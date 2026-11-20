@@ -60,6 +60,24 @@ def test_a_run_given_no_training_config_has_the_scenarios_own(experiment):
     assert json.loads(baseline["ethics_rewards"])["eat"] == 0.8
 
 
+def test_the_export_names_every_file_by_reward_seed_and_society_and_links_it(experiment, monkeypatch):
+    monkeypatch.setattr(rm, "REPO", str(experiment))
+    manifest = rm.build(str(experiment))
+    exported = rm.export(manifest, str(experiment / "results"))
+    names = set(exported["export_file"])
+    assert "results/positive/seed_101/maximin/positive_seed101_maximin_train_episode_report.csv" in names
+    assert "results/positive/seed_102/maximin/positive_seed102_maximin_train_agent2_q_network.keras" in names
+    #the scenario's own config is the current rewards; a test run is named by its test condition, under its training seed
+    assert "results/current/seed_101/baseline/current_seed101_baseline_train_episode_report.csv" in names
+    assert "results/positive/seed_102/maximin/positive_seed102_maximin_test_c_episode_report.csv" in names
+    #linked, not copied, and the runs' own files are untouched
+    for source, target in zip(exported["file"], exported["export_file"]):
+        assert os.path.samefile(experiment / source, experiment / target)
+    assert os.path.exists(experiment / "results" / "manifest.csv")
+    #exporting again finds every file already there
+    assert len(rm.export(manifest, str(experiment / "results"))) == len(exported)
+
+
 def test_a_test_run_has_its_training_runs_reward_config_and_seed(experiment):
     manifest = rm.build(str(experiment))
     test = manifest[manifest["mode"] == "test"].iloc[0]
