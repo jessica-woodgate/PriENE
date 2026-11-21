@@ -114,11 +114,12 @@ def finished(convergence_path):
 def training_finished(run_folder):
     """
     Whether a training run's folder (run.py --output-root) says its training is done with --until-converged: it has a convergence file
-    for every model episode report, and each says converged or stopped at max_episodes
+    for every model episode report, and each says converged or stopped at max_episodes. The files are where run.py writes them
+    (data/results/current_run/), or moved up into data/results/ once the run is done
     """
-    results = os.path.join(run_folder, "data", "results", "current_run")
-    reports = glob.glob(os.path.join(results, "model_episode_reports_*.csv"))
-    if not reports:
-        return False
-    names = [os.path.basename(report)[len("model_episode_reports_"):-len(".csv")] for report in reports]
-    return all(finished(os.path.join(results, CONVERGENCE_PREFIX + name + ".json")) for name in names)
+    for results in [os.path.join(run_folder, "data", "results", "current_run"), os.path.join(run_folder, "data", "results")]:
+        reports = glob.glob(os.path.join(results, "model_episode_reports_*.csv"))
+        if reports:
+            names = [os.path.basename(report)[len("model_episode_reports_"):-len(".csv")] for report in reports]
+            return all(finished(os.path.join(results, CONVERGENCE_PREFIX + name + ".json")) for name in names)
+    return False

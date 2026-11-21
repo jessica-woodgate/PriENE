@@ -76,6 +76,11 @@ def test_a_training_run_is_finished_once_its_convergence_file_says_so(tmp_path):
     write_training_run(str(tmp_path / "c"), {"converged": True})
     write_training_run(str(tmp_path / "d"), {"converged": False, "stopped": "reached max_episodes"})
     assert [cv.training_finished(str(tmp_path / name)) for name in "abcd"] == [False, False, True, True]
+    #a finished run's files moved up from data/results/current_run/ into data/results/
+    results = tmp_path / "c" / "data" / "results"
+    for path in (results / "current_run").iterdir():
+        path.rename(results / path.name)
+    assert cv.training_finished(str(tmp_path / "c"))
 
 
 @pytest.mark.parametrize("until_converged", [False, True])

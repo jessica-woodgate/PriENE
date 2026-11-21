@@ -22,14 +22,14 @@ REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 RUN_FILE = "run.json"
 COLUMNS = ["file", "file_type", "agent_id", "mode", "scenario", "condition", "society", "training_seed", "test_seed", "reward_config",
            "sanction", "positive_sanction_only", "death_reward", "throw_reward", "forage_reward", "eat_reward", "ethics_rewards", "status",
-           "run_folder"]
+           "learning", "last_episode", "run_folder"]
 #what each file is, by its name
 FILE_TYPES = [("model_episode_reports_", "model_episode_report"), ("fm_model_episode_reports_", "model_episode_report"),
               ("agent_reports_", "agent_report"), ("fm_agent_reports_", "agent_report"), ("agent_norms_", "agent_norms"),
               ("q_model_variables.keras", "q_network"), ("target_model_variables.keras", "target_network"),
               ("optimiser.npz", "optimiser_state"), ("replay_buffer.npz", "replay_buffer"), ("training_state.json", "training_state"),
               ("progress.json", "checkpoint_progress"), ("settings.json", "checkpoint_settings"), ("agent_types.json", "agent_types"),
-              ("run.json", "run_record"), ("status.json", "run_status"), ("run.log", "run_log")]
+              ("run.json", "run_record"), ("status.json", "run_status"), ("run.log", "run_log"), ("convergence_", "convergence")]
 
 
 def file_type(name):
@@ -67,6 +67,20 @@ def training_record(record, records_by_folder):
     return None
 
 
+def learning(folder):
+    """
+    A training run's learning, from its convergence file (run.py --until-converged, src/convergence.py): "converged", "stopped at max
+    episodes" (trained to the cap without converging), or "not assessed" (no convergence file: e.g. trained until exploration decayed,
+    or a test run); and the last episode its convergence was assessed after (None without one)
+    """
+    paths = glob.glob(os.path.join(folder, "data", "results", "**", "convergence_*.json"), recursive=True)
+    if not paths:
+        return {"learning": "not assessed", "last_episode": None}
+    record = read_json(paths[0])
+    outcome = "converged" if record.get("converged") else ("stopped at max episodes" if "stopped" in record else "not converged yet")
+    return {"learning": outcome, "last_episode": record.get("after_episode")}
+
+
 def run_rows(folder, record, trained_with, status):
     configuration = record["configuration"]
     #a test run's agents were trained with its training run's config (the one recorded beside the checkpoint, which the test uses)
@@ -80,7 +94,8 @@ def run_rows(folder, record, trained_with, status):
               "death_reward": rewards.get("death"), "throw_reward": rewards.get("throw"), "forage_reward": rewards.get("forage"),
               "eat_reward": rewards.get("eat"),
               #the rewards ethics agents get instead of the baseline's (e.g. harvest.yaml's eat 0.8), as JSON; {} when they get the same
-              "ethics_rewards": json.dumps(training_config.get("ethics_rewards", {}), sort_keys=True), "status": status, "run_folder": os.path.relpath(folder, REPO)}
+              "ethics_rewards": json.dumps(training_config.get("ethics_rewards", {}), sort_keys=True), "status": status,
+              **learning(folder), "run_folder": os.path.relpath(folder, REPO)}
     rows = []
     for root, _, files in os.walk(folder):
         for name in sorted(files):
