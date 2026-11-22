@@ -765,10 +765,18 @@ if args.option == "test" or args.option == "train":
         if args.training_config is None and recorded_config is not None:
             training_config = TrainingConfig(**recorded_config)
             print(f"Testing with the training config the checkpoint was trained with (recorded in {checkpoint_path}settings.json).")
+        elif args.training_config is not None and training_config != DEFAULT_TRAINING_CONFIG:
+            #a test given the training config its agents were trained with is named after it (as their training run is), so tests of
+            #agents trained with different configs (e.g. rewards) never share a folder; it must be the config the checkpoint records
+            trained_with = TrainingConfig(**recorded_config) if recorded_config is not None else DEFAULT_TRAINING_CONFIG
+            if training_config != trained_with:
+                raise SystemExit(f"{args.training_config} isn't the training config the checkpoint in {checkpoint_path} was trained with "
+                                 f"(recorded in its settings.json)")
+            config_name = training_config_name(args.training_config)
     #########################################################################################
     if args.output_root is not None:
         condition = harvest_condition(scenario, seasons, season_length, num_allocations, mixed_allotments, society_mix, throw_between_allotments,
-                                      num_agents, max_days, commons_parameters, config_name if training else None)
+                                      num_agents, max_days, commons_parameters, config_name)
         enter_run_folder(mode, condition, agent_type,
                          {"scenario": scenario, "seasons": seasons, "season_length": season_length if seasons else None, "max_days": max_days,
                           "society_mix": society_mix, "agent_type": agent_type, "num_agents": num_agents, "num_allocations": num_allocations,

@@ -168,11 +168,13 @@ def plan(experiment):
                 trained.append((train, society, seed, folder))
     for train, society, seed, train_folder in trained:
         for test in experiment["tests"]:
-            condition = _condition_name(test, train["num_agents"], train["days"], mix)
+            #named after the training config too (as run.py names a test given it), so tests of agents trained with different configs
+            #(e.g. an experiment file per reward function) never share a folder
+            condition = _condition_name(test, train["num_agents"], train["days"], mix, config_name)
             folder = run_folder(root, name, "test", condition, society, f"train_seed_{seed}")
             norms = ["--norms", "y", "--norms-module", experiment["norms_module"]] if _yes(experiment["norms"]) else ["--norms", "n"]
             command = [python, run_py, "test", *common, "--seed", str(seed), "--test-seed", str(experiment["test_seed"]),
-                       "--test-episodes", str(experiment["test_episodes"]), "--checkpoint", train_folder,
+                       "--test-episodes", str(experiment["test_episodes"]), "--checkpoint", train_folder, *config_flags,
                        *_condition_flags(test, train["num_agents"]), "--society-mix", mix, "--agent-type", society, "--write-data", "y",
                        *norms, "--render", "n"]
             runs.append(PlannedRun("test", condition, society, seed, folder, command, train_folder))
