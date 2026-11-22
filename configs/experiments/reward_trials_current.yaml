@@ -1,5 +1,5 @@
-# Reward trials (control): the current rewards (configs/training/harvest.yaml), every society, training seeds 101-103, training
-# only.
+# Reward trials (control): the current rewards (configs/training/harvest.yaml), every society, training seeds 101-103, trained
+# until converged and tested in colours.
 #   python run.py experiments configs/experiments/reward_trials_current.yaml --max-workers 2
 name: reward_trials
 output_root: runs
@@ -14,4 +14,10 @@ convergence_max_episodes: 10000
 num_threads: 1
 train:
   - {scenario: basic, seasons: n, days: 200, num_agents: 4}
-tests: []
+#every trained society tested in colours: 1000 episodes at the test seed, data and rule-based norms written
+test_seed: 1000
+test_episodes: 1000
+norms: y
+norms_module: rule_based
+tests:
+  - {scenario: colours, seasons: n}
