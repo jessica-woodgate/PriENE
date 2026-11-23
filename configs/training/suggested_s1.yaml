@@ -1,0 +1,26 @@
+# Reward trial: suggested.yaml (death -1) with a two-sided sanction of 1.0. Completes the death x sanction 2x2; offline checks
+# predict sharing pays for 5 of 7 ethics types but surviving > dying early fails for 2 more agent types than at s0.4.
+learning_rate: 0.0001
+gamma: 0.95
+batch_size: 64
+hidden_units: 128
+huber_delta: 1.0
+min_experiences: 100
+max_experiences: 100000
+target_update_interval: 50
+epsilon_start: 1.0
+epsilon_min: 0.01
+epsilon_decay: 0.001
+max_training_episodes: null
+sanction: 1.0
+rewards:
+  death: -1
+  no_berries: -0.1
+  no_benefactor: -0.1
+  insufficient_health: -0.1
+  neutral_reward: 0
+  throw: 0
+  forage: 0
+  eat: 1
+  survive: 1
+ethics_rewards: {}

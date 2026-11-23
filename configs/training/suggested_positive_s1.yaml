@@ -1,0 +1,27 @@
+# Reward trial: suggested.yaml (death -1) with a positive-only sanction of 1.0. Vs suggested_s1 isolates the positive-only rule at the
+# same sanction size; vs suggested_positive_s14 isolates sanction size. Every other parameter is configs/training/harvest.yaml's.
+learning_rate: 0.0001
+gamma: 0.95
+batch_size: 64
+hidden_units: 128
+huber_delta: 1.0
+min_experiences: 100
+max_experiences: 100000
+target_update_interval: 50
+epsilon_start: 1.0
+epsilon_min: 0.01
+epsilon_decay: 0.001
+max_training_episodes: null
+sanction: 1.0
+positive_sanction_only: true
+rewards:
+  death: -1
+  no_berries: -0.1
+  no_benefactor: -0.1
+  insufficient_health: -0.1
+  neutral_reward: 0
+  throw: 0
+  forage: 0
+  eat: 1
+  survive: 1
+ethics_rewards: {}
