@@ -78,6 +78,19 @@ def test_the_export_names_every_file_by_reward_seed_and_society_and_links_it(exp
     assert len(rm.export(manifest, str(experiment / "results"))) == len(exported)
 
 
+def test_the_export_leaves_out_runs_still_in_progress(experiment, monkeypatch):
+    #a run still training rewrites its checkpoints, so a link made now would go stale
+    monkeypatch.setattr(rm, "REPO", str(experiment))
+    with open(experiment / "train" / "c" / "seed_101" / "maximin" / "status.json", "w") as file:
+        json.dump({"status": "running"}, file)
+    converging = experiment / "train" / "d" / "seed_101" / "baseline" / "data" / "results" / "current_run"
+    with open(converging / "convergence_train_basic_baseline.json", "w") as file:
+        json.dump({"converged": False, "after_episode": 3000}, file)
+    exported = rm.export(rm.build(str(experiment)), str(experiment / "results"))
+    assert set(exported["run_folder"]) == {"train/c/seed_102/maximin", "test/e/train_seed_102/maximin"}
+    assert not os.path.exists(experiment / "results" / "positive" / "seed_101")
+
+
 def test_a_test_run_has_its_training_runs_reward_config_and_seed(experiment):
     manifest = rm.build(str(experiment))
     test = manifest[manifest["mode"] == "test"].iloc[0]

@@ -150,12 +150,13 @@ def export(manifest, out):
     """
     Every file in the manifest, under out/<reward>/seed_<training seed>/<society>/ with a name saying the same (export_name), as a hard
     link to the run's file (no copy: the same file under a second name; the runs' own folders are untouched, as testing and the
-    experiment runner need them as they are). Returns the manifest with each file's exported path (export_file); writes it to
-    out/manifest.csv
+    experiment runner need them as they are). Runs still in progress are left out (their files are still being rewritten): runs that
+    aren't complete, and training runs whose learning hasn't converged yet. Returns the manifest with each file's exported path
+    (export_file); writes it to out/manifest.csv
     """
-    exported = manifest.copy()
+    exported = manifest[(manifest["status"] == "complete") & (manifest["learning"] != "not converged yet")].copy()
     exported["export_file"] = [os.path.join(out, reward_label(row["reward_config"]), f"seed_{row['training_seed']}", row["society"],
-                                            export_name(row)) for _, row in manifest.iterrows()]
+                                            export_name(row)) for _, row in exported.iterrows()]
     duplicates = exported["export_file"][exported["export_file"].duplicated()]
     if len(duplicates):
         raise ValueError(f"two files would be exported under the same name, e.g. {duplicates.iloc[0]}")
