@@ -57,6 +57,7 @@ REMOVED_OPTIONS = {
     "--initial-healths": "unequal starting health was removed; every agent starts each episode with the default health",
     "--season-quality": "it is now part of seasons, chosen at the prompt, where each season is randomly normal, good or bad",
     "--season-swaps": "random swaps of berry allocations between groups were removed; seasons (chosen at the prompt) give each season a random quality instead",
+    "--throw-between-allotments": "allotment agents can always throw berries to agents in other allotments",
 }
 
 def generate_paper_graphs(scenario):
@@ -461,14 +462,6 @@ class RemovedOption(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         parser.error(f"{option_string} is not an option: {REMOVED_OPTIONS[option_string]}")
 
-class OnlyThrowBetween(argparse.Action):
-    """
-    --throw-between-allotments: y, the only behaviour, does nothing; n fails, as allotment agents can no longer only throw within theirs
-    """
-    def __call__(self, parser, namespace, values, option_string=None):
-        if values != "y":
-            parser.error(f"{option_string} {values} is not an option: allotment agents can always throw berries to agents in other allotments")
-
 def enter_run_folder(mode, condition, society, configuration):
     """
     With --output-root, work in the run's own folder (src/run_record.py) and record the run there: everything the run writes lands in
@@ -647,8 +640,6 @@ answers.add_argument("--agent-type")
 answers.add_argument("--num-agents", type=int)
 answers.add_argument("--groups", type=int, help="Allotments (allotment) or capabilities (capabilities)")
 answers.add_argument("--layout", choices=["split", "separate"], help="How a mixed society shares the allotments")
-#allotment agents can always throw between allotments: y (what experiment runners started before this change pass) does nothing
-answers.add_argument("--throw-between-allotments", action=OnlyThrowBetween, help=argparse.SUPPRESS)
 answers.add_argument("--carrying-capacity", type=int)
 answers.add_argument("--growth-rate", type=float)
 answers.add_argument("--initial-stock", type=int)

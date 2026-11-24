@@ -44,7 +44,8 @@ def test_recorded_settings_say_whether_agents_could_throw_between_allotments(tmp
     assert recorded_settings(off).get("throw_between_allotments", False) is False
     assert recorded_settings(str(tmp_path / "missing") + "/") == {}
 
-def test_the_flag_only_accepts_throwing_between():
-    #y (passed by experiment runners started before the option was removed) is accepted; n, throwing only within an allotment, isn't
-    result = subprocess.run([sys.executable, "run.py", "test", "--throw-between-allotments", "n"], capture_output=True, text=True, timeout=300)
-    assert result.returncode != 0 and "can always throw berries to agents in other allotments" in result.stderr
+def test_throwing_between_allotments_is_not_a_flag():
+    for value in ["y", "n"]:
+        result = subprocess.run([sys.executable, "run.py", "test", "--throw-between-allotments", value], capture_output=True, text=True,
+                                timeout=300)
+        assert result.returncode != 0 and "is not an option" in result.stderr
