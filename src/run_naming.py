@@ -4,10 +4,10 @@ Names run.py gives a harvest run's outputs and, with --output-root, its folder's
 """
 
 
-def scenario_file_string(scenario, seasons, allotment_regrowth_delays=None, mixed_allotments="split", society_mix="homogeneous",
-                         throw_between_allotments=False):
+def scenario_file_string(scenario, seasons, allotment_regrowth_delays=None, mixed_allotments="split", society_mix="homogeneous"):
     """
-    scenario part of output filenames; options that are on are added after the scenario so runs don't overwrite each other
+    scenario part of output filenames; options that are on are added after the scenario so runs don't overwrite each other. Allotment
+    is always "_throwbetween" (agents can throw berries to other allotments), apart from runs made when they could only throw within one
     """
     file_scenario = scenario
     if seasons:
@@ -18,17 +18,17 @@ def scenario_file_string(scenario, seasons, allotment_regrowth_delays=None, mixe
         file_scenario += "_mixed"
         if scenario == "allotment" and mixed_allotments == "separate":
             file_scenario += "_separate"
-    if scenario == "allotment" and throw_between_allotments:
+    if scenario == "allotment":
         file_scenario += "_throwbetween"
     return file_scenario
 
 
-def harvest_condition(scenario, seasons, season_length, num_allocations, mixed_allotments, society_mix, throw_between_allotments, num_agents,
-                      max_days, commons_parameters=None, config_name=None):
+def harvest_condition(scenario, seasons, season_length, num_allocations, mixed_allotments, society_mix, num_agents, max_days,
+                      commons_parameters=None, config_name=None):
     """
     A harvest run's condition, as its folder (--output-root) names it: the scenario and its options, e.g. colours_seasons_len25_4agents_200days
     """
-    parts = [scenario_file_string(scenario, seasons, None, mixed_allotments, society_mix, throw_between_allotments)]
+    parts = [scenario_file_string(scenario, seasons, None, mixed_allotments, society_mix)]
     if seasons:
         parts.append(f"len{season_length}")
     if scenario in ["allotment", "capabilities"]:

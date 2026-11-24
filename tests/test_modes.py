@@ -189,7 +189,7 @@ def test_checkpoint_names_are_unique_across_settings():
         names.setdefault(name, set()).add(key)
     assert all(len(keys) == 1 for keys in names.values())
     assert len(names) == len({key for keys in names.values() for key in keys})
-    assert training_checkpoint_name("allotment", True, 25, 2, [0, 2], 200, 42) == "allotment_seasons25_2allotments_regrow0-2_200days_seed42"
+    assert training_checkpoint_name("allotment", True, 25, 2, [0, 2], 200, 42) == "allotment_seasons25_2allotments_regrow0-2_throwbetween_200days_seed42"
     with pytest.raises(ValueError, match="regrowth delays"):
         training_checkpoint_name("allotment", True, 25, 2, None, 200, 42)
     assert training_checkpoint_name("basic", False, 25, 1, None, 200, 42) == "basic_200days_seed42"
@@ -425,6 +425,6 @@ def test_mixed_training_never_overwrites_and_names_say_mixed(in_tmp_dir):
     prepare_training_checkpoints(root, ["maximin"], {"seed": 42}, "heterogeneous")
     names = {training_checkpoint_name("allotment", False, 25, 2, [0, 2], 200, 42, society_mix, layout)
              for society_mix in ["homogeneous", "heterogeneous"] for layout in ["split", "separate"]}
-    assert names == {"allotment_2allotments_regrow0-2_200days_seed42", "allotment_2allotments_regrow0-2_mixed_200days_seed42",
-                     "allotment_2allotments_regrow0-2_mixed-separate_200days_seed42"}
+    assert names == {"allotment_2allotments_regrow0-2_throwbetween_200days_seed42", "allotment_2allotments_regrow0-2_throwbetween_mixed_200days_seed42",
+                     "allotment_2allotments_regrow0-2_throwbetween_mixed-separate_200days_seed42"}
     assert training_checkpoint_name("colours", False, 25, 1, None, 200, 42, "heterogeneous", "separate") == "colours_mixed_200days_seed42"

@@ -58,11 +58,11 @@ def test_render_pygame_does_not_raise_for_any_agent_type(tmp_path, agent_type, m
     render_inst.render_pygame(model)
 
 
-@pytest.mark.parametrize("scenario, reachable", [("allotment", False), ("capabilities", True)])
-def test_berries_can_only_be_thrown_within_an_allotment(tmp_path, scenario, reachable):
+@pytest.mark.parametrize("scenario, reachable", [("allotment", True), ("capabilities", True)])
+def test_berries_can_be_thrown_to_the_other_allocation(tmp_path, scenario, reachable):
     """
-    Two agents share allocation_0 and two share allocation_1. In allotment a berry thrown
-    to the other allotment is out of reach; in capabilities every agent shares the grid.
+    Two agents share allocation_0 and two share allocation_1. A berry thrown to the other allocation reaches it: in allotment agents
+    can throw berries to agents in other allotments; in capabilities every agent shares the grid.
     """
     model = make_scenario_model(tmp_path, scenario, "baseline")
     agents = {a.unique_id: a for a in model.get_living_agents()}

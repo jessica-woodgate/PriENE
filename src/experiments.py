@@ -32,9 +32,10 @@ An experiment file:
     tests:                            # test conditions, run for every training run (with its number of agents and days)
       - {scenario: colours, seasons: n}
       - {scenario: capabilities, seasons: n, groups: 2}
-      - {scenario: allotment, seasons: n, groups: 2, throw_between_allotments: n}
+      - {scenario: allotment, seasons: n, groups: 2}
 A condition may also give season_length (default 25), groups (allotment and capabilities, default 2), layout (a mixed society's
-allotments), throw_between_allotments (allotment, default n) and, for commons, carrying_capacity, growth_rate and initial_stock.
+allotments) and, for commons, carrying_capacity, growth_rate and initial_stock. Allotment agents can always throw berries to agents in
+other allotments.
 """
 import os
 import shlex
@@ -54,7 +55,7 @@ HARVEST_SCENARIOS = ["basic", "colours", "capabilities", "allotment", "commons"]
 DEFAULTS = {"seeds": [1, 2, 3, 4, 5], "societies": AGENT_TYPES, "society_mix": "homogeneous", "training_config": None, "checkpoint_every": 10,
             "num_threads": 1, "test_seed": 1000, "test_episodes": 1000, "norms": "y", "norms_module": "rule_based", "tests": [],
             "until_converged": False, "convergence_max_episodes": CONVERGENCE_MAX_EPISODES}
-CONDITION_DEFAULTS = {"seasons": "n", "season_length": 25, "groups": 2, "layout": "split", "throw_between_allotments": "n"}
+CONDITION_DEFAULTS = {"seasons": "n", "season_length": 25, "groups": 2, "layout": "split"}
 
 
 class ExperimentError(ValueError):
@@ -114,7 +115,7 @@ def _condition_flags(condition, num_agents):
     if c["scenario"] in ["allotment", "capabilities"]:
         flags += ["--groups", str(c["groups"])]
     if c["scenario"] == "allotment":
-        flags += ["--layout", c["layout"], "--throw-between-allotments", "y" if _yes(c["throw_between_allotments"]) else "n"]
+        flags += ["--layout", c["layout"]]
     if c["scenario"] == "commons":
         for key in ["carrying_capacity", "growth_rate", "initial_stock"]:
             if key not in c:
@@ -124,14 +125,17 @@ def _condition_flags(condition, num_agents):
 
 
 def _condition_name(condition, num_agents, days, society_mix, config_name=None):
+    if "throw_between_allotments" in condition:
+        raise ExperimentError(f"condition {condition}: throw_between_allotments is no longer a setting (allotment agents can always throw "
+                              f"berries to agents in other allotments)")
     c = {**CONDITION_DEFAULTS, **condition}
     missing = [key for key in ["carrying_capacity", "growth_rate", "initial_stock"] if c["scenario"] == "commons" and key not in c]
     if missing:
         raise ExperimentError(f"commons condition {condition} must give {', '.join(missing)}")
     commons = {key: c[key] for key in ["carrying_capacity", "growth_rate", "initial_stock"]} if c["scenario"] == "commons" else None
     groups = c["groups"] if c["scenario"] in ["allotment", "capabilities"] else 1
-    return harvest_condition(c["scenario"], _yes(c["seasons"]), c["season_length"], groups, c["layout"], society_mix,
-                             c["scenario"] == "allotment" and _yes(c["throw_between_allotments"]), num_agents, days, commons, config_name)
+    return harvest_condition(c["scenario"], _yes(c["seasons"]), c["season_length"], groups, c["layout"], society_mix, num_agents, days,
+                             commons, config_name)
 
 
 def _config_name(experiment):

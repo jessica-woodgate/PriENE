@@ -44,7 +44,7 @@ def test_the_plan_has_a_training_run_per_society_and_seed_and_a_test_run_per_tra
         assert flag(run.command, "--test-seed") == "1000" and flag(run.command, "--seed") == str(run.seed)
         assert run.folder.endswith(f"/train_seed_{run.seed}/{run.society}")
     conditions = {r.condition for r in test}
-    assert conditions == {"colours_4agents_10days", "allotment_seasons_len25_2groups_4agents_10days"}
+    assert conditions == {"colours_4agents_10days", "allotment_seasons_throwbetween_len25_2groups_4agents_10days"}
     for run in runs:
         assert run.command[:3] == [sys.executable, os.path.join(REPO, "run.py"), run.mode]
         assert flag(run.command, "--output-root") == str(tmp_path / "runs") and flag(run.command, "--num-threads") == "1"
@@ -64,6 +64,14 @@ def test_a_mixed_society_experiment_doesnt_run_baseline_alone(tmp_path):
 def test_bad_experiment_files_are_refused(tmp_path, overrides, message):
     with pytest.raises(ex.ExperimentError, match=message):
         ex.plan(ex.load_experiment(experiment_file(tmp_path, **overrides)))
+
+
+def test_throwing_only_within_an_allotment_is_no_longer_a_setting(tmp_path):
+    tests = [{"scenario": "allotment", "seasons": "n", "groups": 2, "throw_between_allotments": "n"}]
+    with pytest.raises(ex.ExperimentError, match="no longer a setting"):
+        ex.plan(ex.load_experiment(experiment_file(tmp_path, tests=tests)))
+    runs = ex.plan(ex.load_experiment(experiment_file(tmp_path, tests=[{"scenario": "allotment", "seasons": "n", "groups": 2}])))
+    assert all("--throw-between-allotments" not in r.command for r in runs)
 
 
 def test_list_prints_one_command_per_run(tmp_path, capsys):

@@ -49,9 +49,6 @@ def _allocation_answers(scenario, mix, layout, num_allocations):
         answers = [str(num_allocations)]
         if scenario == "allotment" and mix == "heterogeneous" and num_allocations % 2 == 0:
             answers.append(layout)
-        if scenario == "allotment":
-            #throw berries to other allotments: enter, for the default (only within an allotment, as every reference run was made)
-            answers.append("")
         return answers
     return []
 
@@ -66,7 +63,7 @@ def train_step(scenario, seasons, mix, agent_type, layout="split", num_agents=4,
                continuing=None):
     """
     Answers to run.py train's prompts, in order: scenario, seasons, [season length], days, society mix, agent type, agents,
-    [allotments or capabilities, [layout], [throw between allotments]], [commons K, r, R0], write data, [continue y for each type already trained]
+    [allotments or capabilities, [layout]], [commons K, r, R0], write data, [continue y for each type already trained]
     """
     answers = [scenario, "y" if seasons else "n"] + ([str(SEASON_LENGTH)] if seasons else []) + [str(MAX_DAYS), mix, agent_type, str(num_agents)]
     answers += _allocation_answers(scenario, mix, layout, num_allocations) + _commons_answers(scenario, commons) + ["y"]
@@ -78,7 +75,7 @@ def test_step(scenario, seasons, mix, agent_type, checkpoint, norms="rule_based"
               commons=None, episodes=TEST_EPISODES):
     """
     Answers to run.py test's prompts, in order: scenario, seasons, [season length], checkpoint, society mix, agent type, agents,
-    [allotments or capabilities, [layout], [throw between allotments]], [commons K, r, R0], write data, write norms, [norms module], render
+    [allotments or capabilities, [layout]], [commons K, r, R0], write data, write norms, [norms module], render
     (days come from the checkpoint's name)
     """
     answers = [scenario, "y" if seasons else "n"] + ([str(SEASON_LENGTH)] if seasons else []) + [checkpoint, mix, agent_type, str(num_agents)]

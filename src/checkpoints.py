@@ -26,16 +26,15 @@ PROGRESS_FILE = "progress.json"
 MIXED_SUFFIX = "_with_baseline"
 
 def training_checkpoint_name(scenario, seasons, season_length, num_allocations, allotment_regrowth_delays, max_days, seed,
-                             society_mix="homogeneous", mixed_allotments="split", commons_parameters=None, config_name=None,
-                             throw_between_allotments=False):
+                             society_mix="homogeneous", mixed_allotments="split", commons_parameters=None, config_name=None):
     """
     Name of a training run's checkpoint folder, from every setting that changes what is learned (the number of agents is the
-    folder inside it), e.g. allotment_seasons25_2allotments_regrow0-2_200days_seed42, or with a mixed society
-    allotment_2allotments_regrow0-2_mixed-separate_200days_seed42, or commons_K48_r0.25_R024_200days_seed42
+    folder inside it), e.g. allotment_seasons25_2allotments_regrow0-2_throwbetween_200days_seed42, or with a mixed society
+    allotment_2allotments_regrow0-2_throwbetween_mixed-separate_200days_seed42, or commons_K48_r0.25_R024_200days_seed42; allotment is
+    always "throwbetween" (agents can throw berries to other allotments), apart from checkpoints trained when they could only throw
+    within one
     config_name -- the name of the training config file the run uses, when it isn't the scenario's own (e.g. basic_200days_seed42_R2
         for configs/training/R2.yaml); None for the scenario's own
-    throw_between_allotments -- allotment only: agents could throw berries to other allotments (e.g. allotment_2allotments_regrow0-2_
-        throwbetween_200days_seed42)
     allotment_regrowth_delays -- the delays the allotments regrow with (AllotmentHarvest.default_regrowth_delays when none are chosen);
         only used, and needed, for the allotment scenario
     commons_parameters -- dict of the commons' carrying_capacity, growth_rate and initial_stock; only used, and needed, for the commons scenario
@@ -52,9 +51,7 @@ def training_checkpoint_name(scenario, seasons, season_length, num_allocations, 
     elif scenario == "allotment":
         if allotment_regrowth_delays is None:
             raise ValueError("an allotment checkpoint name needs the regrowth delays its allotments use")
-        parts += [f"{num_allocations}allotments", "regrow" + "-".join(str(delay) for delay in allotment_regrowth_delays)]
-        if throw_between_allotments:
-            parts.append("throwbetween")
+        parts += [f"{num_allocations}allotments", "regrow" + "-".join(str(delay) for delay in allotment_regrowth_delays), "throwbetween"]
     if society_mix != "homogeneous":
         parts.append("mixed-separate" if scenario == "allotment" and mixed_allotments == "separate" else "mixed")
     parts += [f"{max_days}days", f"seed{seed}"]

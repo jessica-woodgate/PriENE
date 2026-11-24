@@ -20,4 +20,4 @@ norms_module: rule_based
 tests:
   - {scenario: colours, seasons: n}
   - {scenario: capabilities, seasons: n, groups: 2}
-  - {scenario: allotment, seasons: n, groups: 2, throw_between_allotments: n}
+  - {scenario: allotment, seasons: n, groups: 2}

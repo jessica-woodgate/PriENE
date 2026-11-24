@@ -50,7 +50,6 @@ def test_capabilities_compare_the_berries_of_each_group(tmp_path):
 
 def test_allotments_with_as_many_berries_compare_regrowth_delays(tmp_path):
     model = make_scenario_model(tmp_path, "allotment", "baseline")
-    model.throw_between_allotments = True
     agents, berries = agents_of(model), by_berries(model)
     #the allotments have as many berries, but allotment 1 regrows 2 days after a berry is foraged and allotment 0 at once
     assert len(set(berries.values())) == 1
@@ -62,7 +61,6 @@ def test_allotments_with_as_many_berries_compare_regrowth_delays(tmp_path):
 
 def test_berries_count_before_regrowth_delays(tmp_path, monkeypatch):
     model = make_scenario_model(tmp_path, "allotment", "baseline")
-    model.throw_between_allotments = True
     agents = agents_of(model)
     fast = next(a for a in agents.values() if model._allotment_regrowth_delay(a) == 0)
     slow = next(a for a in agents.values() if model._allotment_regrowth_delay(a) > 0)
@@ -81,12 +79,12 @@ def test_nothing_is_recorded_when_no_berry_is_thrown(tmp_path):
     model._collect_agent_data(thrower)
     assert pd.isna(model.agent_reporter.iloc[-1]["group_thrown_to"])
 
-def test_allotment_records_nothing_for_a_throw_refused_between_allotments(tmp_path):
+def test_allotment_records_a_throw_to_another_allotment(tmp_path):
     model = make_scenario_model(tmp_path, "allotment", "baseline")
     thrower, *others = model.get_living_agents()
     other = next(a for a in others if a.allocation_id != thrower.allocation_id)
     row = throw_row(model, thrower, other)
-    assert pd.isna(row["thrown_to"]) and pd.isna(row["group_thrown_to"])
+    assert row["thrown_to"] == other.unique_id and not pd.isna(row["group_thrown_to"])
 
 def test_scenarios_without_groups_record_nothing(tmp_path):
     model = make_scenario_model(tmp_path, "basic", "baseline")
@@ -166,8 +164,6 @@ def norm_consequents(agent):
 
 def throw_norm(tmp_path, scenario, receiver_pick, thrower_state=(0.6, 2), receiver_state=(1.4, 0), dead=False):
     model = make_scenario_model(tmp_path, scenario, "baseline", track_norms=True)
-    if scenario == "allotment":
-        model.throw_between_allotments = True
     thrower, *others = model.get_living_agents()
     receiver = receiver_pick(model, thrower, others)
     if dead:
