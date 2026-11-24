@@ -1,0 +1,26 @@
+# Reward trials: configs/training/suggested_s1_nopenalty.yaml (sanction 1.0, no -0.1 penalties), every society, training seeds
+# 101-103, trained until converged and tested in colours, capabilities and allotment. Baseline is trained too: its rewards differ
+# from the other trials' (no penalties).
+#   python run.py experiments configs/experiments/reward_trials_suggested_s1_nopenalty.yaml --max-workers 2
+name: reward_trials
+output_root: runs
+seeds: [101, 102, 103]
+societies: [baseline, maximin, utilitarian, egalitarian, average, majoritarian, optimist, veto]
+society_mix: homogeneous
+training_config: configs/training/suggested_s1_nopenalty.yaml
+checkpoint_every: 10
+#training trains on at the exploration floor until learning has converged (src/convergence.py), up to episode 10000
+until_converged: true
+convergence_max_episodes: 10000
+num_threads: 1
+train:
+  - {scenario: basic, seasons: n, days: 200, num_agents: 4}
+#every trained society tested in colours, capabilities and allotment: 1000 episodes at the test seed, data and rule-based norms written
+test_seed: 1000
+test_episodes: 1000
+norms: y
+norms_module: rule_based
+tests:
+  - {scenario: colours, seasons: n}
+  - {scenario: capabilities, seasons: n, groups: 2}
+  - {scenario: allotment, seasons: n, groups: 2}
