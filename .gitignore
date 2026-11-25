@@ -11,3 +11,7 @@ tests/reference_data/outputs/
 /runs/
 #the reward check's step logs (python -m src.reward_checks.simulate); its results and checks are kept
 /data/reward_checks/logs/
+#the archived reward ablation's allotment tests with throwing between allotments: agent reports and emerged norms kept locally (too large
+#to push); their episode reports are kept
+/data/archive/2026-11-17/results/200_days/reward_ablation_lower_forage_R1_rounding_fix/allotment/agent_reports_allotment_throwbetween_*.csv
+/data/archive/2026-11-17/results/200_days/reward_ablation_lower_forage_R1_rounding_fix/allotment/allotment_throwbetween_*_emerged_norms.json
