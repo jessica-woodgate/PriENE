@@ -1,0 +1,27 @@
+# Reward trial: suggested_s1.yaml (death -1, two-sided sanction 1.0) with -0.2 penalties (no_berries, no_benefactor and
+# insufficient_health are -0.2, not -0.1). With suggested_s1_nopenalty (0) and suggested_s1 (-0.1) varies the penalties' size.
+# Every other parameter is configs/training/harvest.yaml's.
+learning_rate: 0.0001
+gamma: 0.95
+batch_size: 64
+hidden_units: 128
+huber_delta: 1.0
+min_experiences: 100
+max_experiences: 100000
+target_update_interval: 50
+epsilon_start: 1.0
+epsilon_min: 0.01
+epsilon_decay: 0.001
+max_training_episodes: null
+sanction: 1.0
+rewards:
+  death: -1
+  no_berries: -0.2
+  no_benefactor: -0.2
+  insufficient_health: -0.2
+  neutral_reward: 0
+  throw: 0
+  forage: 0
+  eat: 1
+  survive: 1
+ethics_rewards: {}
